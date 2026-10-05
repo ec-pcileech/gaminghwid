@@ -350,22 +350,3 @@ genres   = Hero Shooter, Third-Person
 features = Multiplayer
 featured = false
 
-# ───────────────────────────────────────────────────────────────────────────
-#  Marvel Rivals2
-# ───────────────────────────────────────────────────────────────────────────
-[MARVELRIVALS2]
-title    = Marvel Rivals 2
-short    = Rivals
-icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2767030/header.jpg
-cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/05c3266777dfa88b7b13742c72088a6431eea474/ss_05c3266777dfa88b7b13742c72088a6431eea474.1920x1080.jpg?t=1789119923
-cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/0b7cb73d511f327e3552750b76baf08daf0b5542/ss_0b7cb73d511f327e3552750b76baf08daf0b5542.1920x1080.jpg?t=1789119923
-cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/df4df5542db4d8d89bcf7588a5cc5d2f383d420b/ss_df4df5542db4d8d89bcf7588a5cc5d2f383d420b.1920x1080.jpg?t=1789119923
-process  = MarvelRivals.exe
-runmode  = dll
-download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_marvelrivals.zip
-dev      = NetEase Games
-pub      = NetEase Games
-rel      = Dec 6, 2024
-genres   = Hero Shooter, Third-Person
-features = Multiplayer
-featured = false
