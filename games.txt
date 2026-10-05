@@ -24,6 +24,18 @@
 #       rel         发行日期（任意文本）
 #       genres      类型，逗号分隔
 #       features    特性，逗号分隔
+#       featured    是否进首页 banner 精选轮播：true / false（不填 = false）
+#                   · 只有 true 的游戏会进 banner，顺序沿用本文件顺序
+#                   · 一个都没标（或标了的代号不存在）时，banner 自动回退成全部游戏
+#       price30     30 天档显示价（USD），如 14.99
+#       price90     90 天档显示价（USD）
+#       priceLife   永久档显示价（USD）
+#                   · 卡片和 banner 上显示的是这三档里最低的那个价格
+#                   · 三档都留空则显示默认价 $19.99
+#                   · 值可写 14.99 / $14.99 / 14,99，三种写法都认
+#                   · 别名：price30 = price_30 = d30
+#                          price90 = price_90 = d90
+#                          priceLife = price_life = pricelt = life = price
 #
 #   · 新增游戏：复制一节，改代号和字段即可，无需重新编译
 # ═══════════════════════════════════════════════════════════════════════════
@@ -47,6 +59,10 @@ pub      = Valve
 rel      = Sep 27, 2023
 genres   = FPS, Competitive, Action
 features = Anti-Cheat, Multiplayer, Cloud Save
+featured = true
+price30  = 34.99
+price90  = 79.99
+priceLife= 129.99
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -67,6 +83,10 @@ pub      = Valve
 rel      = TBA
 genres   = MOBA, Shooter, Third-Person
 features = Multiplayer, Early Access
+featured = true
+price30  = 19.99
+price90  = 44.99
+priceLife= 74.99
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -87,6 +107,10 @@ pub      = KRAFTON
 rel      = Dec 21, 2017
 genres   = Battle Royale, Shooter
 features = Multiplayer, Anti-Cheat
+featured = true
+price30  = 24.99
+price90  = 59.99
+priceLife= 99.99
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -107,6 +131,10 @@ pub      = TiMi Studio Group
 rel      = 2024
 genres   = FPS, Tactical
 features = Multiplayer
+featured = true
+price30  = 29.99
+price90  = 69.99
+priceLife= 109.99
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -127,6 +155,10 @@ pub      = Battlestate Games
 rel      = 2017
 genres   = Survival, Shooter, Hardcore
 features = Multiplayer, Realistic
+featured = true
+price30  = 34.99
+price90  = 79.99
+priceLife= 129.99
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -147,6 +179,10 @@ pub      = Valve
 rel      = Dec 5, 2003
 genres   = FPS, Competitive, Action
 features = Multiplayer, Cloud Save
+featured = true
+price30  = 14.99
+price90  = 34.99
+priceLife= 59.99
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -155,10 +191,10 @@ features = Multiplayer, Cloud Save
 [APEX]
 title    = Apex Legends
 short    = Apex
-icon     = https://cdn.example.com/starline/apex/icon.png
-cover1   = https://cdn.example.com/starline/apex/cover1.jpg
-cover2   = https://cdn.example.com/starline/apex/cover2.jpg
-cover3   = https://cdn.example.com/starline/apex/cover3.jpg
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1172470/header.jpg
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2/ss_3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2.1920x1080.jpg?t=1790164440
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/d64ce54903a3ba6429c6e3189ad746a7db70ee3e/ss_d64ce54903a3ba6429c6e3189ad746a7db70ee3e.1920x1080.jpg?t=1790164440
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/6593905f527d4b1bf01b0bb148b9c9a39616a2e4/ss_6593905f527d4b1bf01b0bb148b9c9a39616a2e4.1920x1080.jpg?t=1790164440
 process  = r5apex.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_apex.zip
@@ -167,18 +203,19 @@ pub      = Electronic Arts
 rel      = Feb 4, 2019
 genres   = Battle Royale, FPS
 features = Multiplayer, Anti-Cheat
+featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
-#  VALORANT
+#  VALORANT   （非 Steam 游戏：图片是占位图，请替换成官方素材）
 # ───────────────────────────────────────────────────────────────────────────
 [VALORANT]
 title    = VALORANT
 short    = VALORANT
-icon     = https://cdn.example.com/starline/valorant/icon.png
-cover1   = https://cdn.example.com/starline/valorant/cover1.jpg
-cover2   = https://cdn.example.com/starline/valorant/cover2.jpg
-cover3   = https://cdn.example.com/starline/valorant/cover3.jpg
+icon     = https://placehold.co/460x215/0f1923/ff4655.jpg?text=VALORANT
+cover1   = https://placehold.co/1920x1080/0f1923/ff4655.jpg?text=VALORANT%20Screenshot%201
+cover2   = https://placehold.co/1920x1080/0f1923/ff4655.jpg?text=VALORANT%20Screenshot%202
+cover3   = https://placehold.co/1920x1080/0f1923/ff4655.jpg?text=VALORANT%20Screenshot%203
 process  = VALORANT-Win64-Shipping.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_valorant.zip
@@ -187,18 +224,19 @@ pub      = Riot Games
 rel      = Jun 2, 2020
 genres   = FPS, Tactical
 features = Multiplayer, Anti-Cheat
+featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
-#  Fortnite
+#  Fortnite   （非 Steam 游戏：图片是占位图，请替换成官方素材）
 # ───────────────────────────────────────────────────────────────────────────
 [FORTNITE]
 title    = Fortnite
 short    = Fortnite
-icon     = https://cdn.example.com/starline/fortnite/icon.png
-cover1   = https://cdn.example.com/starline/fortnite/cover1.jpg
-cover2   = https://cdn.example.com/starline/fortnite/cover2.jpg
-cover3   = https://cdn.example.com/starline/fortnite/cover3.jpg
+icon     = https://placehold.co/460x215/2a1a4a/9d7bff.jpg?text=Fortnite
+cover1   = https://placehold.co/1920x1080/2a1a4a/9d7bff.jpg?text=Fortnite%20Screenshot%201
+cover2   = https://placehold.co/1920x1080/2a1a4a/9d7bff.jpg?text=Fortnite%20Screenshot%202
+cover3   = https://placehold.co/1920x1080/2a1a4a/9d7bff.jpg?text=Fortnite%20Screenshot%203
 process  = FortniteClient-Win64-Shipping.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_fortnite.zip
@@ -207,6 +245,7 @@ pub      = Epic Games
 rel      = Jul 25, 2017
 genres   = Battle Royale, Shooter
 features = Multiplayer, Cross-Platform
+featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -215,10 +254,10 @@ features = Multiplayer, Cross-Platform
 [RUST]
 title    = Rust
 short    = Rust
-icon     = https://cdn.example.com/starline/rust/icon.png
-cover1   = https://cdn.example.com/starline/rust/cover1.jpg
-cover2   = https://cdn.example.com/starline/rust/cover2.jpg
-cover3   = https://cdn.example.com/starline/rust/cover3.jpg
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/252490/header.jpg
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_271feae67943bdc141c1249aba116349397e9ba9.1920x1080.jpg?t=1781536981
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_e825b087b95e51c3534383cfd75ad6e8038147c3.1920x1080.jpg?t=1781536981
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_0e646f1a70e5cb8eed00efef8adb9579d40d5b2e.1920x1080.jpg?t=1781536981
 process  = RustClient.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_rust.zip
@@ -227,6 +266,7 @@ pub      = Facepunch Studios
 rel      = Dec 11, 2013
 genres   = Survival, Shooter
 features = Multiplayer, Early Access
+featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -235,10 +275,10 @@ features = Multiplayer, Early Access
 [GTA5]
 title    = Grand Theft Auto V
 short    = GTA V
-icon     = https://cdn.example.com/starline/gta5/icon.png
-cover1   = https://cdn.example.com/starline/gta5/cover1.jpg
-cover2   = https://cdn.example.com/starline/gta5/cover2.jpg
-cover3   = https://cdn.example.com/starline/gta5/cover3.jpg
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/271590/header.jpg
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/ss_32aa18ab3175e3002217862dd5917646d298ab6b.1920x1080.jpg?t=1765387725
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/ss_2744f112fa060320d191a50e8b3a92441a648a56.1920x1080.jpg?t=1765387725
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/ss_da39c16db175f6973770bae6b91d411251763152.1920x1080.jpg?t=1765387725
 process  = GTA5.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_gta5.zip
@@ -247,6 +287,7 @@ pub      = Rockstar Games
 rel      = Apr 14, 2015
 genres   = Action, Open World
 features = Multiplayer
+featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -255,10 +296,10 @@ features = Multiplayer
 [RAINBOW6]
 title    = Rainbow Six Siege
 short    = R6 Siege
-icon     = https://cdn.example.com/starline/r6/icon.png
-cover1   = https://cdn.example.com/starline/r6/cover1.jpg
-cover2   = https://cdn.example.com/starline/r6/cover2.jpg
-cover3   = https://cdn.example.com/starline/r6/cover3.jpg
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/359550/header.jpg
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/2efed3587d876f560cbf3f25d9a72fbd387b74e6/ss_2efed3587d876f560cbf3f25d9a72fbd387b74e6.1920x1080.jpg?t=1790952963
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/ee34a63203916d39dc50d96c14aefc24dc3ff34e/ss_ee34a63203916d39dc50d96c14aefc24dc3ff34e.1920x1080.jpg?t=1790952963
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/00fb4ac1f236cfd2e364ebfecb599a30b72560fe/ss_00fb4ac1f236cfd2e364ebfecb599a30b72560fe.1920x1080.jpg?t=1790952963
 process  = RainbowSix.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_r6.zip
@@ -267,6 +308,7 @@ pub      = Ubisoft
 rel      = Dec 1, 2015
 genres   = FPS, Tactical
 features = Multiplayer, Anti-Cheat
+featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -275,10 +317,10 @@ features = Multiplayer, Anti-Cheat
 [WARZONE]
 title    = Call of Duty: Warzone
 short    = Warzone
-icon     = https://cdn.example.com/starline/warzone/icon.png
-cover1   = https://cdn.example.com/starline/warzone/cover1.jpg
-cover2   = https://cdn.example.com/starline/warzone/cover2.jpg
-cover3   = https://cdn.example.com/starline/warzone/cover3.jpg
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1962663/header.jpg
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962663/9263884bebe73028931c27e01d1b6f687fe3951e/ss_9263884bebe73028931c27e01d1b6f687fe3951e.1920x1080.jpg?t=1789748005
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962663/46181762c5c1a1f039c33a91833c578b94cc6f00/ss_46181762c5c1a1f039c33a91833c578b94cc6f00.1920x1080.jpg?t=1789748005
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962663/fd6baaf9884e4a23d7f1cf2282c91ac6613d93c0/ss_fd6baaf9884e4a23d7f1cf2282c91ac6613d93c0.1920x1080.jpg?t=1789748005
 process  = ModernWarfare.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_warzone.zip
@@ -295,10 +337,10 @@ features = Multiplayer, Cross-Platform
 [BF2042]
 title    = Battlefield 2042
 short    = BF 2042
-icon     = https://cdn.example.com/starline/bf2042/icon.png
-cover1   = https://cdn.example.com/starline/bf2042/cover1.jpg
-cover2   = https://cdn.example.com/starline/bf2042/cover2.jpg
-cover3   = https://cdn.example.com/starline/bf2042/cover3.jpg
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1517290/header.jpg
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/4443207b9a21def316907bda32c5f32c7d42fcb6/ss_4443207b9a21def316907bda32c5f32c7d42fcb6.1920x1080.jpg?t=1777324359
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/931142c4907822f144340f34cc51c64b523669ff/ss_931142c4907822f144340f34cc51c64b523669ff.1920x1080.jpg?t=1777324359
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/cf954bff997292185b157a6024a59350544f8147/ss_cf954bff997292185b157a6024a59350544f8147.1920x1080.jpg?t=1777324359
 process  = bf2042.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_bf2042.zip
@@ -307,6 +349,7 @@ pub      = Electronic Arts
 rel      = Nov 19, 2021
 genres   = FPS, Shooter
 features = Multiplayer
+featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -315,10 +358,10 @@ features = Multiplayer
 [THEFINALS]
 title    = THE FINALS
 short    = Finals
-icon     = https://cdn.example.com/starline/thefinals/icon.png
-cover1   = https://cdn.example.com/starline/thefinals/cover1.jpg
-cover2   = https://cdn.example.com/starline/thefinals/cover2.jpg
-cover3   = https://cdn.example.com/starline/thefinals/cover3.jpg
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2073850/header.jpg
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073850/320437621741c7be66de4b42d7633b9b0a60fd49/ss_320437621741c7be66de4b42d7633b9b0a60fd49.1920x1080.jpg?t=1789034839
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073850/3c20dd5e9fcfbbbabe8f9050b06de2c1a8eba471/ss_3c20dd5e9fcfbbbabe8f9050b06de2c1a8eba471.1920x1080.jpg?t=1789034839
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073850/aba261218adfb917756e1736c33bea77597d47ee/ss_aba261218adfb917756e1736c33bea77597d47ee.1920x1080.jpg?t=1789034839
 process  = Discovery.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_thefinals.zip
@@ -327,6 +370,7 @@ pub      = Embark Studios
 rel      = Dec 7, 2023
 genres   = FPS, Shooter
 features = Multiplayer, Destruction
+featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -335,10 +379,10 @@ features = Multiplayer, Destruction
 [MARVELRIVALS]
 title    = Marvel Rivals
 short    = Rivals
-icon     = https://cdn.example.com/starline/marvelrivals/icon.png
-cover1   = https://cdn.example.com/starline/marvelrivals/cover1.jpg
-cover2   = https://cdn.example.com/starline/marvelrivals/cover2.jpg
-cover3   = https://cdn.example.com/starline/marvelrivals/cover3.jpg
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2767030/header.jpg
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/05c3266777dfa88b7b13742c72088a6431eea474/ss_05c3266777dfa88b7b13742c72088a6431eea474.1920x1080.jpg?t=1789119923
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/0b7cb73d511f327e3552750b76baf08daf0b5542/ss_0b7cb73d511f327e3552750b76baf08daf0b5542.1920x1080.jpg?t=1789119923
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/df4df5542db4d8d89bcf7588a5cc5d2f383d420b/ss_df4df5542db4d8d89bcf7588a5cc5d2f383d420b.1920x1080.jpg?t=1789119923
 process  = MarvelRivals.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_marvelrivals.zip
@@ -347,6 +391,7 @@ pub      = NetEase Games
 rel      = Dec 6, 2024
 genres   = Hero Shooter, Third-Person
 features = Multiplayer
+featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -356,10 +401,10 @@ features = Multiplayer
 [STEAM]
 title    = Steam Client Setup
 short    = Steam
-icon     = https://cdn.example.com/starline/steam/icon.png
-cover1   = https://cdn.example.com/starline/steam/cover1.jpg
-cover2   = https://cdn.example.com/starline/steam/cover2.jpg
-cover3   = https://cdn.example.com/starline/steam/cover3.jpg
+icon     = https://placehold.co/460x215/1b2838/66c0f4.jpg?text=Steam
+cover1   = https://placehold.co/1920x1080/1b2838/66c0f4.jpg?text=Steam%20Setup
+cover2   = https://placehold.co/1920x1080/1b2838/66c0f4.jpg?text=Steam%20Setup
+cover3   = https://placehold.co/1920x1080/1b2838/66c0f4.jpg?text=Steam%20Setup
 process  = steam.exe
 runmode  = exe
 download = https://cdn.example.com/starline/steam/starline_steam_setup.exe
@@ -368,3 +413,4 @@ pub      = Valve
 rel      = Sep 12, 2003
 genres   = Utility
 features = Digital Distribution
+featured = false
