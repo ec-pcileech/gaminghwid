@@ -244,7 +244,7 @@ pub      = Rockstar Games
 rel      = Apr 14, 2015
 genres   = Action, Open World
 features = Multiplayer
-featured = false
+featured = true
 
 
 # ───────────────────────────────────────────────────────────────────────────
