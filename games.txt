@@ -76,7 +76,7 @@ cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/14
 cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/1a5a68e51d6aff5e2910410f84854c4c39af68cc/ss_1a5a68e51d6aff5e2910410f84854c4c39af68cc.1920x1080.jpg?t=1790716179
 cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/52159118573367c304c43fc9ed85588c0c518a19/ss_52159118573367c304c43fc9ed85588c0c518a19.1920x1080.jpg?t=1790716179
 process  = deadlock.exe
-runmode  = dll
+runmode  = exe
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_deadlock.zip
 dev      = Valve
 pub      = Valve
