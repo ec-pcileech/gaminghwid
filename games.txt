@@ -375,3 +375,126 @@ featured = true
 price30  = 29.99
 price90  = 59.99
 priceLife= 89.99
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Gray Zone Warfare
+# ───────────────────────────────────────────────────────────────────────────
+[GZW]
+title    = Gray Zone Warfare
+short    = GZW
+icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/257310302/fb6323d77eab5e608e5581be8da627ad89d52938/movie_600x337.jpg?t=1774641592
+cover1   = https://video.akamai.steamstatic.com/store_trailers/2479810/51791228/1f35d77092712072b40beaddba6beb6194f14328/1788605408/hls_264_master.m3u8?t=1788767874
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/2fa64e158672ee4026a37d5d4fd6029972225c00/ss_2fa64e158672ee4026a37d5d4fd6029972225c00.1920x1080.jpg?t=1791019595
+runmode  = exe
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
+dev      = MADFINGER Games
+pub      = MADFINGER Games
+rel      = 30 Apr, 2024
+genres   = FPS, Competitive, Action
+features = Anti-Cheat, Multiplayer, Cloud Save
+featured = true
+price30  = 39.99
+price90  = 69.99
+priceLife= 119.99
+
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  WARDOGS
+# ───────────────────────────────────────────────────────────────────────────
+[WARDOGS]
+title    = WARDOGS
+short    = WARDOGS
+icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/257278851/b0e909a044729d275cfc460cfaf225e9a913446c/movie_600x337.jpg?t=1780798756
+cover1   = https://video.akamai.steamstatic.com/store_trailers/1867240/575341225/15786b3bb86e18b28ff64169f9dd628db62002b3/1780764715/hls_264_master.m3u8?t=1780775194
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1867240/188530148b5f96f9af23bebaaa6882cac49bd23c/ss_188530148b5f96f9af23bebaaa6882cac49bd23c.1920x1080.jpg?t=1790774170
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1867240/69773ecf3030e541fb1012feed3413a8f7d3f321/ss_69773ecf3030e541fb1012feed3413a8f7d3f321.1920x1080.jpg?t=1790774170
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1867240/93d48086eb922f919d9c7e512d8fa48cbe9ebd45/ss_93d48086eb922f919d9c7e512d8fa48cbe9ebd45.1920x1080.jpg?t=1790774170
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1867240/4792ae161c417d87c55e8fc5097f3653579c702b/ss_4792ae161c417d87c55e8fc5097f3653579c702b.1920x1080.jpg?t=1790774170
+runmode  = exe
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
+dev      = BULKHEAD
+pub      = Team17
+rel      = 10 Sep, 2026
+genres   = FPS, Competitive, Action
+features = Anti-Cheat, Multiplayer, Cloud Save
+featured = true
+price30  = 21.99
+price90  = 59.99
+priceLife= 89.99
+
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Arena Breakout: Infinite
+# ───────────────────────────────────────────────────────────────────────────
+[ABI]
+title    = Arena Breakout: Infinite
+short    = ABI
+icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/eccc13f9398a6af599a78ec7a437d6540f43a3c5/header.jpg?t=1789712295
+cover1   = https://video.akamai.steamstatic.com/store_trailers/2073620/1887492880/95c977ff44f41f69d1a5e0ebfecd9d0cb04187b3/1789548561/hls_264_master.m3u8?t=1789712294
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/b992207904414c33d7870b7e4f1ab751ff91f4da/ss_b992207904414c33d7870b7e4f1ab751ff91f4da.1920x1080.jpg?t=1789712295
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/52c4c8be39ce0f25a46d30546ffa224c47a905b6/ss_52c4c8be39ce0f25a46d30546ffa224c47a905b6.1920x1080.jpg?t=1789712295
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/52ab1c8049b6cebe87aab569ee967ad6d74315a2/ss_52ab1c8049b6cebe87aab569ee967ad6d74315a2.1920x1080.jpg?t=1789712295
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/66ae091bd4aa84d264c8c0c5b80aaccdccd5923e/ss_66ae091bd4aa84d264c8c0c5b80aaccdccd5923e.1920x1080.jpg?t=1789712295
+runmode  = exe
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
+dev      = Morefun Studios
+pub      = Morefun Studios
+rel      = 16 Sep, 2025
+genres   = FPS, Competitive, Action
+features = Anti-Cheat, Multiplayer, Cloud Save
+featured = true
+price30  = 39.99
+price90  = 89.99
+priceLife= 149.99
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Ready or Not
+# ───────────────────────────────────────────────────────────────────────────
+[RON]
+title    = Ready or Not
+short    = RON
+icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1144200/2b44644b033a996a9efb95051bb01809215d0d23/header.jpg?t=1790846188
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256987629/movie480.mp4
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1144200/88aec4ee3fba8860070370032495e0c9ff87a607/ss_88aec4ee3fba8860070370032495e0c9ff87a607.1920x1080.jpg?t=1790846188
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1144200/ss_873f74f54ca8ce5f4ac7d675563129417a1fd0c9.1920x1080.jpg?t=1790846188
+runmode  = exe
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
+dev      = VOID Interactive
+pub      = VOID Interactive
+rel      = 14 Dec, 2023
+genres   = FPS, Competitive, Shooter
+features = Multiplayer
+featured = true
+price30  = 39.99
+price90  = 89.99
+priceLife= 149.99
+
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Overwatch®
+# ───────────────────────────────────────────────────────────────────────────
+[OW]
+title    = Overwatch®
+short    = OW
+icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2357570/7baa151c768868f1fe1d3aeea2467fa1a35fb531/header_alt_assets_22.jpg?t=1788890347
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256980013/movie480.mp4
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/257188804/movie480.mp4
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2357570/c48aa3d3379473f92df5f2665e1a28144900b1f8/ss_c48aa3d3379473f92df5f2665e1a28144900b1f8.1920x1080.jpg?t=1788890347
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2357570/b17b61def60cb8b3f693cb3a6b80152f7963b04e/ss_b17b61def60cb8b3f693cb3a6b80152f7963b04e.1920x1080.jpg?t=1788890347
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2357570/a9c53181f654194c16719cfcf083cc7ae93b01bb/ss_a9c53181f654194c16719cfcf083cc7ae93b01bb.1920x1080.jpg?t=1788890347
+runmode  = exe
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
+dev      = Blizzard Entertainment
+pub      = Blizzard Entertainment
+rel      = 11 Aug, 2023
+genres   = FPS
+features = Multiplayer
+featured = true
+price30  = 26.53
+price90  = 63.61
+priceLife= 95.32
