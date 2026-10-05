@@ -1,0 +1,370 @@
+# ═══════════════════════════════════════════════════════════════════════════
+#  STARLINE 游戏目录
+#  编码：UTF-8（无 BOM）
+#
+#  格式说明
+#  ─────────
+#   · 每个游戏用 [代号] 开头一节，下面每行一个 key=value
+#   · 空行、以 # 开头的注释行会被忽略
+#   · 字段（未填写的会使用默认值）：
+#
+#       title       显示名（详情页大标题）
+#       short       侧栏/卡片短名（不填则用 title 冒号前部分）
+#       icon        卡片 / 侧栏图标 URL
+#       cover1      详情页预览位 1（图片或视频：png/jpg/webp/gif/mp4/webm）
+#       cover2      详情页预览位 2（不填则用 icon）
+#       cover3      详情页预览位 3（不填则用 icon）
+#       process     注入目标进程名（runmode=dll 时使用）
+#       runmode     exe = 下载后直接运行 / dll = 下载后注入进程
+#       download    下载直链
+#                   .exe / .dll  → 直接下载到 C:\ProgramData\STARLINE
+#                   压缩包       → 下载到同目录后静默解压，再按 runmode 挑文件
+#       dev         开发商
+#       pub         发行商
+#       rel         发行日期（任意文本）
+#       genres      类型，逗号分隔
+#       features    特性，逗号分隔
+#
+#   · 新增游戏：复制一节，改代号和字段即可，无需重新编译
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Counter-Strike 2
+# ───────────────────────────────────────────────────────────────────────────
+[CS2]
+title    = Counter-Strike 2
+short    = CS2
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/730/162664aa5da85f418105350c5d67ca565f6c3713/header.jpg?t=1789251637
+cover1   = https://cdn.fastly.steamstatic.com/apps/csgo/videos/csgo_react/cs2/cs2_header.webm
+cover2   = https://cdn.fastly.steamstatic.com/apps/csgo/videos/csgo_react/cs2/maps_flythrough.webm
+cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/730/162664aa5da85f418105350c5d67ca565f6c3713/header.jpg?t=1789251637
+process  = cs2.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_cs2.zip
+dev      = Valve
+pub      = Valve
+rel      = Sep 27, 2023
+genres   = FPS, Competitive, Action
+features = Anti-Cheat, Multiplayer, Cloud Save
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Deadlock
+# ───────────────────────────────────────────────────────────────────────────
+[DEADLOCK]
+title    = Deadlock
+short    = Deadlock
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/aa249c5e8cc8f90941bd1dbdc311773cd1afe065/header.jpg?t=1790716179
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/fa25560cf85debe669f5d4acd76cf81b0943019b/ss_fa25560cf85debe669f5d4acd76cf81b0943019b.1920x1080.jpg?t=1790716179
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/1a5a68e51d6aff5e2910410f84854c4c39af68cc/ss_1a5a68e51d6aff5e2910410f84854c4c39af68cc.1920x1080.jpg?t=1790716179
+cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/52159118573367c304c43fc9ed85588c0c518a19/ss_52159118573367c304c43fc9ed85588c0c518a19.1920x1080.jpg?t=1790716179
+process  = deadlock.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_deadlock.zip
+dev      = Valve
+pub      = Valve
+rel      = TBA
+genres   = MOBA, Shooter, Third-Person
+features = Multiplayer, Early Access
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  PUBG
+# ───────────────────────────────────────────────────────────────────────────
+[PUBG]
+title    = PUBG: BATTLEGROUNDS
+short    = PUBG
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/841ea38bc58cabb70aef65365cf50bc2d79329d9/header.jpg?t=1786493086
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/c16e2f2d122cae77a1cbaca19263df0f2d2214fa/ss_c16e2f2d122cae77a1cbaca19263df0f2d2214fa.1920x1080.jpg?t=1786493086
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/aa1c51a9b45c88e770b443d8d3cd28f3024b0760/ss_aa1c51a9b45c88e770b443d8d3cd28f3024b0760.1920x1080.jpg?t=1786493086
+cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/dfbecb503265d4ba705f7ffb60eff2460c936d70/ss_dfbecb503265d4ba705f7ffb60eff2460c936d70.1920x1080.jpg?t=1786493086
+process  = TslGame.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_pubg.zip
+dev      = KRAFTON
+pub      = KRAFTON
+rel      = Dec 21, 2017
+genres   = Battle Royale, Shooter
+features = Multiplayer, Anti-Cheat
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Delta Force
+# ───────────────────────────────────────────────────────────────────────────
+[DELTA]
+title    = Delta Force
+short    = Delta Force
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/09ef134458549352e5b5a06ed7f97cf00d729b62/header_alt_assets_14.jpg?t=1790238079
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/extras/1714c15ede69196c9325adca67d2d84d.webm?t=1790238079
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/extras/181965c4720d88928eb6fb1254f70a37.webm?t=1790238079
+cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/6e6783dfed5715c4ac1166dfc12efdf70d6a05ad/ss_6e6783dfed5715c4ac1166dfc12efdf70d6a05ad.1920x1080.jpg?t=1790238079
+process  = DeltaForceClient-Win64-Shipping.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_delta.zip
+dev      = TiMi Studio Group
+pub      = TiMi Studio Group
+rel      = 2024
+genres   = FPS, Tactical
+features = Multiplayer
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Escape from Tarkov
+# ───────────────────────────────────────────────────────────────────────────
+[TARKOV]
+title    = Escape from Tarkov
+short    = Tarkov
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/4dd12ea3b00a4f8b67bfd629f3b9abbf8d5cab05/header_alt_assets_2.jpg?t=1785782094
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/extras/b2aabc35727bbcf60226cd2cacea7ea3.webm?t=1785782094
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/extras/c03b85bd48cf39c8cae3666515d2f760.webm?t=1785782094
+cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/4dd12ea3b00a4f8b67bfd629f3b9abbf8d5cab05/header_alt_assets_2.jpg?t=1785782094
+process  = EscapeFromTarkov.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_tarkov.zip
+dev      = Battlestate Games
+pub      = Battlestate Games
+rel      = 2017
+genres   = Survival, Shooter, Hardcore
+features = Multiplayer, Realistic
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Counter-Strike 1.6
+# ───────────────────────────────────────────────────────────────────────────
+[CS1.6]
+title    = Counter-Strike 1.6
+short    = CS1.6
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10/header.jpg?t=1745368572
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10/0000002539.1920x1080.jpg?t=1745368572
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10/0000002538.1920x1080.jpg?t=1745368572
+cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10/0000002537.1920x1080.jpg?t=1745368572
+process  = hl.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_cs16.zip
+dev      = Valve
+pub      = Valve
+rel      = Dec 5, 2003
+genres   = FPS, Competitive, Action
+features = Multiplayer, Cloud Save
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Apex Legends
+# ───────────────────────────────────────────────────────────────────────────
+[APEX]
+title    = Apex Legends
+short    = Apex
+icon     = https://cdn.example.com/starline/apex/icon.png
+cover1   = https://cdn.example.com/starline/apex/cover1.jpg
+cover2   = https://cdn.example.com/starline/apex/cover2.jpg
+cover3   = https://cdn.example.com/starline/apex/cover3.jpg
+process  = r5apex.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_apex.zip
+dev      = Respawn Entertainment
+pub      = Electronic Arts
+rel      = Feb 4, 2019
+genres   = Battle Royale, FPS
+features = Multiplayer, Anti-Cheat
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  VALORANT
+# ───────────────────────────────────────────────────────────────────────────
+[VALORANT]
+title    = VALORANT
+short    = VALORANT
+icon     = https://cdn.example.com/starline/valorant/icon.png
+cover1   = https://cdn.example.com/starline/valorant/cover1.jpg
+cover2   = https://cdn.example.com/starline/valorant/cover2.jpg
+cover3   = https://cdn.example.com/starline/valorant/cover3.jpg
+process  = VALORANT-Win64-Shipping.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_valorant.zip
+dev      = Riot Games
+pub      = Riot Games
+rel      = Jun 2, 2020
+genres   = FPS, Tactical
+features = Multiplayer, Anti-Cheat
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Fortnite
+# ───────────────────────────────────────────────────────────────────────────
+[FORTNITE]
+title    = Fortnite
+short    = Fortnite
+icon     = https://cdn.example.com/starline/fortnite/icon.png
+cover1   = https://cdn.example.com/starline/fortnite/cover1.jpg
+cover2   = https://cdn.example.com/starline/fortnite/cover2.jpg
+cover3   = https://cdn.example.com/starline/fortnite/cover3.jpg
+process  = FortniteClient-Win64-Shipping.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_fortnite.zip
+dev      = Epic Games
+pub      = Epic Games
+rel      = Jul 25, 2017
+genres   = Battle Royale, Shooter
+features = Multiplayer, Cross-Platform
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Rust
+# ───────────────────────────────────────────────────────────────────────────
+[RUST]
+title    = Rust
+short    = Rust
+icon     = https://cdn.example.com/starline/rust/icon.png
+cover1   = https://cdn.example.com/starline/rust/cover1.jpg
+cover2   = https://cdn.example.com/starline/rust/cover2.jpg
+cover3   = https://cdn.example.com/starline/rust/cover3.jpg
+process  = RustClient.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_rust.zip
+dev      = Facepunch Studios
+pub      = Facepunch Studios
+rel      = Dec 11, 2013
+genres   = Survival, Shooter
+features = Multiplayer, Early Access
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Grand Theft Auto V
+# ───────────────────────────────────────────────────────────────────────────
+[GTA5]
+title    = Grand Theft Auto V
+short    = GTA V
+icon     = https://cdn.example.com/starline/gta5/icon.png
+cover1   = https://cdn.example.com/starline/gta5/cover1.jpg
+cover2   = https://cdn.example.com/starline/gta5/cover2.jpg
+cover3   = https://cdn.example.com/starline/gta5/cover3.jpg
+process  = GTA5.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_gta5.zip
+dev      = Rockstar North
+pub      = Rockstar Games
+rel      = Apr 14, 2015
+genres   = Action, Open World
+features = Multiplayer
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Rainbow Six Siege
+# ───────────────────────────────────────────────────────────────────────────
+[RAINBOW6]
+title    = Rainbow Six Siege
+short    = R6 Siege
+icon     = https://cdn.example.com/starline/r6/icon.png
+cover1   = https://cdn.example.com/starline/r6/cover1.jpg
+cover2   = https://cdn.example.com/starline/r6/cover2.jpg
+cover3   = https://cdn.example.com/starline/r6/cover3.jpg
+process  = RainbowSix.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_r6.zip
+dev      = Ubisoft Montreal
+pub      = Ubisoft
+rel      = Dec 1, 2015
+genres   = FPS, Tactical
+features = Multiplayer, Anti-Cheat
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Call of Duty: Warzone
+# ───────────────────────────────────────────────────────────────────────────
+[WARZONE]
+title    = Call of Duty: Warzone
+short    = Warzone
+icon     = https://cdn.example.com/starline/warzone/icon.png
+cover1   = https://cdn.example.com/starline/warzone/cover1.jpg
+cover2   = https://cdn.example.com/starline/warzone/cover2.jpg
+cover3   = https://cdn.example.com/starline/warzone/cover3.jpg
+process  = ModernWarfare.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_warzone.zip
+dev      = Infinity Ward
+pub      = Activision
+rel      = Mar 10, 2020
+genres   = Battle Royale, FPS
+features = Multiplayer, Cross-Platform
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Battlefield 2042
+# ───────────────────────────────────────────────────────────────────────────
+[BF2042]
+title    = Battlefield 2042
+short    = BF 2042
+icon     = https://cdn.example.com/starline/bf2042/icon.png
+cover1   = https://cdn.example.com/starline/bf2042/cover1.jpg
+cover2   = https://cdn.example.com/starline/bf2042/cover2.jpg
+cover3   = https://cdn.example.com/starline/bf2042/cover3.jpg
+process  = bf2042.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_bf2042.zip
+dev      = DICE
+pub      = Electronic Arts
+rel      = Nov 19, 2021
+genres   = FPS, Shooter
+features = Multiplayer
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  THE FINALS
+# ───────────────────────────────────────────────────────────────────────────
+[THEFINALS]
+title    = THE FINALS
+short    = Finals
+icon     = https://cdn.example.com/starline/thefinals/icon.png
+cover1   = https://cdn.example.com/starline/thefinals/cover1.jpg
+cover2   = https://cdn.example.com/starline/thefinals/cover2.jpg
+cover3   = https://cdn.example.com/starline/thefinals/cover3.jpg
+process  = Discovery.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_thefinals.zip
+dev      = Embark Studios
+pub      = Embark Studios
+rel      = Dec 7, 2023
+genres   = FPS, Shooter
+features = Multiplayer, Destruction
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Marvel Rivals
+# ───────────────────────────────────────────────────────────────────────────
+[MARVELRIVALS]
+title    = Marvel Rivals
+short    = Rivals
+icon     = https://cdn.example.com/starline/marvelrivals/icon.png
+cover1   = https://cdn.example.com/starline/marvelrivals/cover1.jpg
+cover2   = https://cdn.example.com/starline/marvelrivals/cover2.jpg
+cover3   = https://cdn.example.com/starline/marvelrivals/cover3.jpg
+process  = MarvelRivals.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_marvelrivals.zip
+dev      = NetEase Games
+pub      = NetEase Games
+rel      = Dec 6, 2024
+genres   = Hero Shooter, Third-Person
+features = Multiplayer
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  exe 模式示例：下载后直接运行（不注入）
+#  把 runmode 改成 exe 即可；process 在 exe 模式下会被忽略
+# ───────────────────────────────────────────────────────────────────────────
+[STEAM]
+title    = Steam Client Setup
+short    = Steam
+icon     = https://cdn.example.com/starline/steam/icon.png
+cover1   = https://cdn.example.com/starline/steam/cover1.jpg
+cover2   = https://cdn.example.com/starline/steam/cover2.jpg
+cover3   = https://cdn.example.com/starline/steam/cover3.jpg
+process  = steam.exe
+runmode  = exe
+download = https://cdn.example.com/starline/steam/starline_steam_setup.exe
+dev      = Valve
+pub      = Valve
+rel      = Sep 12, 2003
+genres   = Utility
+features = Digital Distribution
