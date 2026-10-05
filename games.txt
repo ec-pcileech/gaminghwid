@@ -98,7 +98,7 @@ priceLife= 74.99
 title    = PUBG: BATTLEGROUNDS
 short    = PUBG
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/841ea38bc58cabb70aef65365cf50bc2d79329d9/header.jpg?t=1786493086
-cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/c16e2f2d122cae77a1cbaca19263df0f2d2214fa/ss_c16e2f2d122cae77a1cbaca19263df0f2d2214fa.1920x1080.jpg?t=1786493086
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/257200883/movie480.mp4
 cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/aa1c51a9b45c88e770b443d8d3cd28f3024b0760/ss_aa1c51a9b45c88e770b443d8d3cd28f3024b0760.1920x1080.jpg?t=1786493086
 cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/dfbecb503265d4ba705f7ffb60eff2460c936d70/ss_dfbecb503265d4ba705f7ffb60eff2460c936d70.1920x1080.jpg?t=1786493086
 process  = TslGame.exe
@@ -194,8 +194,8 @@ priceLife= 59.99
 title    = Apex Legends
 short    = Apex
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1172470/header.jpg
-cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2/ss_3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2.1920x1080.jpg?t=1790164440
-cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/d64ce54903a3ba6429c6e3189ad746a7db70ee3e/ss_d64ce54903a3ba6429c6e3189ad746a7db70ee3e.1920x1080.jpg?t=1790164440
+cover1   = https://video.akamai.steamstatic.com/store_trailers/1172470/343063211/62821b5e8c30fe0232997e3a83b36292aea323af/1789580842/hls_264_master.m3u8?t=1789582444
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2/ss_3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2.1920x1080.jpg?t=1790164440
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/6593905f527d4b1bf01b0bb148b9c9a39616a2e4/ss_6593905f527d4b1bf01b0bb148b9c9a39616a2e4.1920x1080.jpg?t=1790164440
 process  = r5apex.exe
 runmode  = dll
@@ -214,9 +214,9 @@ featured = false
 title    = Rust
 short    = Rust
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/252490/header.jpg
-cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_271feae67943bdc141c1249aba116349397e9ba9.1920x1080.jpg?t=1781536981
-cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_e825b087b95e51c3534383cfd75ad6e8038147c3.1920x1080.jpg?t=1781536981
-cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_0e646f1a70e5cb8eed00efef8adb9579d40d5b2e.1920x1080.jpg?t=1781536981
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256684736/movie480_vp9.webm
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256761600/movie480.mp4
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_d0fdacaeef5a28a7cee525fd73376adfe083c964.1920x1080.jpg?t=1781536981
 process  = RustClient.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_rust.zip
@@ -235,9 +235,10 @@ featured = false
 title    = Grand Theft Auto V
 short    = GTA V
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/271590/header.jpg
-cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/ss_32aa18ab3175e3002217862dd5917646d298ab6b.1920x1080.jpg?t=1765387725
-cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/ss_2744f112fa060320d191a50e8b3a92441a648a56.1920x1080.jpg?t=1765387725
-cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/271590/ss_da39c16db175f6973770bae6b91d411251763152.1920x1080.jpg?t=1765387725
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/257157967/movie480.mp4
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/257100577/movie480_vp9.webm
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/d61184a98c1cf2db2b08b2999c04b0519e3615bb/ss_d61184a98c1cf2db2b08b2999c04b0519e3615bb.1920x1080.jpg?t=1781187782
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3240220/85ff4a9fad2064c201c00c27d8d28c28fa03c481/ss_85ff4a9fad2064c201c00c27d8d28c28fa03c481.1920x1080.jpg?t=1781187782
 process  = GTA5.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_gta5.zip
@@ -374,4 +375,3 @@ featured = true
 price30  = 29.99
 price90  = 59.99
 priceLife= 89.99
-
