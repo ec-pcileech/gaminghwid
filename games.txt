@@ -351,9 +351,9 @@ features = Multiplayer
 featured = false
 
 # ───────────────────────────────────────────────────────────────────────────
-#  Marvel Rivals
+#  Marvel Rivals2
 # ───────────────────────────────────────────────────────────────────────────
-[MARVELRIVALS]
+[MARVELRIVALS2]
 title    = Marvel Rivals 2
 short    = Rivals
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2767030/header.jpg
