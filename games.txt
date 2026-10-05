@@ -356,9 +356,9 @@ featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
-#  Fortnite
+#  FORTNITE
 # ───────────────────────────────────────────────────────────────────────────
-[Fortnite]
+[FORTNITE]
 title    = Fortnite
 short    = Fortnite
 icon     = https://cdn2.unrealengine.com/fneco-28-00-creative-discovertiles-keyart-1920x1080-1920x1080-51c98fe78d7a.jpg
