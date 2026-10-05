@@ -52,7 +52,7 @@ cover1   = https://cdn.fastly.steamstatic.com/apps/csgo/videos/csgo_react/cs2/cs
 cover2   = https://cdn.fastly.steamstatic.com/apps/csgo/videos/csgo_react/cs2/maps_flythrough.webm
 cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/730/162664aa5da85f418105350c5d67ca565f6c3713/header.jpg?t=1789251637
 process  = cs2.exe
-runmode  = dll
+runmode  = exe
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_cs2.zip
 dev      = Valve
 pub      = Valve
@@ -205,49 +205,6 @@ genres   = Battle Royale, FPS
 features = Multiplayer, Anti-Cheat
 featured = false
 
-
-# ───────────────────────────────────────────────────────────────────────────
-#  VALORANT   （非 Steam 游戏：图片是占位图，请替换成官方素材）
-# ───────────────────────────────────────────────────────────────────────────
-[VALORANT]
-title    = VALORANT
-short    = VALORANT
-icon     = https://placehold.co/460x215/0f1923/ff4655.jpg?text=VALORANT
-cover1   = https://placehold.co/1920x1080/0f1923/ff4655.jpg?text=VALORANT%20Screenshot%201
-cover2   = https://placehold.co/1920x1080/0f1923/ff4655.jpg?text=VALORANT%20Screenshot%202
-cover3   = https://placehold.co/1920x1080/0f1923/ff4655.jpg?text=VALORANT%20Screenshot%203
-process  = VALORANT-Win64-Shipping.exe
-runmode  = dll
-download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_valorant.zip
-dev      = Riot Games
-pub      = Riot Games
-rel      = Jun 2, 2020
-genres   = FPS, Tactical
-features = Multiplayer, Anti-Cheat
-featured = false
-
-
-# ───────────────────────────────────────────────────────────────────────────
-#  Fortnite   （非 Steam 游戏：图片是占位图，请替换成官方素材）
-# ───────────────────────────────────────────────────────────────────────────
-[FORTNITE]
-title    = Fortnite
-short    = Fortnite
-icon     = https://placehold.co/460x215/2a1a4a/9d7bff.jpg?text=Fortnite
-cover1   = https://placehold.co/1920x1080/2a1a4a/9d7bff.jpg?text=Fortnite%20Screenshot%201
-cover2   = https://placehold.co/1920x1080/2a1a4a/9d7bff.jpg?text=Fortnite%20Screenshot%202
-cover3   = https://placehold.co/1920x1080/2a1a4a/9d7bff.jpg?text=Fortnite%20Screenshot%203
-process  = FortniteClient-Win64-Shipping.exe
-runmode  = dll
-download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_fortnite.zip
-dev      = Epic Games
-pub      = Epic Games
-rel      = Jul 25, 2017
-genres   = Battle Royale, Shooter
-features = Multiplayer, Cross-Platform
-featured = false
-
-
 # ───────────────────────────────────────────────────────────────────────────
 #  Rust
 # ───────────────────────────────────────────────────────────────────────────
@@ -393,24 +350,3 @@ genres   = Hero Shooter, Third-Person
 features = Multiplayer
 featured = false
 
-
-# ───────────────────────────────────────────────────────────────────────────
-#  exe 模式示例：下载后直接运行（不注入）
-#  把 runmode 改成 exe 即可；process 在 exe 模式下会被忽略
-# ───────────────────────────────────────────────────────────────────────────
-[STEAM]
-title    = Steam Client Setup
-short    = Steam
-icon     = https://placehold.co/460x215/1b2838/66c0f4.jpg?text=Steam
-cover1   = https://placehold.co/1920x1080/1b2838/66c0f4.jpg?text=Steam%20Setup
-cover2   = https://placehold.co/1920x1080/1b2838/66c0f4.jpg?text=Steam%20Setup
-cover3   = https://placehold.co/1920x1080/1b2838/66c0f4.jpg?text=Steam%20Setup
-process  = steam.exe
-runmode  = exe
-download = https://cdn.example.com/starline/steam/starline_steam_setup.exe
-dev      = Valve
-pub      = Valve
-rel      = Sep 12, 2003
-genres   = Utility
-features = Digital Distribution
-featured = false
