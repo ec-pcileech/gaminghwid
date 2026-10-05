@@ -77,6 +77,8 @@ icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/14
 cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/fa25560cf85debe669f5d4acd76cf81b0943019b/ss_fa25560cf85debe669f5d4acd76cf81b0943019b.1920x1080.jpg?t=1790716179
 cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/1a5a68e51d6aff5e2910410f84854c4c39af68cc/ss_1a5a68e51d6aff5e2910410f84854c4c39af68cc.1920x1080.jpg?t=1790716179
 cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/52159118573367c304c43fc9ed85588c0c518a19/ss_52159118573367c304c43fc9ed85588c0c518a19.1920x1080.jpg?t=1790716179
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1422450/ac02851ede518092df55746dbc98a199c91d7411/ss_ac02851ede518092df55746dbc98a199c91d7411.1920x1080.jpg?t=1790716179
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1422450/caaf254176430d69244b99e565d3d56559f1743b/ss_caaf254176430d69244b99e565d3d56559f1743b.1920x1080.jpg?t=1790716179
 process  = deadlock.exe
 runmode  = exe
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_deadlock.zip
@@ -101,6 +103,8 @@ icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/57
 cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/257200883/movie480.mp4
 cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/aa1c51a9b45c88e770b443d8d3cd28f3024b0760/ss_aa1c51a9b45c88e770b443d8d3cd28f3024b0760.1920x1080.jpg?t=1786493086
 cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/578080/dfbecb503265d4ba705f7ffb60eff2460c936d70/ss_dfbecb503265d4ba705f7ffb60eff2460c936d70.1920x1080.jpg?t=1786493086
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/578080/01dfa3ae5449218b17d6d04229dfed681fc377db/ss_01dfa3ae5449218b17d6d04229dfed681fc377db.1920x1080.jpg?t=1786493086
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/578080/d874034ce52876c300ce9a97aaee57497347b6ab/ss_d874034ce52876c300ce9a97aaee57497347b6ab.1920x1080.jpg?t=1786493086
 process  = TslGame.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_pubg.zip
@@ -125,6 +129,9 @@ icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/25
 cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/extras/1714c15ede69196c9325adca67d2d84d.webm?t=1790238079
 cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/extras/181965c4720d88928eb6fb1254f70a37.webm?t=1790238079
 cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/6e6783dfed5715c4ac1166dfc12efdf70d6a05ad/ss_6e6783dfed5715c4ac1166dfc12efdf70d6a05ad.1920x1080.jpg?t=1790238079
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2507950/ss_7006f261d2d50ef06293e0b29785211db687a9b1.1920x1080.jpg?t=1790238079
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2507950/ss_0336d3bdff28cdb9dcb2c76538af9f8a999a7a0b.1920x1080.jpg?t=1790238079
+cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2507950/ss_c6109219c92d56f09f250a3427e54408c619cf37.1920x1080.jpg?t=1790238079
 process  = DeltaForceClient-Win64-Shipping.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_delta.zip
@@ -148,7 +155,10 @@ short    = Tarkov
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/4dd12ea3b00a4f8b67bfd629f3b9abbf8d5cab05/header_alt_assets_2.jpg?t=1785782094
 cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/extras/b2aabc35727bbcf60226cd2cacea7ea3.webm?t=1785782094
 cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/extras/c03b85bd48cf39c8cae3666515d2f760.webm?t=1785782094
-cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/4dd12ea3b00a4f8b67bfd629f3b9abbf8d5cab05/header_alt_assets_2.jpg?t=1785782094
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3932890/a3008a8ce41cd39293b77e5988ab6d3465c01ce2/ss_a3008a8ce41cd39293b77e5988ab6d3465c01ce2.1920x1080.jpg?t=1785782094
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3932890/10f05f9abd2d53c29613c2ac34aa868d64dbb525/ss_10f05f9abd2d53c29613c2ac34aa868d64dbb525.1920x1080.jpg?t=1785782094
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3932890/328f9a1b535506a529910ea822387fb5722556a4/ss_328f9a1b535506a529910ea822387fb5722556a4.1920x1080.jpg?t=1785782094
+cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3932890/7ce6dcc9543c8d698efe8f89bf61a385a1d07ddd/ss_7ce6dcc9543c8d698efe8f89bf61a385a1d07ddd.1920x1080.jpg?t=1785782094
 process  = EscapeFromTarkov.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_tarkov.zip
@@ -170,9 +180,12 @@ priceLife= 129.99
 title    = Counter-Strike 1.6
 short    = CS1.6
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10/header.jpg?t=1745368572
-cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10/0000002539.1920x1080.jpg?t=1745368572
-cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10/0000002538.1920x1080.jpg?t=1745368572
-cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/10/0000002537.1920x1080.jpg?t=1745368572
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/10/0000000132.1920x1080.jpg?t=1745368572
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/10/0000000133.1920x1080.jpg?t=1745368572
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/10/0000000134.1920x1080.jpg?t=1745368572
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/10/0000000135.1920x1080.jpg?t=1745368572
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/10/0000000136.1920x1080.jpg?t=1745368572
+cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/10/0000002540.1920x1080.jpg?t=1745368572
 process  = hl.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_cs16.zip
@@ -194,9 +207,11 @@ priceLife= 59.99
 title    = Apex Legends
 short    = Apex
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1172470/header.jpg
-cover1   = https://video.akamai.steamstatic.com/store_trailers/1172470/343063211/62821b5e8c30fe0232997e3a83b36292aea323af/1789580842/hls_264_master.m3u8?t=1789582444
-cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2/ss_3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2.1920x1080.jpg?t=1790164440
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2/ss_3fc2dfcf0e8d7d7202a3ca32ae26c7afaec723e2.1920x1080.jpg?t=1790164440
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/d64ce54903a3ba6429c6e3189ad746a7db70ee3e/ss_d64ce54903a3ba6429c6e3189ad746a7db70ee3e.1920x1080.jpg?t=1790164440
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/6593905f527d4b1bf01b0bb148b9c9a39616a2e4/ss_6593905f527d4b1bf01b0bb148b9c9a39616a2e4.1920x1080.jpg?t=1790164440
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/d8a07de4444fb8f43ad19c7aa9e3fa8e26eb94d6/ss_d8a07de4444fb8f43ad19c7aa9e3fa8e26eb94d6.1920x1080.jpg?t=1790164440
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1172470/f880e64654baad384f3afb9e4b0004e411770241/ss_f880e64654baad384f3afb9e4b0004e411770241.1920x1080.jpg?t=1790164440
 process  = r5apex.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_apex.zip
@@ -217,6 +232,9 @@ icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/25
 cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256684736/movie480_vp9.webm
 cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256761600/movie480.mp4
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_d0fdacaeef5a28a7cee525fd73376adfe083c964.1920x1080.jpg?t=1781536981
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_c88939db635d959b25eb1bcf9b4c4dcdec04b3fe.1920x1080.jpg?t=1781536981
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_aaa718a3cb0696a816456283526842c4f2d6b1bc.1920x1080.jpg?t=1781536981
+cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/252490/ss_24483e657f7e59d74e4914f79c51d9c821454e98.1920x1080.jpg?t=1781536981
 process  = RustClient.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_rust.zip
@@ -260,6 +278,8 @@ icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/35
 cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/2efed3587d876f560cbf3f25d9a72fbd387b74e6/ss_2efed3587d876f560cbf3f25d9a72fbd387b74e6.1920x1080.jpg?t=1790952963
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/ee34a63203916d39dc50d96c14aefc24dc3ff34e/ss_ee34a63203916d39dc50d96c14aefc24dc3ff34e.1920x1080.jpg?t=1790952963
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/00fb4ac1f236cfd2e364ebfecb599a30b72560fe/ss_00fb4ac1f236cfd2e364ebfecb599a30b72560fe.1920x1080.jpg?t=1790952963
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/0fa7bb7203d3839f29861c4b5e2436cd2694291b/ss_0fa7bb7203d3839f29861c4b5e2436cd2694291b.1920x1080.jpg?t=1790952963
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/7dbe5772037723a59c11ad381e0d6a3b6bc6aaf7/ss_7dbe5772037723a59c11ad381e0d6a3b6bc6aaf7.1920x1080.jpg?t=1790952963
 process  = RainbowSix.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_r6.zip
@@ -281,6 +301,9 @@ icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/19
 cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962663/9263884bebe73028931c27e01d1b6f687fe3951e/ss_9263884bebe73028931c27e01d1b6f687fe3951e.1920x1080.jpg?t=1789748005
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962663/46181762c5c1a1f039c33a91833c578b94cc6f00/ss_46181762c5c1a1f039c33a91833c578b94cc6f00.1920x1080.jpg?t=1789748005
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962663/fd6baaf9884e4a23d7f1cf2282c91ac6613d93c0/ss_fd6baaf9884e4a23d7f1cf2282c91ac6613d93c0.1920x1080.jpg?t=1789748005
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962663/7662c01b2ef1e609c8bc1ab2214e393916eb4421/ss_7662c01b2ef1e609c8bc1ab2214e393916eb4421.1920x1080.jpg?t=1789748005
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962663/a7ea3102e64c774a3c85e6ae1f16a27703cfbea6/ss_a7ea3102e64c774a3c85e6ae1f16a27703cfbea6.1920x1080.jpg?t=1789748005
+cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1962663/42cf0b02e21d01541e0c01ec99d71db7bdebac8d/ss_42cf0b02e21d01541e0c01ec99d71db7bdebac8d.1920x1080.jpg?t=1789748005
 process  = ModernWarfare.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_warzone.zip
@@ -298,9 +321,13 @@ features = Multiplayer, Cross-Platform
 title    = Battlefield 2042
 short    = BF 2042
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1517290/header.jpg
-cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/4443207b9a21def316907bda32c5f32c7d42fcb6/ss_4443207b9a21def316907bda32c5f32c7d42fcb6.1920x1080.jpg?t=1777324359
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/257000580/movie480.mp4
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/931142c4907822f144340f34cc51c64b523669ff/ss_931142c4907822f144340f34cc51c64b523669ff.1920x1080.jpg?t=1777324359
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/cf954bff997292185b157a6024a59350544f8147/ss_cf954bff997292185b157a6024a59350544f8147.1920x1080.jpg?t=1777324359
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/c080841fe6e2c58dabf5c955cc90bcf58239c453/ss_c080841fe6e2c58dabf5c955cc90bcf58239c453.1920x1080.jpg?t=1777324359
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/6cf4f4f09aa86be025b5d6e41d15c90f7c9eae54/ss_6cf4f4f09aa86be025b5d6e41d15c90f7c9eae54.1920x1080.jpg?t=1777324359
+cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/d5a94ef9f982bcd68aec3e5543d2789eed0b02f2/ss_d5a94ef9f982bcd68aec3e5543d2789eed0b02f2.1920x1080.jpg?t=1777324359
+cover7   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1517290/17dd094e28adff15e05eaee62846707e567b793d/ss_17dd094e28adff15e05eaee62846707e567b793d.1920x1080.jpg?t=1777324359
 process  = bf2042.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_bf2042.zip
@@ -319,9 +346,11 @@ featured = false
 title    = THE FINALS
 short    = Finals
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2073850/header.jpg
-cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073850/320437621741c7be66de4b42d7633b9b0a60fd49/ss_320437621741c7be66de4b42d7633b9b0a60fd49.1920x1080.jpg?t=1789034839
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/257102318/movie480.mp4
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073850/3c20dd5e9fcfbbbabe8f9050b06de2c1a8eba471/ss_3c20dd5e9fcfbbbabe8f9050b06de2c1a8eba471.1920x1080.jpg?t=1789034839
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073850/aba261218adfb917756e1736c33bea77597d47ee/ss_aba261218adfb917756e1736c33bea77597d47ee.1920x1080.jpg?t=1789034839
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073850/4e4afb25df89ca2821c0d16cd32d55a0d3c5366d/ss_4e4afb25df89ca2821c0d16cd32d55a0d3c5366d.1920x1080.jpg?t=1789034839
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073850/768d19884d70c58500e9ab88af1b4a5d7d12e0ad/ss_768d19884d70c58500e9ab88af1b4a5d7d12e0ad.1920x1080.jpg?t=1789034839
 process  = Discovery.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_thefinals.zip
@@ -343,6 +372,7 @@ icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/27
 cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/05c3266777dfa88b7b13742c72088a6431eea474/ss_05c3266777dfa88b7b13742c72088a6431eea474.1920x1080.jpg?t=1789119923
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/0b7cb73d511f327e3552750b76baf08daf0b5542/ss_0b7cb73d511f327e3552750b76baf08daf0b5542.1920x1080.jpg?t=1789119923
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/df4df5542db4d8d89bcf7588a5cc5d2f383d420b/ss_df4df5542db4d8d89bcf7588a5cc5d2f383d420b.1920x1080.jpg?t=1789119923
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/ef2d770c98f3d543285693c47d78f418fd09d2dd/ss_ef2d770c98f3d543285693c47d78f418fd09d2dd.1920x1080.jpg?t=1789119923
 process  = MarvelRivals.exe
 runmode  = dll
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_marvelrivals.zip
@@ -364,6 +394,9 @@ short    = Fortnite
 icon     = https://cdn2.unrealengine.com/fneco-28-00-creative-discovertiles-keyart-1920x1080-1920x1080-51c98fe78d7a.jpg
 cover1   = https://fn-creator-community-cdn.qstv.on.epicgames.com/332cc7a7-5293-4904-86ef-b16cc69975a5/post-image-block_2048x1152.webp
 cover2   = https://fn-creator-community-cdn.qstv.on.epicgames.com/fcfb6524-2630-41cd-a71c-f414a2c0bc28/post-image-block_2048x1152.webp
+cover3   = https://cdn2.unrealengine.com/links-admin-EN_FN_OG_42-10_C1SX_DiscoverTile_1920x1080-fdc0df7f.jpg
+cover4   = https://cdn2.unrealengine.com/links-admin-FNBR_42-30_Fortnitemares_Blitz_DiscoverTile_1920x1080-7ebb8cf6.jpg
+cover5   = https://cdn2.unrealengine.com/links-admin-EN_FNSP_41-30_AnvilAlarm_DiscoverTile_1920x1080-5f4372ca.jpg
 runmode  = exe
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
 dev      = Epic Games
@@ -384,8 +417,11 @@ priceLife= 89.99
 title    = Gray Zone Warfare
 short    = GZW
 icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/257310302/fb6323d77eab5e608e5581be8da627ad89d52938/movie_600x337.jpg?t=1774641592
-cover1   = https://video.akamai.steamstatic.com/store_trailers/2479810/51791228/1f35d77092712072b40beaddba6beb6194f14328/1788605408/hls_264_master.m3u8?t=1788767874
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2479810/extras/2fdff7de4f378eaf631873ca671561e1.webm?t=1791019595
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/2fa64e158672ee4026a37d5d4fd6029972225c00/ss_2fa64e158672ee4026a37d5d4fd6029972225c00.1920x1080.jpg?t=1791019595
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/7968de28c22b0cdf6fefbad740969fe67afd7d8c/ss_7968de28c22b0cdf6fefbad740969fe67afd7d8c.1920x1080.jpg?t=1791019595
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/3f8b34d2ddd034a22b74595ee4409e667db10194/ss_3f8b34d2ddd034a22b74595ee4409e667db10194.1920x1080.jpg?t=1791019595
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/8e058f615120bba63ad612870ab05297f7288e60/ss_8e058f615120bba63ad612870ab05297f7288e60.1920x1080.jpg?t=1791019595
 runmode  = exe
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
 dev      = MADFINGER Games
@@ -407,7 +443,7 @@ priceLife= 119.99
 title    = WARDOGS
 short    = WARDOGS
 icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/257278851/b0e909a044729d275cfc460cfaf225e9a913446c/movie_600x337.jpg?t=1780798756
-cover1   = https://video.akamai.steamstatic.com/store_trailers/1867240/575341225/15786b3bb86e18b28ff64169f9dd628db62002b3/1780764715/hls_264_master.m3u8?t=1780775194
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1867240/extras/84d320e9a5fe43524c39cd7d30d8ceb8.webm?t=1790774170
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1867240/188530148b5f96f9af23bebaaa6882cac49bd23c/ss_188530148b5f96f9af23bebaaa6882cac49bd23c.1920x1080.jpg?t=1790774170
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1867240/69773ecf3030e541fb1012feed3413a8f7d3f321/ss_69773ecf3030e541fb1012feed3413a8f7d3f321.1920x1080.jpg?t=1790774170
 cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1867240/93d48086eb922f919d9c7e512d8fa48cbe9ebd45/ss_93d48086eb922f919d9c7e512d8fa48cbe9ebd45.1920x1080.jpg?t=1790774170
@@ -433,11 +469,11 @@ priceLife= 89.99
 title    = Arena Breakout: Infinite
 short    = ABI
 icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/eccc13f9398a6af599a78ec7a437d6540f43a3c5/header.jpg?t=1789712295
-cover1   = https://video.akamai.steamstatic.com/store_trailers/2073620/1887492880/95c977ff44f41f69d1a5e0ebfecd9d0cb04187b3/1789548561/hls_264_master.m3u8?t=1789712294
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2073620/extras/35363ba129d760d47e2272ef5044970e.webm?t=1789712295
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/b992207904414c33d7870b7e4f1ab751ff91f4da/ss_b992207904414c33d7870b7e4f1ab751ff91f4da.1920x1080.jpg?t=1789712295
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/52c4c8be39ce0f25a46d30546ffa224c47a905b6/ss_52c4c8be39ce0f25a46d30546ffa224c47a905b6.1920x1080.jpg?t=1789712295
 cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/52ab1c8049b6cebe87aab569ee967ad6d74315a2/ss_52ab1c8049b6cebe87aab569ee967ad6d74315a2.1920x1080.jpg?t=1789712295
-cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/66ae091bd4aa84d264c8c0c5b80aaccdccd5923e/ss_66ae091bd4aa84d264c8c0c5b80aaccdccd5923e.1920x1080.jpg?t=1789712295
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2073620/d056abb31c206833a06c838b69157e528bb11007/ss_d056abb31c206833a06c838b69157e528bb11007.1920x1080.jpg?t=1789712295
 runmode  = exe
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
 dev      = Morefun Studios
@@ -461,6 +497,7 @@ icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/11
 cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256987629/movie480.mp4
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1144200/88aec4ee3fba8860070370032495e0c9ff87a607/ss_88aec4ee3fba8860070370032495e0c9ff87a607.1920x1080.jpg?t=1790846188
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1144200/ss_873f74f54ca8ce5f4ac7d675563129417a1fd0c9.1920x1080.jpg?t=1790846188
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1144200/21c748dc43e90596677fac5e690ca2679c94bc7d/ss_21c748dc43e90596677fac5e690ca2679c94bc7d.1920x1080.jpg?t=1790846188
 runmode  = exe
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
 dev      = VOID Interactive
