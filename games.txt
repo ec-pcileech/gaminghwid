@@ -352,3 +352,26 @@ genres   = Hero Shooter, Third-Person
 features = Multiplayer
 featured = false
 
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Fortnite
+# ───────────────────────────────────────────────────────────────────────────
+[Fortnite]
+title    = Fortnite
+short    = Fortnite
+icon     = https://cdn2.unrealengine.com/fneco-28-00-creative-discovertiles-keyart-1920x1080-1920x1080-51c98fe78d7a.jpg
+cover1   = https://fn-creator-community-cdn.qstv.on.epicgames.com/332cc7a7-5293-4904-86ef-b16cc69975a5/post-image-block_2048x1152.webp
+cover2   = https://fn-creator-community-cdn.qstv.on.epicgames.com/fcfb6524-2630-41cd-a71c-f414a2c0bc28/post-image-block_2048x1152.webp
+runmode  = exe
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
+dev      = Epic Games
+pub      = Epic Games
+rel      = July 25, 2017
+genres   = FPS, Competitive, Action
+features = Anti-Cheat, Multiplayer, Cloud Save
+featured = true
+price30  = 29.99
+price90  = 59.99
+priceLife= 89.99
+
