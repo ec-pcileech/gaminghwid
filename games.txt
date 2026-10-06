@@ -62,9 +62,11 @@ rel      = Sep 27, 2023
 genres   = FPS, Competitive, Action
 features = Anti-Cheat, Multiplayer, Cloud Save
 featured = true
-price30  = 19.99
-price90  = 59.99
-priceLife= 109.99
+price7   = 4.99        
+price15  = 8.99      
+price30  = 19.99       
+price90  = 59.99     
+priceLife= 109.99 
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -88,6 +90,8 @@ rel      = TBA
 genres   = MOBA, Shooter, Third-Person
 features = Multiplayer, Early Access
 featured = true
+price7   = 4.99        
+price15  = 8.99    
 price30  = 19.99
 price90  = 44.99
 priceLife= 74.99
@@ -141,6 +145,8 @@ rel      = 2024
 genres   = FPS, Tactical
 features = Multiplayer
 featured = true
+price7   = 8.99        
+price15  = 12.99    
 price30  = 29.99
 price90  = 69.99
 priceLife= 109.99
@@ -168,6 +174,8 @@ rel      = 2017
 genres   = Survival, Shooter, Hardcore
 features = Multiplayer, Realistic
 featured = true
+price7   = 8.99        
+price15  = 15.99    
 price30  = 34.99
 price90  = 79.99
 priceLife= 129.99
@@ -195,9 +203,11 @@ rel      = Dec 5, 2003
 genres   = FPS, Competitive, Action
 features = Multiplayer, Cloud Save
 featured = true
-price30  = 14.99
-price90  = 34.99
-priceLife= 59.99
+price7   = 3.89        
+price15  = 7.99    
+price30  = 12.99
+price90  = 30.99
+priceLife= 49.99
 
 
 # ───────────────────────────────────────────────────────────────────────────
