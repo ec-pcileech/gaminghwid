@@ -54,7 +54,7 @@ cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/73
 cover4   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/730/ss_ef82850f036dac5772cb07dbc2d1116ea13eb163.1920x1080.jpg?t=1789251637
 cover5   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/730/ss_54b9c26b028c84d5f8a5316f31ae6203953ed84d.1920x1080.jpg?t=1789251637
 process  = cs2.exe
-runmode  = exe
+runmode  = dll
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
 dev      = Valve
 pub      = Valve
