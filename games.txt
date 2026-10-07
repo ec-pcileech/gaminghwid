@@ -373,11 +373,38 @@ featured = false
 
 
 # ───────────────────────────────────────────────────────────────────────────
-#  Marvel Rivals
+#  Marvel Rivals External
 # ───────────────────────────────────────────────────────────────────────────
-[MARVELRIVALS]
-title    = Marvel Rivals
-short    = Rivals
+[MARVELRIVALSEXTERNAL]
+title    = Marvel Rivals External
+short    = Rivals External
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2767030/header.jpg
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/05c3266777dfa88b7b13742c72088a6431eea474/ss_05c3266777dfa88b7b13742c72088a6431eea474.1920x1080.jpg?t=1789119923
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/0b7cb73d511f327e3552750b76baf08daf0b5542/ss_0b7cb73d511f327e3552750b76baf08daf0b5542.1920x1080.jpg?t=1789119923
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/df4df5542db4d8d89bcf7588a5cc5d2f383d420b/ss_df4df5542db4d8d89bcf7588a5cc5d2f383d420b.1920x1080.jpg?t=1789119923
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/ef2d770c98f3d543285693c47d78f418fd09d2dd/ss_ef2d770c98f3d543285693c47d78f418fd09d2dd.1920x1080.jpg?t=1789119923
+process  = MarvelRivals.exe
+runmode  = exe
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_marvelrivals.zip
+dev      = NetEase Games
+pub      = NetEase Games
+rel      = Dec 6, 2024
+genres   = Hero Shooter, Third-Person
+features = Multiplayer
+featured = false
+price7   = 3.89        
+price15  = 7.99    
+price30  = 12.99
+price90  = 30.99
+priceLife= 49.99
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Marvel Rivals Internal
+# ───────────────────────────────────────────────────────────────────────────
+[MARVELRIVALSINTERNAL]
+title    = Marvel Rivals Internal
+short    = Rivals Internal
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2767030/header.jpg
 cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/05c3266777dfa88b7b13742c72088a6431eea474/ss_05c3266777dfa88b7b13742c72088a6431eea474.1920x1080.jpg?t=1789119923
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2767030/0b7cb73d511f327e3552750b76baf08daf0b5542/ss_0b7cb73d511f327e3552750b76baf08daf0b5542.1920x1080.jpg?t=1789119923
@@ -392,8 +419,11 @@ rel      = Dec 6, 2024
 genres   = Hero Shooter, Third-Person
 features = Multiplayer
 featured = false
-
-
+price7   = 5.99        
+price15  = 12.99    
+price30  = 28.99
+price90  = 65.99
+priceLife= 109.99
 
 # ───────────────────────────────────────────────────────────────────────────
 #  FORTNITE
@@ -430,7 +460,7 @@ icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/25
 cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2479810/extras/2fdff7de4f378eaf631873ca671561e1.webm?t=1791019595
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/2fa64e158672ee4026a37d5d4fd6029972225c00/ss_2fa64e158672ee4026a37d5d4fd6029972225c00.1920x1080.jpg?t=1791019595
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/7968de28c22b0cdf6fefbad740969fe67afd7d8c/ss_7968de28c22b0cdf6fefbad740969fe67afd7d8c.1920x1080.jpg?t=1791019595
-cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/3f8b34d2ddd034a22b74595ee4409e667db10194/ss_3f8b34d2ddd034a22b74595ee4409e667db10194.1920x1080.jpg?t=1791019595
+cover4   = Mhttps://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/3f8b34d2ddd034a22b74595ee4409e667db10194/ss_3f8b34d2ddd034a22b74595ee4409e667db10194.1920x1080.jpg?t=1791019595
 cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2479810/8e058f615120bba63ad612870ab05297f7288e60/ss_8e058f615120bba63ad612870ab05297f7288e60.1920x1080.jpg?t=1791019595
 runmode  = exe
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
