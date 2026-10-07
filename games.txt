@@ -576,7 +576,6 @@ priceLife= 58.99
 
 
 
-
 # ───────────────────────────────────────────────────────────────────────────
 #  ARC Raiders
 # ───────────────────────────────────────────────────────────────────────────
@@ -602,3 +601,31 @@ featured = false
 price30  = 25.99
 price90  = 48.99
 priceLife= 78.99
+
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Dead by Daylight
+# ───────────────────────────────────────────────────────────────────────────
+[DBD]
+title    = Dead by Daylight
+short    = Dead by Daylight
+icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/23fed9f741423413769ad1617e41519d1a466cdc/header_alt_assets_10.jpg?t=1791302579
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/381210/extras/c89f997a1228bf7ef88851b5a9bb1e83.webm?t=1791302579
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/381210/extras/9da7fadab1ee67047feab3cf57f48860.webm?t=1791302579
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/5355ac410e985cac27f04b877280a984be4d28a6/ss_5355ac410e985cac27f04b877280a984be4d28a6.1920x1080.jpg?t=1791302579
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/76776660827b2b6b73afc4a506c1267462cc70ff/ss_76776660827b2b6b73afc4a506c1267462cc70ff.1920x1080.jpg?t=1791302579
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/141a099b39afb31b864e8eda9570c344ad0c70f5/ss_141a099b39afb31b864e8eda9570c344ad0c70f5.1920x1080.jpg?t=1791302579
+cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/30fa7d276001c8b33a60dc1cd8683c6aae5c20b6/ss_30fa7d276001c8b33a60dc1cd8683c6aae5c20b6.1920x1080.jpg?t=1791302579
+cover7   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/381210/7a898338890f6e0aabf1c8c424a4f33c56c4e1e1/ss_7a898338890f6e0aabf1c8c424a4f33c56c4e1e1.1920x1080.jpg?t=1791302579
+runmode  = exe
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
+dev      = Behaviour Interactive Inc.
+pub      = Behaviour Interactive Inc.
+rel      = 14 Jun, 2016
+genres   = Survival Horror
+features = Multiplayer
+featured = false
+price30  = 12.99
+price90  = 35.99
+priceLife= 68.99
