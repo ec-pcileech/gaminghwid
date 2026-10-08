@@ -3919,13 +3919,13 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
   align-items: flex-end;
   gap: 8px;
 
-  /* 收起：宽度正好包住小横线 + 对称内边距，胶囊左边不再溢出空白 */
-  width: 36px;
-  padding: 8px 4px;
+  /* 固定宽度：收起 / 展开都用这一个值，宽度不参与过渡 */
+  width: 320px;
+  padding: 5px;
   box-sizing: border-box;
   border-radius: 14px;
 
-  /* 收起时完全透明：不写死颜色，展开时才用主题变量上色 */
+  /* 收起状态：完全透明，不加边框、不加阴影、不加模糊 */
   background: transparent;
   border: 1px solid transparent;
   box-shadow: none;
@@ -3942,8 +3942,8 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
   scroll-snap-type: y proximity;
   scroll-behavior: smooth;
 
+  /* 只过渡颜色类属性，宽度/尺寸都不动 */
   transition:
-    width .28s cubic-bezier(.2,.8,.2,1),   /* 宽度过渡：收起↔展开 */
     background .2s ease,
     border-color .2s ease,
     box-shadow .2s ease,
@@ -3956,9 +3956,12 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 /* 悬停 / 键盘聚焦时展开成图2的浮层菜单 */
 .ui-log-rail:hover,
 .ui-log-rail:focus-within {
-  width: 340px;                                  /* 展开宽度：容纳版本号 + 摘要 */
+  /* 固定宽度，不写死值，跟收起时一样 */
+  width: 320px;
 
-  /* 主题变量：浅色主题 → 白玻璃；深色主题 → 深玻璃 */
+  /* 主题变量：浅色主题 → 白玻璃；深色主题 → 深玻璃
+     --surface-2 本身带一点透明度（浅色 .88 / 深色 .82），
+     再叠一层 backdrop-filter 就是干净的 blur 效果 */
   background: var(--surface-2, var(--surface));
   border-color: var(--border-2, var(--border));
 
@@ -3968,6 +3971,8 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
 }
+
+
 .ui-log-rail-item {
   display: flex;
   align-items: center;
@@ -3991,14 +3996,14 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 
 /* 正常状态只显示小横线 */
 .ui-log-rail-dash {
-  width: 14px;                     
-  height: 3px;
+  width: 14px;             /* 宽度固定，选中也不会变 */
+  height: 1px;             /* 未选中：1px 细线 */
   flex-shrink: 0;
   border-radius: 999px;
   background: var(--ui-text-mute);
   opacity: .55;
   transition:
-    width .2s ease,
+    height .2s ease,       /* 只过渡高度 */
     background .2s ease,
     opacity .2s ease,
     box-shadow .2s ease;
@@ -4011,11 +4016,11 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 
 /* 当前项：蓝色长胶囊 */
 .ui-log-rail-item.active .ui-log-rail-dash {
-  width: 22px;                    
-  height: 5px;
+  width: 14px;             /* 宽度不变，跟未选中一样 */
+  height: 2px;             /* 选中：2px 稍粗一点 */
   background: var(--ui-accent);
   opacity: 1;
-  box-shadow: 0 0 12px var(--ui-accent-soft);
+  box-shadow: 0 0 10px var(--ui-accent-soft);
 }
 
 /* 默认隐藏文字，悬停整个导航时再展开 */
