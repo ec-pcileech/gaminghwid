@@ -6790,6 +6790,10 @@ __UI_CSS__
           <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
           <span class="tb-badge" id="tbInboxBadge" hidden>0</span>
         </button>
+        <button class="tb-btn tb-ann" id="tbAnn" onclick="toggleAnn(event)" title="Announcements" data-ui-title="annTitle">
+          <svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+          <span class="tb-ann-dot" id="tbAnnDot" hidden></span>
+        </button>
         <div class="tb-avatar" id="tbAvatar" onclick="showProfile()" title="Profile" data-ui-title="profile">S</div>
         <button class="tb-btn close" onclick="wv('CLOSE')" title="Close" data-ui-title="close">
           <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
@@ -7192,6 +7196,25 @@ __UI_CSS__
 </div>
 
 __UI_MARKUP__
+
+<!-- Announcements 弹窗：定位到图标正下方 -->
+<div class="ann-pop" id="annPop" hidden role="dialog" aria-modal="false">
+  <div class="ann-arrow" id="annArrow"></div>
+  <div class="ann-head">
+    <div class="ann-head-ico">
+      <svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+    </div>
+    <div class="ann-head-txt">
+      <div class="ann-title" data-ui="annTitle">Announcements</div>
+      <div class="ann-sub" data-ui="annSub">Latest news from the team</div>
+    </div>
+    <button class="ann-x" type="button" onclick="closeAnn(event)" aria-label="Close">
+      <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="ann-list" id="annList"></div>
+</div>
+
 <div class="toast-wrap" id="toastWrap"></div>
 
 <!-- 悬停卡片浮出的预览（网格模式）：游戏名 → 媒体轮换（图片每 3 秒一张，视频播完再换）→ 运行次数 -->
@@ -7284,6 +7307,108 @@ __UI_MARKUP__
 .ib-reply-meta{font-size:10.5px;color:var(--text-3);margin-bottom:4px}
 .ib-reply-meta b{margin-left:6px;color:var(--ok);font-weight:700;letter-spacing:.4px}
 .ib-reply-body{font-size:12.5px;line-height:1.55;color:var(--text);white-space:pre-wrap;word-break:break-word}
+
+/* ═════════ Announcements：图标 + 弹窗 ═════════ */
+.tb-ann{position:relative;overflow:visible}
+
+/* 右下角小红点（跟信息图标一致） */
+.tb-ann-dot{
+  position:absolute;right:-2px;bottom:-2px;
+  width:9px;height:9px;border-radius:50%;
+  background:var(--err);pointer-events:none;
+  box-shadow:0 0 0 2px var(--surface);
+  animation:tbDotPulse 1.8s ease-in-out infinite;
+}
+.tb-ann-dot[hidden]{display:none}
+
+/* 有新公告时，图标轻微跳动（跳两下 → 停一会儿 → 再跳两下） */
+.tb-ann.bounce svg{
+  animation:annBounce 2.6s cubic-bezier(.28,.84,.42,1) infinite;
+  transform-origin:50% 60%;
+}
+@keyframes annBounce{
+  0%, 36%, 100% { transform:translateY(0)    rotate(0);     }
+  8%            { transform:translateY(-3px) rotate(-6deg); }
+  16%           { transform:translateY(0)    rotate(0);     }
+  24%           { transform:translateY(-3px) rotate(5deg);  }
+  32%           { transform:translateY(0)    rotate(0);     }
+}
+
+/* 弹窗本体：fixed 定位，JS 计算到图标正下方 */
+.ann-pop{
+  position:fixed;z-index:260;
+  width:340px;max-width:calc(100vw - 32px);
+  padding:14px 14px 10px;
+  border-radius:var(--radius-lg);
+  /* 用主题里那个“不透明表面色”，浅色主题白底、深色主题深底 */
+  background:var(--surface-solid,var(--surface));
+  border:1px solid var(--border-2);
+  box-shadow:var(--shadow-3),0 0 0 1px rgba(0,0,0,.02);
+  backdrop-filter:blur(26px) saturate(180%);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);
+  color:var(--text);
+  opacity:0;transform:translateY(-6px) scale(.985);
+  transition:opacity .18s ease,transform .22s cubic-bezier(.2,.8,.2,1);
+  pointer-events:none;
+}
+.ann-pop.show{opacity:1;transform:none;pointer-events:auto}
+
+/* 箭头：12px 小菱形，旋转 45°，位置由 JS 设置 left */
+.ann-arrow{
+  position:absolute;top:-6px;
+  width:12px;height:12px;margin-left:-6px;
+  background:var(--surface-solid,var(--surface));
+  border-left:1px solid var(--border-2);
+  border-top:1px solid var(--border-2);
+  transform:rotate(45deg);
+  border-top-left-radius:3px;
+}
+
+.ann-head{display:flex;align-items:center;gap:10px;padding:0 2px 10px;border-bottom:1px solid var(--border)}
+.ann-head-ico{
+  width:32px;height:32px;border-radius:9px;flex-shrink:0;
+  display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent-2);
+}
+.ann-head-ico svg{width:16px;height:16px;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ann-head-txt{flex:1;min-width:0}
+.ann-title{font-size:13.5px;font-weight:700;letter-spacing:-.1px}
+.ann-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+.ann-x{
+  width:26px;height:26px;flex-shrink:0;border-radius:8px;
+  display:grid;place-items:center;border:1px solid var(--border);
+  background:transparent;color:var(--text-2);cursor:pointer;
+  transition:color var(--tr),border-color var(--tr),background var(--tr);
+}
+.ann-x:hover{color:var(--err);border-color:rgba(239,68,68,.42);background:rgba(239,68,68,.12)}
+.ann-x svg{width:13px;height:13px;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.ann-list{max-height:320px;overflow-y:auto;padding:4px 0 0}
+.ann-list::-webkit-scrollbar{width:8px}
+.ann-list::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+
+.ann-item{display:flex;gap:11px;padding:11px 4px;border-bottom:1px solid var(--border)}
+.ann-item:last-child{border-bottom:0}
+.ann-item-ico{
+  width:26px;height:26px;flex-shrink:0;border-radius:8px;
+  display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent-2);
+}
+.ann-item-ico svg{width:13px;height:13px;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ann-item-body{flex:1;min-width:0}
+.ann-item-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.ann-item-title{font-size:12.5px;font-weight:700;color:var(--text)}
+.ann-item-new{
+  font-size:9px;font-weight:800;letter-spacing:.4px;
+  padding:1px 7px;border-radius:999px;
+  background:var(--accent-soft);color:var(--accent-2);
+  border:1px solid var(--border);
+}
+.ann-item-txt{margin-top:4px;font-size:12px;line-height:1.55;color:var(--text-2);word-break:break-word}
+.ann-item-date{margin-top:5px;font-size:10.5px;color:var(--text-3)}
 </style>
 <!-- 信息图标：我提交的游戏 + 管理员的回复 -->
 <div class="req-modal" id="inboxModal" onmousedown="if(event.target===this)closeInbox()">
@@ -10826,6 +10951,30 @@ __UI_SCRIPT__
       if (!UI_T[c]) { UI_T[c] = {}; }
       for (var k in X[c]) { UI_T[c][k] = X[c][k]; }
     }
+
+    /* Announcements 弹窗文案 */
+    var ANN_T = {
+      en:{ annTitle:'Announcements', annSub:'Latest news from the team', annNew:'NEW',
+           annEmpty:'No announcements yet.' },
+      zh:{ annTitle:'公告', annSub:'来自团队的最新消息', annNew:'新',
+           annEmpty:'暂时没有公告。' },
+      ru:{ annTitle:'Объявления', annSub:'Последние новости от команды', annNew:'НОВОЕ',
+           annEmpty:'Объявлений пока нет.' },
+      de:{ annTitle:'Ankündigungen', annSub:'Neueste Neuigkeiten vom Team', annNew:'NEU',
+           annEmpty:'Noch keine Ankündigungen.' },
+      ja:{ annTitle:'お知らせ', annSub:'チームからの最新情報', annNew:'新着',
+           annEmpty:'お知らせはまだありません。' },
+      es:{ annTitle:'Anuncios', annSub:'Últimas noticias del equipo', annNew:'NUEVO',
+           annEmpty:'Aún no hay anuncios.' },
+      tr:{ annTitle:'Duyurular', annSub:'Ekibimizden son haberler', annNew:'YENİ',
+           annEmpty:'Henüz duyuru yok.' },
+      pt:{ annTitle:'Anúncios', annSub:'Últimas notícias da equipe', annNew:'NOVO',
+           annEmpty:'Ainda não há anúncios.' }
+    };
+    for (var c2 in ANN_T) {
+      if (!UI_T[c2]) { UI_T[c2] = {}; }
+      for (var k2 in ANN_T[c2]) { UI_T[c2][k2] = ANN_T[c2][k2]; }
+    }
   })();
 
   var INBOX = null;          /* null = 还没拉到；[] = 没有任何请求 */
@@ -10913,6 +11062,137 @@ __UI_SCRIPT__
   });
   setInterval(function(){ if (!document.hidden) { wv('INBOX'); } }, 60000);
   wv('INBOX');
+
+  /* ════════ Announcements：顶部图标 + 弹窗 ════════
+     公告数据就在这个数组里维护；有新的（id 没在 localStorage 里）时图标跳动 + 小红点。
+     打开弹窗即视为已读。 */
+  var ANNOUNCEMENTS = [
+    { id:'ann-2026-10-08-v310',
+      title:'v3.1.0 已上线',
+      text:'启动更快、导航更流畅。详情见更新日志。',
+      date:'2026-10-08' },
+    { id:'ann-2026-10-05-v300',
+      title:'v3.0.0 已上线',
+      text:'启动器整体响应速度提升，欢迎体验并反馈。',
+      date:'2026-10-05' },
+    { id:'ann-2026-09-20-hwid',
+      title:'HWID 解绑说明',
+      text:'更换电脑后如果遇到「HWID 不匹配」，可以在个人资料里提交解绑申请，管理员会尽快处理。',
+      date:'2026-09-20' }
+  ];
+  var ANN_SEEN_KEY = 'starline.ann.seen';
+  var ANN_SEEN = (function(){
+    try {
+      var raw = localStorage.getItem(ANN_SEEN_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  })();
+  function annIsUnread(a){ return ANN_SEEN.indexOf(a.id) < 0; }
+  function annUnreadCount(){
+    var n = 0;
+    for (var i = 0; i < ANNOUNCEMENTS.length; i++) { if (annIsUnread(ANNOUNCEMENTS[i])) { n++; } }
+    return n;
+  }
+  function annSaveSeen(){
+    try { localStorage.setItem(ANN_SEEN_KEY, JSON.stringify(ANN_SEEN)); } catch (e) {}
+  }
+  function annPaintBadge(){
+    var btn = document.getElementById('tbAnn');
+    var dot = document.getElementById('tbAnnDot');
+    var un  = annUnreadCount();
+    if (btn) btn.classList.toggle('bounce', un > 0);
+    if (dot) dot.hidden = !(un > 0);
+  }
+  function annRenderList(){
+    var box = document.getElementById('annList');
+    if (!box) return;
+    if (!ANNOUNCEMENTS.length) {
+      box.innerHTML = '<div class="ann-item"><div class="ann-item-body">'
+        + '<div class="ann-item-txt">' + uiEsc(uiT('annEmpty')) + '</div></div></div>';
+      return;
+    }
+    var html = '';
+    ANNOUNCEMENTS.forEach(function(a){
+      var isNew = annIsUnread(a);
+      html += '<div class="ann-item">'
+        +   '<div class="ann-item-ico">'
+        +     '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>'
+        +   '</div>'
+        +   '<div class="ann-item-body">'
+        +     '<div class="ann-item-top">'
+        +       '<span class="ann-item-title">' + uiEsc(a.title || '') + '</span>'
+        +       (isNew ? '<span class="ann-item-new">' + uiEsc(uiT('annNew')) + '</span>' : '')
+        +     '</div>'
+        +     '<div class="ann-item-txt">' + uiEsc(a.text || '') + '</div>'
+        +     '<div class="ann-item-date">' + uiEsc(a.date || '') + '</div>'
+        +   '</div>'
+        + '</div>';
+    });
+    box.innerHTML = html;
+  }
+  /* 定位：贴在图标正下方，箭头对准图标中心 */
+  function annPlace(){
+    var btn = document.getElementById('tbAnn');
+    var pop = document.getElementById('annPop');
+    var arr = document.getElementById('annArrow');
+    if (!btn || !pop) return;
+    var r = btn.getBoundingClientRect();
+    var pw = pop.offsetWidth || 340;
+    var ph = pop.offsetHeight || 260;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var x = r.left + r.width / 2 - pw / 2;
+    if (x + pw > vw - 10) x = vw - pw - 10;
+    if (x < 10) x = 10;
+    var y = r.bottom + 10;
+    if (y + ph > vh - 10) { y = Math.max(10, r.top - ph - 10); }   /* 空间不够就翻到上面 */
+    pop.style.left = Math.round(x) + 'px';
+    pop.style.top  = Math.round(y) + 'px';
+    if (arr) arr.style.left = Math.round(r.left + r.width / 2 - x) + 'px';
+  }
+  function openAnn(ev){
+    if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+    var pop = document.getElementById('annPop');
+    if (!pop) return;
+    annRenderList();
+    pop.hidden = false;
+    void pop.offsetWidth;                 /* 强制 reflow，让 transition 生效 */
+    pop.classList.add('show');
+    annPlace();
+    /* 打开即视为已读：图标停止跳动、小红点消失 */
+    ANNOUNCEMENTS.forEach(function(a){ if (annIsUnread(a)) { ANN_SEEN.push(a.id); } });
+    annSaveSeen();
+    setTimeout(annPaintBadge, 200);
+  }
+  function closeAnn(ev){
+    if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+    var pop = document.getElementById('annPop');
+    if (!pop) return;
+    pop.classList.remove('show');
+    setTimeout(function(){ if (!pop.classList.contains('show')) { pop.hidden = true; } }, 220);
+  }
+  function toggleAnn(ev){
+    var pop = document.getElementById('annPop');
+    if (!pop) return;
+    if (pop.hidden || !pop.classList.contains('show')) { openAnn(ev); }
+    else { closeAnn(ev); }
+  }
+  document.addEventListener('pointerdown', function(e){
+    var pop = document.getElementById('annPop');
+    if (!pop || pop.hidden) return;
+    var t = e.target;
+    if (t && t.closest && (t.closest('#annPop') || t.closest('#tbAnn'))) return;
+    closeAnn();
+  }, true);
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') { closeAnn(); }
+  });
+  window.addEventListener('resize', function(){
+    var pop = document.getElementById('annPop');
+    if (pop && pop.classList.contains('show')) { annPlace(); }
+  });
+
+  /* 首次进页面初始化图标状态（有未读 → 跳动 + 小红点） */
+  annPaintBadge();
 
 
   window.onRenewSuccess = function(){
