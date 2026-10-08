@@ -1796,56 +1796,10 @@ var UI_LAYOUT_KEY = { 'rail-l':'layoutRailL', 'rail-r':'layoutRailR',
 
 
 var UI_CHANGELOG = [
-  { v:'3.0.0', date:'2026-10-05', tag:'latest',
-    en:['Improve launcher performance'],
-    zh:['提升登陆器性能'] },
-  { v:'2.2.0', date:'2026-10-03',
-    en:['The login page now uses the same glass style as the dashboard.',
-        'New neutral graphite dark theme with a blue accent, replacing the purple one.',
-        'Blur added to toasts, settings, renew and detail pages.',
-        'Toasts now pop up at the bottom centre; the back button on Buy Now / Renew is animated.'],
-    zh:['登录页改为与主界面一致的毛玻璃风格。',
-        '全新中性石墨暗黑主题，主色改为蓝色，不再偏紫。',
-        '提示窗口、设置页、续费页、详情页加入背景模糊。',
-        '提示窗口改为底部居中弹出；Buy Now / Renew 返回按钮加入动画。'] },
-  { v:'2.1.0', date:'2026-03-01',
-    en:['Fixed empty space at the bottom of the window when Windows Scale is 80% or 90%.',
-        'Buy Now button on the dashboard hero is no longer covered by the discount badge.',
-        'Wishlisted games are pinned to the front of All Games with a heart icon.',
-        'Games without a subscription now show a real Buy Now button on the detail page.',
-        'The Renew page has been rebuilt — key grouping, plan preview and clearer status.'],
-    zh:['修复 Windows 缩放 80%/90% 时窗口底部出现空白的问题。',
-        '主界面 Hero 的 Buy Now 按钮不再被折扣角标遮挡。',
-        '收藏的游戏会带爱心图标排到 All Games 前面。',
-        '未订阅的游戏详情页现在会显示真正的 Buy Now 按钮。',
-        'Renew 续费页重做 — 密钥分组、套餐预览、状态提示更清晰。'] },
-  { v:'2.0.0', date:'2026-02-14',
-    en:['Window chrome redesigned — the top bar is gone; settings and the update log are full pages now.',
-        'New settings page: language grid, light/dark/system themes and a custom theme editor.',
-        'Window controls moved under the login form: settings, update log and close.'],
-    zh:['重做窗口外壳 — 顶部栏移除，设置与更新日志改为独立整页。',
-        '新增设置页：语言选择网格、浅色/深色/跟随系统主题，以及自定义主题编辑器。',
-        '窗口按钮移动到登录表单下方：设置、更新日志、关闭。'] },
-  { v:'1.9.0', date:'2025-12-03',
-    en:['License keys are validated on a background thread so the login form never freezes.',
-        'Added a paste button and Enter-to-submit on the key field.'],
-    zh:['卡密校验放到后台线程，登录界面不再卡顿。',
-        '密钥输入框新增粘贴按钮与回车提交。'] },
-  { v:'1.8.0', date:'2025-10-21',
-    en:['Dashboard rebuilt around a sidebar layout with a live licence countdown.',
-        'Injection results are reported through toast notifications.'],
-    zh:['仪表盘改为侧边栏布局，授权倒计时实时刷新。',
-        '注入结果通过右下角 Toast 通知展示。'] },
-  { v:'1.7.0', date:'2025-09-08',
-    en:['Eight interface languages with a flag picker.',
-        'Dark and light palettes for both the login page and the dashboard.'],
-    zh:['支持 8 种界面语言与国旗选择。',
-        '登录页与仪表盘都提供深色/浅色配色。'] },
-  { v:'1.6.0', date:'2025-07-30',
-    en:['First single-file WebView2 build.',
-        'Local licence cache so activated users skip the login form.'],
-    zh:['首个单文件 WebView2 版本。',
-        '本地授权缓存，已激活用户跳过登录。'] }
+  { v:'3.1.0', date:'2026-10-08', tag:'latest',
+    en:['Recode luancher'],
+  { v:'3.0.0', date:'2026-10-05',
+    en:['Improve launcher performance'] }
 ];
 
 /* ════════════════════════════════════════════════════════════════
@@ -6527,7 +6481,7 @@ __UI_CSS__
       </div>
       <div class="sb-brand-text">
         <b>STARLINE</b>
-        <span id="sbVer">v3.0</span>
+        <span id="sbVer">v3.1</span>
       </div>
     </div>
     <nav class="sb-nav">
