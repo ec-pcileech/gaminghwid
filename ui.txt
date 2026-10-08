@@ -3917,7 +3917,7 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 9px;
+  gap: 8px;
   padding: 10px;
   border-radius: 18px;
   background: transparent;
@@ -3925,6 +3925,17 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
   box-shadow: none;
   backdrop-filter: blur(0);
   -webkit-backdrop-filter: blur(0);
+
+  /* ── 只显示 6 条小横线，其余透过滚轮查看 ── */
+  max-height: 150px;                 /* 6 条小横线 + 上下内边距的精确高度 */
+  overflow-y: auto;                  /* 悬停时用滚轮滚动，查看其余小横线 */
+  overflow-x: hidden;
+  scrollbar-width: none;             /* Firefox：隐藏滚动条 */
+  -ms-overflow-style: none;          /* 旧 Edge：隐藏滚动条 */
+  overscroll-behavior: contain;      /* 滚到头不带动外层页面跟着滚 */
+  scroll-snap-type: y proximity;     /* 滚动时有点“吸附”手感 */
+  scroll-behavior: smooth;
+
   transition:
     background .2s ease,
     border-color .2s ease,
@@ -3932,6 +3943,8 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
     backdrop-filter .2s ease,
     -webkit-backdrop-filter .2s ease;
 }
+.ui-log-rail::-webkit-scrollbar { width: 0; height: 0; display: none; }  /* Chrome / Edge / Safari：隐藏滚动条 */
+
 
 /* 悬停 / 键盘聚焦时展开成图2的浮层菜单 */
 .ui-log-rail:hover,
@@ -3949,7 +3962,10 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
   justify-content: flex-end;
   gap: 10px;
   width: 100%;
-  padding: 1px 0;
+  /* 固定行高：6 条 x 14px + 5 x 8px = 124px，再加 padding = 150px（即上方 max-height） */
+  min-height: 14px;
+  max-height: 14px;
+  padding: 0;
   border: 0;
   background: none;
   color: var(--ui-text-dim);
@@ -3957,11 +3973,13 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
   text-align: right;
   font: inherit;
   white-space: nowrap;
+  flex-shrink: 0;                    /* 不参与压缩，6 条数量才稳定 */
+  scroll-snap-align: center;         /* 滚动吸附到中间位置 */
 }
 
 /* 正常状态只显示小横线 */
 .ui-log-rail-dash {
-  width: 22px;
+  width: 14px;                      
   height: 3px;
   flex-shrink: 0;
   border-radius: 999px;
@@ -3981,7 +3999,7 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 
 /* 当前项：蓝色长胶囊 */
 .ui-log-rail-item.active .ui-log-rail-dash {
-  width: 34px;
+  width: 16px;                      
   height: 5px;
   background: var(--ui-accent);
   opacity: 1;
