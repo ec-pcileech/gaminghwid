@@ -6709,7 +6709,7 @@ __UI_CSS__
       </div>
       <div class="sb-brand-text">
         <b>STARLINE</b>
-        <span id="sbVer">v3.1.0</span>
+        <span id="sbVer">v3.1</span>
       </div>
     </div>
     <nav class="sb-nav">
@@ -11048,6 +11048,7 @@ __UI_SCRIPT__
     if (msg.indexOf('ANNOUNCEMENTS_RAW:') === 0) {
       try {
         var annList = JSON.parse(msg.slice(18));
+        if (annList && !Array.isArray(annList)) { annList = annList.announcements; }   /* 网站回 {ok:true, announcements:[...]} */
         if (Array.isArray(annList)) {
           ANNOUNCEMENTS = annList.map(function(a){
             return {
