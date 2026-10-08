@@ -3918,46 +3918,56 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
-  /* 左侧内边距收窄（原来是 10px 一圈）：背景圆角矩形不再往左溢出多余宽度 */
-  padding: 8px 10px 8px 4px;
+
+  /* 收起：宽度正好包住小横线 + 对称内边距，胶囊左边不再溢出空白 */
+  width: 36px;
+  padding: 8px 4px;
+  box-sizing: border-box;
   border-radius: 14px;
+
+  /* 收起时完全透明：不写死颜色，展开时才用主题变量上色 */
   background: transparent;
   border: 1px solid transparent;
-  /* 默认无阴影，展开时才出现（悬停规则里用主题阴影变量） */
   box-shadow: none;
   backdrop-filter: blur(0);
   -webkit-backdrop-filter: blur(0);
 
   /* ── 只显示 6 条小横线，其余透过滚轮查看 ── */
-  max-height: 150px;                 /* 6 条小横线 + 上下内边距的精确高度 */
-  overflow-y: auto;                  /* 悬停时用滚轮滚动，查看其余小横线 */
+  max-height: 150px;
+  overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: none;             /* Firefox：隐藏滚动条 */
-  -ms-overflow-style: none;          /* 旧 Edge：隐藏滚动条 */
-  overscroll-behavior: contain;      /* 滚到头不带动外层页面跟着滚 */
-  scroll-snap-type: y proximity;     /* 滚动时有点“吸附”手感 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+  scroll-snap-type: y proximity;
   scroll-behavior: smooth;
 
   transition:
+    width .28s cubic-bezier(.2,.8,.2,1),   /* 宽度过渡：收起↔展开 */
     background .2s ease,
     border-color .2s ease,
     box-shadow .2s ease,
     backdrop-filter .2s ease,
     -webkit-backdrop-filter .2s ease;
 }
-.ui-log-rail::-webkit-scrollbar { width: 0; height: 0; display: none; }  /* Chrome / Edge / Safari：隐藏滚动条 */
+.ui-log-rail::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
 
 /* 悬停 / 键盘聚焦时展开成图2的浮层菜单 */
 .ui-log-rail:hover,
 .ui-log-rail:focus-within {
+  width: 340px;                                  /* 展开宽度：容纳版本号 + 摘要 */
 
-  background: var(--ui-surface-3, var(--ui-surface-2));
-  border-color: var(--ui-border-2, var(--ui-border));
+  /* 主题变量：浅色主题 → 白玻璃；深色主题 → 深玻璃 */
+  background: var(--surface-2, var(--surface));
+  border-color: var(--border-2, var(--border));
+
+  /* 淡阴影也走主题变量：浅色下是淡蓝灰、深色下是柔黑 */
   box-shadow: var(--shadow-2, 0 8px 28px rgba(0,0,0,.35));
+
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
 }
-
 .ui-log-rail-item {
   display: flex;
   align-items: center;
@@ -4010,33 +4020,28 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 
 /* 默认隐藏文字，悬停整个导航时再展开 */
 .ui-log-rail-label {
-  max-width: 0;
-  opacity: 0;
+  display: none;
+  max-width: 280px;
   overflow: hidden;
-  transform: translateX(8px);
-  transition:
-    max-width .24s cubic-bezier(.2,.8,.2,1),
-    opacity .18s ease,
-    transform .24s cubic-bezier(.2,.8,.2,1);
   font-size: 12px;
   font-weight: 600;
-  color: var(--ui-text-dim);
+  color: var(--text-2, var(--ui-text-dim));
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ui-log-rail:hover .ui-log-rail-label,
 .ui-log-rail:focus-within .ui-log-rail-label {
-  max-width: 320px;
-  opacity: 1;
-  transform: none;
+  display: block;
+  margin-right: 10px;      /* 展开时 label 与 dash 之间留 10px */
 }
 
+/* 当前项 / 悬停项的文字颜色：跟随主题强调色 / 主文字色 */
 .ui-log-rail-item.active .ui-log-rail-label {
-  color: var(--ui-accent);
+  color: var(--accent, var(--ui-accent));
 }
-
 .ui-log-rail-item:hover .ui-log-rail-label {
-  color: var(--ui-text);
+  color: var(--text, var(--ui-text));
 }
 
 __UI_CSS__
