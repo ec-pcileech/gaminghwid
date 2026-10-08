@@ -279,7 +279,7 @@ rel      = Apr 14, 2015
 genres   = Action, Open World
 features = Multiplayer
 featured = true
-status   = outdated
+status   = available
 
 
 # ───────────────────────────────────────────────────────────────────────────
