@@ -11081,8 +11081,9 @@ __UI_SCRIPT__
       setTimeout(function(){ wv('INBOX'); }, 400);     /* 刚提交的请求马上出现在信息里 */
     }
   });
-  setInterval(function(){ if (!document.hidden) { wv('INBOX'); } }, 60000);
+  setInterval(function(){ if (!document.hidden) { wv('INBOX'); wv('ANNOUNCEMENTS'); } }, 60000);
   wv('INBOX');
+  wv('ANNOUNCEMENTS');   /* 向宿主要公告列表；宿主回 ANNOUNCEMENTS_RAW:[...] */
 
   /* ════════ Announcements：顶部图标 + 弹窗 ════════
      公告数据就在这个数组里维护；有新的（id 没在 localStorage 里）时图标跳动 + 小红点。
@@ -11161,6 +11162,7 @@ __UI_SCRIPT__
     var pop = document.getElementById('annPop');
     if (!pop) return;
     annRenderList();
+    wv('ANNOUNCEMENTS');                  /* 打开时再拉一次，保证看到最新公告 */
     pop.hidden = false;
     void pop.offsetWidth;                 /* 强制 reflow，让 transition 生效 */
     pop.classList.add('show');
