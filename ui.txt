@@ -7227,10 +7227,33 @@ __UI_MARKUP__
 </div>
 <style>
 .tb-inbox{position:relative}
-.tb-badge{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;
-  background:var(--err);color:#fff;font-size:10px;font-weight:700;line-height:16px;text-align:center;
-  box-shadow:0 0 0 2px var(--surface);pointer-events:none}
+/* 有未读消息时，图标右下角显示一个小红点（不显示数字） */
+.tb-badge{
+  position:absolute;
+  right:-2px;
+  bottom:-2px;
+  top:auto;
+  left:auto;
+  min-width:0;
+  width:9px;
+  height:9px;
+  padding:0;
+  border-radius:50%;
+  background:var(--err);
+  color:transparent;              /* 数字不可见 */
+  font-size:0;
+  line-height:0;
+  overflow:hidden;
+  text-indent:-9999px;
+  box-shadow:0 0 0 2px var(--surface);   /* 外圈跟背景同色：看起来像从按钮上“挖”出来的 */
+  pointer-events:none;
+  animation:tbDotPulse 1.8s ease-in-out infinite;   /* 轻微呼吸光晕，新消息更显眼 */
+}
 .tb-badge[hidden]{display:none}
+@keyframes tbDotPulse{
+  0%,100%{ box-shadow:0 0 0 2px var(--surface), 0 0 0 0   rgba(239,68,68,.55); }
+  50%    { box-shadow:0 0 0 2px var(--surface), 0 0 0 5px rgba(239,68,68,0);   }
+}
 .inbox-box{width:min(520px,calc(100% - 40px));max-height:min(640px,calc(100vh - 80px));
   display:flex;flex-direction:column;padding:22px 22px 18px}
 .inbox-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
