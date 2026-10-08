@@ -91,6 +91,7 @@ rel      = TBA
 genres   = MOBA, Shooter, Third-Person
 features = Multiplayer, Early Access
 featured = true
+status   = available
 price7   = 4.99        
 price15  = 8.99    
 price30  = 19.99
@@ -119,6 +120,7 @@ rel      = Dec 21, 2017
 genres   = Battle Royale, Shooter
 features = Multiplayer, Anti-Cheat
 featured = true
+status   = updating
 price30  = 24.99
 price90  = 59.99
 priceLife= 99.99
@@ -277,6 +279,7 @@ rel      = Apr 14, 2015
 genres   = Action, Open World
 features = Multiplayer
 featured = true
+status   = outdated
 
 
 # ───────────────────────────────────────────────────────────────────────────
