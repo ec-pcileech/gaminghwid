@@ -6709,7 +6709,7 @@ __UI_CSS__
       </div>
       <div class="sb-brand-text">
         <b>STARLINE</b>
-        <span id="sbVer">v3.1</span>
+        <span id="sbVer">v3.1.0</span>
       </div>
     </div>
     <nav class="sb-nav">
@@ -11058,10 +11058,15 @@ __UI_SCRIPT__
               date:  String(a.ann_date || a.date || '').slice(0, 10)
             };
           });
+          ANN_STATE = 'ok';
           annRenderList();
           annPaintBadge();
-        }
-      } catch (e) {}
+        } else { ANN_STATE = 'err:FORMAT'; annRenderList(); }
+      } catch (e) { ANN_STATE = 'err:PARSE'; annRenderList(); }
+    }
+    else if (msg.indexOf('ANNOUNCEMENTS_ERR:') === 0) {
+      ANN_STATE = 'err:' + msg.slice(18);
+      annRenderList();
     }
     else if (msg.indexOf('INBOX_RAW:') === 0) {
       var d = null;
@@ -11089,6 +11094,7 @@ __UI_SCRIPT__
   /* ════════ Announcements：顶部图标 + 弹窗 ════════
      公告数据就在这个数组里维护；有新的（id 没在 localStorage 里）时图标跳动 + 小红点。
      打开弹窗即视为已读。 */
+  var ANN_STATE = 'wait';   /* wait = 还没收到宿主回复；ok；err:<代码> */
   var ANN_SEEN_KEY = 'starline.ann.seen';
   var ANN_SEEN = (function(){
     try {
@@ -11116,8 +11122,11 @@ __UI_SCRIPT__
     var box = document.getElementById('annList');
     if (!box) return;
     if (!ANNOUNCEMENTS.length) {
+      var emptyTxt = uiT('annEmpty');
+      if (ANN_STATE === 'wait') { emptyTxt = 'Loading…'; }
+      else if (ANN_STATE.indexOf('err:') === 0) { emptyTxt = 'Failed to load announcements (' + ANN_STATE.slice(4) + ')'; }
       box.innerHTML = '<div class="ann-item"><div class="ann-item-body">'
-        + '<div class="ann-item-txt">' + uiEsc(uiT('annEmpty')) + '</div></div></div>';
+        + '<div class="ann-item-txt">' + uiEsc(emptyTxt) + '</div></div></div>';
       return;
     }
     var html = '';
