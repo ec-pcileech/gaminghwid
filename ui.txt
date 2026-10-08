@@ -3979,7 +3979,7 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 
 /* 正常状态只显示小横线 */
 .ui-log-rail-dash {
-  width: 14px;                      
+  width: 14px;                     
   height: 3px;
   flex-shrink: 0;
   border-radius: 999px;
@@ -3999,7 +3999,7 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 
 /* 当前项：蓝色长胶囊 */
 .ui-log-rail-item.active .ui-log-rail-dash {
-  width: 16px;                      
+  width: 22px;                    
   height: 5px;
   background: var(--ui-accent);
   opacity: 1;
