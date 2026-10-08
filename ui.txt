@@ -3918,10 +3918,12 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
-  padding: 10px;
-  border-radius: 18px;
+  /* 左侧内边距收窄（原来是 10px 一圈）：背景圆角矩形不再往左溢出多余宽度 */
+  padding: 8px 10px 8px 4px;
+  border-radius: 14px;
   background: transparent;
   border: 1px solid transparent;
+  /* 默认无阴影，展开时才出现（悬停规则里用主题阴影变量） */
   box-shadow: none;
   backdrop-filter: blur(0);
   -webkit-backdrop-filter: blur(0);
@@ -3945,13 +3947,13 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 }
 .ui-log-rail::-webkit-scrollbar { width: 0; height: 0; display: none; }  /* Chrome / Edge / Safari：隐藏滚动条 */
 
-
 /* 悬停 / 键盘聚焦时展开成图2的浮层菜单 */
 .ui-log-rail:hover,
 .ui-log-rail:focus-within {
-  background: rgba(20, 20, 26, .76);
-  border-color: var(--ui-border-2, rgba(255,255,255,.15));
-  box-shadow: 0 18px 48px rgba(0,0,0,.45);
+
+  background: var(--ui-surface-3, var(--ui-surface-2));
+  border-color: var(--ui-border-2, var(--ui-border));
+  box-shadow: var(--shadow-2, 0 8px 28px rgba(0,0,0,.35));
   backdrop-filter: blur(24px) saturate(160%);
   -webkit-backdrop-filter: blur(24px) saturate(160%);
 }
