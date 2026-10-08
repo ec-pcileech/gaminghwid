@@ -62,6 +62,7 @@ rel      = Sep 27, 2023
 genres   = FPS, Competitive, Action
 features = Anti-Cheat, Multiplayer, Cloud Save
 featured = true
+status   = available
 price7   = 4.99        
 price15  = 8.99      
 price30  = 19.99       
