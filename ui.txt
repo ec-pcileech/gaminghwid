@@ -10981,6 +10981,7 @@ __UI_SCRIPT__
 
   var INBOX = null;          /* null = 还没拉到；[] = 没有任何请求 */
   var INBOX_LAST = -1;       /* 上一次看到的未读数（-1 = 还没拉过） */
+    if (typeof ANNOUNCEMENTS === 'undefined') { var ANNOUNCEMENTS = []; }
   function inboxEl(id){ return document.getElementById(id); }
   function inboxIsOpen(){
     var m = inboxEl('inboxModal');
@@ -11043,7 +11044,8 @@ __UI_SCRIPT__
   window.chrome.webview.addEventListener('message', function(e){
     var msg = e.data;
     if (typeof msg !== 'string') return;
-        else if (msg.indexOf('ANNOUNCEMENTS_RAW:') === 0) {
+
+    if (msg.indexOf('ANNOUNCEMENTS_RAW:') === 0) {
       try {
         var annList = JSON.parse(msg.slice(18));
         if (Array.isArray(annList)) {
@@ -11060,7 +11062,7 @@ __UI_SCRIPT__
         }
       } catch (e) {}
     }
-    if (msg.indexOf('INBOX_RAW:') === 0) {
+    else if (msg.indexOf('INBOX_RAW:') === 0) {
       var d = null;
       try { d = JSON.parse(msg.slice(10)); } catch (err) {}
       if (!d || !d.ok) return;
@@ -11085,7 +11087,6 @@ __UI_SCRIPT__
   /* ════════ Announcements：顶部图标 + 弹窗 ════════
      公告数据就在这个数组里维护；有新的（id 没在 localStorage 里）时图标跳动 + 小红点。
      打开弹窗即视为已读。 */
-  var ANNOUNCEMENTS = [];
   var ANN_SEEN_KEY = 'starline.ann.seen';
   var ANN_SEEN = (function(){
     try {
