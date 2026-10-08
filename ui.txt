@@ -1797,7 +1797,7 @@ var UI_LAYOUT_KEY = { 'rail-l':'layoutRailL', 'rail-r':'layoutRailR',
 
 var UI_CHANGELOG = [
   { v:'3.1.0', date:'2026-10-08', tag:'latest',
-    en:['Recode luancher'],
+    en:['Improve launcher performance'] },
   { v:'3.0.0', date:'2026-10-05',
     en:['Improve launcher performance'] }
 ];
