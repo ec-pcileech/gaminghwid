@@ -6709,7 +6709,7 @@ __UI_CSS__
       </div>
       <div class="sb-brand-text">
         <b>STARLINE</b>
-        <span id="sbVer">v3.1</span>
+        <span id="sbVer">v3.1.0</span>
       </div>
     </div>
     <nav class="sb-nav">
