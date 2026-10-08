@@ -11043,6 +11043,23 @@ __UI_SCRIPT__
   window.chrome.webview.addEventListener('message', function(e){
     var msg = e.data;
     if (typeof msg !== 'string') return;
+        else if (msg.indexOf('ANNOUNCEMENTS_RAW:') === 0) {
+      try {
+        var annList = JSON.parse(msg.slice(18));
+        if (Array.isArray(annList)) {
+          ANNOUNCEMENTS = annList.map(function(a){
+            return {
+              id:    String(a.ann_key || a.id || ''),
+              title: String(a.title || ''),
+              text:  String(a.text || a.body || ''),
+              date:  String(a.ann_date || a.date || '').slice(0, 10)
+            };
+          });
+          annRenderList();
+          annPaintBadge();
+        }
+      } catch (e) {}
+    }
     if (msg.indexOf('INBOX_RAW:') === 0) {
       var d = null;
       try { d = JSON.parse(msg.slice(10)); } catch (err) {}
@@ -11068,20 +11085,7 @@ __UI_SCRIPT__
   /* ════════ Announcements：顶部图标 + 弹窗 ════════
      公告数据就在这个数组里维护；有新的（id 没在 localStorage 里）时图标跳动 + 小红点。
      打开弹窗即视为已读。 */
-  var ANNOUNCEMENTS = [
-    { id:'ann-2026-10-08-v310',
-      title:'v3.1.0 已上线',
-      text:'启动更快、导航更流畅。详情见更新日志。',
-      date:'2026-10-08' },
-    { id:'ann-2026-10-05-v300',
-      title:'v3.0.0 已上线',
-      text:'启动器整体响应速度提升，欢迎体验并反馈。',
-      date:'2026-10-05' },
-    { id:'ann-2026-09-20-hwid',
-      title:'HWID 解绑说明',
-      text:'更换电脑后如果遇到「HWID 不匹配」，可以在个人资料里提交解绑申请，管理员会尽快处理。',
-      date:'2026-09-20' }
-  ];
+  var ANNOUNCEMENTS = [];
   var ANN_SEEN_KEY = 'starline.ann.seen';
   var ANN_SEEN = (function(){
     try {
