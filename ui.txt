@@ -3898,8 +3898,27 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
   animation:popIn .5s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes popIn{from{transform:scale(0)}to{transform:scale(1)}}
-.s-ring svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
-.s-title{font-size:23px;font-weight:900;letter-spacing:-.5px}
+.s-ring{position:relative}
+.s-ring::after{                      /* 外圈柔和扩散的光环 */
+  content:'';position:absolute;inset:0;border-radius:50%;border:2px solid var(--ok);
+  opacity:0;animation:lgRipple 1.4s .35s ease-out infinite;
+}
+@keyframes lgRipple{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.7);opacity:0}}
+.s-ring svg{width:34px;height:34px;stroke:#fff;fill:none;stroke-width:2.9;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,.18))}
+.s-tick{stroke-dasharray:1;stroke-dashoffset:1;animation:lgTick .5s .28s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes lgTick{to{stroke-dashoffset:0}}
+.s-title{
+  display:inline-block;font-size:30px;font-weight:700;letter-spacing:8px;padding-left:8px;text-transform:uppercase;
+  --base:#71717a;--hi:#ffffff;--spread:28px;
+  color:transparent;-webkit-background-clip:text;background-clip:text;
+  background-image:linear-gradient(90deg,#0000 calc(50% - var(--spread)),var(--hi),#0000 calc(50% + var(--spread))),
+                   linear-gradient(var(--base),var(--base));
+  background-size:250% 100%,auto;background-repeat:no-repeat;
+  animation:lgShimmer 2s linear infinite;
+}
+[data-theme="light"] .s-title{--base:#a1a1aa;--hi:#14151a}
+@keyframes lgShimmer{from{background-position:100% center}to{background-position:0% center}}
 .s-meta{
   display:inline-flex;align-items:center;gap:8px;font-size:12px;font-family:var(--font-mono);
   color:var(--text-2);padding:8px 18px;border-radius:var(--radius-full);
@@ -4221,7 +4240,7 @@ __UI_CSS__
 <div class="toast-wrap" id="toastWrap"></div>
 <div class="success-ovl" id="sovl">
   <div class="s-ring">
-    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    <svg viewBox="0 0 24 24"><path class="s-tick" pathLength="1" d="M6.2 12.9C7.7 14.1 9 15.4 10.2 17.1C12.3 13.5 15 10.2 18.4 7.4"/></svg>
   </div>
   <div class="s-title" id="sTitle">Activated!</div>
   <div class="s-meta"  id="sMeta"></div>
