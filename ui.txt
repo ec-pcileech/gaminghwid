@@ -3628,7 +3628,7 @@ body::before{
 }
 input,button{font-family:inherit;font-size:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none;padding:0}
-/* ═══════════════ 登录页：居中毛玻璃卡片 + 星空背景 ═══════════════ */
+/* ═══════════════ 登录页：居中毛玻璃卡片 + 动态星空 ═══════════════ */
 :root{
   --lg-bg:#1c1c1e;
   --lg-glow-a:rgba(124,92,214,.16);--lg-glow-b:rgba(64,92,230,.22);--lg-glow-c:rgba(206,72,96,.10);
@@ -3640,8 +3640,8 @@ button{cursor:pointer;border:none;background:none;padding:0}
   --lg-btn-line:rgba(255,255,255,.11);--lg-btn-hover:rgba(255,255,255,.12);
   --lg-fg:#f4f4f5;--lg-fg2:rgba(255,255,255,.62);--lg-fg3:rgba(255,255,255,.40);
   --lg-star:255,255,255;
+  --lg-tile-line:rgba(255,255,255,.06);--lg-tile-fill:rgba(255,255,255,.022);--lg-deco-line:rgba(255,255,255,.22);
   --lg-card-shadow:0 34px 90px rgba(0,0,0,.55),0 8px 24px rgba(0,0,0,.35);
-  --lg-bgimg-op:.08;
 }
 [data-theme="light"]{
   --lg-bg:#eceef3;
@@ -3654,73 +3654,77 @@ button{cursor:pointer;border:none;background:none;padding:0}
   --lg-btn-line:rgba(20,25,45,.12);--lg-btn-hover:#fff;
   --lg-fg:#14151a;--lg-fg2:rgba(20,25,45,.66);--lg-fg3:rgba(20,25,45,.42);
   --lg-star:40,50,90;
+  --lg-tile-line:rgba(20,25,45,.08);--lg-tile-fill:rgba(20,25,45,.02);--lg-deco-line:rgba(20,25,45,.22);
   --lg-card-shadow:0 30px 80px rgba(30,40,80,.18),0 6px 18px rgba(30,40,80,.08);
-  --lg-bgimg-op:.07;
 }
 body{background:var(--lg-bg)}
 
-/* 背景层：星空 + 精选游戏截图（极淡、重度虚化，只当环境色） */
+/* 背景：动态星空画布（脚本里绘制） */
 .lg-sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.lg-stars{position:absolute;left:0;top:0;width:1px;height:1px;border-radius:50%;background:transparent}
-.lg-stars.big{width:2px;height:2px}
-.lg-glint{
-  position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;opacity:.6;
-  background:radial-gradient(circle,rgba(var(--lg-star),.75) 0,rgba(var(--lg-star),.16) 28%,transparent 62%);
-}
-.game-bg{
-  position:absolute;inset:-8%;background-size:cover;background-position:center;
-  opacity:0;filter:blur(46px) saturate(1.1);will-change:opacity;
-  transition:opacity .9s ease;
-}
-.game-bg.visible{opacity:var(--lg-bgimg-op)}
+.lg-sky canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 
-/* 舞台：卡片居中；窗口太矮时整页可滚动 */
+/* 舞台：卡片居中，整页不可滚动（太矮的窗口由脚本整体缩小来适配） */
 .lg-stage{
-  position:relative;z-index:1;width:100%;height:100%;min-height:0;overflow-y:auto;
-  display:flex;flex-direction:column;align-items:center;padding:46px 18px 22px;
+  position:relative;z-index:1;width:100%;height:100%;min-height:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;padding:36px 18px 18px;
   animation:lgIn .6s cubic-bezier(.2,.8,.2,1);
 }
-.lg-stage > .right{margin-top:auto}
-.lg-stage > .lg-below{margin-bottom:auto}
 @keyframes lgIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
 
 /* 卡片（.right 保留类名：脚本用它切换登录/注册） */
 .right{
-  position:relative;flex-shrink:0;width:min(348px,100%);
-  display:flex;flex-direction:column;padding:26px 22px 16px;border-radius:28px;
+  position:relative;flex-shrink:0;width:min(430px,100%);
+  display:flex;flex-direction:column;padding:38px 34px 26px;border-radius:32px;
   background:linear-gradient(180deg,var(--lg-card-a),var(--lg-card-b));
   box-shadow:var(--lg-card-shadow),inset 0 1px 0 rgba(255,255,255,.07);
-  backdrop-filter:blur(26px) saturate(150%);-webkit-backdrop-filter:blur(26px) saturate(150%);
+  backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
+  transform-origin:center center;
 }
-/* 渐变描边：上沿最亮，两侧淡，下沿微亮 */
 .right::before{
   content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;
   background:linear-gradient(180deg,var(--lg-ring-a),var(--lg-ring-b) 38%,var(--lg-ring-b) 62%,var(--lg-ring-c));
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;mask-composite:exclude;
 }
+
+/* 卡片左右两侧的装饰：四块圆角「便当格」轮廓 + 一条贯穿中线，越往外越淡 */
+.lg-deco{position:absolute;inset:0;pointer-events:none}
+.lg-tile{
+  position:absolute;width:310px;height:calc(50% - 3px);border-radius:32px;
+  border:1px solid var(--lg-tile-line);
+  background:linear-gradient(180deg,var(--lg-tile-fill),transparent);
+}
+.lg-tile.tl,.lg-tile.bl{right:calc(100% + 18px);
+  -webkit-mask-image:linear-gradient(to left,#000 8%,transparent 100%);mask-image:linear-gradient(to left,#000 8%,transparent 100%)}
+.lg-tile.tr,.lg-tile.br{left:calc(100% + 18px);
+  -webkit-mask-image:linear-gradient(to right,#000 8%,transparent 100%);mask-image:linear-gradient(to right,#000 8%,transparent 100%)}
+.lg-tile.tl,.lg-tile.tr{top:0}
+.lg-tile.bl,.lg-tile.br{bottom:0}
+.lg-line{position:absolute;top:50%;width:310px;height:1px;margin-top:-1px}
+.lg-line.l{right:calc(100% + 18px);background:linear-gradient(to left,var(--lg-deco-line),transparent)}
+.lg-line.r{left:calc(100% + 18px);background:linear-gradient(to right,var(--lg-deco-line),transparent)}
+
 .lg-logo{
-  width:42px;height:42px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;
+  position:relative;width:58px;height:58px;margin:0 auto 16px;border-radius:50%;display:grid;place-items:center;
   color:var(--lg-fg2);
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
-  box-shadow:inset 0 0 0 1px var(--lg-btn-line),0 6px 18px rgba(0,0,0,.22);
+  box-shadow:inset 0 0 0 1px var(--lg-btn-line),0 8px 22px rgba(0,0,0,.22);
 }
-.lg-logo svg{width:19px;height:19px;fill:currentColor}
-.lg-title{text-align:center;font-size:22px;font-weight:600;letter-spacing:-.3px;color:var(--lg-fg)}
-.right .acc-tabs,.right .form-title{display:none}   /* 切换登录/注册改用卡片底部的文字链接；节点保留给脚本用 */
-.right .form-hint{text-align:center;font-size:11.5px;color:var(--lg-fg3);margin:4px 0 20px;min-height:16px}
+.lg-logo svg{width:26px;height:26px;fill:currentColor}
+.lg-title{position:relative;text-align:center;font-size:29px;font-weight:600;letter-spacing:-.3px;color:var(--lg-fg)}
+.right .acc-tabs,.right .form-title{display:none}
+.right .form-hint{position:relative;text-align:center;font-size:13px;color:var(--lg-fg3);margin:6px 0 28px;min-height:18px}
 
-/* 输入框：只有占位文字，没有图标和标签 */
 input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
-.right .field{display:block;margin-bottom:9px}
+.right .field{position:relative;display:block;margin-bottom:12px}
 .right .field[hidden]{display:none}
 .right .field-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .right .field-wrap{position:relative;display:flex;align-items:center}
 .right .field-icon{display:none}
 .right .key-input{
-  width:100%;height:40px;padding:0 40px 0 14px;border-radius:12px;border:1px solid transparent;
+  width:100%;height:52px;padding:0 48px 0 18px;border-radius:15px;border:1px solid transparent;
   background:var(--lg-field);color:var(--lg-fg);
-  font-family:var(--font);font-size:12.5px;letter-spacing:0;text-transform:none;outline:none;
+  font-family:var(--font);font-size:14px;letter-spacing:0;text-transform:none;outline:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
   transition:background var(--tr),border-color var(--tr),box-shadow var(--tr);
 }
@@ -3731,21 +3735,20 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 .right .key-input.is-ok{border-color:var(--ok);box-shadow:0 0 0 3px rgba(16,185,129,.16)}
 .right .key-input:-webkit-autofill{-webkit-text-fill-color:var(--lg-fg);caret-color:var(--lg-fg);transition:background-color 9999s ease 0s}
 .right .paste-btn{
-  position:absolute;right:8px;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+  position:absolute;right:10px;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
   color:var(--lg-fg3);transition:color var(--tr),background var(--tr);
 }
-.right .paste-btn svg{width:14px;height:14px}
+.right .paste-btn svg{width:17px;height:17px}
 .right .paste-btn:hover{color:var(--lg-fg);background:var(--lg-field-hi)}
 
-/* 「记住我」：小号文字 + 小开关 */
 .right .rem-row{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  margin:2px 2px 12px;width:auto;font-size:11.5px;color:var(--lg-fg3);
+  position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin:4px 3px 16px;width:auto;font-size:13px;color:var(--lg-fg3);
   cursor:pointer;user-select:none;transition:color var(--tr);
 }
 .right .rem-row:hover{color:var(--lg-fg2)}
 .right .rem-row[hidden]{display:none}
-.right .bg-switch{position:relative;width:32px;height:18px;flex-shrink:0;display:inline-block}
+.right .bg-switch{position:relative;width:38px;height:21px;flex-shrink:0;display:inline-block}
 .right .bg-switch input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer;z-index:1}
 .right .bg-switch span{
   position:absolute;inset:0;border-radius:999px;
@@ -3753,66 +3756,101 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
   transition:background var(--tr),border-color var(--tr);
 }
 .right .bg-switch span::after{
-  content:'';position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;
+  content:'';position:absolute;left:2px;top:2px;width:15px;height:15px;border-radius:50%;
   background:var(--lg-fg3);transition:transform .2s ease,background .2s ease;
 }
 .right .bg-switch input:checked + span{background:rgba(var(--lg-star),.78);border-color:transparent}
-.right .bg-switch input:checked + span::after{transform:translateX(14px);background:var(--lg-bg)}
+.right .bg-switch input:checked + span::after{transform:translateX(17px);background:var(--lg-bg)}
 
-/* 登录按钮：深色玻璃按钮，默认是灰字；两个输入框都有内容后字变亮 */
+/* 登录按钮：深色玻璃按钮。点击后收缩成圆形，里面转圈（不再有任何文字提示） */
 .right .act-btn{
-  position:relative;width:100%;height:40px;margin:0;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
+  position:relative;align-self:center;width:100%;height:52px;margin:0;padding:0;border-radius:15px;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
-  border:1px solid var(--lg-btn-line);color:var(--lg-fg3);font-size:12.5px;font-weight:600;
+  border:1px solid var(--lg-btn-line);color:var(--lg-fg3);font-size:14px;font-weight:600;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.18);
-  transition:color var(--tr),background var(--tr),border-color var(--tr),transform var(--tr);
+  transition:width .38s cubic-bezier(.4,0,.2,1),border-radius .38s cubic-bezier(.4,0,.2,1),
+             color var(--tr),background var(--tr),border-color var(--tr),transform var(--tr);
 }
 .right:has(#accUser:not(:placeholder-shown)):has(#accPass:not(:placeholder-shown)) .act-btn{color:var(--lg-fg);border-color:var(--lg-field-line)}
 .right .act-btn:hover:not(:disabled){background:var(--lg-btn-hover);color:var(--lg-fg);transform:translateY(-1px)}
 .right .act-btn:active:not(:disabled){transform:none}
-.right .act-btn:disabled{opacity:.6;cursor:not-allowed}
+.right .act-btn.loading{width:52px;border-radius:50%;color:var(--lg-fg);border-color:var(--lg-field-line)}
+.right .act-btn.loading:disabled{opacity:1;cursor:progress}
+.right .act-btn .bt{white-space:nowrap;transition:opacity .15s ease}
+.right .act-btn.loading .bt{display:none}
 .right .act-btn .sp{
-  display:none;width:15px;height:15px;border:2px solid rgba(var(--lg-star),.25);
+  display:none;width:22px;height:22px;border:2.5px solid rgba(var(--lg-star),.22);
   border-top-color:var(--lg-fg);border-radius:50%;animation:spin .7s linear infinite;
 }
-.right .act-btn.loading .bt{display:none}
 .right .act-btn.loading .sp{display:block}
 @keyframes spin{to{transform:rotate(360deg)}}
-.right .status-msg{margin-top:10px;padding:8px 12px;font-size:12px;border-radius:10px}
+.right .status-msg{display:none !important}   /* 不再在卡片里显示任何状态文字 */
 
-/* 第二排按钮（设置 / 更新日志 / 关闭）：做成和截图里「Sign in with Google」同款的次级按钮 */
-.right .foot-row{display:flex;align-items:center;gap:8px;margin-top:8px;padding:0}
+/* 第二排按钮（设置 / 更新日志 / 关闭） */
+.right .foot-row{position:relative;display:flex;align-items:center;gap:10px;margin-top:10px;padding:0}
 .right .foot-btn{
-  height:40px;border-radius:12px;font-size:12.5px;font-weight:600;
+  height:52px;border-radius:15px;font-size:14px;font-weight:600;
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
   border:1px solid var(--lg-btn-line);color:var(--lg-fg);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
 }
-.right .foot-btn.icon{width:40px}
-.right .foot-btn svg{width:15px;height:15px}
+.right .foot-btn.icon{width:52px}
+.right .foot-btn svg{width:17px;height:17px}
 .right .foot-btn:hover{background:var(--lg-btn-hover);border-color:var(--lg-field-line);color:var(--lg-fg)}
 .right .foot-btn.close:hover{border-color:var(--ui-danger);color:var(--ui-danger);background:var(--ui-danger-soft)}
 
-/* 卡片底部「还没有账号？」 */
-.lg-switch{margin-top:14px;text-align:center;font-size:11px;color:var(--lg-fg3)}
-.lg-switch button{margin-left:4px;font-size:11px;font-weight:700;color:var(--lg-fg2);transition:color var(--tr)}
+.lg-switch{position:relative;margin-top:20px;text-align:center;font-size:12.5px;color:var(--lg-fg3)}
+.lg-switch button{margin-left:5px;font-size:12.5px;font-weight:700;color:var(--lg-fg2);transition:color var(--tr)}
 .lg-switch button:hover{color:var(--lg-fg)}
 
-/* 卡片下方：一句话介绍 + 精选游戏圆点（脚本会往 #lBlurb / #gameTabs 里写内容） */
-.lg-below{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:30px;text-align:center}
-.login-blurb{max-width:340px;margin:0;font-size:12px;line-height:1.5;color:var(--lg-fg3)}
-.game-tabs{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px;min-height:14px}
-.gdot{
-  width:6px;height:6px;flex-shrink:0;padding:0;border:none;border-radius:50%;
-  background:rgba(var(--lg-star),.22);cursor:pointer;
-  transition:background .2s ease,width .25s ease;
+/* 提示条：和主界面 toast 完全一致（底部居中弹出） */
+.toast-wrap{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:9999;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  width:max-content;max-width:calc(100vw - 48px);pointer-events:none;
 }
-.gdot:hover{background:rgba(var(--lg-star),.45)}
-.gdot.active{width:18px;border-radius:999px;background:rgba(var(--lg-star),.85)}
-.swap-in{animation:loginSwap .45s cubic-bezier(.2,.8,.2,1)}
-@keyframes loginSwap{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.lg-compat{display:none}   /* 脚本仍会写 #lBrandSub / #lHeadline，留着避免报错，但不显示 */
+.toast{
+  --toast-c:var(--accent-2);--toast-bg:var(--accent-soft);
+  position:relative;overflow:hidden;pointer-events:auto;
+  display:flex;align-items:center;gap:12px;
+  min-width:240px;max-width:460px;
+  padding:9px 22px 9px 9px;
+  border-radius:var(--radius-full);
+  background:rgba(var(--ov),.62);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid var(--border-2);
+  color:var(--text);font-size:13px;font-weight:600;letter-spacing:.1px;
+  box-shadow:var(--shadow-3),0 0 34px var(--toast-bg);
+  animation:toastIn .42s cubic-bezier(.2,.9,.3,1.15);
+}
+.toast.ok{--toast-c:var(--ok);--toast-bg:rgba(16,185,129,.22)}
+.toast.err{--toast-c:var(--err);--toast-bg:rgba(239,68,68,.22)}
+.toast.warn{--toast-c:var(--warn);--toast-bg:rgba(245,158,11,.22)}
+.toast-ico{
+  width:30px;height:30px;border-radius:50%;flex-shrink:0;
+  display:grid;place-items:center;
+  background:var(--toast-bg);color:var(--toast-c);
+}
+.toast-ico svg{width:15px;height:15px;fill:none;stroke:currentColor;
+  stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.toast-txt{flex:1;min-width:0;line-height:1.35;word-break:break-word}
+.toast::after{
+  content:'';position:absolute;left:22px;right:22px;bottom:0;height:2px;
+  border-radius:2px;background:var(--toast-c);opacity:.75;
+  transform-origin:left center;
+  animation:toastBar var(--toast-ms,3200ms) linear forwards;
+}
+@keyframes toastBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@keyframes toastIn{
+  from{opacity:0;transform:translateY(28px) scale(.9)}
+  to{opacity:1;transform:none}
+}
+.toast.out{animation:toastOut .3s cubic-bezier(.4,0,1,1) forwards}
+@keyframes toastOut{
+  to{opacity:0;transform:translateY(18px) scale(.94)}
+}
 .status-msg{
   display:none;margin-top:12px;padding:10px 14px;border-radius:var(--radius);
   font-size:12.5px;font-weight:600;text-align:center;border:1px solid transparent;
@@ -4076,12 +4114,13 @@ __UI_CSS__
 <div id="fxLayer" aria-hidden="true"></div>
 <canvas id="decoCanvas" aria-hidden="true"></canvas></div>
 <div class="drag-strip" onmousedown="uiDrag(event)"></div>
-<div class="lg-sky" id="lgSky" aria-hidden="true">
-  <div class="game-bg" id="bg0"></div>
-  <div class="game-bg" id="bg1"></div>
-</div>
+<div class="lg-sky" id="lgSky" aria-hidden="true"><canvas id="lgStars"></canvas></div>
 <div class="lg-stage">
   <div class="right">
+    <div class="lg-deco" aria-hidden="true">
+      <i class="lg-tile tl"></i><i class="lg-tile tr"></i><i class="lg-tile bl"></i><i class="lg-tile br"></i>
+      <i class="lg-line l"></i><i class="lg-line r"></i>
+    </div>
     <div class="lg-logo">
       <svg viewBox="0 0 24 24"><path d="M12 2.5C12.9 8 16 11.1 21.5 12C16 12.9 12.9 16 12 21.5C11.1 16 8 12.9 2.5 12C8 11.1 11.1 8 12 2.5Z"/></svg>
     </div>
@@ -4160,31 +4199,14 @@ __UI_CSS__
       <span id="accSwText">Don't have an account?</span><button type="button" id="accSwBtn" onclick="accSetMode(accMode_==='reg'?'login':'reg')">Sign up, it's free!</button>
     </div>
   </div>
-  <div class="lg-below">
-    <p class="login-blurb" id="lBlurb">Advanced tooling for competitive play — injected seamlessly.</p>
-    <div class="game-tabs" id="gameTabs"></div>
-  </div>
-  <div class="lg-compat" aria-hidden="true"><span id="lBrandSub"></span><span id="lHeadline"></span></div>
 </div>
+<div class="toast-wrap" id="toastWrap"></div>
 <div class="success-ovl" id="sovl">
   <div class="s-ring">
     <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
   </div>
   <div class="s-title" id="sTitle">Activated!</div>
   <div class="s-meta"  id="sMeta"></div>
-</div>
-<!-- 登录 / 注册失败：主题化提示窗口（不再是按钮下面那行小字） -->
-<div class="gate-ovl" id="errOvl" onclick="if(event.target===this)closeErrOvl()">
-  <div class="gate-card">
-    <div class="gate-ico err">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5"/><path d="M12 16h.01"/></svg>
-    </div>
-    <div class="gate-title" data-ui="accErrFail">Something went wrong</div>
-    <div class="gate-body" id="errBody"></div>
-    <div class="gate-acts">
-      <button class="gate-btn" type="button" onclick="closeErrOvl()" data-ui="adminOk">OK</button>
-    </div>
-  </div>
 </div>
 <!-- 非管理员登录时弹的主题化提示（确定 = 退出程序，稍后 = 回到登录界面） -->
 <div class="gate-ovl" id="adminOvl">
@@ -4357,12 +4379,7 @@ var LOGIN_DATA = __LOGIN_GAMES_JSON__;
 var currentLang = (document.documentElement.getAttribute('lang') || 'en');
 function setLang(code) {
   currentLang = code;
-  var L = LANGS[code] || LANGS.en;
-  document.getElementById('lBrandSub').textContent    = L.brandSub;
-  document.getElementById('lHeadline').innerHTML      = L.headline;
-  document.getElementById('lBlurb').textContent       = L.blurb;
   document.documentElement.lang = code;
-  renderLoginGames();
 }
 function onUiLangChanged(code) {
   setLang(code);
@@ -4370,210 +4387,52 @@ function onUiLangChanged(code) {
   applyAdminGateText();          /* 提示语里的程序名/文案跟着语言走 */
   document.body.setAttribute('dir', code === 'ar' ? 'rtl' : 'ltr');
 }
-/* 左边展示的游戏 = games.txt 里标记为精选(featured)的游戏，按列表顺序 */
-function loginFeatured(){
-  var out = [];
-  var d = (typeof LOGIN_DATA !== 'undefined' && LOGIN_DATA) ? LOGIN_DATA : null;
-  if (!d || !d.order || !d.games) { return out; }
-  d.order.forEach(function(code){
-    var g = d.games[code];
-    if (g && g.featured) { out.push(code); }
-  });
-  return out;
-}
-function loginGame(code){
-  var d = (typeof LOGIN_DATA !== 'undefined' && LOGIN_DATA) ? LOGIN_DATA : null;
-  return (d && d.games && d.games[code]) ? d.games[code] : {};
-}
-/* 背景图 = 主界面 banner 用的那张：全部 cover 里第一张非视频图，再退回 icon
-   与 dashboard 里的 g.poster 选法完全一致，两个界面的图才不会对不上。 */
-function loginIsVideo(u){
-  return /\.(mp4|webm|ogv|m4v|mov)(\?.*)?$/i.test(u || '');
-}
-function loginShot(code){
-  var g = loginGame(code);
-  var c = g.covers || [];
-  var list = c.slice();
-  list.push(g.img);
-  for (var i = 0; i < list.length; i++) {
-    if (list[i] && !loginIsVideo(list[i])) { return list[i]; }
-  }
-  return g.img || '';
-}
-function loginTileLabel(code){
-  var g = loginGame(code);
-  return String(g.short || g.title || code).toUpperCase();
-}
-/* 预载每张背景图，切换时不会闪白 */
-function loginPreload(codes){
-  for (var i = 0; i < codes.length; i++) {
-    var img = new Image();
-    img.src = loginShot(codes[i]);
-  }
-}
-/* ── 背景层：只有 bg0 / bg1 两层，轮流当“当前层” ─────────────────────────
-     切页时把目标图铺到隐藏的那层再淡入，另一层淡出。
-   （旧写法只给前两张赋图、却按 index 去取 bg2/bg3，所以第 3 个游戏开始就是空白） */
-var loginBgCur = -1;      /* 当前可见层：0 / 1；-1 = 还没初始化 */
-var loginBgCode = '';     /* 当前层显示的遊戲代号，避免同一张重复淡入 */
-function loginBgApply(idx, codes){
-  codes = codes || loginFeatured();
-  if (!codes.length) { return; }
-  if (!(idx >= 0 && idx < codes.length)) { idx = 0; }
-  var code = codes[idx];
-  if (code === loginBgCode && loginBgCur >= 0) { return; }
-  var src = loginShot(code);
-  var css = src ? 'url("' + src.replace(/"/g, '%22') + '")' : '';
-
-  if (loginBgCur < 0) {                    /* 首次：直接铺第一层，不做淡入 */
-    var first = document.getElementById('bg0');
-    var second = document.getElementById('bg1');
-    if (first) { first.style.backgroundImage = css; first.classList.add('visible'); }
-    if (second) { second.classList.remove('visible'); second.style.backgroundImage = ''; }
-    loginBgCur = 0;
-  } else {
-    var next = (loginBgCur + 1) % 2;
-    var el = document.getElementById('bg' + next);
-    var prev = document.getElementById('bg' + loginBgCur);
-    if (!el) { return; }
-    el.style.backgroundImage = css;
-    el.classList.remove('visible');
-    void el.offsetWidth;                  /* 先让新图落位，再淡入 */
-    el.classList.add('visible');
-    if (prev) { prev.classList.remove('visible'); }
-    loginBgCur = next;
-  }
-  loginBgCode = code;
-}
-/* 只预载「当前 + 下一张（+ 上一张）」：精选可能有 7~8 个，
-   全部预载会一次性下载+解码 7 张 1920x1080 大图（几十 MB 内存 + 抢带宽，
-   反而拖慢首屏）。轮播只会用到下一张，所以这样就够顺滑了。 */
-function loginPreloadAround(codes, idx){
-  var n = codes.length;
-  if (!n) { return; }
-  var want = [idx, (idx + 1) % n];
-  if (n > 2) { want.push((idx - 1 + n) % n); }
-  for (var i = 0; i < want.length; i++) {
-    var u = loginShot(codes[want[i]]);
-    if (!u) { continue; }
-    var img = new Image();
-    img.decoding = 'async';
-    img.src = u;
-  }
-}
-/* 生成底部圆点指示器 */
-function renderLoginDots(codes, active){
-  var box = document.getElementById('gameTabs');
-  if (!box) { return; }
-  var html = "";
-  codes.forEach(function(code, i){
-    html += '<button type="button" class="gdot' + (i === active ? ' active' : '') + '"' +
-      ' title="' + uiEsc(loginTileLabel(code)) + '"' +
-      ' aria-label="' + uiEsc(loginTileLabel(code)) + '"' +
-      ' onclick="switchGame(' + i + ')"></button>';
-  });
-  box.innerHTML = html;
-}
-function renderLoginGames(){
-  var codes = loginFeatured();
-  var box = document.getElementById('gameTabs');
-  if (!box) { return; }
-  if (!codes.length) { box.innerHTML = ""; return; }
-  var active = Math.min(curGame, codes.length - 1);
-  loginBgApply(active, codes);          /* 先把当前那张铺上，再后台预载相邻图 */
-  loginPreloadAround(codes, active);
-  renderLoginDots(codes, active);
-  applyLoginText(codes[active]);
-}
-/* 自动翻页 */
-var loginAuto = { timer: 0, hold: 0 };
-var LOGIN_ROTATE_MS = 7000;
-function loginAutoStop(){ if (loginAuto.timer) { clearInterval(loginAuto.timer); loginAuto.timer = 0; } }
-function loginAutoStart(){
-  loginAutoStop();
-  if (loginFeatured().length < 2) { return; }
-  loginAuto.timer = setInterval(function(){
-    if (document.hidden) { return; }
-    var n = loginFeatured().length;
-    if (n < 2) { return; }
-    switchGame((curGame + 1) % n);
-  }, LOGIN_ROTATE_MS);
-}
-/* 登录页初始化：套用语言并生成精选游戏缩略图 */
+/* 登录页初始化：套用语言，并向宿主要已保存的账号 */
 function loginBoot(){
   setLang(currentLang);
-  renderLoginGames();
-  loginAutoStart();
-  /* 向宿主要已保存的账号：用户名总是保存，密码只在勾选「记住我」后保存 */
+  /* 用户名总是保存，密码只在勾选「记住我」后保存 */
   wv('GET_SAVED_PASS');
 }
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loginBoot);
 } else { loginBoot(); }
-var curGame = 0;
-function applyLoginText(code){
-  var L = LANGS[currentLang] || LANGS.en;
-  var g = loginGame(code);
-  var em = /<em>.*<\/em>/.exec(L.headline);
-  var name = g.short || g.title || code;
-  document.getElementById('lHeadline').innerHTML = uiEsc(name) + '<br>' + (em ? em[0] : '<em></em>');
-  var tbl = UI_T[currentLang] || UI_T.en;
-  document.getElementById('lBlurb').textContent = (g.featured && tbl.dlBlurb) ? tbl.dlBlurb : (L.blurb || '');
-  var bs = L.brandSub || "";
-  document.getElementById('lBrandSub').textContent = bs;
-}
-function switchGame(idx) {
-  var codes = loginFeatured();
-  var n = codes.length;
-  if (n < 1) { return; }
-  idx = ((idx % n) + n) % n;
-  var first = (idx === curGame);
-  curGame = idx;
-  loginBgApply(idx, codes);
-  loginPreloadAround(codes, idx);      /* 提前备好下一张，翻页不会闪白 */
-  renderLoginDots(codes, idx);
-  applyLoginText(codes[idx]);
-  if (!first) {
-    ['lHeadline', 'lBlurb'].forEach(function(id){
-      var el = document.getElementById(id);
-      if (!el) { return; }
-      el.classList.remove('swap-in');
-      void el.offsetWidth;
-      el.classList.add('swap-in');
-    });
-  }
-}
 function wv(m) { window.chrome.webview.postMessage(m); }
 var accMode_ = 'login', accBusy = false;
 var ACC_USER_RE = /^[A-Za-z0-9_.-]{3,20}$/;
 var ACC_MAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 var ACC_FIELDS = ['accUser', 'accPass', 'accEmail'];
-/* 加载中还是写在按钮下面；错误/成功一律走提示窗口（见 showErr / sovl） */
-function showStatus(type, msg) {
-  var el = document.getElementById('status');
-  el.className = 'status-msg ' + type + ' show';
-  el.textContent = msg;
+/* 登录/注册中：不显示任何文字，只让按钮变成圆形转圈（见 accSetBusy）；
+   失败：和主界面一样，从屏幕底部居中弹出 toast */
+var TOAST_ICONS = {
+  ok:   '<path d="M20 6L9 17l-5-5"/>',
+  err:  '<circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.6v.01"/>',
+  warn: '<path d="M12 3.5L2.5 20h19L12 3.5z"/><path d="M12 10v4.5"/><path d="M12 17.6v.01"/>',
+  info: '<circle cx="12" cy="12" r="9"/><path d="M12 11.4v5.1"/><circle cx="12" cy="7.9" r="1.15" fill="currentColor" stroke="none"/>'
+};
+function toast(text, type, ms){
+  type = TOAST_ICONS[type] ? type : 'info';
+  ms = ms || 3200;
+  var wrap = document.getElementById('toastWrap');
+  if (!wrap) { return; }
+  while (wrap.children.length >= 3) { wrap.removeChild(wrap.firstChild); }
+  var t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.style.setProperty('--toast-ms', ms + 'ms');
+  t.innerHTML = '<span class="toast-ico"><svg viewBox="0 0 24 24">' + TOAST_ICONS[type] + '</svg></span><span class="toast-txt"></span>';
+  t.lastChild.textContent = text;
+  wrap.appendChild(t);
+  setTimeout(function(){
+    t.classList.add('out');
+    setTimeout(function(){ if (t.parentNode) { t.parentNode.removeChild(t); } }, 300);
+  }, ms);
 }
-/* 登录/注册失败：弹主题化提示窗口 */
 function showErr(msg) {
-  var o = document.getElementById('errOvl');
-  var b = document.getElementById('errBody');
-  var st = document.getElementById('status');
-  if (st) { st.className = 'status-msg'; st.textContent = ''; }
-  if (!o || !b) { return; }
-  /* 别让键盘输入继续落到弹层后面的输入框上 */
+  /* 别让键盘输入继续落到后面的输入框上 */
   try { if (document.activeElement && document.activeElement.blur) { document.activeElement.blur(); } } catch (e) {}
-  b.textContent = msg || uiT('accErrFail');
-  o.classList.add('show');
+  toast(msg || uiT('accErrFail'), 'err', 3500);
 }
-function closeErrOvl() {
-  var o = document.getElementById('errOvl');
-  if (o) { o.classList.remove('show'); }
-}
-function errOvlShown() {
-  var o = document.getElementById('errOvl');
-  return !!(o && o.classList.contains('show'));
-}
+function closeErrOvl() {}
+function errOvlShown() { return false; }
 /* 卡片底部「还没有账号？ / 已有账号？」的文案 */
 var ACC_SW = {
   en:{no:"Don't have an account?", yes:'Already have an account?', reg:"Sign up, it's free!", login:'Log in'},
@@ -4624,6 +4483,7 @@ function accSetMode(m) {
   document.getElementById('accPass').setAttribute('autocomplete', reg ? 'new-password' : 'current-password');
   accClearErr();
   accApplyText();
+  if (typeof lgFit === 'function') { lgFit(); }
 }
 function accTogglePw() {
   var a = document.getElementById('accPass');
@@ -4705,7 +4565,6 @@ function accSubmit() {
     if (!ACC_MAIL_RE.test(mail)) { showErr(uiT('accErrEmail')); accMark('accEmail'); return; }
   }
   accSetBusy(true);
-  showStatus('ld', uiT(reg ? 'accCreating' : 'accSigningIn'));
   /* 账号验证走网站（www.cata1y3t.boats/api/auth.php）：
      注册：用户名 邮箱 密码；登录：用户名 密码 + 是否记住密码 */
   wv((reg ? 'ACC_REG:' : 'ACC_LOGIN:') + u + String.fromCharCode(31) + p
@@ -4750,32 +4609,114 @@ window.chrome.webview.addEventListener('message', function(e) {
     if (code === 'EMAIL_FMT') { accMark('accEmail'); }
   }
 });
-/* 星空背景：只生成一次、完全静态（不做动画，毛玻璃面板不用每帧重算） */
+/* ── 动态星空：慢速漂移 + 闪烁 + 偶尔划过的流星（30fps，切走窗口自动暂停） ── */
 (function(){
-  var sky = document.getElementById('lgSky');
-  if (!sky) { return; }
-  var seed = 20261009;
-  function rnd(){ seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
-  function layer(cls, n, a0, a1){
-    var el = document.createElement('i');
-    el.className = 'lg-stars ' + cls;
-    var s = [];
-    for (var i = 0; i < n; i++) {
-      var x = (rnd() * 100).toFixed(2), y = (Math.pow(rnd(), 1.45) * 100).toFixed(2);   /* 越靠上星越多 */
-      s.push(x + 'vw ' + y + 'vh 0 rgba(var(--lg-star),' + (a0 + rnd() * (a1 - a0)).toFixed(2) + ')');
-    }
-    el.style.boxShadow = s.join(',');
-    sky.appendChild(el);
+  var cv = document.getElementById('lgStars');
+  if (!cv || !cv.getContext) { return; }
+  var ctx = cv.getContext('2d');
+  var W = 0, H = 0, stars = [], col = '255,255,255', raf = 0, last = 0, shoot = null, nextShoot = 0;
+  var still = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function rnd(a, b){ return a + Math.random() * (b - a); }
+  function readCol(){
+    var v = getComputedStyle(document.documentElement).getPropertyValue('--lg-star');
+    if (v && v.trim()) { col = v.trim(); }
   }
-  layer('', 190, 0.18, 0.75);
-  layer('big', 16, 0.35, 0.85);
-  [[17, 14], [24, 33], [86, 16], [71, 86]].forEach(function(p){
-    var d = document.createElement('i');
-    d.className = 'lg-glint';
-    d.style.left = p[0] + '%'; d.style.top = p[1] + '%';
-    sky.appendChild(d);
-  });
+  function build(){
+    var n = Math.max(110, Math.min(300, Math.round(W * H / 4800)));
+    stars = [];
+    for (var i = 0; i < n; i++) {
+      var z = Math.pow(Math.random(), 1.6);                   /* 0 = 远、1 = 近：近的更大、更亮、更快 */
+      stars.push({
+        x: rnd(0, W), y: Math.pow(Math.random(), 1.25) * H,    /* 越靠上越密 */
+        z: z, r: 0.45 + z * 1.15, a: rnd(0.25, 0.8),
+        vx: -(3 + z * 13), vy: -(0.6 + z * 2.4),               /* 向左上方缓慢漂移，近处更快（视差） */
+        tw: rnd(0, 6.283), ts: rnd(0.5, 2.1), big: z > 0.9
+      });
+    }
+  }
+  function resize(){
+    W = Math.max(1, window.innerWidth); H = Math.max(1, window.innerHeight);
+    cv.width = W; cv.height = H;
+    build();
+    if (still) { draw(0, 0); }
+  }
+  function draw(dt, now){
+    ctx.clearRect(0, 0, W, H);
+    var tt = now / 1000;
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      s.x += s.vx * dt; s.y += s.vy * dt;
+      if (s.x < -4) { s.x = W + 4; s.y = Math.random() * H; }
+      if (s.y < -4) { s.y = H + 4; s.x = Math.random() * W; }
+      var al = s.a * (0.62 + 0.38 * Math.sin(tt * s.ts + s.tw));
+      ctx.fillStyle = 'rgba(' + col + ',' + al.toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, 6.2832); ctx.fill();
+      if (s.big) {                                              /* 亮星带一圈柔光 */
+        ctx.fillStyle = 'rgba(' + col + ',' + (al * 0.16).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r * 4.2, 0, 6.2832); ctx.fill();
+      }
+    }
+    /* 流星：每 6~13 秒一颗，斜着划过上半屏 */
+    if (!still) {
+      if (!shoot && now > nextShoot) {
+        var ang = rnd(0.35, 0.6);
+        shoot = { x: rnd(W * 0.25, W * 0.95), y: rnd(0, H * 0.35), vx: -Math.cos(ang) * 880, vy: Math.sin(ang) * 880, life: 0, len: rnd(110, 190) };
+        nextShoot = now + rnd(6000, 13000);
+      }
+      if (shoot) {
+        shoot.life += dt; shoot.x += shoot.vx * dt; shoot.y += shoot.vy * dt;
+        var k = shoot.life / 0.9, f = k < 0.15 ? k / 0.15 : Math.max(0, 1 - (k - 0.15) / 0.85);
+        var m = Math.sqrt(shoot.vx * shoot.vx + shoot.vy * shoot.vy);
+        var tx = shoot.x - shoot.vx / m * shoot.len, ty = shoot.y - shoot.vy / m * shoot.len;
+        var g = ctx.createLinearGradient(shoot.x, shoot.y, tx, ty);
+        g.addColorStop(0, 'rgba(' + col + ',' + (0.85 * f).toFixed(3) + ')');
+        g.addColorStop(1, 'rgba(' + col + ',0)');
+        ctx.strokeStyle = g; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(shoot.x, shoot.y); ctx.lineTo(tx, ty); ctx.stroke();
+        if (k >= 1) { shoot = null; }
+      }
+    }
+  }
+  function loop(now){
+    raf = requestAnimationFrame(loop);
+    if (now - last < 33) { return; }                            /* 限 30fps：下面的毛玻璃卡片每帧都要重算模糊 */
+    var dt = Math.min(0.1, (now - (last || now)) / 1000);
+    last = now;
+    draw(dt, now);
+  }
+  function start(){ if (still || raf) { return; } last = 0; nextShoot = performance.now() + 2500; raf = requestAnimationFrame(loop); }
+  function stop(){ if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+  readCol(); resize(); start();
+  window.addEventListener('resize', resize);
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) { stop(); } else { start(); } });
+  try {
+    new MutationObserver(function(){ readCol(); if (still) { draw(0, 0); } })
+      .observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] });
+  } catch (e) {}
 })();
+
+/* ── 窗口太矮/太窄时，把整张卡片（含两侧装饰）等比缩小，保证登录页永远不需要滚动 ── */
+function lgFit(){
+  var c = document.querySelector('.right');
+  if (!c) { return; }
+  var h = c.offsetHeight, w = c.offsetWidth;
+  if (!h || !w) { return; }
+  var s = Math.min(1, (window.innerHeight - 40) / h, (window.innerWidth - 24) / w);
+  c.style.transform = s < 0.999 ? 'scale(' + s.toFixed(3) + ')' : '';
+}
+window.addEventListener('resize', lgFit);
+if (window.ResizeObserver) { new ResizeObserver(lgFit).observe(document.querySelector('.right')); }
+lgFit();
+
+/* ── 登录页禁用滚轮 / 触摸滚动 / Ctrl+滚轮缩放（设置、更新日志这类浮层里照常可以滚） ── */
+function lgNoScroll(e){
+  if (e.ctrlKey) { e.preventDefault(); return; }
+  var el = e.target;
+  if (el && el.closest && el.closest('.ui-view, .ui-pop')) { return; }
+  e.preventDefault();
+}
+window.addEventListener('wheel', lgNoScroll, { passive: false });
+window.addEventListener('touchmove', lgNoScroll, { passive: false });
 uiInit();
 /* 账号存在网站上，不存在「本机有没有账号」这回事：一律先显示登录，
    新用户点上面的 Register 切过去 */
