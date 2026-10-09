@@ -4719,8 +4719,9 @@ function lgFit(){
   if (!c) { return; }
   var h = c.offsetHeight, w = c.offsetWidth;
   if (!h || !w) { return; }
-  var s = Math.min(1, (window.innerHeight - 40) / h, (window.innerWidth - 24) / w);
-  c.style.transform = s < 0.999 ? 'scale(' + s.toFixed(3) + ')' : '';
+  /* 窗口大就整体放大（最多 1.35 倍），窗口小就缩小，卡片始终占满窗口高度的合适比例 */
+  var s = Math.min(1.35, (window.innerHeight - 56) / h, (window.innerWidth - 24) / w);
+  c.style.transform = Math.abs(s - 1) > 0.002 ? 'scale(' + s.toFixed(3) + ')' : '';
 }
 window.addEventListener('resize', lgFit);
 if (window.ResizeObserver) { new ResizeObserver(lgFit).observe(document.querySelector('.right')); }
