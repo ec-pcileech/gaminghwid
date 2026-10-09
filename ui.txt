@@ -3642,7 +3642,7 @@ button{cursor:pointer;border:none;background:none;padding:0}
   --lg-star:255,255,255;
   --lg-tile-line:rgba(255,255,255,.06);--lg-tile-fill:rgba(255,255,255,.022);--lg-deco-line:rgba(255,255,255,.22);
   --lg-card-shadow:0 34px 90px rgba(0,0,0,.55),0 8px 24px rgba(0,0,0,.35);
-  --lg-card-h:710px;                 /* 卡片高度：登录和注册固定同一个尺寸（原来约 560px，再加 150px） */
+  --lg-card-h:740px;                 /* 卡片高度：登录和注册固定同一个尺寸（原来约 560px，再加 150px） */
   --lg-vg:rgba(28,28,30,.9);
 }
 [data-theme="light"]{
@@ -3691,7 +3691,7 @@ body{background:var(--lg-bg)}
 /* 卡片（.right 保留类名：脚本用它切换登录/注册） */
 .right{
   position:relative;flex-shrink:0;width:min(430px,100%);
-  display:flex;flex-direction:column;min-height:var(--lg-card-h);padding:44px 34px 28px;border-radius:32px;
+  display:flex;flex-direction:column;min-height:var(--lg-card-h);padding:44px 36px 30px;border-radius:32px;
   background:linear-gradient(180deg,var(--lg-card-a),var(--lg-card-b));
   box-shadow:var(--lg-card-shadow),inset 0 1px 0 rgba(255,255,255,.07);
   backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
@@ -3722,27 +3722,27 @@ body{background:var(--lg-bg)}
 .lg-line.r{left:calc(100% + 18px);background:linear-gradient(to right,var(--lg-deco-line),transparent)}
 
 .lg-logo{
-  position:relative;width:58px;height:58px;margin:0 auto 16px;border-radius:50%;display:grid;place-items:center;
+  position:relative;width:68px;height:68px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;
   color:var(--lg-fg2);
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
   box-shadow:inset 0 0 0 1px var(--lg-btn-line),0 8px 22px rgba(0,0,0,.22);
 }
-.lg-logo svg{width:26px;height:26px;fill:currentColor}
-.lg-title{position:relative;text-align:center;font-size:29px;font-weight:600;letter-spacing:-.3px;color:var(--lg-fg)}
+.lg-logo svg{width:31px;height:31px;fill:currentColor}
+.lg-title{position:relative;text-align:center;font-size:36px;font-weight:600;letter-spacing:-.3px;color:var(--lg-fg)}
 .right .acc-tabs,.right .form-title{display:none}
-.right .form-hint{position:relative;text-align:center;font-size:13px;color:var(--lg-fg3);margin:6px 0 28px;min-height:18px}
+.right .form-hint{position:relative;text-align:center;font-size:16px;color:var(--lg-fg3);margin:8px 0 30px;min-height:22px}
 
 input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
-.right .field{position:relative;display:block;margin-bottom:12px}
+.right .field{position:relative;display:block;margin-bottom:14px}
 .right .field.lg-form-top{margin-top:auto}
 .right .field[hidden]{display:none}
 .right .field-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .right .field-wrap{position:relative;display:flex;align-items:center}
 .right .field-icon{display:none}
 .right .key-input{
-  width:100%;height:52px;padding:0 48px 0 18px;border-radius:15px;border:1px solid transparent;
+  width:100%;height:60px;padding:0 54px 0 22px;border-radius:17px;border:1px solid transparent;
   background:var(--lg-field);color:var(--lg-fg);
-  font-family:var(--font);font-size:14px;letter-spacing:0;text-transform:none;outline:none;
+  font-family:var(--font);font-size:17px;letter-spacing:0;text-transform:none;outline:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
   transition:background var(--tr),border-color var(--tr),box-shadow var(--tr);
 }
@@ -3753,20 +3753,20 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 .right .key-input.is-ok{border-color:var(--ok);box-shadow:0 0 0 3px rgba(16,185,129,.16)}
 .right .key-input:-webkit-autofill{-webkit-text-fill-color:var(--lg-fg);caret-color:var(--lg-fg);transition:background-color 9999s ease 0s}
 .right .paste-btn{
-  position:absolute;right:10px;width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+  position:absolute;right:11px;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
   color:var(--lg-fg3);transition:color var(--tr),background var(--tr);
 }
-.right .paste-btn svg{width:17px;height:17px}
+.right .paste-btn svg{width:21px;height:21px}
 .right .paste-btn:hover{color:var(--lg-fg);background:var(--lg-field-hi)}
 
 .right .rem-row{
   position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;
-  margin:4px 3px 16px;width:auto;font-size:13px;color:var(--lg-fg3);
+  margin:4px 3px 18px;width:auto;font-size:15.5px;color:var(--lg-fg3);
   cursor:pointer;user-select:none;transition:color var(--tr);
 }
 .right .rem-row:hover{color:var(--lg-fg2)}
 .right .rem-row[hidden]{display:none}
-.right .bg-switch{position:relative;width:38px;height:21px;flex-shrink:0;display:inline-block}
+.right .bg-switch{position:relative;width:46px;height:26px;flex-shrink:0;display:inline-block}
 .right .bg-switch input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer;z-index:1}
 .right .bg-switch span{
   position:absolute;inset:0;border-radius:999px;
@@ -3774,18 +3774,18 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
   transition:background var(--tr),border-color var(--tr);
 }
 .right .bg-switch span::after{
-  content:'';position:absolute;left:2px;top:2px;width:15px;height:15px;border-radius:50%;
+  content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;
   background:var(--lg-fg3);transition:transform .2s ease,background .2s ease;
 }
 .right .bg-switch input:checked + span{background:rgba(var(--lg-star),.78);border-color:transparent}
-.right .bg-switch input:checked + span::after{transform:translateX(17px);background:var(--lg-bg)}
+.right .bg-switch input:checked + span::after{transform:translateX(20px);background:var(--lg-bg)}
 
 /* 登录按钮：深色玻璃按钮。点击后收缩成圆形，里面转圈（不再有任何文字提示） */
 .right .act-btn{
-  position:relative;align-self:center;width:100%;height:52px;margin:0 0 10px;padding:0;border-radius:15px;
+  position:relative;align-self:center;width:100%;height:60px;margin:0 0 12px;padding:0;border-radius:17px;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
-  border:1px solid var(--lg-btn-line);color:var(--lg-fg3);font-size:14px;font-weight:600;
+  border:1px solid var(--lg-btn-line);color:var(--lg-fg3);font-size:17px;font-weight:600;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.18);
   transition:width .38s cubic-bezier(.4,0,.2,1),border-radius .38s cubic-bezier(.4,0,.2,1),
              color var(--tr),background var(--tr),border-color var(--tr),transform var(--tr);
@@ -3793,12 +3793,12 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 .right:has(#accUser:not(:placeholder-shown)):has(#accPass:not(:placeholder-shown)) .act-btn{color:var(--lg-fg);border-color:var(--lg-field-line)}
 .right .act-btn:hover:not(:disabled){background:var(--lg-btn-hover);color:var(--lg-fg);transform:translateY(-1px)}
 .right .act-btn:active:not(:disabled){transform:none}
-.right .act-btn.loading{width:52px;border-radius:50%;color:var(--lg-fg);border-color:var(--lg-field-line)}
+.right .act-btn.loading{width:60px;border-radius:50%;color:var(--lg-fg);border-color:var(--lg-field-line)}
 .right .act-btn.loading:disabled{opacity:1;cursor:progress}
 .right .act-btn .bt{white-space:nowrap;transition:opacity .15s ease}
 .right .act-btn.loading .bt{display:none}
 .right .act-btn .sp{
-  display:none;width:22px;height:22px;border:2.5px solid rgba(var(--lg-star),.22);
+  display:none;width:26px;height:26px;border:3px solid rgba(var(--lg-star),.22);
   border-top-color:var(--lg-fg);border-radius:50%;animation:spin .7s linear infinite;
 }
 .right .act-btn.loading .sp{display:block}
@@ -3806,20 +3806,20 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 .right .status-msg{display:none !important}   /* 不再在卡片里显示任何状态文字 */
 
 /* 第二排按钮（设置 / 更新日志 / 关闭） */
-.right .foot-row{position:relative;display:flex;align-items:center;gap:10px;margin-top:auto;padding:0}
+.right .foot-row{position:relative;display:flex;align-items:center;gap:12px;margin-top:auto;padding:0}
 .right .foot-btn{
-  height:52px;border-radius:15px;font-size:14px;font-weight:600;
+  height:60px;border-radius:17px;font-size:16px;font-weight:600;
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
   border:1px solid var(--lg-btn-line);color:var(--lg-fg);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
 }
-.right .foot-btn.icon{width:52px}
-.right .foot-btn svg{width:17px;height:17px}
+.right .foot-btn.icon{width:60px}
+.right .foot-btn svg{width:21px;height:21px}
 .right .foot-btn:hover{background:var(--lg-btn-hover);border-color:var(--lg-field-line);color:var(--lg-fg)}
 .right .foot-btn.close:hover{border-color:var(--ui-danger);color:var(--ui-danger);background:var(--ui-danger-soft)}
 
-.lg-switch{position:relative;margin-top:20px;text-align:center;font-size:12.5px;color:var(--lg-fg3)}
-.lg-switch button{margin-left:5px;font-size:12.5px;font-weight:700;color:var(--lg-fg2);transition:color var(--tr)}
+.lg-switch{position:relative;margin-top:22px;text-align:center;font-size:14.5px;color:var(--lg-fg3)}
+.lg-switch button{margin-left:6px;font-size:14.5px;font-weight:700;color:var(--lg-fg2);transition:color var(--tr)}
 .lg-switch button:hover{color:var(--lg-fg)}
 
 /* 提示条：和主界面 toast 完全一致（底部居中弹出） */
