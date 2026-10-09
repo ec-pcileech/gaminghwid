@@ -1800,7 +1800,9 @@ var UI_LAYOUT_KEY = { 'rail-l':'layoutRailL', 'rail-r':'layoutRailR',
 
 
 var UI_CHANGELOG = [
-  { v:'3.1.1', date:'2026-10-08', tag:'latest',
+  { v:'3.1.2', date:'2026-10-09', tag:'latest',
+    en:['New login ui released.'] },
+  { v:'3.1.1', date:'2026-10-08',
     en:['Fixed announcements issue.'] },
   { v:'3.1.0', date:'2026-10-08',
     en:['Faster startup and smoother navigation throughout the launcher.',
@@ -6715,7 +6717,7 @@ __UI_CSS__
       </div>
       <div class="sb-brand-text">
         <b>STARLINE</b>
-        <span id="sbVer">v3.1.1</span>
+        <span id="sbVer">v3.1.2</span>
       </div>
     </div>
     <nav class="sb-nav">
