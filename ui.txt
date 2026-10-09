@@ -1800,9 +1800,7 @@ var UI_LAYOUT_KEY = { 'rail-l':'layoutRailL', 'rail-r':'layoutRailR',
 
 
 var UI_CHANGELOG = [
-  { v:'3.1.2', date:'2026-10-09', tag:'latest',
-    en:['New login ui released.'] },
-  { v:'3.1.1', date:'2026-10-08',
+  { v:'3.1.1', date:'2026-10-08', tag:'latest',
     en:['Fixed announcements issue.'] },
   { v:'3.1.0', date:'2026-10-08',
     en:['Faster startup and smoother navigation throughout the launcher.',
@@ -3644,6 +3642,8 @@ button{cursor:pointer;border:none;background:none;padding:0}
   --lg-star:255,255,255;
   --lg-tile-line:rgba(255,255,255,.06);--lg-tile-fill:rgba(255,255,255,.022);--lg-deco-line:rgba(255,255,255,.22);
   --lg-card-shadow:0 34px 90px rgba(0,0,0,.55),0 8px 24px rgba(0,0,0,.35);
+  --lg-card-h:710px;                 /* 卡片高度：登录和注册固定同一个尺寸（原来约 560px，再加 150px） */
+  --lg-vg:rgba(28,28,30,.9);
 }
 [data-theme="light"]{
   --lg-bg:#eceef3;
@@ -3658,12 +3658,27 @@ button{cursor:pointer;border:none;background:none;padding:0}
   --lg-star:40,50,90;
   --lg-tile-line:rgba(20,25,45,.08);--lg-tile-fill:rgba(20,25,45,.02);--lg-deco-line:rgba(20,25,45,.22);
   --lg-card-shadow:0 30px 80px rgba(30,40,80,.18),0 6px 18px rgba(30,40,80,.08);
+  --lg-vg:rgba(236,238,243,.9);
 }
 body{background:var(--lg-bg)}
 
 /* 背景：动态星空画布（脚本里绘制） */
 .lg-sky{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .lg-sky canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* 游戏图标背景：图标图案、280x280 单元、间隔、9.3s 线性漂移，全部取自 Main.cpp 的 SPLASH_SVG_URI / drift。
+   用 transform 平移代替 background-position 动画（效果一样，但只走合成器，不会逐帧重绘）：
+   元素向左上多出一个单元，平移 280px 后正好和起点重合，循环无缝。颜色跟随主题（深色白、浅色深灰） */
+.lg-icons{
+  position:absolute;left:-280px;top:-280px;right:0;bottom:0;
+  background:rgb(var(--lg-star));
+  -webkit-mask-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280' viewBox='0 0 280 280' fill='none' stroke='white' stroke-opacity='.16' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(35 35) rotate(-14) scale(0.9) translate(-12 -12)'%3E%3Cline x1='6' x2='10' y1='11' y2='11'/%3E%3Cline x1='8' x2='8' y1='9' y2='13'/%3E%3Cline x1='15' x2='15.01' y1='12' y2='12'/%3E%3Cline x1='18' x2='18.01' y1='10' y2='10'/%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z'/%3E%3C/g%3E%3Cg transform='translate(105 35) rotate(23) scale(0.9) translate(-12 -12)'%3E%3Cpolyline points='14.5 17.5 3 6 3 3 6 3 17.5 14.5'/%3E%3Cline x1='13' x2='19' y1='19' y2='13'/%3E%3Cline x1='16' x2='20' y1='16' y2='20'/%3E%3Cline x1='19' x2='21' y1='21' y2='19'/%3E%3C/g%3E%3Cg transform='translate(175 35) rotate(10) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M6 9H4.5a2.5 2.5 0 0 1 0-5H6'/%3E%3Cpath d='M18 9h1.5a2.5 2.5 0 0 0 0-5H18'/%3E%3Cpath d='M4 22h16'/%3E%3Cpath d='M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22'/%3E%3Cpath d='M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22'/%3E%3Cpath d='M18 2H6v7a6 6 0 0 0 12 0V2Z'/%3E%3C/g%3E%3Cg transform='translate(245 35) rotate(-3) scale(0.9) translate(-12 -12)'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='22' x2='18' y1='12' y2='12'/%3E%3Cline x1='6' x2='2' y1='12' y2='12'/%3E%3Cline x1='12' x2='12' y1='6' y2='2'/%3E%3Cline x1='12' x2='12' y1='22' y2='18'/%3E%3C/g%3E%3Cg transform='translate(0 105) rotate(-16) scale(0.9) translate(-12 -12)'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Cpath d='M16 8h.01'/%3E%3Cpath d='M8 8h.01'/%3E%3Cpath d='M8 16h.01'/%3E%3Cpath d='M16 16h.01'/%3E%3Cpath d='M12 12h.01'/%3E%3C/g%3E%3Cg transform='translate(280 105) rotate(-16) scale(0.9) translate(-12 -12)'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Cpath d='M16 8h.01'/%3E%3Cpath d='M8 8h.01'/%3E%3Cpath d='M8 16h.01'/%3E%3Cpath d='M16 16h.01'/%3E%3Cpath d='M12 12h.01'/%3E%3C/g%3E%3Cg transform='translate(70 105) rotate(21) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/%3E%3C/g%3E%3Cg transform='translate(140 105) rotate(8) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M9 10h.01'/%3E%3Cpath d='M15 10h.01'/%3E%3Cpath d='M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z'/%3E%3C/g%3E%3Cg transform='translate(210 105) rotate(-5) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M21 17a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2Z'/%3E%3Cpath d='M6 15v-2'/%3E%3Cpath d='M12 15V9'/%3E%3Ccircle cx='12' cy='6' r='3'/%3E%3C/g%3E%3Cg transform='translate(35 175) rotate(-18) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M6 9H4.5a2.5 2.5 0 0 1 0-5H6'/%3E%3Cpath d='M18 9h1.5a2.5 2.5 0 0 0 0-5H18'/%3E%3Cpath d='M4 22h16'/%3E%3Cpath d='M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22'/%3E%3Cpath d='M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22'/%3E%3Cpath d='M18 2H6v7a6 6 0 0 0 12 0V2Z'/%3E%3C/g%3E%3Cg transform='translate(105 175) rotate(19) scale(0.9) translate(-12 -12)'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='22' x2='18' y1='12' y2='12'/%3E%3Cline x1='6' x2='2' y1='12' y2='12'/%3E%3Cline x1='12' x2='12' y1='6' y2='2'/%3E%3Cline x1='12' x2='12' y1='22' y2='18'/%3E%3C/g%3E%3Cg transform='translate(175 175) rotate(6) scale(0.9) translate(-12 -12)'%3E%3Cline x1='6' x2='10' y1='11' y2='11'/%3E%3Cline x1='8' x2='8' y1='9' y2='13'/%3E%3Cline x1='15' x2='15.01' y1='12' y2='12'/%3E%3Cline x1='18' x2='18.01' y1='10' y2='10'/%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z'/%3E%3C/g%3E%3Cg transform='translate(245 175) rotate(-7) scale(0.9) translate(-12 -12)'%3E%3Cpolyline points='14.5 17.5 3 6 3 3 6 3 17.5 14.5'/%3E%3Cline x1='13' x2='19' y1='19' y2='13'/%3E%3Cline x1='16' x2='20' y1='16' y2='20'/%3E%3Cline x1='19' x2='21' y1='21' y2='19'/%3E%3C/g%3E%3Cg transform='translate(0 245) rotate(-20) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M9 10h.01'/%3E%3Cpath d='M15 10h.01'/%3E%3Cpath d='M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z'/%3E%3C/g%3E%3Cg transform='translate(280 245) rotate(-20) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M9 10h.01'/%3E%3Cpath d='M15 10h.01'/%3E%3Cpath d='M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z'/%3E%3C/g%3E%3Cg transform='translate(70 245) rotate(17) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M21 17a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2Z'/%3E%3Cpath d='M6 15v-2'/%3E%3Cpath d='M12 15V9'/%3E%3Ccircle cx='12' cy='6' r='3'/%3E%3C/g%3E%3Cg transform='translate(140 245) rotate(4) scale(0.9) translate(-12 -12)'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Cpath d='M16 8h.01'/%3E%3Cpath d='M8 8h.01'/%3E%3Cpath d='M8 16h.01'/%3E%3Cpath d='M16 16h.01'/%3E%3Cpath d='M12 12h.01'/%3E%3C/g%3E%3Cg transform='translate(210 245) rotate(-9) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/%3E%3C/g%3E%3C/svg%3E");mask-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280' viewBox='0 0 280 280' fill='none' stroke='white' stroke-opacity='.16' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(35 35) rotate(-14) scale(0.9) translate(-12 -12)'%3E%3Cline x1='6' x2='10' y1='11' y2='11'/%3E%3Cline x1='8' x2='8' y1='9' y2='13'/%3E%3Cline x1='15' x2='15.01' y1='12' y2='12'/%3E%3Cline x1='18' x2='18.01' y1='10' y2='10'/%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z'/%3E%3C/g%3E%3Cg transform='translate(105 35) rotate(23) scale(0.9) translate(-12 -12)'%3E%3Cpolyline points='14.5 17.5 3 6 3 3 6 3 17.5 14.5'/%3E%3Cline x1='13' x2='19' y1='19' y2='13'/%3E%3Cline x1='16' x2='20' y1='16' y2='20'/%3E%3Cline x1='19' x2='21' y1='21' y2='19'/%3E%3C/g%3E%3Cg transform='translate(175 35) rotate(10) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M6 9H4.5a2.5 2.5 0 0 1 0-5H6'/%3E%3Cpath d='M18 9h1.5a2.5 2.5 0 0 0 0-5H18'/%3E%3Cpath d='M4 22h16'/%3E%3Cpath d='M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22'/%3E%3Cpath d='M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22'/%3E%3Cpath d='M18 2H6v7a6 6 0 0 0 12 0V2Z'/%3E%3C/g%3E%3Cg transform='translate(245 35) rotate(-3) scale(0.9) translate(-12 -12)'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='22' x2='18' y1='12' y2='12'/%3E%3Cline x1='6' x2='2' y1='12' y2='12'/%3E%3Cline x1='12' x2='12' y1='6' y2='2'/%3E%3Cline x1='12' x2='12' y1='22' y2='18'/%3E%3C/g%3E%3Cg transform='translate(0 105) rotate(-16) scale(0.9) translate(-12 -12)'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Cpath d='M16 8h.01'/%3E%3Cpath d='M8 8h.01'/%3E%3Cpath d='M8 16h.01'/%3E%3Cpath d='M16 16h.01'/%3E%3Cpath d='M12 12h.01'/%3E%3C/g%3E%3Cg transform='translate(280 105) rotate(-16) scale(0.9) translate(-12 -12)'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Cpath d='M16 8h.01'/%3E%3Cpath d='M8 8h.01'/%3E%3Cpath d='M8 16h.01'/%3E%3Cpath d='M16 16h.01'/%3E%3Cpath d='M12 12h.01'/%3E%3C/g%3E%3Cg transform='translate(70 105) rotate(21) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/%3E%3C/g%3E%3Cg transform='translate(140 105) rotate(8) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M9 10h.01'/%3E%3Cpath d='M15 10h.01'/%3E%3Cpath d='M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z'/%3E%3C/g%3E%3Cg transform='translate(210 105) rotate(-5) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M21 17a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2Z'/%3E%3Cpath d='M6 15v-2'/%3E%3Cpath d='M12 15V9'/%3E%3Ccircle cx='12' cy='6' r='3'/%3E%3C/g%3E%3Cg transform='translate(35 175) rotate(-18) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M6 9H4.5a2.5 2.5 0 0 1 0-5H6'/%3E%3Cpath d='M18 9h1.5a2.5 2.5 0 0 0 0-5H18'/%3E%3Cpath d='M4 22h16'/%3E%3Cpath d='M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22'/%3E%3Cpath d='M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22'/%3E%3Cpath d='M18 2H6v7a6 6 0 0 0 12 0V2Z'/%3E%3C/g%3E%3Cg transform='translate(105 175) rotate(19) scale(0.9) translate(-12 -12)'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cline x1='22' x2='18' y1='12' y2='12'/%3E%3Cline x1='6' x2='2' y1='12' y2='12'/%3E%3Cline x1='12' x2='12' y1='6' y2='2'/%3E%3Cline x1='12' x2='12' y1='22' y2='18'/%3E%3C/g%3E%3Cg transform='translate(175 175) rotate(6) scale(0.9) translate(-12 -12)'%3E%3Cline x1='6' x2='10' y1='11' y2='11'/%3E%3Cline x1='8' x2='8' y1='9' y2='13'/%3E%3Cline x1='15' x2='15.01' y1='12' y2='12'/%3E%3Cline x1='18' x2='18.01' y1='10' y2='10'/%3E%3Cpath d='M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z'/%3E%3C/g%3E%3Cg transform='translate(245 175) rotate(-7) scale(0.9) translate(-12 -12)'%3E%3Cpolyline points='14.5 17.5 3 6 3 3 6 3 17.5 14.5'/%3E%3Cline x1='13' x2='19' y1='19' y2='13'/%3E%3Cline x1='16' x2='20' y1='16' y2='20'/%3E%3Cline x1='19' x2='21' y1='21' y2='19'/%3E%3C/g%3E%3Cg transform='translate(0 245) rotate(-20) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M9 10h.01'/%3E%3Cpath d='M15 10h.01'/%3E%3Cpath d='M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z'/%3E%3C/g%3E%3Cg transform='translate(280 245) rotate(-20) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M9 10h.01'/%3E%3Cpath d='M15 10h.01'/%3E%3Cpath d='M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z'/%3E%3C/g%3E%3Cg transform='translate(70 245) rotate(17) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M21 17a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2Z'/%3E%3Cpath d='M6 15v-2'/%3E%3Cpath d='M12 15V9'/%3E%3Ccircle cx='12' cy='6' r='3'/%3E%3C/g%3E%3Cg transform='translate(140 245) rotate(4) scale(0.9) translate(-12 -12)'%3E%3Crect width='18' height='18' x='3' y='3' rx='2' ry='2'/%3E%3Cpath d='M16 8h.01'/%3E%3Cpath d='M8 8h.01'/%3E%3Cpath d='M8 16h.01'/%3E%3Cpath d='M16 16h.01'/%3E%3Cpath d='M12 12h.01'/%3E%3C/g%3E%3Cg transform='translate(210 245) rotate(-9) scale(0.9) translate(-12 -12)'%3E%3Cpath d='M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z'/%3E%3C/g%3E%3C/svg%3E");
+  -webkit-mask-size:280px 280px;mask-size:280px 280px;
+  -webkit-mask-repeat:repeat;mask-repeat:repeat;
+  animation:lgFade .8s ease both,lgDrift 9.3s linear infinite;will-change:transform;
+}
+@keyframes lgDrift{from{transform:translate(0,0)}to{transform:translate(280px,280px)}}
+@keyframes lgFade{from{opacity:0}to{opacity:1}}
+.lg-vg{position:absolute;inset:0;background:radial-gradient(ellipse 46% 38% at 50% 50%,var(--lg-vg),transparent)}
 
 /* 舞台：卡片居中，整页不可滚动（太矮的窗口由脚本整体缩小来适配） */
 .lg-stage{
@@ -3676,7 +3691,7 @@ body{background:var(--lg-bg)}
 /* 卡片（.right 保留类名：脚本用它切换登录/注册） */
 .right{
   position:relative;flex-shrink:0;width:min(430px,100%);
-  display:flex;flex-direction:column;padding:38px 34px 26px;border-radius:32px;
+  display:flex;flex-direction:column;min-height:var(--lg-card-h);padding:44px 34px 28px;border-radius:32px;
   background:linear-gradient(180deg,var(--lg-card-a),var(--lg-card-b));
   box-shadow:var(--lg-card-shadow),inset 0 1px 0 rgba(255,255,255,.07);
   backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
@@ -3719,6 +3734,7 @@ body{background:var(--lg-bg)}
 
 input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 .right .field{position:relative;display:block;margin-bottom:12px}
+.right .field.lg-form-top{margin-top:auto}
 .right .field[hidden]{display:none}
 .right .field-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .right .field-wrap{position:relative;display:flex;align-items:center}
@@ -3766,7 +3782,7 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 
 /* 登录按钮：深色玻璃按钮。点击后收缩成圆形，里面转圈（不再有任何文字提示） */
 .right .act-btn{
-  position:relative;align-self:center;width:100%;height:52px;margin:0;padding:0;border-radius:15px;
+  position:relative;align-self:center;width:100%;height:52px;margin:0 0 10px;padding:0;border-radius:15px;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
   border:1px solid var(--lg-btn-line);color:var(--lg-fg3);font-size:14px;font-weight:600;
@@ -3790,7 +3806,7 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 .right .status-msg{display:none !important}   /* 不再在卡片里显示任何状态文字 */
 
 /* 第二排按钮（设置 / 更新日志 / 关闭） */
-.right .foot-row{position:relative;display:flex;align-items:center;gap:10px;margin-top:10px;padding:0}
+.right .foot-row{position:relative;display:flex;align-items:center;gap:10px;margin-top:auto;padding:0}
 .right .foot-btn{
   height:52px;border-radius:15px;font-size:14px;font-weight:600;
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
@@ -4116,7 +4132,7 @@ __UI_CSS__
 <div id="fxLayer" aria-hidden="true"></div>
 <canvas id="decoCanvas" aria-hidden="true"></canvas></div>
 <div class="drag-strip" onmousedown="uiDrag(event)"></div>
-<div class="lg-sky" id="lgSky" aria-hidden="true"><canvas id="lgStars"></canvas></div>
+<div class="lg-sky" id="lgSky" aria-hidden="true"><div class="lg-icons"></div><div class="lg-vg"></div><canvas id="lgStars"></canvas></div>
 <div class="lg-stage">
   <div class="right">
     <div class="lg-deco" aria-hidden="true">
@@ -4137,7 +4153,7 @@ __UI_CSS__
     </div>
     <div class="form-title" id="lFormTitle">Welcome back</div>
     <div class="form-hint"  id="lFormHint">Log in to continue</div>
-    <div class="field">
+    <div class="field lg-form-top">
       <div class="field-label" id="lKeyLabel">Username</div>
       <div class="field-wrap">
         <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
@@ -6717,7 +6733,7 @@ __UI_CSS__
       </div>
       <div class="sb-brand-text">
         <b>STARLINE</b>
-        <span id="sbVer">v3.1.2</span>
+        <span id="sbVer">v3.1.1</span>
       </div>
     </div>
     <nav class="sb-nav">
