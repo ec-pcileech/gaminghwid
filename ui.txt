@@ -1,5 +1,5 @@
 #STARLINE-UI 1
-#VERSION 2026-10-08
+#VERSION 2026-10-09
 #===THEME_CSS
 
 :root{
@@ -636,6 +636,9 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
   color:var(--ui-text);margin-bottom:3px;
 }
 .renew-plan-desc{font-size:11px;color:var(--ui-text-mute)}
+.renew-old{display:block;font-size:11px;font-weight:600;color:var(--ui-text-mute);text-decoration:line-through;margin-bottom:2px}
+.renew-off{display:inline-block;margin-left:6px;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;
+  background:var(--ui-accent,#3b82f6);color:#fff;vertical-align:middle;font-family:inherit;letter-spacing:0}
 
 
 .renew-actions{
@@ -2913,11 +2916,13 @@ function uiRenewMeta(){
 function uiRenewPlanPrice(plan){
   var m = uiRenewMeta();
   var k = uiRenewPlanKeys(plan);
-  if (m && m[k.free]) return { free: true, text: uiT('free') };
-  if (m && typeof m[k.price] === 'number' && m[k.price] > 0) {
-    return { free: false, text: '$' + m[k.price].toFixed(2) };
-  }
-  return { free: false, text: uiMoney(uiPrice(k.global)) };
+  if (m && m[k.free]) return { free: true, text: uiT('free'), old: '', off: 0 };
+  var base = (m && typeof m[k.price] === 'number' && m[k.price] > 0) ? m[k.price] : uiPrice(k.global);
+  /* games.txt 的 discount：整款游戏所有方案统一打折（百分比，默认 0） */
+  var off = m ? Math.round(Number(m.discount)) : 0;
+  if (!(isFinite(off) && off > 0 && off < 100)) off = 0;
+  var now = off ? Math.round(base * (100 - off)) / 100 : base;
+  return { free: false, text: uiMoney(now), old: off ? uiMoney(base) : '', off: off };
 }
 /* 档位 → games.txt 里的价格字段 / 免费标记 / 全局默认价 */
 function uiRenewPlanKeys(plan){
@@ -2935,7 +2940,16 @@ function uiRenewPaintPrices(){
     var el = document.getElementById(slots[i][0]);
     if (!el) continue;
     var p = uiRenewPlanPrice(slots[i][1]);
-    el.textContent = p.text;
+    el.textContent = '';
+    if (p.off) {
+      var so = document.createElement('span'); so.className = 'renew-old'; so.textContent = p.old;
+      el.appendChild(so);
+    }
+    el.appendChild(document.createTextNode(p.text));
+    if (p.off) {
+      var sf = document.createElement('span'); sf.className = 'renew-off'; sf.textContent = '-' + p.off + '%';
+      el.appendChild(sf);
+    }
     el.classList.toggle('free', !!p.free);
     var card = el.closest ? el.closest('.renew-plan') : null;
     if (card) card.classList.toggle('is-free', !!p.free);
@@ -5575,6 +5589,7 @@ body.dragging .qp-drop-hint{display:block}
   .grid .card .card-title{font-size:13px}
   .grid .card .card-sub{font-size:11px;margin-bottom:9px;gap:6px}
   .grid .card .card-price .old{display:none}
+  .grid .card .card-price .disc{font-size:9px;padding:1px 5px}
   .grid .card .card-price .new{font-size:14px}
   .grid .card .card-cta{height:30px;padding:0 11px;font-size:11.5px}
   .grid .card .card-badge{top:8px;left:8px;font-size:9px;padding:3px 7px}
@@ -5952,6 +5967,10 @@ body.dragging .qp-drop-hint{display:block}
 .card-price .old{
   font-size:11px;color:var(--text-3);text-decoration:line-through;
   font-family:var(--font-mono);
+}
+.card-price .disc{
+  align-self:center;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;white-space:nowrap;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;font-family:var(--font);
 }
 .card-price .new{
   font-size:16px;font-weight:800;
@@ -7999,11 +8018,21 @@ __UI_SCRIPT__
   }
   function priceFor(g){ return priceOf(g); }
   function isFreeGame(g){ return priceOf(g) <= 0; }
-  function fmtPrice(g){ return isFreeGame(g) ? uiT('free') : '$' + priceOf(g).toFixed(2); }
-  /* 折扣角标也不能给免费游戏显示 */
+  /* games.txt 的 discount（百分比，默认 0 = 不打折；有效 1~99）。免费游戏不显示折扣。 */
+  function discOf(g){
+    if (isFreeGame(g)) return 0;
+    var d = Math.round(Number((GAMES[g] || {}).discount));
+    return (isFinite(d) && d > 0 && d < 100) ? d : 0;
+  }
+  /* 折后价（保留两位小数，按分四舍五入） */
+  function salePriceOf(g){
+    var p = priceOf(g), d = discOf(g);
+    return d ? Math.round(p * (100 - d)) / 100 : p;
+  }
+  function fmtPrice(g){ return isFreeGame(g) ? uiT('free') : '$' + salePriceOf(g).toFixed(2); }
+  /* 划线原价：只有真的打折才有（以前是 价格×1.1 的假原价，已去掉） */
   function fmtOldPrice(g){
-    if (isFreeGame(g)) return '';
-    return '$' + (priceOf(g) * 1.1).toFixed(2);
+    return discOf(g) ? '$' + priceOf(g).toFixed(2) : '';
   }
 
 
@@ -8183,8 +8212,9 @@ __UI_SCRIPT__
       +   '</div>'
       + '</div>'
       + '<div class="hero-badge">'
-      +   '<span class="discount">' + uiEsc(isFreeGame(gid) ? uiT('free') : heroDiscLabel()) + '</span>'
-      + (isFreeGame(gid) ? '' : '<span class="price-old">$' + (p * 1.1).toFixed(2) + '</span>')
+      + (isFreeGame(gid) ? '<span class="discount">' + uiEsc(uiT('free')) + '</span>'
+         : (discOf(gid) ? '<span class="discount">-' + discOf(gid) + '%</span>' : ''))
+      + (discOf(gid) ? '<span class="price-old">' + uiEsc(fmtOldPrice(gid)) + '</span>' : '')
       +   '<span class="price-new' + (isFreeGame(gid) ? ' free' : '') + '">' + uiEsc(fmtPrice(gid)) + '</span>'
       + '</div>');
 
@@ -9340,7 +9370,10 @@ __UI_SCRIPT__
         /* 售价写 0 = 免费：绿色 FREE，不显示划线原价 */
         html += '<span class="new free" data-ui="free">' + uiEsc(uiT('free')) + '</span>';
       } else {
-        html += '<span class="old">$' + (p * 1.1).toFixed(2) + '</span>';
+        if (discOf(g)) {
+          html += '<span class="disc">-' + discOf(g) + '%</span>';
+          html += '<span class="old">' + fmtOldPrice(g) + '</span>';
+        }
         html += '<span class="new">' + fmtPrice(g) + '</span>';
       }
       html += '</div>';
