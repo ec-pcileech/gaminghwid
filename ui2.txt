@@ -3,10 +3,10 @@
 #===THEME_CSS
 
 :root{
-  --accent:#3b82f6;--accent-2:#60a5fa;--accent-3:#93c5fd;
-  --accent-glow:rgba(59,130,246,.38);--accent-soft:rgba(59,130,246,.14);
+  --accent:#1692ff;--accent-2:#4fb0ff;--accent-3:#9bd2ff;
+  --accent-glow:rgba(22,146,255,.38);--accent-soft:rgba(22,146,255,.14);
   --ok:#10b981;--warn:#f59e0b;--err:#ef4444;
-  --radius-sm:8px;--radius:12px;--radius-lg:18px;--radius-xl:24px;--radius-full:999px;
+  --radius-sm:6px;--radius:8px;--radius-lg:12px;--radius-xl:16px;--radius-full:999px;
   --tr-fast:.15s cubic-bezier(.4,0,.2,1);
   --tr:.25s cubic-bezier(.4,0,.2,1);
   --tr-slow:.4s cubic-bezier(.4,0,.2,1);
@@ -15,29 +15,31 @@
 }
 :root,[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#0a0a0c;--bg-2:#0f0f12;--bg-rgb:10,10,12;
-  --surface:rgba(26,26,30,.66);--surface-2:rgba(34,34,40,.82);
-  --surface-3:rgba(46,46,54,.92);--surface-solid:#17171b;
-  --ov:24,24,28;
-  --text:#f4f4f5;--text-2:#b6b6be;--text-3:#73737d;
-  --border:rgba(255,255,255,.08);--border-2:rgba(255,255,255,.15);
-  --overlay:rgba(10,10,12,.82);
-  --shadow-1:0 2px 8px rgba(0,0,0,.4);
-  --shadow-2:0 8px 28px rgba(0,0,0,.55);
-  --shadow-3:0 20px 60px rgba(0,0,0,.7);
+  --bg:#0a1018;--bg-2:#0e1520;--bg-rgb:10,16,24;--rail:#0c141d;
+  --surface:rgba(20,32,48,.92);--surface-2:#1a2a3d;
+  --surface-3:#21344a;--surface-solid:#142030;
+  --ov:20,32,48;
+  --text:#e9f0f8;--text-2:#9aabc0;--text-3:#62748b;
+  --border:rgba(140,170,210,.10);--border-2:rgba(140,170,210,.20);
+  --overlay:rgba(10,16,24,.84);
+  --shadow-1:0 2px 8px rgba(0,0,0,.35);
+  --shadow-2:0 8px 28px rgba(0,0,0,.5);
+  --shadow-3:0 20px 60px rgba(0,0,0,.65);
 }
 [data-theme="light"]{
   color-scheme:light;
-  --bg:#f3f4f7;--bg-2:#eaecf1;--bg-rgb:243,244,247;
-  --surface:rgba(255,255,255,.7);--surface-2:rgba(255,255,255,.88);
-  --surface-3:rgba(244,245,249,.97);--surface-solid:#ffffff;
+  --accent:#0a7ff0;--accent-2:#2a96ff;--accent-3:#7cc0ff;
+  --accent-glow:rgba(10,127,240,.28);--accent-soft:rgba(10,127,240,.10);
+  --bg:#eef2f7;--bg-2:#e5ebf3;--bg-rgb:238,242,247;--rail:#ffffff;
+  --surface:rgba(255,255,255,.94);--surface-2:#f2f6fb;
+  --surface-3:#e6edf6;--surface-solid:#ffffff;
   --ov:255,255,255;
-  --text:#14151a;--text-2:#4f5563;--text-3:#8c92a0;
-  --border:rgba(20,25,45,.09);--border-2:rgba(20,25,45,.17);
-  --overlay:rgba(243,244,247,.86);
-  --shadow-1:0 2px 8px rgba(20,25,45,.08);
-  --shadow-2:0 8px 28px rgba(20,25,45,.12);
-  --shadow-3:0 20px 60px rgba(20,25,45,.18);
+  --text:#0f1b2a;--text-2:#4a5b70;--text-3:#8494a8;
+  --border:rgba(15,40,80,.09);--border-2:rgba(15,40,80,.17);
+  --overlay:rgba(238,242,247,.88);
+  --shadow-1:0 2px 8px rgba(15,40,80,.07);
+  --shadow-2:0 8px 28px rgba(15,40,80,.11);
+  --shadow-3:0 20px 60px rgba(15,40,80,.17);
 }
 #===UI_CSS
 
@@ -4144,6 +4146,54 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 }
 
 __UI_CSS__
+
+/* ═══════ eSports 风格覆盖（登录页）═══════ */
+:root{
+  --lg-bg:#0a1018;--lg-glow-a:rgba(22,146,255,.18);--lg-glow-b:rgba(22,146,255,.12);--lg-glow-c:rgba(0,200,255,.07);
+  --lg-vig:rgba(0,0,0,.45);--lg-card-a:#15212f;--lg-card-b:#121d2a;
+  --lg-field:#0d1620;--lg-field-hi:#101c29;--lg-field-line:var(--accent);
+  --lg-btn-a:#1b2b3d;--lg-btn-b:#172535;--lg-btn-line:rgba(140,170,210,.14);--lg-btn-hover:#233750;
+  --lg-fg:#e9f0f8;--lg-fg2:#9aabc0;--lg-fg3:#62748b;--lg-star:110,165,230;
+  --lg-tile-line:rgba(140,170,210,.08);--lg-tile-fill:rgba(140,170,210,.03);--lg-deco-line:rgba(140,170,210,.2);
+  --lg-card-shadow:0 30px 80px rgba(0,0,0,.55);--lg-vg:rgba(10,16,24,.9);
+}
+[data-theme="light"]{
+  --lg-bg:#eef2f7;--lg-glow-a:rgba(10,127,240,.14);--lg-glow-b:rgba(10,127,240,.10);--lg-glow-c:rgba(0,170,255,.07);
+  --lg-vig:rgba(40,60,100,.10);--lg-card-a:#ffffff;--lg-card-b:#fbfcfe;
+  --lg-field:#f1f5fa;--lg-field-hi:#e9eff7;--lg-field-line:var(--accent);
+  --lg-btn-a:#ffffff;--lg-btn-b:#f3f6fb;--lg-btn-line:rgba(15,40,80,.13);--lg-btn-hover:#eaf1fa;
+  --lg-fg:#0f1b2a;--lg-fg2:#4a5b70;--lg-fg3:#8494a8;--lg-star:40,80,140;
+  --lg-tile-line:rgba(15,40,80,.08);--lg-tile-fill:rgba(15,40,80,.02);--lg-deco-line:rgba(15,40,80,.2);
+  --lg-card-shadow:0 24px 70px rgba(15,40,80,.16);--lg-vg:rgba(238,242,247,.9);
+}
+.lg-deco{display:none}
+.lg-sky{opacity:.55}
+.right{border-radius:16px;padding:40px 34px 28px;background:var(--lg-card-a);border:1px solid var(--border-2);
+  box-shadow:var(--lg-card-shadow);backdrop-filter:none;-webkit-backdrop-filter:none}
+.right::before{display:none}
+.lg-logo{border-radius:50%;background:var(--accent);color:#fff;border:none;box-shadow:0 0 0 6px var(--accent-soft)}
+.lg-title{font-size:26px;font-weight:700}
+.right .form-hint{font-size:14px;margin:8px 0 26px}
+.right .key-input,.right .act-btn,.right .foot-btn{border-radius:10px}
+.right .key-input{background:var(--lg-field);border:1px solid var(--border)}
+.right .act-btn{background:var(--accent)!important;color:#fff!important;border-color:transparent!important;
+  box-shadow:0 8px 22px var(--accent-glow)}
+.right .act-btn:hover:not(:disabled){background:var(--accent-2)!important}
+.right .foot-btn{background:var(--lg-btn-a);border:1px solid var(--lg-btn-line)}
+.right .bg-switch input:checked + span{background:var(--accent)}
+.lg-switch button{color:var(--accent-2)}
+.lg-switch button:hover{color:var(--accent)}
+/* 通知 toast：深色面板卡片，左侧状态色条，右下角滑入 */
+.toast-wrap{left:auto;right:24px;bottom:24px;transform:none;align-items:flex-end}
+.toast{min-width:260px;max-width:380px;padding:12px 16px 14px 12px;border-radius:10px;
+  background:var(--surface-solid);border:1px solid var(--border-2);border-left:3px solid var(--toast-c);
+  backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--shadow-2);
+  font-size:13px;font-weight:600;animation:nxIn .32s cubic-bezier(.2,.9,.3,1)}
+.toast-ico{width:30px;height:30px;border-radius:8px}
+.toast::after{left:0;right:0;bottom:0;height:2px;border-radius:0;transform-origin:left center}
+.toast.out{animation:nxOut .24s ease forwards}
+@keyframes nxIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes nxOut{to{opacity:0;transform:translateX(28px)}}
 </style>
 </head>
 <body>
@@ -7690,6 +7740,65 @@ html,body{background:#050507}
 }
 .s2-card b{font-size:26px;font-weight:700;letter-spacing:-.6px;line-height:1}
 .s2-card span{font-size:9.5px;font-weight:700;letter-spacing:1.3px;color:#6b6b75;text-transform:uppercase}
+
+/* ═══════ eSports 风格覆盖（主界面）═══════ */
+body::before{background:radial-gradient(55% 40% at 15% 0%,var(--accent-soft),transparent 70%),radial-gradient(45% 40% at 100% 100%,var(--accent-soft),transparent 70%)}
+.sidebar{width:72px;background:var(--rail);border-right:1px solid var(--border)}
+.sb-logo{width:44px;height:44px;border-radius:50%;background:var(--accent);color:#fff;border:none;box-shadow:0 0 0 4px var(--accent-soft)}
+.sb-item{border-radius:50%;background:var(--surface-2);color:var(--text-2)}
+.sb-item:hover{background:var(--surface-3);color:var(--text)}
+.sb-item.active{background:var(--accent);color:#fff;border-radius:12px;box-shadow:0 6px 18px var(--accent-glow)}
+.sb-add,.sb-mini{background:var(--surface-2);border:1px solid var(--border);border-radius:50%}
+.sb-mini-ico{border-radius:50%}
+.sb-mini:hover{border-color:var(--accent)}
+.sb-mini-x{background:var(--surface-3);border-color:var(--border-2)}
+#sbDown{border-top-color:var(--border)}
+.sb-task,.qp-picker{background:var(--surface-solid);border:1px solid var(--border-2);border-radius:12px}
+.topbar{background:rgba(var(--bg-rgb),.84);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.topbar.s2-scrolled{background:rgba(var(--bg-rgb),.94);border-bottom-color:var(--border)}
+.topbar-search input,.tb-btn,.tb-avatar{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;backdrop-filter:none;-webkit-backdrop-filter:none}
+.tb-avatar{border-radius:50%;box-shadow:0 0 0 2px var(--accent-soft)}
+.topbar-search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);transform:none}
+.page:not(#storePage){padding:84px 28px 70px}
+.hero{height:min(42vh,380px);margin:78px 28px 0;border-radius:14px;border:1px solid var(--border);box-shadow:var(--shadow-2);overflow:hidden}
+.hero-overlay{background:linear-gradient(to top,rgba(8,14,22,.92) 2%,rgba(8,14,22,.45) 40%,transparent 75%),linear-gradient(to right,rgba(8,14,22,.6),transparent 55%)}
+.hero-body{left:32px;right:32px;bottom:26px}
+.hero-title{font-size:34px;letter-spacing:-.6px}
+.hero-stats{left:32px;bottom:26px;border-radius:12px;border-color:rgba(255,255,255,.1);background:rgba(8,14,22,.5)}
+.hero-stats .hs{border-radius:9px;min-width:110px;padding:14px 14px 10px}
+.hero-badge{top:16px;right:16px}
+.btn-primary{background:var(--accent);color:#fff;border-radius:8px;box-shadow:0 6px 18px var(--accent-glow)}
+.btn-secondary{border-radius:8px}
+.hero-actions .btn-primary,.detail-hero .btn-primary{background:var(--accent);color:#fff;box-shadow:0 6px 18px var(--accent-glow)}
+.hero-actions .btn-primary svg,.detail-hero .btn-primary svg{stroke:#fff}
+#storePage .sec-head,#storePage .grid-wrap,.s2-stats{padding-left:28px;padding-right:28px}
+#storePage .sec-title{font-size:16px;font-weight:700}
+.sec-filter,.genre-btn{background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.sec-filter button{border-radius:6px;color:var(--text-3)}
+.sec-filter button.active{background:var(--accent);color:#fff}
+.grid:not(.list){display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;height:auto;overflow:visible;scroll-snap-type:none}
+.grid:not(.list) .card{display:block;flex:none;height:auto;border-radius:12px;background:var(--surface-solid);border:1px solid var(--border);box-shadow:var(--shadow-1);transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.grid:not(.list):not(:hover) .card:first-child{border-color:var(--border);transform:none;box-shadow:var(--shadow-1)}
+.grid:not(.list) .card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 28px var(--accent-soft)}
+.grid:not(.list):hover .card:not(:hover){filter:none}
+.grid:not(.list) .card-img{position:relative;inset:auto;width:100%;height:auto;aspect-ratio:16/10;border-radius:0}
+.grid:not(.list) .card-body{position:static;padding:12px 14px 14px;background:none;opacity:1;transform:none}
+.panel,.renew-card,.genre-pop,.ui-card,.s2-card{background:var(--surface-solid);border:1px solid var(--border);border-radius:12px;backdrop-filter:none;-webkit-backdrop-filter:none}
+.s2-card span{color:var(--text-3)}
+.detail{background:var(--bg)}
+.detail-hero::after{background:linear-gradient(to top,rgb(var(--bg-rgb)) 2%,rgba(var(--bg-rgb),.5) 34%,transparent 66%)}
+.detail-back{background:rgba(var(--bg-rgb),.7);border:1px solid var(--border-2)}
+/* 通知 toast：深色面板卡片，左侧状态色条，右下角滑入 */
+.toast-wrap{left:auto;right:24px;bottom:24px;transform:none;align-items:flex-end}
+.toast{min-width:260px;max-width:380px;padding:12px 16px 14px 12px;border-radius:10px;
+  background:var(--surface-solid);border:1px solid var(--border-2);border-left:3px solid var(--toast-c);
+  backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:var(--shadow-2);
+  font-size:13px;font-weight:600;animation:nxIn .32s cubic-bezier(.2,.9,.3,1)}
+.toast-ico{width:30px;height:30px;border-radius:8px}
+.toast::after{left:0;right:0;bottom:0;height:2px;border-radius:0;transform-origin:left center}
+.toast.out{animation:nxOut .24s ease forwards}
+@keyframes nxIn{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes nxOut{to{opacity:0;transform:translateX(28px)}}
 </style>
 <!-- 信息图标：我提交的游戏 + 管理员的回复 -->
 <div class="req-modal" id="inboxModal" onmousedown="if(event.target===this)closeInbox()">
