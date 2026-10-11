@@ -3847,6 +3847,11 @@ html,body{background:var(--bg)}
 .lg-now{bottom:30px}
 .lg-now{position:static;margin-top:16px}
 .lg-copy{bottom:40px}
+.lg-3d{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.lg-show{background:radial-gradient(70% 80% at 30% 45%,var(--accent-soft),transparent 70%),var(--bg)}
+.lg-show::before{display:none}
+.lg-shade{background:linear-gradient(90deg,transparent 0%,rgba(var(--bg-rgb),.15) 50%,rgba(var(--bg-rgb),.75) 100%),linear-gradient(180deg,rgba(var(--bg-rgb),.45),transparent 22%,transparent 62%,rgba(var(--bg-rgb),.7))}
+.lg-show::after{display:none}
 
 __UI_CSS__
 </style>
@@ -3859,7 +3864,7 @@ __UI_CSS__
 <div class="stage" id="stage">
 <div class="lg">
   <section class="lg-show" onmousedown="uiDrag(event)">
-    <div class="lg-slides" id="lgSlides"></div>
+    <canvas class="lg-3d" id="lg3d"></canvas>
     <div class="lg-shade"></div>
     <div class="lg-brand">
       <div class="lg-logo"><svg viewBox="0 0 24 24"><path d="M12 2.5C12.9 8 16 11.1 21.5 12C16 12.9 12.9 16 12 21.5C11.1 16 8 12.9 2.5 12C8 11.1 11.1 8 12 2.5Z"/></svg></div>
@@ -3871,9 +3876,7 @@ __UI_CSS__
       <ul class="lg-feats">
         <li><b id="lgF1t"></b><span id="lgF1d"></span></li>
         <li><b id="lgF2t"></b><span id="lgF2d"></span></li>
-        <li><b id="lgF3t"></b><span id="lgF3d"></span></li>
-      </ul>
-      <div class="lg-now"><span class="lg-now-title" id="lgNowTitle"></span><div class="lg-dots" id="lgDots"></div></div>
+</ul>
     </div>
   </section>
   <section class="lg-panel">
@@ -3929,11 +3932,7 @@ __UI_CSS__
         <button class="act-btn" id="mbtn" onclick="accSubmit()"><span class="bt" id="lActivate">Log in</span><span class="sp"></span></button>
         <div class="status-msg" id="status"></div>
         <div class="lg-switch"><span id="accSwText">Don't have an account?</span><button type="button" id="accSwBtn" onclick="accSetMode(accMode_==='reg'?'login':'reg')">Sign up, it's free!</button></div>
-        <div class="lg-foot">
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><i id="lgT1" style="font-style:normal"></i></span>
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><i id="lgT2" style="font-style:normal"></i></span>
-          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg><i id="lgT3" style="font-style:normal"></i></span>
-        </div>
+        
       </div>
     </div>
   </section>
@@ -4419,10 +4418,121 @@ uiInit();
    新用户点上面的 Register 切过去 */
 accSetMode('login');
 lgShowText();
-lgShowBuild();
 try { wv('RESIZE:1100x700'); } catch (e) {}
 applyAdminGateText();   /* i18n 跑完后再套一次真实程序名 */
 bgfxApply();
+
+/* ── 登录页 3D 背景：WebGL 线框晶体 + 旋转光环 + 穿梭粒子（无外部依赖） ── */
+(function(){
+  var cv = document.getElementById('lg3d');
+  if (!cv) { return; }
+  var gl = cv.getContext('webgl', { alpha: true, antialias: true, premultipliedAlpha: true });
+  if (!gl) { return; }
+  var W = 1100, H = 700, DPR = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = W * DPR; cv.height = H * DPR;
+  gl.viewport(0, 0, cv.width, cv.height);
+
+  var vs = 'attribute vec3 p;uniform mat4 m;uniform float ps;varying float d;void main(){vec4 c=m*vec4(p,1.0);gl_Position=c;gl_PointSize=ps/ max(c.w,0.2);d=c.w;}';
+  var fs = 'precision mediump float;uniform vec4 col;uniform float pt;varying float d;void main(){float a=col.a;if(pt>0.5){vec2 q=gl_PointCoord-0.5;float r=length(q);if(r>0.5)discard;a*=smoothstep(0.5,0.0,r);}a*=clamp(1.6-d*0.045,0.08,1.0);gl_FragColor=vec4(col.rgb*a,a);}';
+  function sh(t, s) { var o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); return o; }
+  var pg = gl.createProgram();
+  gl.attachShader(pg, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pg, sh(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(pg);
+  if (!gl.getProgramParameter(pg, gl.LINK_STATUS)) { return; }
+  gl.useProgram(pg);
+  var aP = gl.getAttribLocation(pg, 'p'), uM = gl.getUniformLocation(pg, 'm'), uC = gl.getUniformLocation(pg, 'col'),
+      uPS = gl.getUniformLocation(pg, 'ps'), uPT = gl.getUniformLocation(pg, 'pt');
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE);
+
+  /* 4x4 矩阵（列主序） */
+  function mul(a, b) { var o = new Array(16), i, j, k; for (i = 0; i < 4; i++) { for (j = 0; j < 4; j++) { var s = 0; for (k = 0; k < 4; k++) { s += a[k * 4 + j] * b[i * 4 + k]; } o[i * 4 + j] = s; } } return o; }
+  function persp(f, a, n, fa) { var t = 1 / Math.tan(f / 2); return [t / a, 0, 0, 0, 0, t, 0, 0, 0, 0, (fa + n) / (n - fa), -1, 0, 0, 2 * fa * n / (n - fa), 0]; }
+  function rotX(a) { var c = Math.cos(a), s = Math.sin(a); return [1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1]; }
+  function rotY(a) { var c = Math.cos(a), s = Math.sin(a); return [c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1]; }
+  function rotZ(a) { var c = Math.cos(a), s = Math.sin(a); return [c, s, 0, 0, -s, c, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]; }
+  function trans(x, y, z) { return [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1]; }
+  function scal(s) { return [s, 0, 0, 0, 0, s, 0, 0, 0, 0, s, 0, 0, 0, 0, 1]; }
+
+  function buf(arr) { var b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arr), gl.DYNAMIC_DRAW); return b; }
+
+  /* 二十面体线框 */
+  var t = (1 + Math.sqrt(5)) / 2, iv = [[-1, t, 0], [1, t, 0], [-1, -t, 0], [1, -t, 0], [0, -1, t], [0, 1, t], [0, -1, -t], [0, 1, -t], [t, 0, -1], [t, 0, 1], [-t, 0, -1], [-t, 0, 1]];
+  var ln = Math.sqrt(1 + t * t); iv = iv.map(function(v){ return [v[0] / ln, v[1] / ln, v[2] / ln]; });
+  var edges = [], i, j;
+  for (i = 0; i < 12; i++) { for (j = i + 1; j < 12; j++) { var dx = iv[i][0] - iv[j][0], dy = iv[i][1] - iv[j][1], dz = iv[i][2] - iv[j][2]; if (Math.sqrt(dx * dx + dy * dy + dz * dz) < 1.15) { edges.push(iv[i][0], iv[i][1], iv[i][2], iv[j][0], iv[j][1], iv[j][2]); } } }
+  var ico = buf(edges), icoN = edges.length / 3;
+  /* 内部八面体 */
+  var ov = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]], oe = [];
+  for (i = 0; i < 6; i++) { for (j = i + 1; j < 6; j++) { if (i >> 1 !== j >> 1) { oe.push(ov[i][0], ov[i][1], ov[i][2], ov[j][0], ov[j][1], ov[j][2]); } } }
+  var oct = buf(oe), octN = oe.length / 3;
+  /* 光环 */
+  var ring = [], S = 120;
+  for (i = 0; i < S; i++) { var a1 = i / S * 6.2832, a2 = (i + 1) / S * 6.2832; ring.push(Math.cos(a1), Math.sin(a1), 0, Math.cos(a2), Math.sin(a2), 0); }
+  var ringB = buf(ring), ringN = ring.length / 3;
+  /* 地面网格（透视消失线） */
+  var grid = [], g;
+  for (g = -10; g <= 10; g++) { grid.push(g * 1.2, -2.2, -30, g * 1.2, -2.2, 6); }
+  for (g = -30; g <= 6; g += 2) { grid.push(-12, -2.2, g, 12, -2.2, g); }
+  var gridB = buf(grid), gridN = grid.length / 3;
+  /* 粒子 */
+  var NP = 900, pp = new Float32Array(NP * 3), sp = new Float32Array(NP);
+  function seed(k, far) { var r = 2.5 + Math.random() * 11, a = Math.random() * 6.2832; pp[k * 3] = Math.cos(a) * r; pp[k * 3 + 1] = Math.sin(a) * r * 0.7; pp[k * 3 + 2] = far ? -40 - Math.random() * 10 : -45 + Math.random() * 50; sp[k] = 0.05 + Math.random() * 0.12; }
+  for (i = 0; i < NP; i++) { seed(i, false); }
+  var partB = gl.createBuffer();
+
+  var col = [0.25, 0.55, 1.0], mx = 0, my = 0, tx = 0, ty = 0;
+  function readCol() {
+    var v = (getComputedStyle(document.documentElement).getPropertyValue('--accent') || '').trim(), m;
+    if ((m = /^#([0-9a-f]{6})$/i.exec(v))) { col = [parseInt(m[1].substr(0, 2), 16) / 255, parseInt(m[1].substr(2, 2), 16) / 255, parseInt(m[1].substr(4, 2), 16) / 255]; }
+    else if ((m = /^#([0-9a-f]{3})$/i.exec(v))) { col = [parseInt(m[1][0] + m[1][0], 16) / 255, parseInt(m[1][1] + m[1][1], 16) / 255, parseInt(m[1][2] + m[1][2], 16) / 255]; }
+    else if ((m = /rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)/i.exec(v))) { col = [m[1] / 255, m[2] / 255, m[3] / 255]; }
+  }
+  document.addEventListener('mousemove', function(e){ tx = (e.clientX / window.innerWidth - 0.5); ty = (e.clientY / window.innerHeight - 0.5); });
+
+  function draw(b, n, mode, mat, a, c, size) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.enableVertexAttribArray(aP); gl.vertexAttribPointer(aP, 3, gl.FLOAT, false, 0, 0);
+    gl.uniformMatrix4fv(uM, false, new Float32Array(mat));
+    gl.uniform4f(uC, c[0], c[1], c[2], a);
+    gl.uniform1f(uPT, mode === gl.POINTS ? 1 : 0); gl.uniform1f(uPS, size || 1);
+    gl.drawArrays(mode, 0, n);
+  }
+  var t0 = performance.now(), last = 0, frame = 0;
+  function tick(now) {
+    requestAnimationFrame(tick);
+    if (document.hidden || now - last < 15) { return; }
+    last = now; frame++;
+    if (frame % 90 === 1) { readCol(); }
+    var T = (now - t0) / 1000;
+    mx += (tx - mx) * 0.05; my += (ty - my) * 0.05;
+    gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+    var P = persp(0.95, W / H, 0.1, 80);
+    var V = mul(rotX(-my * 0.35), mul(rotY(mx * 0.5), trans(-3.2, 0.2, -9.5)));   /* 晶体偏左，给右侧登录卡片让位 */
+    var VP = mul(P, V);
+    var hi = [Math.min(1, col[0] * 0.6 + 0.4), Math.min(1, col[1] * 0.6 + 0.4), Math.min(1, col[2] * 0.6 + 0.4)];
+    /* 地面网格 */
+    draw(gridB, gridN, gl.LINES, VP, 0.22, col);
+    /* 晶体 */
+    var M1 = mul(VP, mul(rotY(T * 0.35), mul(rotX(T * 0.22), scal(2.6))));
+    draw(ico, icoN, gl.LINES, M1, 0.95, hi);
+    var M2 = mul(VP, mul(rotY(-T * 0.5), mul(rotZ(T * 0.3), scal(1.5))));
+    draw(oct, octN, gl.LINES, M2, 0.85, col);
+    var M3 = mul(VP, mul(rotY(T * 0.35), mul(rotX(T * 0.22), scal(3.6))));
+    draw(ico, icoN, gl.LINES, M3, 0.18, col);
+    /* 光环 */
+    for (var r = 0; r < 3; r++) {
+      var Mr = mul(VP, mul(rotY(T * (0.2 + r * 0.12) + r * 1.1), mul(rotX(1.1 + r * 0.55 + Math.sin(T * 0.4 + r) * 0.15), scal(4.4 + r * 1.1))));
+      draw(ringB, ringN, gl.LINES, Mr, 0.5 - r * 0.1, r === 1 ? hi : col);
+    }
+    /* 粒子 */
+    for (i = 0; i < NP; i++) { pp[i * 3 + 2] += sp[i]; if (pp[i * 3 + 2] > 5) { seed(i, true); } }
+    gl.bindBuffer(gl.ARRAY_BUFFER, partB); gl.bufferData(gl.ARRAY_BUFFER, pp, gl.DYNAMIC_DRAW);
+    gl.uniformMatrix4fv(uM, false, new Float32Array(VP));
+    gl.uniform4f(uC, hi[0], hi[1], hi[2], 0.85); gl.uniform1f(uPT, 1); gl.uniform1f(uPS, 14 * DPR);
+    gl.enableVertexAttribArray(aP); gl.vertexAttribPointer(aP, 3, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.POINTS, 0, NP);
+  }
+  requestAnimationFrame(tick);
+})();
 </script>
 </body>
 </html>
@@ -4451,338 +4561,294 @@ svg{flex-shrink:0}
 ::-webkit-scrollbar-track{background:transparent}
 svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-/* ───────── 外壳：顶部导航 + 通栏内容（无侧栏） ───────── */
+/* ═══════════ Steam 商店风格 ═══════════ */
+body{font-family:"Motiva Sans",Arial,Helvetica,sans-serif;font-size:13px;color:var(--text)}
 .app{position:relative;z-index:1;height:100%}
-.main{position:relative;height:100%;display:flex;flex-direction:column}
-.topbar{position:absolute;left:0;right:0;top:0;z-index:30;height:70px;display:flex;align-items:center;gap:28px;padding:0 40px;-webkit-app-region:drag;
-  background:linear-gradient(to bottom,rgba(var(--bg-rgb),.88),rgba(var(--bg-rgb),0));transition:background .3s,border-color .3s,backdrop-filter .3s}
-.topbar.s2-scrolled{background:rgba(var(--bg-rgb),.86);backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);border-bottom-color:var(--border)}
-.topbar button,.topbar input,.topbar .tb-avatar,.topbar .sb-item{-webkit-app-region:no-drag}
-.sb-brand{display:flex;align-items:center;gap:11px}
-.sb-logo{width:34px;height:34px;border-radius:2px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-3))}
-.sb-logo svg{width:18px;height:18px}
-.sb-brand-text b{display:block;font-size:15px;font-weight:900;letter-spacing:2.4px;line-height:1.1}
-.sb-brand-text span{font-size:10px;color:var(--text-3)}
-.tb-nav{display:flex;align-items:stretch;height:70px;gap:4px}
-.tb-nav .sb-item{position:relative;display:flex;align-items:center;gap:7px;padding:0 16px;font-size:13.5px;font-weight:700;letter-spacing:.3px;color:var(--text-2);cursor:pointer;transition:color var(--tr-fast)}
-.tb-nav .sb-item:hover{color:var(--text)}
-.tb-nav .sb-item.active{color:var(--text)}
-.tb-nav .sb-item.active::after{content:'';position:absolute;left:16px;right:16px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--accent);box-shadow:0 -2px 14px var(--accent-glow)}
-.sb-badge{min-width:17px;height:17px;padding:0 5px;border-radius:2px;background:var(--err);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
+.main{height:100%;display:flex;flex-direction:column}
+/* 全局顶栏 */
+.topbar{position:relative;z-index:30;flex-shrink:0;height:64px;display:flex;align-items:center;gap:30px;padding:0 24px;-webkit-app-region:drag;background:rgba(0,0,0,.55);border-bottom:1px solid rgba(0,0,0,.4)}
+.topbar button,.topbar .tb-avatar,.topbar .sb-item{-webkit-app-region:no-drag}
+.sb-brand{display:flex;align-items:center;gap:10px}
+.sb-logo{width:30px;height:30px;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-3));border-radius:3px}
+.sb-logo svg{width:17px;height:17px}
+.sb-brand-text b{display:block;font-size:17px;font-weight:700;letter-spacing:3px;line-height:1}
+.sb-brand-text span{display:none}
+.tb-nav{display:flex;align-items:center;gap:2px;height:100%}
+.tb-nav .sb-item{display:flex;align-items:center;gap:6px;height:100%;padding:0 14px;font-size:14px;letter-spacing:.03em;text-transform:uppercase;color:#b8b6b4;cursor:pointer;transition:color .15s}
+.tb-nav .sb-item:hover,.tb-nav .sb-item.active{color:#fff}
+.tb-nav .sb-item.active{box-shadow:inset 0 -2px 0 var(--accent-2)}
+.sb-badge{min-width:16px;height:16px;padding:0 4px;border-radius:2px;background:var(--err);color:#fff;font-size:10px;display:grid;place-items:center}
 .tb-spacer{flex:1}
-.topbar-search{position:relative;width:min(300px,26vw)}
-.topbar-search svg{position:absolute;left:13px;top:50%;width:15px;height:15px;transform:translateY(-50%);color:var(--text-3);pointer-events:none}
-.topbar-search input{width:100%;height:38px;padding:0 14px 0 38px;border-radius:8px;outline:none;background:rgba(255,255,255,.07);border:1px solid transparent;transition:all var(--tr-fast)}
-.topbar-search input::placeholder{color:var(--text-3)}
-.topbar-search input:focus{background:var(--surface-3);border-color:var(--accent)}
 .tb-actions{display:flex;align-items:center;gap:2px}
-.tb-btn{position:relative;width:38px;height:38px;border-radius:2px;display:grid;place-items:center;color:var(--text-2);transition:all var(--tr-fast)}
-.tb-btn svg{width:18px;height:18px}
-.tb-btn:hover{background:rgba(255,255,255,.08);color:var(--text)}
-.tb-btn.close:hover{background:rgba(239,68,68,.18);color:var(--err)}
-.tb-badge{position:absolute;top:3px;right:3px;min-width:16px;height:16px;padding:0 4px;border-radius:2px;background:var(--err);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center}
-.tb-ann-dot{position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 2px var(--bg)}
-.tb-avatar{width:34px;height:34px;margin:0 8px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;cursor:pointer;overflow:hidden;
-  background:linear-gradient(135deg,var(--accent),var(--accent-3));background-size:cover;background-position:center}
+.tb-btn{position:relative;width:34px;height:34px;border-radius:2px;display:grid;place-items:center;color:#b8b6b4;transition:all .15s}
+.tb-btn svg{width:17px;height:17px}
+.tb-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
+.tb-btn.close:hover{background:rgba(239,68,68,.35)}
+.tb-badge{position:absolute;top:2px;right:2px;min-width:15px;height:15px;padding:0 3px;border-radius:2px;background:var(--err);color:#fff;font-size:9.5px;display:grid;place-items:center}
+.tb-ann-dot{position:absolute;top:7px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--accent-2)}
+.tb-avatar{width:30px;height:30px;margin:0 8px;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;cursor:pointer;overflow:hidden;border-radius:2px;background:linear-gradient(135deg,var(--accent),var(--accent-3));background-size:cover;background-position:center;outline:1px solid rgba(255,255,255,.25)}
 
-.page{flex:1;min-height:0;overflow-y:auto;padding:0 0 80px}
-#profilePage,#adminPage{padding:96px 40px 80px}
-.page.page-back{animation:pageBack .3s cubic-bezier(.32,.72,0,1)}
+.page{flex:1;min-height:0;overflow-y:auto;padding:0 0 60px}
+#profilePage,#adminPage{padding:26px 24px 60px}
+.page.page-back{animation:pageBack .25s ease}
 @keyframes pageBack{from{opacity:.6}to{opacity:1}}
-.wrap{padding:0 48px;max-width:1500px;margin:0 auto}
+.wrap{max-width:940px;margin:0 auto;padding:0}
 
-/* ───────── 通栏主视觉 ───────── */
-.hero{position:relative;height:clamp(440px,68vh,640px);margin:0 0 8px;overflow:hidden;cursor:pointer}
-.hero-carousel{position:absolute;inset:0;overflow:hidden;z-index:0}
-.hero-panel{position:absolute;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center 25%;background-color:#0e1016;will-change:transform;z-index:1}
+/* 商店二级导航条 */
+.store-nav{max-width:940px;margin:16px auto 20px;height:34px;display:flex;align-items:center;padding:0 0 0 4px;border-radius:2px;
+  background:linear-gradient(90deg,var(--accent-soft) 0%,rgba(0,0,0,.18) 100%),rgba(0,0,0,.25);box-shadow:0 0 6px rgba(0,0,0,.4)}
+.sec-filter{display:flex;height:100%}
+.sec-filter button{height:100%;padding:0 14px;font-size:12px;color:#c6d4df;transition:all .15s}
+.sec-filter button:hover{background:rgba(255,255,255,.12);color:#fff}
+.sec-filter button.active{background:rgba(255,255,255,.18);color:#fff}
+.genre-wrap{position:relative;height:100%}
+.genre-btn{display:flex;align-items:center;gap:6px;height:100%;padding:0 14px;font-size:12px;color:#c6d4df}
+.genre-btn svg{width:12px;height:12px}
+.genre-btn:hover,.genre-btn.on{background:rgba(255,255,255,.12);color:#fff}
+.genre-caret{transition:transform .15s}
+.genre-pop{position:absolute;left:0;top:100%;z-index:40;min-width:190px;max-height:300px;overflow-y:auto;padding:4px 0;background:#c6d4df;box-shadow:0 0 12px #000;border-radius:0 0 2px 2px}
+.genre-pop button,.genre-pop .genre-item{display:block;width:100%;padding:7px 14px;font-size:12px;text-align:left;color:#1b2838}
+.genre-pop button:hover{background:#1b2838;color:#fff}
+.genre-pop .active{background:rgba(27,40,56,.18);font-weight:700}
+.genre-sep{height:1px;margin:4px 0;background:rgba(0,0,0,.2)}
+.tb-spacer2{flex:1}
+.topbar-search{position:relative;margin-left:auto;margin-right:6px;width:220px}
+.topbar-search svg{position:absolute;right:7px;top:50%;width:13px;height:13px;transform:translateY(-50%);color:#8bb9e0;pointer-events:none}
+.topbar-search input{width:100%;height:24px;padding:0 26px 0 8px;border-radius:2px;outline:none;font-size:12px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);color:#fff}
+.topbar-search input::placeholder{color:#8bb9e0}
+.topbar-search input:focus{background:rgba(0,0,0,.5);border-color:var(--accent-2)}
+
+/* 区块标题 */
+.st-h,.sec-title{margin:0 0 10px;font-size:14px;font-weight:400;letter-spacing:.03em;text-transform:uppercase;color:#fff}
+.sec-head{display:flex;align-items:baseline;gap:8px;margin:26px 0 10px}
+.sec-head .sec-title{margin:0}
+.sec-count{font-size:12px;color:#8f98a0}
+.sec-spacer,.sec-tools{display:none}
+
+/* 精选轮播：左大图 + 右信息栏 */
+.hero{position:relative;width:100%;height:383px;margin:0 auto 18px;cursor:pointer}
+.hero-carousel{position:absolute;left:0;right:0;top:0;height:353px;overflow:hidden;background:#0e141b;box-shadow:0 0 12px rgba(0,0,0,.6)}
+.hero-panel{position:absolute;top:0;left:0;width:100%;height:100%;background-size:632px 353px;background-repeat:no-repeat;background-position:left top;background-color:#0e141b;will-change:transform;z-index:1}
 .hero-panel.on{z-index:2}
-.hero-panel.anim{transition:transform .48s cubic-bezier(.4,0,.2,1)}
-.hero-overlay{position:absolute;inset:0;z-index:1;cursor:pointer;
-  background:linear-gradient(to top,var(--bg) 0%,rgba(var(--bg-rgb),.55) 26%,transparent 58%),linear-gradient(to right,rgba(var(--bg-rgb),.82) 0%,rgba(var(--bg-rgb),.2) 48%,transparent 70%)}
-.hero-body{position:absolute;left:48px;right:120px;bottom:104px;z-index:3;display:flex;flex-direction:column;align-items:flex-start;gap:26px;pointer-events:none}
+.hero-panel.anim{transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.hero-overlay{position:absolute;left:632px;right:0;top:0;bottom:0;z-index:1;cursor:pointer;background:linear-gradient(to bottom,rgba(20,32,46,.55),rgba(10,16,24,.88))}
+.hero-body{position:absolute;left:auto;right:0;top:0;bottom:0;width:308px;z-index:3;display:flex;flex-direction:column;justify-content:space-between;padding:16px 16px 14px;pointer-events:none}
 .hero-body>*{pointer-events:auto}
-.hero-info{max-width:640px;min-width:0}
-.hero-tag{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:11.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent-3)}
-.hero-tag::before{content:'';width:26px;height:2px;background:var(--accent)}
-.hero-tag .card-status{text-transform:none;letter-spacing:0}
-.hero-title{margin-bottom:12px;font-size:clamp(38px,6vw,72px);font-weight:900;letter-spacing:-2.5px;line-height:.98;color:#fff;text-shadow:0 6px 40px rgba(0,0,0,.55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hero-meta{font-size:14px;color:rgba(255,255,255,.78);font-weight:500}
-.hero-actions{display:flex;gap:12px;align-items:center}
-.hero-actions .btn{height:50px;padding:0 28px;border-radius:2px;font-size:14.5px}
-.hero-badge{position:absolute;left:48px;bottom:46px;z-index:3;display:flex;align-items:center;gap:12px;color:#fff}
-.hero-badge .discount{padding:4px 9px;border-radius:2px;background:var(--ok);font-size:12px;font-weight:800}
-.hero-badge .price-old{font-size:13.5px;color:rgba(255,255,255,.5);text-decoration:line-through}
-.hero-badge .price-new{font-size:22px;font-weight:800}
-.hero-badge .price-new.free{color:#34d399}
-.hero-nav{position:absolute;right:40px;top:50%;z-index:3;display:flex;flex-direction:column;align-items:center;gap:9px;transform:translateY(-50%)}
-.hero-dot{width:4px;height:18px;border-radius:4px;background:rgba(255,255,255,.3);transition:all var(--tr)}
-.hero-dot:hover{background:rgba(255,255,255,.7)}
-.hero-dot.active{height:46px;background:var(--accent);box-shadow:0 0 14px var(--accent-glow)}
-.hero-ctrl{position:absolute;bottom:40px;z-index:4;width:44px;height:44px;border-radius:2px;display:grid;place-items:center;color:#fff;background:rgba(255,255,255,.1);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.14);transition:all var(--tr)}
-.hero-ctrl.prev{right:100px}
-.hero-ctrl.next{right:48px}
-.hero-ctrl:hover{background:var(--accent);border-color:var(--accent)}
+.hero-info{min-width:0}
+.hero-tag{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-2)}
+.hero-title{margin-bottom:8px;font-size:24px;font-weight:400;line-height:1.15;color:#fff;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;white-space:normal;text-shadow:none}
+.hero-meta{font-size:12px;line-height:1.5;color:#8f98a0}
+.hero-actions{display:flex;gap:8px}
+.hero-actions .btn{flex:1;padding:0 8px}
+.hero-badge{position:absolute;right:16px;bottom:56px;z-index:4;display:flex;align-items:center;gap:0;color:#c6d4df}
+.hero-badge .discount{padding:0 7px;line-height:26px;font-size:16px;background:#4c6b22;color:#a4d007}
+.hero-badge .price-old{padding:0 6px;font-size:12px;line-height:26px;background:rgba(0,0,0,.3);color:#738895;text-decoration:line-through}
+.hero-badge .price-new{padding:0 8px;font-size:14px;line-height:26px;background:rgba(0,0,0,.3);color:#c6d4df}
+.hero-badge .price-new.free{color:#a4d007}
+.hero-nav{position:absolute;left:0;right:0;bottom:0;height:30px;z-index:3;display:flex;align-items:center;justify-content:center;gap:5px}
+.hero-dot{width:14px;height:9px;border-radius:2px;background:rgba(255,255,255,.15);transition:background .15s}
+.hero-dot:hover{background:rgba(255,255,255,.35)}
+.hero-dot.active{background:rgba(255,255,255,.5)}
+.hero-ctrl{position:absolute;top:146px;z-index:4;width:34px;height:60px;display:grid;place-items:center;color:#fff;background:rgba(0,0,0,.3);border-radius:2px;opacity:.7;transition:all .15s}
+.hero-ctrl.prev{left:-40px}.hero-ctrl.next{right:-40px}
+.hero-ctrl:hover{opacity:1;background:rgba(255,255,255,.18)}
 .hero-ctrl svg{width:18px;height:18px}
 .hero-stats{display:none}
+@media (max-width:1010px){.hero-ctrl.prev{left:4px}.hero-ctrl.next{right:4px}}
 
-/* ───────── 资料库横栏（快速启动 + 订阅） ───────── */
-.lib{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:40px;margin:30px 0 44px;padding:20px 24px;border-radius:2px;background:var(--surface-2);border:1px solid var(--border)}
-.sb-section{padding:0 0 12px;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--text-3)}
-.sb-section-row{display:flex;align-items:center;gap:10px}
-.sb-add{width:22px;height:22px;border-radius:2px;display:grid;place-items:center;color:var(--text-2);background:var(--surface-3);transition:all var(--tr-fast)}
-.sb-add svg{width:13px;height:13px;transition:transform var(--tr)}
-.sb-add:hover{background:var(--accent);color:#fff}
-.sb-add.open svg{transform:rotate(45deg)}
-#sbQuick,#sbDown{display:flex;flex-wrap:wrap;gap:10px}
-.sb-mini{position:relative;display:flex;align-items:center;gap:10px;padding:5px 14px 5px 5px;border-radius:2px;cursor:pointer;background:var(--surface-3);border:1px solid transparent;transition:all var(--tr-fast)}
-.sb-mini:hover{border-color:var(--accent);transform:translateY(-2px)}
-.sb-mini-ico{width:34px;height:34px;border-radius:6px;overflow:hidden;flex-shrink:0;background:var(--surface-solid)}
+/* 按钮：Steam 蓝 / 绿 */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;padding:0 15px;border-radius:2px;font-size:13px;font-weight:400;letter-spacing:0;text-transform:none;white-space:nowrap;transition:all .15s}
+.btn svg{width:14px;height:14px}
+.btn:disabled{opacity:.6;cursor:default}
+.btn-primary{color:#d2efa9;background:linear-gradient(to right,#75b022 5%,#588a1b 95%)}
+.btn-primary svg{stroke:#d2efa9}
+.btn-primary:hover:not(:disabled){color:#fff;background:linear-gradient(to right,#8ed629 5%,#6aa621 95%)}
+.btn-secondary,.btn-ghost{color:var(--accent-2);background:rgba(103,193,245,.2)}
+.btn-secondary:hover,.btn-ghost:hover{color:#fff;background:rgba(103,193,245,.4)}
+.btn-secondary.wished svg{fill:var(--err);stroke:var(--err)}
+.input,.req-in{width:100%;height:28px;padding:0 8px;border-radius:2px;outline:none;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);color:#fff}
+.input:focus,.req-in:focus{border-color:var(--accent-2)}
+
+/* 资料库横栏 */
+.lib{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:6px 0 4px;padding:12px 14px;background:rgba(0,0,0,.2)}
+.sb-section{margin:0 0 8px;font-size:12px;letter-spacing:.03em;text-transform:uppercase;color:#8f98a0;padding:0}
+.sb-section-row{display:flex;align-items:center;gap:8px}
+.sb-add{width:18px;height:18px;border-radius:2px;display:grid;place-items:center;color:#c6d4df;background:rgba(255,255,255,.1)}
+.sb-add svg{width:11px;height:11px;transition:transform .15s}
+.sb-add:hover{background:rgba(255,255,255,.25)}.sb-add.open svg{transform:rotate(45deg)}
+#sbQuick,#sbDown{display:flex;flex-direction:column;gap:2px}
+.sb-mini{position:relative;display:flex;align-items:center;gap:8px;padding:3px 6px 3px 3px;cursor:pointer;border-radius:2px;transition:background .15s}
+.sb-mini:hover{background:rgba(255,255,255,.1)}
+.sb-mini-ico{width:30px;height:30px;overflow:hidden;flex-shrink:0;background:#0e141b}
 .sb-mini-ico img{width:100%;height:100%;object-fit:cover;display:block}
-.sb-mini-txt{font-size:13px;font-weight:700;white-space:nowrap}
-.sb-mini-badge{padding:2px 8px;border-radius:2px;font-size:10.5px;font-weight:800;background:rgba(16,185,129,.18);color:var(--ok)}
-.sb-mini-x{width:20px;height:20px;border-radius:2px;display:grid;place-items:center;color:var(--text-3);margin-left:2px}
-.sb-mini-x:hover{background:rgba(239,68,68,.18);color:var(--err)}
-.sb-mini-x svg{width:12px;height:12px}
-.qp-empty{padding:8px 0;font-size:12px;color:var(--text-3)}
-.qp-head{padding:4px 8px 8px;font-size:11px;font-weight:700;color:var(--text-3)}
-.qp-picker{margin-top:12px;padding:8px;border-radius:2px;background:var(--surface-solid);border:1px solid var(--border-2);max-height:230px;overflow-y:auto}
-.sb-foot{position:fixed;left:50%;bottom:26px;z-index:60;width:min(440px,calc(100vw - 40px));transform:translateX(-50%)}
-.sb-task{padding:14px 16px;border-radius:2px;background:var(--surface-solid);border:1px solid var(--border-2);box-shadow:var(--shadow-3)}
-.sb-task-row{display:flex;align-items:center;gap:12px}
-.sb-task-ico{width:38px;height:38px;border-radius:8px;object-fit:cover;background:var(--surface-3)}
+.sb-mini-txt{flex:1;min-width:0;font-size:13px;color:#c6d4df;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-mini-badge{font-size:11px;padding:1px 6px;background:rgba(0,0,0,.3);color:#a4d007}
+.sb-mini-x{width:18px;height:18px;display:grid;place-items:center;color:#8f98a0;opacity:0}
+.sb-mini:hover .sb-mini-x{opacity:1}.sb-mini-x:hover{color:#fff;background:rgba(239,68,68,.5)}
+.sb-mini-x svg{width:11px;height:11px}
+.qp-empty{padding:4px 2px;font-size:12px;color:#556772}
+.qp-head{padding:4px 6px;font-size:11px;color:#8f98a0}
+.qp-picker{margin-top:8px;padding:4px;background:#1b2838;border:1px solid rgba(255,255,255,.12);max-height:220px;overflow-y:auto}
+.sb-foot{position:fixed;left:50%;bottom:16px;z-index:60;width:min(420px,calc(100vw - 30px));transform:translateX(-50%)}
+.sb-task{padding:10px 12px;background:#1b2838;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 14px #000}
+.sb-task-row{display:flex;align-items:center;gap:10px}
+.sb-task-ico{width:32px;height:32px;object-fit:cover;background:#0e141b}
 .sb-task-txt{flex:1;min-width:0;display:flex;flex-direction:column}
-.sb-task-txt b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sb-task-txt span{font-size:11.5px;color:var(--text-2)}
-.sb-task-pct{font-size:13px;font-weight:800;color:var(--accent-2)}
-.sb-task-bar{height:4px;margin-top:11px;border-radius:4px;background:var(--surface-3);overflow:hidden}
-.sb-task-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
-.sb-task.done .sb-task-bar i{background:var(--ok)}
-.sb-task.err .sb-task-bar i{background:var(--err)}
-.sb-task.closing{opacity:0;transform:translateY(8px);transition:all .3s}
+.sb-task-txt b{font-size:13px;font-weight:400;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-task-txt span{font-size:11px;color:#8f98a0}
+.sb-task-pct{font-size:12px;color:var(--accent-2)}
+.sb-task-bar{height:4px;margin-top:8px;background:rgba(0,0,0,.4);overflow:hidden}
+.sb-task-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#06bfff,#2d73ff);transition:width .3s}
+.sb-task.done .sb-task-bar i{background:#75b022}.sb-task.err .sb-task-bar i{background:var(--err)}
+.sb-task.closing{opacity:0;transition:opacity .3s}
 
-/* ───────── 商店：海报式列表 ───────── */
-.sec-head{display:flex;align-items:flex-end;gap:14px;margin-bottom:22px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--border)}
-.sec-title{font-size:26px;font-weight:900;letter-spacing:-.6px;line-height:1}
-.sec-count{font-size:13px;font-weight:700;color:var(--text-3);padding-bottom:2px}
-.sec-spacer{flex:1}
-.sec-tools{display:flex;align-items:flex-end;gap:24px}
-.sec-filter{display:flex;gap:22px}
-.sec-filter button{position:relative;padding:6px 0;font-size:13.5px;font-weight:700;color:var(--text-3);transition:color var(--tr-fast)}
-.sec-filter button:hover{color:var(--text)}
-.sec-filter button.active{color:var(--text)}
-.sec-filter button.active::after{content:'';position:absolute;left:0;right:0;bottom:-15px;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}
-.genre-wrap{position:relative}
-.genre-btn{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13.5px;font-weight:700;color:var(--text-3);transition:color var(--tr-fast)}
-.genre-btn svg{width:14px;height:14px}
-.genre-btn:hover,.genre-btn.on{color:var(--text)}
-.genre-caret{transition:transform var(--tr)}
-.genre-pop{position:absolute;right:0;top:calc(100% + 16px);z-index:30;min-width:200px;max-height:320px;overflow-y:auto;padding:6px;border-radius:2px;background:var(--surface-solid);border:1px solid var(--border-2);box-shadow:var(--shadow-3)}
-.genre-pop button,.genre-pop .genre-item{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:2px;font-size:13px;text-align:left;color:var(--text-2)}
-.genre-pop button:hover{background:var(--surface-2);color:var(--text)}
-.genre-pop .active{background:var(--accent-soft);color:var(--accent-2)}
-.genre-sep{height:1px;margin:6px 4px;background:var(--border)}
-
-.grid-wrap{display:flex;gap:28px;align-items:flex-start}
+/* 胶囊网格（Special Offers 样式） */
+.grid-wrap{display:flex;gap:16px;align-items:flex-start}
 .grid-wrap .grid{flex:1;min-width:0}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:30px 20px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .grid.cols-n{grid-template-columns:repeat(var(--cols),minmax(0,1fr))}
-.card{position:relative;display:flex;flex-direction:column;cursor:pointer;background:none;border:0}
-.card-img{position:relative;aspect-ratio:3/4;border-radius:2px;overflow:hidden;background:var(--surface-3);box-shadow:0 8px 24px rgba(0,0,0,.32);transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}
-.card:hover .card-img{transform:translateY(-8px) scale(1.02);box-shadow:0 22px 44px rgba(0,0,0,.5),0 0 0 2px var(--accent)}
-.card-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .4s}
+.card{position:relative;display:flex;flex-direction:column;cursor:pointer;background:linear-gradient(to bottom,rgba(0,0,0,.3),rgba(0,0,0,.12));box-shadow:0 0 6px rgba(0,0,0,.35);transition:background .15s}
+.card:hover{background:rgba(255,255,255,.1)}
+.card-img{position:relative;aspect-ratio:460/215;overflow:hidden;background:#0e141b}
+.card-img img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .3s,filter .15s}
 .card-img img.loaded{opacity:1}
-.card-img::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(to top,rgba(0,0,0,.62),transparent 40%)}
-.card-img.loading{background:linear-gradient(110deg,var(--surface-3) 30%,var(--surface-2) 50%,var(--surface-3) 70%);background-size:200% 100%;animation:shimmer 1.3s infinite linear}
+.card:hover .card-img img{filter:brightness(1.12)}
+.card-img.loading{background:linear-gradient(110deg,#0e141b 30%,#1b2838 50%,#0e141b 70%);background-size:200% 100%;animation:shimmer 1.3s infinite linear}
 @keyframes shimmer{to{background-position:-200% 0}}
-.card-badges{position:absolute;left:0;top:12px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
-.card-badge{padding:3px 10px 3px 9px;border-radius:0 5px 5px 0;font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:#fff;background:var(--accent)}
-.card-badge.owned{background:var(--ok)}
-.card-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:2px;font-size:10.5px;font-weight:700;background:rgba(16,185,129,.2);color:#34d399}
-.card-status.updating{background:rgba(245,158,11,.2);color:#fbbf24}
-.card-status.outdated{background:rgba(239,68,68,.2);color:#f87171}
+.card-badges{position:absolute;left:0;top:6px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:3px}
+.card-badge{padding:1px 6px;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.65)}
+.card-badge.owned{background:#4c6b22;color:#a4d007}
+.card-status{display:inline-flex;padding:1px 6px;font-size:10px;background:rgba(76,107,34,.5);color:#a4d007}
+.card-status.updating{background:rgba(180,120,20,.45);color:#f3c35c}.card-status.outdated{background:rgba(160,40,40,.5);color:#ff8a8a}
 .card-img .card-status{display:none}
-.card-wish{position:absolute;right:8px;top:8px;z-index:3;width:32px;height:32px;border-radius:2px;display:grid;place-items:center;color:#fff;opacity:0;background:rgba(0,0,0,.55);backdrop-filter:blur(8px);transition:all var(--tr)}
+.card-wish{position:absolute;right:4px;top:4px;z-index:3;width:24px;height:24px;display:grid;place-items:center;color:#fff;opacity:0;background:rgba(0,0,0,.55);border-radius:2px;transition:opacity .15s}
 .card:hover .card-wish,.card-wish.active{opacity:1}
-.card-wish svg{width:15px;height:15px}
-.card-wish.active svg{fill:var(--err);stroke:var(--err)}
-.card-sublen{position:absolute;left:10px;bottom:10px;z-index:2;display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.8)}
-.card-sublen svg{width:13px;height:13px}
-.card-sublen.expiring{color:#fbbf24}
-.card-sublen.expired{color:#f87171}
-.paused-badge{padding:1px 6px;border-radius:4px;background:rgba(245,158,11,.3);color:#fbbf24;font-size:10px}
-.card-body{display:flex;flex-direction:column;gap:2px;padding:14px 2px 0}
-.card-title{font-size:14.5px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.card-sub{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.card-sub .dot{width:3px;height:3px;border-radius:50%;background:var(--text-3)}
-.card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;min-height:26px}
-.card-price{display:flex;align-items:center;gap:7px}
-.card-price .disc{padding:2px 6px;border-radius:4px;background:var(--ok);color:#fff;font-size:11px;font-weight:800}
-.card-price .old{font-size:11.5px;color:var(--text-3);text-decoration:line-through}
-.card-price .new{font-size:14px;font-weight:800}
-.card-price .new.free{color:var(--ok)}
-.card-cta{display:flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:2px;font-size:11.5px;font-weight:800;color:#fff;background:var(--accent);opacity:0;transform:translateX(6px);transition:all var(--tr)}
-.card-cta svg{width:12px;height:12px}
-.card-cta.owned{background:var(--ok)}
-.card:hover .card-cta{opacity:1;transform:none}
-.empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:80px 20px;text-align:center;color:var(--text-2)}
-.empty>svg{width:44px;height:44px;color:var(--text-3);margin-bottom:6px}
-.empty b{font-size:16px;color:var(--text)}
-.empty .req-btn{margin-top:12px}
+.card-wish svg{width:13px;height:13px}.card-wish.active svg{fill:var(--err);stroke:var(--err)}
+.card-sublen{position:absolute;left:0;bottom:0;z-index:2;display:flex;align-items:center;gap:5px;padding:2px 7px;font-size:11px;color:#c6d4df;background:rgba(0,0,0,.65)}
+.card-sublen svg{width:11px;height:11px}.card-sublen.expiring{color:#f3c35c}.card-sublen.expired{color:#ff8a8a}
+.paused-badge{padding:0 5px;background:rgba(180,120,20,.5);color:#f3c35c;font-size:10px}
+.card-body{display:flex;flex-direction:column;gap:2px;padding:8px 8px 8px}
+.card-title{font-size:13px;font-weight:400;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-sub{display:flex;align-items:center;gap:6px;font-size:11px;color:#8f98a0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-sub .dot{width:2px;height:2px;border-radius:50%;background:#8f98a0}
+.card-foot{display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:6px;min-height:20px}
+.card-price{display:flex;align-items:center;gap:0;margin-left:auto}
+.card-price .disc{padding:0 5px;line-height:20px;font-size:13px;background:#4c6b22;color:#a4d007}
+.card-price .old{padding:0 5px;line-height:20px;font-size:11px;background:rgba(0,0,0,.3);color:#738895;text-decoration:line-through}
+.card-price .new{padding:0 6px;line-height:20px;font-size:12px;background:rgba(0,0,0,.3);color:#c6d4df}
+.card-price .new.free{color:#a4d007}
+.card-cta{display:none}
+.card-cta.owned{display:flex;align-items:center;gap:4px;margin-right:auto;font-size:11px;color:#a4d007;background:none}
+.card-cta.owned svg{width:11px;height:11px}
+.empty{grid-column:1/-1;display:flex;flex-direction:column;align-items:center;gap:8px;padding:60px 20px;text-align:center;color:#8f98a0}
+.empty>svg{width:36px;height:36px;color:#556772}.empty b{font-size:14px;color:#c6d4df;font-weight:400}
+.empty .req-btn{margin-top:10px}
 
-.grid.list{grid-template-columns:1fr;gap:6px}
-.grid.list .card{flex-direction:row;align-items:center;padding:8px;border-radius:2px;background:var(--surface-2);transition:background var(--tr-fast)}
-.grid.list .card:hover{background:var(--surface-3)}
-.grid.list .card-img{width:116px;aspect-ratio:16/10;flex-shrink:0;border-radius:2px;box-shadow:none}
-.grid.list .card:hover .card-img{transform:none;box-shadow:none}
-.grid.list .card-body{flex:1;min-width:0;flex-direction:row;align-items:center;gap:14px;padding:0 10px;overflow:hidden}
-.grid.list .card-title{flex:0 0 190px;min-width:0}
+/* 列表模式 = Steam 搜索结果行 */
+.grid.list{grid-template-columns:1fr;gap:2px}
+.grid.list .card{flex-direction:row;align-items:center;background:rgba(0,0,0,.2);box-shadow:none}
+.grid.list .card:hover{background:rgba(103,193,245,.2)}
+.grid.list .card-img{width:184px;aspect-ratio:460/215;flex-shrink:0}
+.grid.list .card-body{flex:1;min-width:0;flex-direction:row;align-items:center;gap:12px;padding:0 12px}
+.grid.list .card-title{flex:0 0 200px;font-size:14px}
 .grid.list .card-sub{flex:1;min-width:0}
-.grid.list .card-foot{flex-shrink:0;margin:0}
-.grid.list .card-cta{opacity:1;transform:none}
+.grid.list .card-foot{margin:0;min-height:0}
 .grid.list .card-wish,.grid.list .card-img .card-status{display:none}
-.game-pane{width:330px;flex-shrink:0;position:sticky;top:90px;padding:16px;border-radius:2px;background:var(--surface-2);border:1px solid var(--border)}
-.game-pane-title{font-size:17px;font-weight:800}
-.game-pane-sub{margin-top:2px;font-size:12px;color:var(--text-3)}
-.game-pane-media{margin:12px 0;aspect-ratio:16/9;border-radius:2px;overflow:hidden;background:var(--surface-3)}
+.game-pane{width:300px;flex-shrink:0;position:sticky;top:10px;padding:12px;background:rgba(0,0,0,.25)}
+.game-pane-title{font-size:16px;color:#fff}.game-pane-sub{margin-top:2px;font-size:11px;color:#8f98a0}
+.game-pane-media{margin:10px 0;aspect-ratio:16/9;overflow:hidden;background:#0e141b}
 
-/* ───────── 游戏详情：左侧媒体 + 右侧购买面板 ───────── */
-.detail{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;
-  background:radial-gradient(900px 520px at 85% -5%,var(--accent-soft),transparent 65%),var(--bg)}
-.detail.open{display:flex;animation:detailIn .3s cubic-bezier(.2,.8,.2,1)}
-.detail.open.closing{animation:detailOut .26s cubic-bezier(.32,.72,0,1) forwards;pointer-events:none}
-@keyframes detailIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
-@keyframes detailOut{to{opacity:0;transform:scale(.985)}}
-.detail-top{height:64px;flex-shrink:0;display:flex;align-items:center;gap:16px;padding:0 40px;-webkit-app-region:drag}
-.detail-back{-webkit-app-region:no-drag;display:flex;align-items:center;gap:8px;height:36px;padding:0 14px 0 10px;border-radius:2px;background:rgba(255,255,255,.07);color:var(--text-2);font-weight:700;font-size:13px;transition:all var(--tr-fast)}
-.detail-back:hover{background:var(--surface-3);color:var(--text)}
-.detail-back svg{width:16px;height:16px}
-.detail-crumb{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:900;letter-spacing:2.2px;color:var(--text-3)}
-.detail-crumb svg{display:none}
+.s2-stats{margin-top:30px}
+.s2-stats h3{margin-bottom:10px;font-size:14px;font-weight:400;letter-spacing:.03em;text-transform:uppercase;color:#fff}
+.s2-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.s2-card{display:flex;flex-direction:column;gap:4px;padding:10px 12px;background:rgba(0,0,0,.2)}
+.s2-card b{font-size:22px;font-weight:400;color:#fff;line-height:1.1}
+.s2-card span{font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:#8f98a0}
+
+/* ═══ 游戏详情页 = Steam 应用页 ═══ */
+.detail{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;background:radial-gradient(1000px 420px at 50% 0,var(--accent-soft),transparent 70%),var(--bg)}
+.detail.open{display:flex;animation:detailIn .22s ease}
+.detail.open.closing{animation:detailOut .2s ease forwards;pointer-events:none}
+@keyframes detailIn{from{opacity:0}to{opacity:1}}@keyframes detailOut{to{opacity:0}}
+.detail-top{height:64px;flex-shrink:0;display:flex;align-items:center;gap:14px;padding:0 24px;-webkit-app-region:drag;background:rgba(0,0,0,.55)}
+.detail-back{-webkit-app-region:no-drag;display:flex;align-items:center;gap:6px;height:28px;padding:0 12px 0 8px;border-radius:2px;color:var(--accent-2);background:rgba(103,193,245,.2);font-size:12px}
+.detail-back:hover{background:rgba(103,193,245,.4);color:#fff}.detail-back svg{width:14px;height:14px}
+.detail-crumb{font-size:14px;letter-spacing:3px;color:#b8b6b4}.detail-crumb svg{display:none}
 .detail-top .tb-btn{-webkit-app-region:no-drag}
-.detail-scroll{flex:1;min-height:0;overflow-y:auto;padding:8px 40px 80px}
-.d-wrap{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:36px;max-width:1280px;margin:0 auto;align-items:start}
+.detail-scroll{flex:1;min-height:0;overflow-y:auto;padding:18px 24px 60px}
+.d-page{max-width:940px;margin:0 auto}
+.d-title{margin-bottom:14px}
+.d-title .detail-hero-title{font-size:26px;font-weight:400;line-height:1.2;color:#fff;margin:0}
+.d-title .detail-hero-meta{margin-top:4px;display:flex;align-items:center;gap:8px;font-size:12px;color:#8f98a0}
+.d-title .sep{width:2px;height:2px;border-radius:50%;background:#8f98a0}
+.d-wrap{display:grid;grid-template-columns:616px minmax(0,1fr);gap:16px;align-items:start}
 .d-main{min-width:0}
-.d-side{position:sticky;top:8px;display:flex;flex-direction:column;gap:16px}
-.detail-hero{position:relative;aspect-ratio:16/9;border-radius:2px;overflow:hidden;margin-bottom:28px;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.detail-slides{position:absolute;inset:0;z-index:0}
-.detail-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .6s ease}
+.d-side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.detail-hero{position:relative;aspect-ratio:616/353;overflow:hidden;background:#000;margin-bottom:14px;box-shadow:0 0 12px #000}
+.detail-slides{position:absolute;inset:0}
+.detail-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .4s}
 .detail-slide.active{opacity:1}
 .detail-slide .detail-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000;pointer-events:none}
-.detail-nav{position:absolute;left:0;right:0;bottom:12px;z-index:3;display:flex;justify-content:center;gap:6px}
-.detail-dot{width:22px;height:4px;border-radius:4px;background:rgba(255,255,255,.35);transition:all var(--tr)}
-.detail-dot:hover{background:rgba(255,255,255,.7)}
-.detail-dot.active{width:36px;background:var(--accent)}
-.detail-ctrl{position:absolute;top:50%;z-index:4;width:40px;height:40px;border-radius:2px;display:grid;place-items:center;color:#fff;opacity:0;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);transform:translateY(-50%);transition:all var(--tr)}
-.detail-hero:hover .detail-ctrl{opacity:1}
-.detail-ctrl:hover{background:var(--accent)}
-.detail-ctrl.prev{left:12px}
-.detail-ctrl.next{right:12px}
-.detail-ctrl svg{width:18px;height:18px}
+.detail-nav{position:absolute;left:0;right:0;bottom:8px;z-index:3;display:flex;justify-content:center;gap:5px}
+.detail-dot{width:14px;height:6px;border-radius:2px;background:rgba(255,255,255,.3)}
+.detail-dot:hover{background:rgba(255,255,255,.6)}.detail-dot.active{background:#fff}
+.detail-ctrl{position:absolute;top:50%;z-index:4;width:28px;height:50px;display:grid;place-items:center;color:#fff;opacity:0;background:rgba(0,0,0,.5);transform:translateY(-50%);transition:opacity .15s}
+.detail-hero:hover .detail-ctrl{opacity:1}.detail-ctrl:hover{background:rgba(255,255,255,.25)}
+.detail-ctrl.prev{left:0}.detail-ctrl.next{right:0}.detail-ctrl svg{width:16px;height:16px}
 .detail-hero.single .detail-ctrl{display:none}
-.d-cap{padding:22px;border-radius:2px;background:var(--surface-2);border:1px solid var(--border)}
-.detail-hero-title{margin-bottom:10px;font-size:32px;font-weight:900;letter-spacing:-1px;line-height:1.05}
-.detail-hero-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--text-2)}
-.detail-hero-meta .sep{width:3px;height:3px;border-radius:50%;background:var(--text-3)}
-.detail-hero-btns{display:flex;flex-direction:column;gap:10px;margin-top:20px}
-.detail-hero-btns .btn{width:100%;height:50px;border-radius:2px;font-size:14.5px}
-.detail-hero-btns .btn-secondary{color:var(--text);background:var(--surface-3);border-color:var(--border-2)}
-.d-side .section{margin:0;padding:20px 22px;border-radius:2px}
-.d-main .section{margin:0 0 20px;padding:24px 26px;border-radius:2px;background:var(--surface-2);border:1px solid var(--border)}
-.section h2{margin-bottom:16px;font-size:12px;font-weight:900;letter-spacing:1.6px;text-transform:uppercase;color:var(--text-3)}
-.d-side .section{background:var(--surface-2);border:1px solid var(--border)}
-.sec-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-.sec-row h2{margin:0}
-.sub-bar{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
-.sub-icon{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;background:rgba(16,185,129,.16);color:var(--ok)}
-.sub-icon svg{width:22px;height:22px}
+.d-buy{margin-bottom:14px;padding:16px 16px 14px;background:linear-gradient(-60deg,rgba(226,244,255,.3) 5%,rgba(84,107,115,.3) 95%);box-shadow:0 0 5px #000}
+.d-buy>.section{margin:0;padding:0;background:none;border:0;box-shadow:none}
+.d-buy>.section+.section{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.12)}
+.d-buy .section h2{display:none}
+.detail-hero-btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.detail-hero-btns .btn{height:34px;padding:0 18px}
+.detail-hero-btns .btn-primary{order:3}
+.section{margin-bottom:14px;padding:14px 16px;background:rgba(0,0,0,.2)}
+.section h2{margin-bottom:10px;font-size:14px;font-weight:400;letter-spacing:.03em;text-transform:uppercase;color:#fff}
+.sec-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.sec-row h2{margin:0}
+.sub-bar{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.sub-icon{width:34px;height:34px;display:grid;place-items:center;background:rgba(0,0,0,.3);color:#a4d007}.sub-icon svg{width:18px;height:18px}
 .sub-info{flex:1;min-width:0}
-.sub-label{font-size:10.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--text-3)}
-.sub-time{font-size:24px;font-weight:900;letter-spacing:-.5px}
-.sub-time.expiring{color:var(--warn)}
-.sub-time.expired{color:var(--err)}
-.sub-meta{font-size:12px;color:var(--text-2)}
-.sub-actions{display:flex;gap:8px;width:100%}
-.sub-actions .btn{flex:1;height:38px}
-.btn-ico{display:inline-flex}
-.btn-ico svg{width:15px;height:15px}
-.inject-panel{display:flex;flex-wrap:wrap;align-items:center;gap:14px}
-.inject-thumb{position:relative;width:52px;height:52px;flex-shrink:0;border-radius:10px;overflow:hidden;background:var(--surface-solid)}
-.inject-thumb img{width:100%;height:100%;object-fit:cover}
-.inject-info{flex:1;min-width:0}
-.inject-title{font-size:15px;font-weight:800}
-.inject-status{margin:2px 0 9px;font-size:12px;color:var(--text-2)}
-.progress{height:4px;border-radius:4px;background:var(--surface-solid);overflow:hidden}
-.progress-fill{height:100%;width:0;background:var(--accent);transition:width .3s}
-.inject-actions{display:flex;gap:8px;width:100%}
-.inject-actions .btn{flex:1;height:44px}
-.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
-.meta-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border)}
-.meta-k{font-size:12.5px;color:var(--text-3);font-weight:600}
-.meta-v{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;font-size:13px;font-weight:700;text-align:right}
-.tag{padding:3px 10px;border-radius:2px;font-size:11.5px;font-weight:700;background:var(--accent-soft);color:var(--accent-2)}
-.rev-list{display:flex;flex-direction:column;gap:12px}
-.rev-empty{padding:26px;text-align:center;color:var(--text-3)}
-.rev-more-wrap{margin-top:14px;text-align:center}
-@media (max-width:1000px){.d-wrap{grid-template-columns:1fr}.d-side{position:static}.lib{grid-template-columns:1fr}.tb-nav .sb-item{padding:0 10px}.topbar-search{display:none}.wrap{padding:0 24px}.hero-body{left:24px}.hero-badge{left:24px}}
+.sub-label{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#8f98a0}
+.sub-time{font-size:20px;color:#fff}.sub-time.expiring{color:#f3c35c}.sub-time.expired{color:#ff8a8a}
+.sub-meta{font-size:11px;color:#8f98a0}
+.sub-actions{display:flex;gap:8px}
+.btn-ico{display:inline-flex}.btn-ico svg{width:14px;height:14px}
+.inject-panel{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.inject-thumb{width:44px;height:44px;flex-shrink:0;overflow:hidden;background:#0e141b}.inject-thumb img{width:100%;height:100%;object-fit:cover}
+.inject-info{flex:1;min-width:0}.inject-title{font-size:14px;color:#fff}.inject-status{margin:1px 0 6px;font-size:11px;color:#8f98a0}
+.progress{height:4px;background:rgba(0,0,0,.4);overflow:hidden}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#06bfff,#2d73ff);transition:width .3s}
+.inject-actions{display:flex;gap:8px}
+.meta-grid{display:flex;flex-direction:column;gap:0}
+.meta-row{display:block;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px}
+.meta-k{display:block;margin-bottom:1px;font-size:11px;letter-spacing:.03em;text-transform:uppercase;color:#556772}
+.meta-v{display:flex;flex-wrap:wrap;gap:4px;font-size:12px;color:var(--accent-2);text-align:left}
+.tag{padding:2px 7px;font-size:11px;border-radius:2px;background:rgba(103,193,245,.2);color:var(--accent-2)}
+.rev-list{display:flex;flex-direction:column;gap:8px}.rev-empty{padding:18px;text-align:center;color:#8f98a0}.rev-more-wrap{margin-top:10px;text-align:center}
+@media (max-width:1000px){.d-wrap{grid-template-columns:1fr}}
 
-/* 统计条 */
-.s2-stats{margin-top:56px;padding-top:28px;border-top:1px solid var(--border)}
-.s2-stats h3{margin-bottom:18px;font-size:12px;font-weight:900;letter-spacing:1.8px;text-transform:uppercase;color:var(--text-3)}
-.s2-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0}
-.s2-card{display:flex;flex-direction:column;gap:8px;padding:4px 24px;border-left:1px solid var(--border)}
-.s2-card:first-child{border-left:0;padding-left:0}
-.s2-card b{font-size:38px;font-weight:900;letter-spacing:-1.5px;line-height:1}
-.s2-card span{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-3)}
-/* 按钮 */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 20px;border-radius:2px;font-weight:700;font-size:13.5px;white-space:nowrap;
-  transition:transform var(--tr-fast),filter var(--tr-fast),background var(--tr-fast),border-color var(--tr-fast)}
-.btn svg{width:16px;height:16px}
-.btn:disabled{opacity:.6;cursor:default}
-.btn-primary{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-3));box-shadow:0 8px 22px var(--accent-glow)}
-.btn-primary:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-1px)}
-.btn-primary svg{stroke:#fff}
-.btn-secondary{color:var(--text);background:rgba(255,255,255,.09);border:1px solid var(--border-2)}
-.hero .btn-secondary,.detail-hero .btn-secondary{color:#fff;background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.2);backdrop-filter:blur(10px)}
-.btn-secondary:hover{background:var(--surface-3)}
-.btn-secondary.wished svg{fill:var(--err);stroke:var(--err)}
-.btn-ghost{color:var(--text-2);background:var(--surface-2);border:1px solid var(--border)}
-.btn-ghost:hover{color:var(--text);background:var(--surface-3);border-color:var(--border-2)}
-.input,.req-in{width:100%;height:42px;padding:0 14px;border-radius:2px;outline:none;background:var(--surface-2);border:1px solid var(--border);transition:all var(--tr-fast)}
-.input:focus,.req-in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.req-in.is-err{border-color:var(--err)}
-
-/* 弹窗 */
-.req-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(var(--bg-rgb),.66);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .22s}
-.req-modal.open{opacity:1;pointer-events:auto}
-.req-box{width:min(440px,calc(100vw - 40px));padding:26px;border-radius:2px;background:var(--surface-solid);border:1px solid var(--border-2);box-shadow:var(--shadow-3);transform:translateY(14px) scale(.98);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
-.req-modal.open .req-box{transform:none}
-.req-box h3{font-size:19px;font-weight:800}
-.req-box p{margin:6px 0 16px;font-size:13px;color:var(--text-2)}
-.req-box label{display:block;margin-bottom:6px;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-3)}
-.req-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
-
-/* ───────── 个人资料页 ───────── */
+/* 个人资料页 / 弹窗沿用统一变量 */
 .profile-wrap{max-width:860px;margin:0 auto}
-.profile-hero{height:150px;border-radius:2px 22px 0 0;background:radial-gradient(80% 140% at 20% 0%,var(--accent-glow),transparent 70%),linear-gradient(135deg,var(--accent-soft),var(--surface-2))}
-.profile-header{display:flex;align-items:flex-end;gap:18px;margin:-44px 0 22px;padding:0 26px}
-.profile-avatar{position:relative;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-size:36px;font-weight:800;color:#fff;cursor:pointer;overflow:hidden;
-  background:linear-gradient(135deg,var(--accent),var(--accent-3));border:4px solid var(--bg);box-shadow:var(--shadow-2);background-size:cover;background-position:center}
-.profile-name-block{flex:1;min-width:0;padding-bottom:6px}
-.profile-name{font-size:24px;font-weight:800}
-.profile-badges{display:inline-flex;gap:6px;margin-right:8px}
-.profile-badge{padding:2px 10px;border-radius:2px;font-size:11px;font-weight:800;letter-spacing:.6px;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-3))}
-.profile-group{display:inline-block;font-size:12px;color:var(--text-2)}
-.profile-logout{width:42px;height:42px;margin-bottom:6px;border-radius:2px;display:grid;place-items:center;color:var(--text-2);background:var(--surface-2);border:1px solid var(--border);transition:all var(--tr-fast)}
-.profile-logout:hover{color:var(--err);border-color:var(--err);background:rgba(239,68,68,.12)}
-.profile-logout svg{width:18px;height:18px}
-.card-panel{margin-bottom:16px;padding:20px 22px;border-radius:2px;background:var(--surface-2);border:1px solid var(--border)}
-.panel-head{display:flex;align-items:center;gap:13px;margin-bottom:14px}
-.panel-ico{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-2)}
-.panel-ico svg{width:18px;height:18px}
-.panel-title{font-size:14.5px;font-weight:800}
-.panel-sub{font-size:12px;color:var(--text-3)}
+.profile-hero{height:120px;background:linear-gradient(135deg,var(--accent-soft),rgba(0,0,0,.3))}
+.profile-header{display:flex;align-items:flex-end;gap:16px;margin:-36px 0 18px;padding:0 20px}
+.profile-avatar{position:relative;width:84px;height:84px;display:grid;place-items:center;font-size:32px;font-weight:700;color:#fff;cursor:pointer;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--accent-3));outline:3px solid var(--bg);background-size:cover;background-position:center}
+.profile-name-block{flex:1;min-width:0;padding-bottom:4px}.profile-name{font-size:22px;color:#fff}
+.profile-badges{display:inline-flex;gap:6px;margin-right:8px}.profile-badge{padding:1px 8px;font-size:11px;color:#d2efa9;background:#4c6b22}
+.profile-group{display:inline-block;font-size:12px;color:#8f98a0}
+.profile-logout{width:32px;height:32px;margin-bottom:4px;display:grid;place-items:center;color:var(--accent-2);background:rgba(103,193,245,.2);border-radius:2px}
+.profile-logout:hover{background:rgba(239,68,68,.4);color:#fff}.profile-logout svg{width:16px;height:16px}
+.card-panel{margin-bottom:12px;padding:16px 18px;background:rgba(0,0,0,.2)}
+.panel-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.panel-ico{width:30px;height:30px;display:grid;place-items:center;background:rgba(103,193,245,.2);color:var(--accent-2)}.panel-ico svg{width:16px;height:16px}
+.panel-title{font-size:14px;color:#fff}.panel-sub{font-size:11px;color:#8f98a0}
 
+.req-modal{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:opacity .18s}
+.req-modal.open{opacity:1;pointer-events:auto}
+.req-box{position:relative;width:min(420px,calc(100vw - 30px));padding:22px;background:linear-gradient(to bottom,#2a475e,#1b2838);box-shadow:0 0 20px #000}
+.req-box h3{font-size:18px;font-weight:400;color:#fff}.req-box p{margin:6px 0 14px;font-size:12px;color:#8f98a0}
+.req-box label{display:block;margin-bottom:4px;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#8f98a0}
+.req-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
 /* ───────── toast ───────── */
 .toast-wrap{position:fixed;right:24px;bottom:24px;z-index:9999;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
 .toast{--toast-c:var(--accent-2);--toast-bg:var(--accent-soft);position:relative;overflow:hidden;pointer-events:auto;display:flex;align-items:center;gap:12px;min-width:260px;max-width:380px;padding:12px 16px 14px 12px;
@@ -5077,60 +5143,6 @@ __UI_CSS__
 @keyframes vuiPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)} 50%{box-shadow:0 0 0 5px rgba(255,255,255,.09)}}
 @keyframes tbDotPulse{0%,100%{ box-shadow:0 0 0 2px var(--surface), 0 0 0 0 rgba(239,68,68,.55); } 50% { box-shadow:0 0 0 2px var(--surface), 0 0 0 5px rgba(239,68,68,0); }}
 @keyframes annBounce{0%, 36%, 100% { transform:translateY(0) rotate(0); } 8% { transform:translateY(-3px) rotate(-6deg); } 16% { transform:translateY(0) rotate(0); } 24% { transform:translateY(-3px) rotate(5deg); } 32% { transform:translateY(0) rotate(0); }}
-/* ═══════════ HUD 皮肤：直角 / 切角 / 等宽标签 / 角标 ═══════════ */
-:root{--chamfer:9px}
-.btn,.act-btn,.card-cta,.gate-btn,.req-btn{clip-path:polygon(var(--chamfer) 0,100% 0,100% calc(100% - var(--chamfer)),calc(100% - var(--chamfer)) 100%,0 100%,0 var(--chamfer));box-shadow:none!important}
-.btn,.card-cta,.sec-filter button,.tb-nav .sb-item,.genre-btn,.hero-tag,.sb-section,.sec-count,.sub-label,.meta-k,.section h2,.field-label,.card-sub,.card-badge,.tag,.s2-card span,.s2-stats h3,.detail-crumb,.sb-brand-text span,.panel-sub,.hero-meta,.detail-hero-meta,.sub-meta,.inject-status{font-family:var(--font-mono)}
-.btn{text-transform:uppercase;letter-spacing:1px;font-size:12px}
-.tb-nav .sb-item{text-transform:uppercase;letter-spacing:1.6px;font-size:11.5px}
-.tb-nav .sb-item.active::after{height:2px;left:0;right:0}
-.tb-nav .sb-item.active::before{content:'▸';position:absolute;left:-3px;color:var(--accent);font-size:9px}
-.sec-filter button,.genre-btn{text-transform:uppercase;letter-spacing:1.2px;font-size:11.5px}
-.sec-title,.section h2{letter-spacing:1.5px;text-transform:uppercase}
-.sec-title{font-size:20px}
-.sec-title::before,.section h2::before{content:'//';margin-right:9px;color:var(--accent);font-family:var(--font-mono);font-weight:700}
-.hero-title,.detail-hero-title{text-transform:uppercase;font-style:italic;letter-spacing:-1.5px}
-.card-title{text-transform:uppercase;letter-spacing:.6px;font-size:13px}
-.card-sub{font-size:10.5px;letter-spacing:.3px}
-.card-price .new,.hero-badge .price-new,.sub-time,.s2-card b{font-family:var(--font-mono)}
-.sb-brand-text b{letter-spacing:4px}
-.sb-logo,.tb-avatar,.tb-btn,.topbar-search input{border-radius:0}
-.sb-logo{clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
-
-/* 通栏大图：扫描线 + 底部强调线 + 取景角标 */
-.hero::before{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;z-index:3;background:linear-gradient(90deg,var(--accent),transparent 60%)}
-.hero-body{z-index:4}.hero-badge,.hero-nav,.hero-ctrl{z-index:5}
-.hero-tag::before{width:34px}
-
-/* 面板：直角 + 左上角标 */
-.section,.card-panel,.lib,.d-cap,.game-pane,.sb-task,.req-box,.qp-picker,.s2-card{position:relative;border-radius:0!important}
-.section::before,.card-panel::before,.lib::before,.d-cap::before,.game-pane::before,.req-box::before{content:'';position:absolute;top:-1px;left:-1px;width:14px;height:14px;
-  border-top:2px solid var(--accent);border-left:2px solid var(--accent);pointer-events:none}
-.section::after,.card-panel::after,.lib::after,.d-cap::after{content:'';position:absolute;right:-1px;bottom:-1px;width:14px;height:14px;
-  border-right:2px solid var(--accent);border-bottom:2px solid var(--accent);pointer-events:none;opacity:.55}
-
-/* 海报：取景角标 */
-.card-img{border-radius:0;box-shadow:none;outline:1px solid var(--border)}
-.card-img::after{background:
-  linear-gradient(var(--accent),var(--accent)) top left/10px 2px no-repeat,linear-gradient(var(--accent),var(--accent)) top left/2px 10px no-repeat,
-  linear-gradient(var(--accent),var(--accent)) top right/10px 2px no-repeat,linear-gradient(var(--accent),var(--accent)) top right/2px 10px no-repeat,
-  linear-gradient(var(--accent),var(--accent)) bottom left/10px 2px no-repeat,linear-gradient(var(--accent),var(--accent)) bottom left/2px 10px no-repeat,
-  linear-gradient(var(--accent),var(--accent)) bottom right/10px 2px no-repeat,linear-gradient(var(--accent),var(--accent)) bottom right/2px 10px no-repeat,
-  linear-gradient(to top,rgba(0,0,0,.62),transparent 40%);transition:background-size .25s}
-.card:hover .card-img{transform:translateY(-4px);box-shadow:none;outline:1px solid var(--accent)}
-.card-badge{border-radius:0}
-.grid.list .card{border-radius:0;clip-path:none}
-.detail-hero{border-radius:0;outline:1px solid var(--border-2);box-shadow:0 20px 60px rgba(0,0,0,.5)}
-.detail-hero::after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px)}
-.detail-nav,.detail-ctrl,.detail-vui{z-index:5}
-.profile-avatar,.tb-avatar{border-radius:0}
-.profile-hero{border-radius:0}
-.input,.req-in{border-radius:0}
-.toast{border-radius:0}
-.s2-card{padding:16px 20px;background:var(--surface-2);border:1px solid var(--border)}
-.s2-card:first-child{padding-left:20px}
-.s2-row{gap:14px}.s2-card{border-left:1px solid var(--border)}
-
 /* 加载界面（与商店窗口同尺寸，铺满窗口） */
 .boot{position:fixed;inset:0;z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:var(--bg);transition:opacity .5s ease}
 .boot.out{opacity:0;pointer-events:none}
@@ -5148,14 +5160,7 @@ __UI_CSS__
 .hero-overlay{background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 3px),
   linear-gradient(to top,var(--bg) 0%,rgba(var(--bg-rgb),.55) 26%,transparent 58%),linear-gradient(to right,rgba(var(--bg-rgb),.82) 0%,rgba(var(--bg-rgb),.2) 48%,transparent 70%)}
 .hero-title{font-size:clamp(30px,4.6vw,54px);letter-spacing:-1px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.02}
-/* 列表模式修正 */
-.grid.list .card-title{flex:0 0 190px;min-width:0}
-.grid.list .card-sub{flex:1;min-width:0}
-.grid.list .card-foot{flex-shrink:0;margin:0}
-.grid.list .card-img .card-status,.grid.list .card-wish{display:none}
-.grid.list .card-badges{top:8px;left:8px}
-.grid.list .card-body{min-width:0;overflow:hidden}
-.grid.list .card-sublen{left:8px;bottom:8px;padding:2px 8px;font-size:10.5px}
+
 
 __UI_CSS__
 </style>
@@ -5178,17 +5183,13 @@ __UI_CSS__
       </div>
     </div>
       <nav class="tb-nav">
-      <div class="sb-item active" id="navGames" onclick="showStore()"><span data-ui="games">Games</span></div>
+      <div class="sb-item active" id="navGames" onclick="showStore()"><span data-ui="games">Store</span></div>
+      <div class="sb-item" id="navLib" onclick="showStore();var l=document.getElementById('libBlock');if(l)l.scrollIntoView({behavior:'smooth'})"><span data-ui="quickplay">Library</span></div>
       <div class="sb-item" id="navProfile" onclick="showProfile()"><span data-ui="profile">Profile</span></div>
       <div class="sb-item" id="navAdmin" onclick="showAdmin()" hidden><span data-ui="navAdmin">Admin</span><b class="sb-badge" id="sbAdminBadge" hidden>0</b></div>
     </nav>
     <div class="tb-spacer"></div>
-    <div class="topbar-search">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="searchInput" type="text" placeholder="Search games..." data-ui-ph="searchGames" autocomplete="off" spellcheck="false">
-      </div>
-      <div class="tb-spacer"></div>
-      <div class="tb-actions">
+    <div class="tb-actions">
         <button class="tb-btn" onclick="uiToggleTheme()" title="Toggle theme" data-ui-title="toggleTheme">
           <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
@@ -5211,6 +5212,28 @@ __UI_CSS__
     </header>
 
     <div class="page" id="storePage">
+      <div class="store-nav">
+        <div class="sec-filter" id="secFilter">
+            <button class="active" data-filter="all" data-ui="fAll">All</button>
+            <button data-filter="owned" data-ui="fOwned">Owned</button>
+            <button data-filter="available" data-ui="fAvailable">Available</button>
+            <button data-filter="wish" data-ui="fWish">Wishlist</button>
+        </div>
+        <div class="genre-wrap" id="genreWrap">
+            <button class="genre-btn" id="genreBtn" type="button" onclick="toggleGenrePop(event)"
+              aria-haspopup="true" aria-expanded="false">
+              <svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+              <span id="genreBtnTxt" data-ui="genres">Genres</span>
+              <svg class="genre-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div class="genre-pop" id="genrePop" hidden></div>
+          </div>
+        <div class="topbar-search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="text" placeholder="Search games..." data-ui-ph="searchGames" autocomplete="off" spellcheck="false">
+      </div></div>
+      <div class="wrap">
+      <div class="st-h" id="stFeatTitle">Featured</div>
       <div class="hero" id="hero" data-deco="none" onclick="heroOpenDetail(event)">
         <div class="hero-carousel" id="heroCarousel">
           <div class="hero-panel" id="heroPanelA" data-hero-h="A"></div>
@@ -5227,8 +5250,8 @@ __UI_CSS__
       </div>
 
 
-      <div class="wrap">
-      <section class="lib">
+      
+      <section class="lib" id="libBlock">
         <div class="qp-zone" id="qpZone">
           <div class="sb-section sb-section-row"><span data-ui="quickplay">Quickplay</span><button class="sb-add" id="sbQuickAdd" type="button" onclick="toggleQuickPicker(event)" data-ui-title="quickAdd" title="Add to Quickplay">
           <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
@@ -5241,29 +5264,9 @@ __UI_CSS__
           <div id="sbDown"></div>
         </div>
       </section>
-
-      <div class="sec-head">
-        <div class="sec-title" data-ui="allGames">All Games</div>
+      <div class="sec-head"><div class="sec-title" data-ui="allGames">All Games</div>
         <span class="sec-count" id="gameCount">0</span>
-        <div class="sec-spacer"></div>
-        <div class="sec-tools">
-          <div class="genre-wrap" id="genreWrap">
-            <button class="genre-btn" id="genreBtn" type="button" onclick="toggleGenrePop(event)"
-              aria-haspopup="true" aria-expanded="false">
-              <svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
-              <span id="genreBtnTxt" data-ui="genres">Genres</span>
-              <svg class="genre-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-            <div class="genre-pop" id="genrePop" hidden></div>
-          </div>
-          <div class="sec-filter" id="secFilter">
-            <button class="active" data-filter="all" data-ui="fAll">All</button>
-            <button data-filter="owned" data-ui="fOwned">Owned</button>
-            <button data-filter="available" data-ui="fAvailable">Available</button>
-            <button data-filter="wish" data-ui="fWish">Wishlist</button>
-          </div>
         </div>
-      </div>
       <div class="grid-wrap" id="gridWrap">
         <div class="grid" id="grid"></div>
         <!-- 列表模式：右边常驻一块，显示“鼠标悬停那一行”的游戏详情（没悬停就显示第一个） -->
@@ -5458,8 +5461,19 @@ __UI_CSS__
         </div>
       </div>
       <div class="detail-scroll">
-        <div class="d-wrap">
-          <div class="d-main">
+        <div class="d-page">
+          <div class="d-title"><div class="detail-hero-info">
+              <div class="detail-hero-title" id="detailTitle">-</div>
+              <div class="detail-hero-meta">
+                <span id="detailDev">-</span>
+                <span class="sep"></span>
+                <span id="detailRel">-</span>
+                <span class="sep"></span>
+                <span class="card-status available" id="detailStatus">-</span>
+              </div>
+            </div></div>
+          <div class="d-wrap">
+            <div class="d-main">
 <div class="detail-hero">
           <!-- 图集槽位由 JS 按 games.txt 的 cover 数量生成 -->
           <div class="detail-slides" id="detailSlides"></div>
@@ -5499,58 +5513,13 @@ __UI_CSS__
           </button>
           <div class="detail-nav" id="detailNav"></div>
         </div>
-<div class="section">
-          <h2 data-ui="aboutTitle">About</h2>
-          <div class="meta-grid">
-            <div class="meta-row"><span class="meta-k" data-ui="developer">Developer</span><span class="meta-v" id="dDev">-</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="publisher">Publisher</span><span class="meta-v" id="dPub">-</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="release">Release</span><span class="meta-v" id="dRel">-</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="platform">Platform</span><span class="meta-v" id="dPlat">Windows</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="genres">Genres</span><span class="meta-v" id="dGen">-</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="features">Features</span><span class="meta-v" id="dFeat">-</span></div>
-          </div>
-        </div>
-
-        <!-- What players say：网站后台已审核的评价（宿主从 /api/testimonials.php 拉） -->
-        <div class="section" id="reviewsSection">
-          <div class="sec-row">
-            <h2 data-ui="reviewsTitle">What players say</h2>
-            <button class="btn btn-ghost" type="button" onclick="openReviewModal()">
-              <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
-              <span data-ui="reviewWrite">Write a review</span>
-            </button>
-          </div>
-          <div class="rev-list" id="revList"></div>
-          <div class="rev-empty" id="revEmpty" data-ui="reviewEmpty" hidden>No reviews yet — be the first to share your experience!</div>
-          <div class="rev-more-wrap" id="revMoreWrap" hidden>
-            <button class="btn btn-ghost" type="button" onclick="loadMoreReviews()">
-              <span data-ui="reviewMore">Load more</span>
-              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-            </button>
-          </div>
-        </div>
-      
-          </div>
-          <aside class="d-side">
-<div class="d-cap detail-hero-body">
-            <div class="detail-hero-info">
-              <div class="detail-hero-title" id="detailTitle">-</div>
-              <div class="detail-hero-meta">
-                <span id="detailDev">-</span>
-                <span class="sep"></span>
-                <span id="detailRel">-</span>
-                <span class="sep"></span>
-                <span class="card-status available" id="detailStatus">-</span>
-              </div>
-            </div>
-            <div class="detail-hero-btns" id="detailHeroBtns">
+            <div class="d-buy">
+<div class="detail-hero-btns" id="detailHeroBtns">
               <button class="btn btn-secondary" id="detailWish" onclick="toggleWish(event,CURRENT_GAME)">
                 <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 <span id="detailWishText">Wishlist</span>
               </button>
             </div>
-          </div>
-          
 <div class="section" id="subSection" hidden>
           <h2 data-ui="subscription">Subscription</h2>
           <div class="sub-bar">
@@ -5597,7 +5566,41 @@ __UI_CSS__
 
 
         
-          </aside>
+            </div>
+<div class="section" id="reviewsSection">
+          <div class="sec-row">
+            <h2 data-ui="reviewsTitle">What players say</h2>
+            <button class="btn btn-ghost" type="button" onclick="openReviewModal()">
+              <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+              <span data-ui="reviewWrite">Write a review</span>
+            </button>
+          </div>
+          <div class="rev-list" id="revList"></div>
+          <div class="rev-empty" id="revEmpty" data-ui="reviewEmpty" hidden>No reviews yet — be the first to share your experience!</div>
+          <div class="rev-more-wrap" id="revMoreWrap" hidden>
+            <button class="btn btn-ghost" type="button" onclick="loadMoreReviews()">
+              <span data-ui="reviewMore">Load more</span>
+              <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+        </div>
+            </div>
+            <aside class="d-side">
+<div class="section">
+          <h2 data-ui="aboutTitle">About</h2>
+          <div class="meta-grid">
+            <div class="meta-row"><span class="meta-k" data-ui="developer">Developer</span><span class="meta-v" id="dDev">-</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="publisher">Publisher</span><span class="meta-v" id="dPub">-</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="release">Release</span><span class="meta-v" id="dRel">-</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="platform">Platform</span><span class="meta-v" id="dPlat">Windows</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="genres">Genres</span><span class="meta-v" id="dGen">-</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="features">Features</span><span class="meta-v" id="dFeat">-</span></div>
+          </div>
+        </div>
+
+        <!-- What players say：网站后台已审核的评价（宿主从 /api/testimonials.php 拉） -->
+            </aside>
+          </div>
         </div>
       </div>
     </div>
@@ -6365,6 +6368,7 @@ __UI_SCRIPT__
   }
 
   function renderHero(){
+    var _ft = document.getElementById('stFeatTitle'); if (_ft) { _ft.textContent = heroLabel('featured', 'Featured'); }
     var n = HERO_ORDER.length;
     if (!n) return;
     HERO_PENDING = -1;
