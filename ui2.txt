@@ -3853,6 +3853,33 @@ html,body{background:var(--bg)}
 .lg-shade{background:linear-gradient(90deg,transparent 0%,rgba(var(--bg-rgb),.15) 50%,rgba(var(--bg-rgb),.75) 100%),linear-gradient(180deg,rgba(var(--bg-rgb),.45),transparent 22%,transparent 62%,rgba(var(--bg-rgb),.7))}
 .lg-show::after{display:none}
 
+/* ═══ 登录页：全直角 ═══ */
+.act-btn,.lg-logo,.btn,.gate-btn{clip-path:none!important;border-radius:0!important}
+.act-btn{box-shadow:none;background:linear-gradient(to right,#06bfff,#2d73ff);letter-spacing:1.5px}
+.act-btn:hover:not(:disabled){filter:brightness(1.12);transform:none}
+.acc-tabs,.acc-ink,.key-input,.tool-btn,.paste-btn,.gate-card,.gate-ico,.gate-hint,.lg-feats li,.lg-panel{border-radius:0!important}
+.s-ring{border-radius:0;box-shadow:none}
+.s-ring,.gate-ico{border-radius:0}
+/* 记住我：直角复选框 */
+.bg-switch{width:18px;height:18px;order:-1;margin-right:10px}
+.rem-row{justify-content:flex-start}
+.bg-switch>span{border-radius:0!important;background:rgba(0,0,0,.4);border:1px solid var(--border-2);transition:background .12s,border-color .12s}
+.bg-switch>span::after{content:'';left:5px;top:1px;width:5px;height:10px;border-radius:0!important;background:none;border:solid #fff;border-width:0 2px 2px 0;box-shadow:none;transform:rotate(45deg) scale(0);transition:transform .12s}
+.bg-switch input:checked+span{background:var(--accent);border-color:var(--accent)}
+.bg-switch input:checked+span::after{transform:rotate(45deg) scale(1)}
+.bg-switch:hover>span{border-color:var(--accent-2)}
+/* ═══ 通知（Steam 直角弹窗） ═══ */
+.toast-wrap{right:16px;bottom:16px;gap:8px}
+.toast{--toast-c:#67c1f5;--toast-bg:rgba(103,193,245,.18);min-width:290px;max-width:360px;padding:10px 14px 10px 10px;gap:12px;border-radius:0;
+  background:#1a2330;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 14px rgba(0,0,0,.75);font-weight:400;font-size:13px;color:#c6d4df;animation:nxIn .28s ease}
+.toast.ok{--toast-c:#a4d007;--toast-bg:rgba(76,107,34,.5)}
+.toast.err{--toast-c:#ff6b6b;--toast-bg:rgba(160,40,40,.45)}
+.toast.warn{--toast-c:#f3c35c;--toast-bg:rgba(180,120,20,.4)}
+.toast-ico{width:36px;height:36px;border-radius:0;background:var(--toast-bg);color:var(--toast-c)}
+.toast::after{display:none}
+.toast-txt{color:#fff}
+.bg-switch input:checked+span{background:var(--accent)!important;border-color:var(--accent)!important}
+
 __UI_CSS__
 </style>
 </head>
@@ -5160,7 +5187,114 @@ __UI_CSS__
 .hero-overlay{background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 3px),
   linear-gradient(to top,var(--bg) 0%,rgba(var(--bg-rgb),.55) 26%,transparent 58%),linear-gradient(to right,rgba(var(--bg-rgb),.82) 0%,rgba(var(--bg-rgb),.2) 48%,transparent 70%)}
 .hero-title{font-size:clamp(30px,4.6vw,54px);letter-spacing:-1px;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.02}
+/* ═══════════ Steam「库」风格：左侧游戏列表 + 右侧货架 + 底栏 ═══════════ */
+.topbar{height:58px;gap:26px;background:rgba(0,0,0,.5)}
+.tb-nav .sb-item{font-size:17px;text-transform:none;letter-spacing:0;padding:0 12px;color:#c6d4df}
+.tb-nav .sb-item.active{color:#fff;box-shadow:inset 0 -2px 0 var(--accent-2)}
+.tb-btn,.tb-avatar{border-radius:0}
+.tb-btn{background:rgba(255,255,255,.06)}
+.page.page-back{animation:none}
+#storePage{display:flex;padding:0;overflow:hidden}
 
+/* 左侧列表 */
+.lib-side{width:300px;flex-shrink:0;display:flex;flex-direction:column;background:rgba(0,0,0,.3);border-right:1px solid rgba(0,0,0,.35)}
+.ls-top{display:flex;gap:4px;padding:10px 10px 6px}
+.ls-home{flex:1;height:34px;padding:0 10px;text-align:left;font-size:14px;color:#c6d4df;background:rgba(255,255,255,.08)}
+.ls-home:hover{background:rgba(255,255,255,.14);color:#fff}
+.ls-view{width:34px;height:34px;display:grid;place-items:center;color:#8f98a0;background:rgba(255,255,255,.08)}
+.ls-view:hover{color:#fff;background:rgba(255,255,255,.14)}.ls-view svg{width:16px;height:16px}
+.ls-row{padding:0 10px 6px}
+.lib-side .genre-wrap{width:100%;height:auto}
+.lib-side .genre-btn{width:100%;height:30px;padding:0 10px;font-size:13px;color:#c6d4df;background:rgba(0,0,0,.25);justify-content:space-between;border:1px solid rgba(255,255,255,.06)}
+.lib-side .genre-btn:hover{background:rgba(255,255,255,.08)}
+.lib-side .genre-pop{left:0;right:0;min-width:0}
+.lib-side .sec-filter{display:flex;height:auto;margin:0 10px 6px;gap:2px}
+.lib-side .sec-filter button{flex:1;height:24px;padding:0 4px;font-size:11.5px;color:#8f98a0;background:rgba(255,255,255,.05)}
+.lib-side .sec-filter button:hover{color:#fff;background:rgba(255,255,255,.12)}
+.lib-side .sec-filter button.active{color:#fff;background:rgba(255,255,255,.2)}
+.lib-side .topbar-search{position:relative;width:auto;margin:0 10px 8px}
+.lib-side .topbar-search svg{left:9px;right:auto;width:14px;height:14px;color:#8f98a0}
+.lib-side .topbar-search input{height:30px;padding:0 10px 0 30px;font-size:13px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.06)}
+.ls-list{flex:1;min-height:0;overflow-y:auto;padding:0 6px 8px 10px}
+.ls-gh{display:flex;align-items:center;gap:8px;padding:8px 2px 4px;font-size:12px;font-weight:700;color:#8f98a0;cursor:default}
+.ls-gh i{font-style:normal;font-weight:400;color:#556772}
+.ls-gh .sb-add{margin-left:auto}
+#sbQuick,#sbDown,#llAll{display:flex;flex-direction:column;gap:0}
+.sb-mini,.ll-item{display:flex;align-items:center;gap:8px;height:26px;padding:0 6px 0 2px;cursor:pointer;color:#9aa6b2;font-size:13px}
+.sb-mini:hover,.ll-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.sb-mini-ico,.ll-ico{width:20px;height:20px;overflow:hidden;flex-shrink:0;background:#0e141b}
+.sb-mini-ico img,.ll-ico img{width:100%;height:100%;object-fit:cover;display:block}
+.sb-mini-txt,.ll-name{flex:1;min-width:0;font-size:13px;color:inherit;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ll-item.owned{color:#fff;font-weight:700}
+.sb-mini-badge{font-size:10.5px;padding:0 5px;color:#a4d007;background:none}
+.sb-mini-x{width:16px;height:16px}
+.qp-picker{margin:4px 0;padding:2px;background:#141b24;border:1px solid rgba(255,255,255,.1)}
+.qp-empty{padding:2px;font-size:12px}
+
+/* 右侧主区域 */
+.lib-main{flex:1;min-width:0;overflow-y:auto;background:rgba(255,255,255,.025)}
+.lm-pad{padding:16px 24px 40px}
+.st-h{display:flex;align-items:center;margin:0 0 10px;font-size:18px;font-weight:400;letter-spacing:0;text-transform:none;color:#fff}
+.hero{position:relative;width:100%;height:290px;margin:0 0 6px;cursor:pointer}
+.hero-carousel{position:absolute;left:0;right:0;top:0;height:260px;overflow:hidden;background:#0e141b;box-shadow:none}
+.hero-panel{background-size:cover;background-position:center}
+.hero-overlay{left:0;right:0;background:linear-gradient(to right,rgba(10,16,24,.05) 35%,rgba(10,16,24,.92) 72%)}
+.hero-body{width:46%;padding:14px 16px 12px}
+.hero-title{font-size:22px}
+.hero-badge{right:16px;bottom:50px}
+.hero-nav{height:30px}
+.hero-ctrl{top:100px;width:26px;height:56px;background:rgba(0,0,0,.4)}
+.hero-ctrl.prev{left:0}.hero-ctrl.next{right:0}
+.hero-actions .btn{height:28px;font-size:12px}
+.sec-head{display:flex;align-items:center;gap:8px;margin:18px 0 12px}
+.sec-title{font-size:18px;font-weight:400;letter-spacing:0;text-transform:none;color:#c6d4df}
+.sec-count{font-size:15px;color:#8f98a0}
+.sec-head .shelf-fold{margin-left:auto;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#8f98a0;background:rgba(255,255,255,.08);transition:transform .15s}
+.shelf-fold:hover{color:#fff;background:rgba(255,255,255,.16)}.shelf-fold svg{width:14px;height:14px}.shelf-fold.up{transform:rotate(180deg)}
+
+/* 封面货架 */
+.grid{grid-template-columns:repeat(auto-fill,minmax(136px,1fr));gap:18px 14px}
+.grid.cols-n{grid-template-columns:repeat(var(--cols),minmax(0,1fr))}
+.card{background:none;box-shadow:none}
+.card:hover{background:none}
+.card-img{aspect-ratio:2/3;box-shadow:0 2px 8px rgba(0,0,0,.5);transition:transform .15s,box-shadow .15s}
+.card:hover .card-img{transform:scale(1.04);box-shadow:0 6px 18px rgba(0,0,0,.7),0 0 0 2px var(--accent-2);z-index:2}
+.card-body{padding:6px 0 0}
+.card-title{font-size:12.5px;color:#c6d4df}
+.card-sub{display:none}
+.card-foot{margin-top:2px;min-height:18px}
+.card-price{margin-left:0}
+.card-price .disc{line-height:18px;font-size:12px}.card-price .old,.card-price .new{line-height:18px;font-size:11px}
+.card-cta.owned{margin:0}
+.grid.list{grid-template-columns:1fr;gap:2px}
+.grid.list .card{background:rgba(255,255,255,.04)}
+.grid.list .card-img{width:100px;aspect-ratio:2/3;max-height:60px}
+.s2-stats{margin-top:26px}
+
+/* 底栏 */
+.lib-foot{flex-shrink:0;height:36px;display:flex;align-items:center;gap:12px;padding:0 14px;background:rgba(0,0,0,.45);border-top:1px solid rgba(0,0,0,.4)}
+.lf-add{display:flex;align-items:center;gap:8px;height:100%;font-size:12.5px;color:#8f98a0}
+.lf-add:hover{color:#fff}.lf-add svg{width:14px;height:14px}
+.lf-ver{font-size:12px;color:#556772}
+.sb-foot{position:static;flex:1;display:flex;justify-content:center;width:auto;transform:none}
+.sb-task{width:min(420px,100%);padding:0;background:none;border:0;box-shadow:none;display:flex;align-items:center;gap:10px}
+.sb-task-row{flex:1;min-width:0}
+.sb-task-ico{width:20px;height:20px}
+.sb-task-txt{flex-direction:row;gap:8px;align-items:baseline}
+.sb-task-txt b{font-size:12.5px}.sb-task-txt span{font-size:11.5px}
+.sb-task-bar{width:110px;margin:0;flex-shrink:0}
+
+/* ═══ 通知（Steam 直角弹窗） ═══ */
+.toast-wrap{right:14px;bottom:50px;gap:8px}
+.toast{--toast-c:#67c1f5;--toast-bg:rgba(103,193,245,.18);min-width:290px;max-width:360px;padding:10px 14px 10px 10px;gap:12px;border-radius:0;
+  background:#1a2330;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 14px rgba(0,0,0,.75);font-weight:400;font-size:13px;color:#c6d4df;animation:nxIn .28s ease}
+.toast.ok{--toast-c:#a4d007;--toast-bg:rgba(76,107,34,.5)}
+.toast.err{--toast-c:#ff6b6b;--toast-bg:rgba(160,40,40,.45)}
+.toast.warn{--toast-c:#f3c35c;--toast-bg:rgba(180,120,20,.4)}
+.toast-ico{width:36px;height:36px;border-radius:0;background:var(--toast-bg);color:var(--toast-c)}
+.toast::after{display:none}
+.toast-txt{color:#fff}
+.lib-side .topbar-search svg{z-index:3;stroke:#9fb3c4;stroke-width:2.2;top:50%}
 
 __UI_CSS__
 </style>
@@ -5184,7 +5318,6 @@ __UI_CSS__
     </div>
       <nav class="tb-nav">
       <div class="sb-item active" id="navGames" onclick="showStore()"><span data-ui="games">Store</span></div>
-      <div class="sb-item" id="navLib" onclick="showStore();var l=document.getElementById('libBlock');if(l)l.scrollIntoView({behavior:'smooth'})"><span data-ui="quickplay">Library</span></div>
       <div class="sb-item" id="navProfile" onclick="showProfile()"><span data-ui="profile">Profile</span></div>
       <div class="sb-item" id="navAdmin" onclick="showAdmin()" hidden><span data-ui="navAdmin">Admin</span><b class="sb-badge" id="sbAdminBadge" hidden>0</b></div>
     </nav>
@@ -5212,14 +5345,9 @@ __UI_CSS__
     </header>
 
     <div class="page" id="storePage">
-      <div class="store-nav">
-        <div class="sec-filter" id="secFilter">
-            <button class="active" data-filter="all" data-ui="fAll">All</button>
-            <button data-filter="owned" data-ui="fOwned">Owned</button>
-            <button data-filter="available" data-ui="fAvailable">Available</button>
-            <button data-filter="wish" data-ui="fWish">Wishlist</button>
-        </div>
-        <div class="genre-wrap" id="genreWrap">
+      <aside class="lib-side">
+        <div class="ls-top"><button class="ls-home" type="button" onclick="document.getElementById('libMain').scrollTo({top:0,behavior:'smooth'})"><span data-ui="games">Games</span></button><button class="ls-view" type="button" onclick="setLayout(document.getElementById('grid').classList.contains('list')?'grid':'list')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button></div>
+        <div class="ls-row"><div class="genre-wrap" id="genreWrap">
             <button class="genre-btn" id="genreBtn" type="button" onclick="toggleGenrePop(event)"
               aria-haspopup="true" aria-expanded="false">
               <svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
@@ -5227,12 +5355,30 @@ __UI_CSS__
               <svg class="genre-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div class="genre-pop" id="genrePop" hidden></div>
-          </div>
+          </div></div>
+        <div class="sec-filter" id="secFilter">
+            <button class="active" data-filter="all" data-ui="fAll">All</button>
+            <button data-filter="owned" data-ui="fOwned">Owned</button>
+            <button data-filter="available" data-ui="fAvailable">Available</button>
+            <button data-filter="wish" data-ui="fWish">Wishlist</button>
+        </div>
         <div class="topbar-search">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="searchInput" type="text" placeholder="Search games..." data-ui-ph="searchGames" autocomplete="off" spellcheck="false">
-      </div></div>
-      <div class="wrap">
+      </div>
+        <div class="ls-list">
+          <div class="qp-zone" id="qpZone">
+            <div class="ls-gh"><span data-ui="quickplay">Quickplay</span><button class="sb-add" id="sbQuickAdd" type="button" onclick="toggleQuickPicker(event)" data-ui-title="quickAdd" title="Add to Quickplay">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button></div>
+            <div id="sbQuick"></div>
+            <div class="qp-picker" id="qpPicker" hidden></div>
+          </div>
+          <div><div class="ls-gh" data-ui="downloads">Subscriptions</div><div id="sbDown"></div></div>
+          <div><div class="ls-gh"><span data-ui="allGames">All Games</span><i id="llCount"></i></div><div id="llAll"></div></div>
+        </div>
+      </aside>
+      <div class="lib-main" id="libMain"><div class="lm-pad">
       <div class="st-h" id="stFeatTitle">Featured</div>
       <div class="hero" id="hero" data-deco="none" onclick="heroOpenDetail(event)">
         <div class="hero-carousel" id="heroCarousel">
@@ -5251,22 +5397,9 @@ __UI_CSS__
 
 
       
-      <section class="lib" id="libBlock">
-        <div class="qp-zone" id="qpZone">
-          <div class="sb-section sb-section-row"><span data-ui="quickplay">Quickplay</span><button class="sb-add" id="sbQuickAdd" type="button" onclick="toggleQuickPicker(event)" data-ui-title="quickAdd" title="Add to Quickplay">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-        </button></div>
-          <div id="sbQuick"></div>
-          <div class="qp-picker" id="qpPicker" hidden></div>
-        </div>
-        <div>
-          <div class="sb-section" data-ui="downloads">Subscriptions</div>
-          <div id="sbDown"></div>
-        </div>
-      </section>
       <div class="sec-head"><div class="sec-title" data-ui="allGames">All Games</div>
         <span class="sec-count" id="gameCount">0</span>
-        </div>
+        <button class="shelf-fold" type="button" onclick="var g=document.querySelector('.grid-wrap');g.hidden=!g.hidden;this.classList.toggle('up',g.hidden)"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></div>
       <div class="grid-wrap" id="gridWrap">
         <div class="grid" id="grid"></div>
         <!-- 列表模式：右边常驻一块，显示“鼠标悬停那一行”的游戏详情（没悬停就显示第一个） -->
@@ -5283,7 +5416,7 @@ __UI_CSS__
           </div>
         </aside>
       </div>
-      </div>
+      </div></div>
     </div>
 
     <div class="page" id="profilePage" hidden>
@@ -5640,7 +5773,7 @@ __UI_CSS__
         </div>
       </div>
     </div>
-    <div class="sb-foot">
+    <footer class="lib-foot"><button class="lf-add" type="button" onclick="toggleQuickPicker(event)"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span data-ui="quickplay">Quickplay</span></button><div class="sb-foot">
       <div class="sb-task" id="sbTask" hidden>
         <div class="sb-task-row">
           <img class="sb-task-ico" id="sbTaskIco" alt="">
@@ -5652,7 +5785,7 @@ __UI_CSS__
         </div>
         <div class="sb-task-bar"><i id="sbTaskFill"></i></div>
       </div>
-    </div>
+    </div><span class="lf-ver">STARLINE</span></footer>
   </main>
 </div>
 
@@ -7177,6 +7310,21 @@ __UI_SCRIPT__
          + uiEsc(gameStatusText(st)) + '</span>';
   }
 
+
+  /* 左侧游戏列表（Steam 库样式）：跟随当前筛选/搜索 */
+  function llRender(list){
+    var box = document.getElementById('llAll');
+    if (!box) return;
+    var h = '';
+    list.forEach(function(g){
+      var m = GAMES[g]; if (!m) return;
+      h += '<div class="ll-item' + (hasLic(g) ? ' owned' : '') + '" onclick="openDetail(\'' + g + '\')">'
+        + '<span class="ll-ico"><img src="' + m.img + '" alt=""></span><span class="ll-name">' + uiEsc(m.title || g) + '</span></div>';
+    });
+    box.innerHTML = h;
+    var c = document.getElementById('llCount'); if (c) c.textContent = '(' + list.length + ')';
+  }
+
   function renderGrid(){
     var grid = document.getElementById('grid');
     grid.className = 'grid' + (LAYOUT === 'list' ? ' list' : '');
@@ -7210,6 +7358,7 @@ __UI_SCRIPT__
       var wb = isWished(b) ? 0 : 1;
       return wa - wb;
     });
+    llRender(list);
 
 
     if (!list.length) {
