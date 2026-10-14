@@ -147,6 +147,7 @@ rel      = 2024
 genres   = FPS, Tactical
 features = Multiplayer
 featured = true
+status   = updating
 price7   = 8.99        
 price15  = 12.99    
 price30  = 29.99
