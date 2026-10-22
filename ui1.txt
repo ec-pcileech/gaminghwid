@@ -1,5 +1,5 @@
 #STARLINE-UI 1
-#VERSION 2026-10-22-ui1
+#VERSION 2026-10-22-ui1-maxfx
 #===THEME_CSS
 
 /* ═══════════ iOS 26 · Liquid Glass 主题变量 ═══════════ */
@@ -1334,6 +1334,81 @@ html[data-perf="low"] .tour-card{background-color:var(--surface-solid)!important
 .st-h{margin:10px 2px 6px;font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px}
 .st-r{display:flex;align-items:center;gap:10px;padding:5px 2px;font-size:13px}.st-n{width:34%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.st-bar{flex:1;height:8px;border-radius:999px;background:var(--lq-track);overflow:hidden}.st-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent-2))}.st-r b{min-width:26px;text-align:right}
 .hp-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+
+
+/* ═══════════ Max FX v1 · 动画全开 + 毛玻璃 80%（放在 UI_CSS 最后，覆盖性能层）═══════════
+   毛玻璃强度只改这一处：--fx-blur（大面板）/ --fx-blur-s（小控件、遮罩）/ --fx-sat（饱和度）
+   80% = 最大值(40px / 20px / 100%) × 0.8 → 32px / 16px / +80% 饱和
+   性能档位最低也按 mid 处理（JS 里已钳制），所以低配下这些效果同样保留。 */
+:root{--fx-blur:32px;--fx-blur-s:16px;--fx-sat:180%;--fx-bri:1.06;
+  --fx-ease:cubic-bezier(.34,1.32,.4,1);--fx-ease-out:cubic-bezier(.16,1,.3,1)}
+
+/* ① 毛玻璃：大面板 */
+html:not(#_):not(#__) .sidebar,html:not(#_):not(#__) .topbar,html:not(#_):not(#__) .detail,html:not(#_):not(#__) .detail-top,
+html:not(#_):not(#__) .game-pane,html:not(#_):not(#__) .ui-view,html:not(#_):not(#__) .ui-topbar,html:not(#_):not(#__) .ui-card,
+html:not(#_):not(#__) .ui-pop,html:not(#_):not(#__) .iosp,html:not(#_):not(#__) .modal,html:not(#_):not(#__) .gate-card,
+html:not(#_):not(#__) .renew-card,html:not(#_):not(#__) .renew-hero,html:not(#_):not(#__) .cp,html:not(#_):not(#__) .cm,
+html:not(#_):not(#__) .kp,html:not(#_):not(#__) .tour-card,html:not(#_):not(#__) .toast,html:not(#_):not(#__) .genre-pop,
+html:not(#_):not(#__) .qp-picker,html:not(#_):not(#__) .gpop,html:not(#_):not(#__) .ann-pop,html:not(#_):not(#__) .faq,
+html:not(#_):not(#__) .detail-vui,html:not(#_):not(#__) .detail-vol-panel,html:not(#_):not(#__) .right,html:not(#_):not(#__) .s-meta,
+html:not(#_):not(#__) .panel,html:not(#_):not(#__) .card,html:not(#_):not(#__) .card-panel,html:not(#_):not(#__) .meta-grid,
+html:not(#_):not(#__) .inject-panel,html:not(#_):not(#__) .sub-bar{
+  -webkit-backdrop-filter:blur(var(--fx-blur)) saturate(var(--fx-sat)) brightness(var(--fx-bri))!important;
+  backdrop-filter:blur(var(--fx-blur)) saturate(var(--fx-sat)) brightness(var(--fx-bri))!important}
+
+/* ② 毛玻璃：小控件 / 徽标 / 输入框 */
+html:not(#_):not(#__) .tb-btn,html:not(#_):not(#__) .hero-ctrl,html:not(#_):not(#__) .hero-badge,html:not(#_):not(#__) .hero-tag,
+html:not(#_):not(#__) .tag,html:not(#_):not(#__) .btn-secondary,html:not(#_):not(#__) .btn-ghost,html:not(#_):not(#__) .sec-filter,
+html:not(#_):not(#__) .genre-btn,html:not(#_):not(#__) .topbar-search input,html:not(#_):not(#__) .card-badge,
+html:not(#_):not(#__) .card-status,html:not(#_):not(#__) .card-wish,html:not(#_):not(#__) .card-sublen,
+html:not(#_):not(#__) .detail-ctrl,html:not(#_):not(#__) .profile-logout,html:not(#_):not(#__) .status-msg,
+html:not(#_):not(#__) .right .key-input,html:not(#_):not(#__) .ui-select,html:not(#_):not(#__) .ui-btn,html:not(#_):not(#__) .ui-mini,
+html:not(#_):not(#__) .renew-chip,html:not(#_):not(#__) .sl-tip,html:not(#_):not(#__) .cp-thumb,html:not(#_):not(#__) .dg-mini span{
+  -webkit-backdrop-filter:blur(var(--fx-blur-s)) saturate(var(--fx-sat))!important;
+  backdrop-filter:blur(var(--fx-blur-s)) saturate(var(--fx-sat))!important}
+
+/* ③ 全屏遮罩：同样带模糊（之前被压成纯深色） */
+html:not(#_):not(#__) .overlay,html:not(#_):not(#__) .gate-ovl,html:not(#_):not(#__) .success-ovl,
+html:not(#_):not(#__) .req-modal,html:not(#_):not(#__) .cp-scrim,html:not(#_):not(#__) .kp-scrim{
+  -webkit-backdrop-filter:blur(var(--fx-blur-s)) saturate(140%)!important;
+  backdrop-filter:blur(var(--fx-blur-s)) saturate(140%)!important}
+
+/* ④ 低配档也不回退成实色（JS 已钳制，这里再兜一层） */
+html[data-perf="low"] .sidebar,html[data-perf="low"] .topbar{background-color:color-mix(in srgb,var(--surface-solid) 62%,transparent)!important}
+html[data-perf="low"] .ui-view{background-color:rgba(var(--bg-rgb),.62)!important}
+html[data-perf="low"] .kp,html[data-perf="low"] .tour-card{background-color:var(--lq-pop)!important}
+html[data-perf="low"] .bgfx-layer,html[data-perf="low"] .bgfx-layer::before,html[data-perf="low"] #fxLayer{animation:revert-layer!important}
+
+/* ⑤ 背景动画：更快、更亮；打开全屏浮层时也不暂停 */
+.bgfx-layer.aurora{animation-duration:12s!important;opacity:1}
+#fxLayer[data-fx="aurora"]{animation-duration:9s;opacity:.9}
+html:has(.ui-view.open) .bgfx-layer,html:has(.ui-view.open) #fxLayer,
+html:has(.faq:not([hidden])) .bgfx-layer,html:has(.faq:not([hidden])) #fxLayer{animation-play-state:running!important}
+
+/* ⑥ 交互动画：弹簧过渡 + 悬停抬升 + 按压回弹 */
+html:not(#_):not(#__) .card{transition:transform .55s var(--fx-ease),box-shadow .45s var(--fx-ease-out),border-color .3s,background-color .3s}
+html:not(#_):not(#__) .card:hover{transform:translateY(-8px) scale(1.03);
+  box-shadow:var(--lq-hi),0 26px 60px rgba(0,0,0,.42),0 0 38px var(--accent-glow)}
+html:not(#_):not(#__) .card:active{transform:translateY(-2px) scale(.985);transition-duration:.18s}
+html:not(#_):not(#__) .sb-item,html:not(#_):not(#__) .sb-mini,html:not(#_):not(#__) .tb-btn,html:not(#_):not(#__) .genre-btn,
+html:not(#_):not(#__) .sec-filter,html:not(#_):not(#__) .rec-it{transition:transform .4s var(--fx-ease),background-color .25s,border-color .25s,box-shadow .35s}
+html:not(#_):not(#__) .sb-item:hover,html:not(#_):not(#__) .sb-mini:hover,html:not(#_):not(#__) .tb-btn:hover,
+html:not(#_):not(#__) .genre-btn:hover,html:not(#_):not(#__) .sec-filter:hover{transform:translateY(-2px) scale(1.04)}
+html:not(#_):not(#__) .sb-item:active,html:not(#_):not(#__) .sb-mini:active,html:not(#_):not(#__) .tb-btn:active,
+html:not(#_):not(#__) .genre-btn:active,html:not(#_):not(#__) .sec-filter:active{transform:scale(.93);transition-duration:.12s}
+
+/* ⑦ 主按钮：流光扫过 + 呼吸光晕 */
+@keyframes fxSheen{0%{transform:translateX(-130%) skewX(-18deg)}60%,100%{transform:translateX(230%) skewX(-18deg)}}
+@keyframes fxBreath{0%,100%{box-shadow:0 4px 14px var(--accent-glow)}50%{box-shadow:0 6px 30px var(--accent-glow),0 0 0 4px var(--accent-soft)}}
+html:not(#_):not(#__) .btn-primary{position:relative;overflow:hidden;isolation:isolate;animation:fxBreath 3.2s ease-in-out infinite}
+html:not(#_):not(#__) .btn-primary::after{content:"";position:absolute;top:0;bottom:0;left:0;width:42%;z-index:1;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);animation:fxSheen 3.6s ease-in-out infinite}
+
+/* ⑧ 侧栏当前项 / Logo 轻微浮动，弹层统一弹簧入场 */
+@keyframes fxFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+html:not(#_):not(#__) .sb-logo{animation:fxFloat 4.2s ease-in-out infinite}
+html:not(#_):not(#__) .modal,html:not(#_):not(#__) .gate-card,html:not(#_):not(#__) .genre-pop,
+html:not(#_):not(#__) .qp-picker,html:not(#_):not(#__) .gpop{animation-timing-function:var(--fx-ease)}
 
 #===MARKUP
 
@@ -3916,16 +3991,16 @@ function decoInit(){
     var w = bgfx.w, h = bgfx.h, st = BGFX_STYLE, n, i;
     bgfx.parts = [];
     if (st === 'stars') {
-      n = bgfxClamp(Math.round(w * h / 9000), 60, 220);
+      n = bgfxClamp(Math.round(w * h / 5500), 110, 340);
       for (i = 0; i < n; i++) bgfx.parts.push({ x:Math.random()*w, y:Math.random()*h,
         r:bgfxRand(.4, 1.6), ph:Math.random()*6.28, sp:bgfxRand(.4, 1.6),
         vx:bgfxRand(.1, .5), c:Math.random() < .3 ? 2 : -1 });
     } else if (st === 'network') {
-      n = bgfxClamp(Math.round(w * h / 22000), 30, 80);
+      n = bgfxClamp(Math.round(w * h / 14000), 50, 120);
       for (i = 0; i < n; i++) bgfx.parts.push({ x:Math.random()*w, y:Math.random()*h,
         vx:bgfxRand(-.3, .3), vy:bgfxRand(-.3, .3), r:bgfxRand(1.2, 2.4) });
     } else if (st === 'embers') {
-      n = bgfxClamp(Math.round(w * h / 16000), 30, 90);
+      n = bgfxClamp(Math.round(w * h / 9500), 55, 150);
       for (i = 0; i < n; i++) bgfx.parts.push({ x:Math.random()*w, y:Math.random()*h,
         vy:bgfxRand(.25, .9), r:bgfxRand(.8, 2.6), ph:Math.random()*6.28,
         sw:bgfxRand(.3, 1.1), c:1 + (i % 2) });
@@ -4100,19 +4175,19 @@ var perf=(function(){
   var K='starline.perf',S={m:'auto',a:''},de=document.documentElement,idleT=0,idle=false,eff='mid';
   try{var o=JSON.parse(localStorage.getItem(K)||'{}');for(var k in o)S[k]=o[k];}catch(e){}
   function save(){try{localStorage.setItem(K,JSON.stringify(S));}catch(e){}}
-  function base(){var c=navigator.hardwareConcurrency||4,m=navigator.deviceMemory||4;return (c>=8&&m>=8)?'high':(c<=2||m<=2)?'low':'mid';}
+  function base(){return 'high';} /* MaxFX：自动档一律按高档 */
   function bg(){if(typeof bgfxApply==='function'){try{bgfxApply();}catch(e){}}}
   function sync(){
     var s=document.getElementById('perfMode'),n=document.getElementById('perfNow');
     if(s){var lk=(window.uiState&&uiState.lang)||'';if(s.dataset.l!==lk||!s.options.length){s.dataset.l=lk;s.innerHTML=['auto','high','mid','low'].map(function(x){return '<option value="'+x+'">'+uiT('perf'+x.charAt(0).toUpperCase()+x.slice(1))+'</option>';}).join('');}s.value=S.m;}
     if(n)n.textContent=uiT('perfNow')+' '+uiT('perf'+eff.charAt(0).toUpperCase()+eff.slice(1));}
-  function apply(){var was=eff;eff=S.m==='auto'?(S.a||base()):S.m;de.setAttribute('data-perf',eff);sync();if((was==='low')!==(eff==='low'))bg();if(window.lg&&lg.refresh)lg.refresh();}
+  function apply(){var was=eff;eff=S.m==='auto'?'high':S.m;if(eff==='low')eff='mid';/* MaxFX：最低也是 mid，毛玻璃与动画保留 */de.setAttribute('data-perf',eff);sync();if((was==='low')!==(eff==='low'))bg();if(window.lg&&lg.refresh)lg.refresh();}
   /* 取帧间隔的中位数（忽略启动/切页时的偶发卡顿），连续两个窗口都低于约 40fps 才降一档 */
   function probe(ms,cb){var ds=[],last=0,t0=performance.now();
     function f(now){if(document.hidden||idle)return cb(null);if(last)ds.push(now-last);last=now;if(now-t0<ms)requestAnimationFrame(f);else{ds.sort(function(a,b){return a-b;});cb(ds.length>20?ds[ds.length>>1]:null);}}
     requestAnimationFrame(f);}
   var bad=0;
-  function auto(){if(S.m!=='auto')return;
+  function auto(){return;/* MaxFX：关闭按帧率自动降档 */if(S.m!=='auto')return;
     probe(3000,function(med){if(med==null||S.m!=='auto'){bad=0;return;}
       if(med>25){if(++bad>=2){bad=0;var cur=S.a||base(),nx=cur==='high'?'mid':'low';if(nx!==cur){S.a=nx;save();apply();setTimeout(auto,4000);return;}}setTimeout(auto,1200);}else bad=0;});}
   function goIdle(){if(idle)return;idle=true;de.classList.add('perf-idle');if(typeof bgfxStop==='function'){try{bgfxStop();}catch(e){}}}
@@ -4338,7 +4413,7 @@ var ext=(function(){
   /* ── 减少动效：跟随系统 / 开 / 关 ── */
   var mot=(function(){
     var S=ls('starline.mot',{m:'auto'}),mq=window.matchMedia?matchMedia('(prefers-reduced-motion: reduce)'):null;
-    function apply(){var r=S.m==='on'||(S.m==='auto'&&mq&&mq.matches);de.setAttribute('data-motion',r?'reduce':'full');sync();}
+    function apply(){var r=S.m==='on';/* MaxFX：仅当用户手动选「减少动效」才降级 */de.setAttribute('data-motion',r?'reduce':'full');sync();}
     function sync(){var s=$('motMode');if(!s)return;var l=uiState.lang;
       if(s.dataset.l!==l){s.dataset.l=l;s.innerHTML=['auto','on','off'].map(function(x){return '<option value="'+x+'">'+uiT(x==='auto'?'motAuto':x==='on'?'motOn':'motOff')+'</option>';}).join('');}s.value=S.m;}
     if(mq&&mq.addEventListener)mq.addEventListener('change',apply);
