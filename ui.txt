@@ -6587,6 +6587,28 @@ html.ui-resizing,html.ui-resizing *{cursor:nwse-resize !important;-webkit-user-s
 }
 .tb-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .page{flex:1;overflow-y:auto;padding:8px 26px 60px;scroll-behavior:smooth}
+
+/* 商店页：滚动后出现的「回到顶部」悬浮按钮 */
+#storeBackTop{
+  position:fixed;right:30px;bottom:28px;z-index:1200;
+  display:flex;align-items:center;gap:10px;padding:12px 17px;
+  border:1px solid color-mix(in srgb,var(--accent) 48%,var(--border-2));
+  border-radius:999px;color:#fff;
+  background:linear-gradient(135deg,var(--accent-2,var(--accent)),var(--accent));
+  box-shadow:0 8px 28px var(--accent-glow,rgba(59,130,246,.35)),inset 0 1px 0 rgba(255,255,255,.28);
+  font:600 12.5px var(--font);letter-spacing:.1px;cursor:pointer;
+  opacity:0;visibility:hidden;pointer-events:none;transform:translateY(14px) scale(.94);
+  transition:opacity .22s ease,visibility .22s ease,transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .2s ease;
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+}
+#storeBackTop.visible{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1)}
+#storeBackTop:hover{transform:translateY(-3px) scale(1.025);box-shadow:0 12px 34px var(--accent-glow,rgba(59,130,246,.42)),inset 0 1px 0 rgba(255,255,255,.32)}
+#storeBackTop:active{transform:translateY(0) scale(.96)}
+#storeBackTop svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#storeBackTop .top-label{white-space:nowrap}
+@media(max-width:640px){#storeBackTop{right:16px;bottom:16px;padding:11px 14px}}
+@media(prefers-reduced-motion:reduce){#storeBackTop{transition:opacity .12s,visibility .12s}}
+
 .hero{
   position:relative;height:300px;margin-bottom:32px;
   border-radius:var(--radius-xl);overflow:hidden;
@@ -8421,6 +8443,11 @@ __UI_CSS__
         </aside>
       </div>
     </div>
+
+    <button id="storeBackTop" type="button" aria-label="回到商店顶部" title="回到顶部">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5.5 11.5 12 5l6.5 6.5"/></svg>
+      <span class="top-label">回到顶部</span>
+    </button>
 
     <div class="page" id="profilePage" hidden>
       <div class="profile-wrap">
@@ -13963,6 +13990,57 @@ __UI_SCRIPT__
   }
   window.uiOpenTransEditor=open;
   window.ctClose=function(){if(root&&E.ctArch&&!E.ctArch.hidden){archHide();return;}close(false);};
+})();
+</script>
+<script>
+/* 商店页回到顶部：滚动超过阈值显示按钮；点击后使用加速曲线向上滚动 */
+(function(){
+  var page = document.getElementById('storePage');
+  var btn = document.getElementById('storeBackTop');
+  if (!page || !btn) return;
+
+  var raf = 0;
+  var token = 0;
+  var threshold = 180;
+
+  function updateButton(){
+    var onStore = !page.hidden && page.classList.contains('page');
+    btn.classList.toggle('visible', onStore && page.scrollTop > threshold);
+    btn.setAttribute('aria-hidden', onStore && page.scrollTop > threshold ? 'false' : 'true');
+  }
+
+  page.addEventListener('scroll', updateButton, {passive:true});
+  window.addEventListener('resize', updateButton, {passive:true});
+
+  btn.addEventListener('click', function(){
+    if (raf) cancelAnimationFrame(raf);
+    var myToken = ++token;
+    var start = page.scrollTop;
+    if (start <= 0) { updateButton(); return; }
+    var startTime = 0;
+    /* ease-in：前段较缓，越接近顶部速度越快 */
+    var duration = Math.max(420, Math.min(1250, 480 + start * 0.22));
+    function step(now){
+      if (myToken !== token) return;
+      if (!startTime) startTime = now;
+      var t = Math.min(1, (now - startTime) / duration);
+      var eased = t * t * t; // cubic ease-in，加速上滑
+      page.scrollTop = start * (1 - eased);
+      if (t < 1 && page.scrollTop > 0.5) {
+        raf = requestAnimationFrame(step);
+      } else {
+        page.scrollTop = 0;
+        raf = 0;
+        updateButton();
+      }
+    }
+    raf = requestAnimationFrame(step);
+  });
+
+  /* 切换页面后同步显隐，避免个人资料页显示商店按钮 */
+  var observer = new MutationObserver(updateButton);
+  observer.observe(page, {attributes:true, attributeFilter:['hidden','class']});
+  updateButton();
 })();
 </script>
 </body>
