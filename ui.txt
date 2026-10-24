@@ -14188,7 +14188,7 @@ __UI_SCRIPT__
   function importSource(name,source){
     if(!/\.js$/i.test(name)){toast(t('pluginJsOnly'));return;}
     var rec={id:'',name:name.replace(/\.js$/i,''),version:'1.0.0',description:'',source:source,enabled:false};
-    try{var temp=instantiate(rec);var p=temp.plugin;rec.id=String(p.id||rec.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-')).slice(0,64);rec.name=String(p.name||rec.name).slice(0,80);rec.version=String(p.version||'1.0.0').slice(0,32);rec.description=String(p.description||'').slice(0,400);if(!/^[a-z0-9._-]{1,64}$/i.test(rec.id))throw new Error(t('pluginBadId'));}
+    try{var temp=instantiate(rec);var p=temp.plugin;rec.id=String(p.id||rec.name.toLowerCase().replace(/[^a-z0-9._-]+/g,'-')).slice(0,64);rec.name=String(p.name||rec.name).slice(0,80);rec.version=String(p.version||'1.0.0').slice(0,32);rec.description=String(p.description||'').slice(0,400);rec.permissions=Array.isArray(p.permissions)?p.permissions.map(String):[];rec.crossPlugin=Array.isArray(p.crossPlugin)?p.crossPlugin.map(String):[];rec.minApiVersion=String(p.minApiVersion||'2.0.0').slice(0,32);if(!/^[a-z0-9._-]{1,64}$/i.test(rec.id))throw new Error(t('pluginBadId'));}
     catch(e){toast(e.message);return;}
     var old=installed.find(function(x){return x.id===rec.id;});if(old&&!confirm(t('pluginExists')))return;
     if(old)deactivate(old);if(old)installed=installed.filter(function(x){return x.id!==rec.id;});installed.push(rec);write();render();toast(t('pluginImported')+rec.name);
