@@ -1165,7 +1165,7 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
 }
 #logoFx.to-menu{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:none}
 #logoFx.to-menu .logo-fx-brand,#logoFx.to-menu .logo-fx-sub{opacity:0;transform:translateY(10px)}
-#logoFx.to-menu .logo-fly{transform:translate(var(--tx,0px),var(--ty,0px)) scale(var(--ts,.13))}
+#logoFx.to-menu .logo-fly{transition:none;transform:translate(var(--tx,0px),var(--ty,0px)) scale(var(--ts,.13))}
 #logoFx.to-menu .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) scale(1)}
 .sb-logo.logo-arrived{animation:logoArrive .9s cubic-bezier(.2,.8,.2,1)}
 @keyframes logoArrive{
@@ -4435,6 +4435,21 @@ var LOGO_GLB_B64 = "Z2xURgIAAAAA1AEAjAMAAEpTT057ImFzc2V0Ijp7InZlcnNpb24iOiIyLjAi
     setTimeout(function(){ if (done) done(); }, 2250);
   }
 
+  /* cubic-bezier(.62,.02,.18,1) 缓动，和原来的 CSS 过渡一致 */
+  function bezier(x1, y1, x2, y2){
+    return function(t){
+      var lo = 0, hi = 1, u = t;
+      for (var i = 0; i < 24; i++) {
+        var x = 3*(1-u)*(1-u)*u*x1 + 3*(1-u)*u*u*x2 + u*u*u;
+        if (Math.abs(x - t) < 1e-4) break;
+        if (x < t) lo = u; else hi = u;
+        u = (lo + hi) / 2;
+      }
+      return 3*(1-u)*(1-u)*u*y1 + 3*(1-u)*u*u*y2 + u*u*u;
+    };
+  }
+  var flyEase = bezier(.62, .02, .18, 1);
+
   function toMenu(){
     var el = document.getElementById('logoFx');
     var target = document.querySelector('.sb-logo');
@@ -4444,25 +4459,52 @@ var LOGO_GLB_B64 = "Z2xURgIAAAAA1AEAjAMAAEpTT057ImFzc2V0Ijp7InZlcnNpb24iOiIyLjAi
     }
     show();
     if (window.logoGL) logoGL.final();
-    var r = target.getBoundingClientRect();
-    var ts = Math.max(.08, Math.min(.3, r.width / 300));
-    var tx = (r.left + r.width / 2) - window.innerWidth / 2;
-    var ty = (r.top + r.height / 2) - window.innerHeight / 2;
-    el.style.setProperty('--tx', tx.toFixed(1) + 'px');
-    el.style.setProperty('--ty', ty.toFixed(1) + 'px');
-    el.style.setProperty('--ts', ts.toFixed(3));
-    /* 先让居中状态渲染一帧，再开始飞 */
+    var fly = el.querySelector('.logo-fly');
+    var l3 = document.getElementById('logo3d');
     void el.offsetWidth;
+    /* 飞行层下面还有 STARLINE 文字块，logo 并不在屏幕正中：量出它真实的中心偏移，
+       不再假设它在 innerWidth/2、innerHeight/2 */
+    var f0 = fly.getBoundingClientRect();
+    var offY = (f0.top + f0.height / 2) - window.innerHeight / 2;
+    var offX = (f0.left + f0.width / 2) - window.innerWidth / 2;
+    /* 屏幕上真正可见的图形大小：WebGL 模型约占画布高度的 78.7%，回退 SVG 则占满 */
+    var glyph = 240 * (f0.width / 300) * ((l3 && l3.classList.contains('webgl')) ? 0.787 : 1);
+    /* 目标取侧栏里那个 19px 的图形本身，而不是 36px 的底框；每一帧都重新量，窗口尺寸变化也不会偏 */
+    function goal(){
+      var g = target.querySelector('svg') || target;
+      var r = g.getBoundingClientRect();
+      var cx = window.innerWidth / 2 + offX, cy = window.innerHeight / 2 + offY;
+      return {
+        x: (r.left + r.width / 2) - cx,
+        y: (r.top + r.height / 2) - cy,
+        s: Math.max(.04, Math.min(.4, r.height / glyph))
+      };
+    }
+    function setVars(x, y, sc){
+      el.style.setProperty('--tx', x.toFixed(2) + 'px');
+      el.style.setProperty('--ty', y.toFixed(2) + 'px');
+      el.style.setProperty('--ts', sc.toFixed(4));
+    }
+    setVars(0, 0, 1);
+    var DUR = 980, t0 = 0;
+    function finish(){
+      el.classList.remove('show');
+      el.classList.remove('to-menu');
+      el.hidden = true;
+      document.body.classList.remove('logo-intro');
+      target.classList.add('logo-arrived');
+      setTimeout(function(){ target.classList.remove('logo-arrived'); }, 1000);
+    }
+    function frame(now){
+      if (!t0) t0 = now;
+      var p = Math.min(1, (now - t0) / DUR), e = flyEase(p), g = goal();
+      setVars(g.x * e, g.y * e, 1 + (g.s - 1) * e);
+      if (p < 1) requestAnimationFrame(frame);
+      else setTimeout(finish, 140);
+    }
     requestAnimationFrame(function(){
       el.classList.add('to-menu');
-      setTimeout(function(){
-        el.classList.remove('show');
-        el.classList.remove('to-menu');
-        el.hidden = true;
-        document.body.classList.remove('logo-intro');
-        target.classList.add('logo-arrived');
-        setTimeout(function(){ target.classList.remove('logo-arrived'); }, 1000);
-      }, 1120);
+      requestAnimationFrame(frame);
     });
   }
 
@@ -6313,9 +6355,9 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
   position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:3;
   display:flex;align-items:center;gap:4px;height:24px;padding:0 6px;
   border-radius:var(--radius-full);border:1px solid var(--border);
-  background:var(--surface-2);color:var(--text-3);cursor:pointer;
+  background:transparent;color:var(--text-3);cursor:pointer;
   -webkit-app-region:no-drag;
-  transition:border-color var(--tr),color var(--tr),background var(--tr),transform var(--tr);
+  transition:border-color var(--tr),color var(--tr),transform var(--tr);
 }
 .sk-kbd kbd{
   display:grid;place-items:center;min-width:18px;height:16px;padding:0 4px;
@@ -6323,7 +6365,7 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
   font:600 10px/1 var(--font-mono);color:var(--text-2);
   transition:color var(--tr),border-color var(--tr);
 }
-.sk-kbd:hover,.sk-kbd.open{border-color:var(--accent);background:var(--accent-soft)}
+.sk-kbd:hover,.sk-kbd.open{border-color:var(--accent)}
 .sk-kbd:hover kbd,.sk-kbd.open kbd{color:var(--accent-2);border-color:var(--accent)}
 .sk-kbd:active{transform:translateY(-50%) scale(.95)}
 .topbar-search:focus-within .sk-kbd{transform:translateY(calc(-50% - 1px))}
@@ -11453,6 +11495,13 @@ __UI_SCRIPT__
     QUICK.splice(i, 1);
     saveQuick();
     renderQuickplay();
+    var qName = (GAMES[g] && GAMES[g].title) || g;
+    toast(qName + ' · ' + uiT('quickRemoved'), 'info', 5000, {action:{label:uiT('toastUndo'), run:function(){
+      if (!GAMES[g] || QUICK.indexOf(g) >= 0) return;
+      QUICK.splice(Math.min(i, QUICK.length), 0, g);
+      saveQuick();
+      renderQuickplay();
+    }}});
   }
   function toggleQuickPicker(ev){
     if (ev) ev.stopPropagation();
@@ -14917,6 +14966,8 @@ __UI_SCRIPT__
     vn:{toastUndo:'Hoàn tác',toastRetry:'Thử lại'},tr:{toastUndo:'Geri al',toastRetry:'Tekrar dene'},
     pt:{toastUndo:'Desfazer',toastRetry:'Tentar de novo'}
   };
+  var M={en:'Removed from Quickplay',zh:'已从快速启动移除',ru:'Убрано из быстрого запуска',es:'Quitado de Inicio rápido',de:'Aus Schnellstart entfernt',fr:'Retiré du lancement rapide',ja:'クイックプレイから削除しました',ko:'빠른 실행에서 제거됨',vn:'Đã xóa khỏi Chơi nhanh',tr:'Hızlı Başlat’tan çıkarıldı',pt:'Removido do Início rápido'};
+  Object.keys(M).forEach(function(c){L[c]=L[c]||{};L[c].quickRemoved=M[c];});
   if(typeof UI_T==='undefined')return;
   Object.keys(L).forEach(function(c){if(!UI_T[c])UI_T[c]={};Object.keys(L[c]).forEach(function(k){UI_T[c][k]=L[c][k];});});
 })();
