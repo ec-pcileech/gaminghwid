@@ -73,6 +73,25 @@ html.ui-theme-anim,html.ui-theme-anim *,html.ui-theme-anim *::before,html.ui-the
 @media (prefers-reduced-motion:reduce){
   html.ui-theme-anim,html.ui-theme-anim *,html.ui-theme-anim *::before,html.ui-theme-anim *::after{transition:none !important}
 }
+/* 水滴扩散换主题（View Transition） */
+@property --ui-r{syntax:'<length>';inherits:false;initial-value:0px}
+html.ui-theme-vt::view-transition-old(root),
+html.ui-theme-vt::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html.ui-theme-vt::view-transition-old(root){z-index:1}
+html.ui-theme-vt::view-transition-new(root){z-index:2}
+html.ui-theme-vt::view-transition-group(ui-drop-ring),
+html.ui-theme-vt::view-transition-new(ui-drop-ring){animation:none}
+html.ui-theme-vt::view-transition-old(ui-drop-ring){display:none}
+.ui-drop-ring{
+  position:fixed;inset:0;z-index:2147483600;pointer-events:none;view-transition-name:ui-drop-ring;
+  --ui-r:0px;
+  background:radial-gradient(circle at 50% 50%,
+    transparent calc(var(--ui-r) - 22px),
+    color-mix(in srgb,var(--accent,#3b82f6) 38%,transparent) calc(var(--ui-r) - 6px),
+    color-mix(in srgb,#fff 70%,var(--accent,#3b82f6)) calc(var(--ui-r) - 1px),
+    color-mix(in srgb,var(--accent,#3b82f6) 55%,transparent) calc(var(--ui-r) + 1px),
+    transparent calc(var(--ui-r) + 5px));
+}
 #===UI_CSS
 
 :root{
@@ -2563,21 +2582,83 @@ function uiThemeAnimate(){
   clearTimeout(uiThemeAnimTimer);
   uiThemeAnimTimer = setTimeout(function(){ root.classList.remove('ui-theme-anim'); }, 560);
 }
+var uiThemeTok = 0;
+var uiThemeVT = null;
+/* 水滴扩散换主题：APP 正中先「滴」出一颗水珠，随后爆开，圆形向四周扩散，
+   圆内是新主题、圆外仍是旧主题，直到铺满整个 APP。靠 View Transition 抓取新旧两张快照 */
+function uiThemeReveal(paint){
+  var root = document.documentElement;
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  if (reduce) { paint(); return; }
+  if (typeof document.startViewTransition !== 'function') { uiThemeAnimate(); paint(); return; }
+  if (uiThemeVT) { try { uiThemeVT.skipTransition(); } catch (e) {} }
+
+  var W = window.innerWidth, H = window.innerHeight, cx = W / 2, cy = H / 2;
+  var R = Math.ceil(Math.hypot(cx, cy)) + 28;       /* 圆半径要盖住最远的角 */
+  var DUR = 1150;
+  var at = ' at ' + cx + 'px ' + cy + 'px)';
+  var ring = null, vt;
+  root.classList.add('ui-theme-vt');
+  try {
+    vt = document.startViewTransition(function(){
+      paint();
+      ring = document.createElement('div');
+      ring.className = 'ui-drop-ring';
+      document.body.appendChild(ring);
+    });
+  } catch (e) { root.classList.remove('ui-theme-vt'); paint(); return; }
+  uiThemeVT = vt;
+
+  /* 水滴：0 → 冒出(48px) → 微缩蓄力(40px) → 爆开扩散到整个窗口 */
+  var EASE_POP = 'cubic-bezier(.22,.9,.3,1)';
+  var EASE_HOLD = 'cubic-bezier(.4,0,.6,1)';
+  var EASE_BURST = 'cubic-bezier(.32,0,.12,1)';
+  vt.ready.then(function(){
+    root.animate([
+      { clipPath: 'circle(0px' + at, offset: 0,   easing: EASE_POP },
+      { clipPath: 'circle(48px' + at, offset: .15, easing: EASE_HOLD },
+      { clipPath: 'circle(40px' + at, offset: .22, easing: EASE_BURST },
+      { clipPath: 'circle(' + R + 'px' + at, offset: 1 }
+    ], { duration: DUR, fill: 'forwards', pseudoElement: '::view-transition-new(root)' });
+    if (ring) {
+      ring.animate([
+        { '--ui-r': '0px',  offset: 0,   easing: EASE_POP },
+        { '--ui-r': '48px', offset: .15, easing: EASE_HOLD },
+        { '--ui-r': '40px', offset: .22, easing: EASE_BURST },
+        { '--ui-r': R + 'px', offset: 1 }
+      ], { duration: DUR, fill: 'forwards' });
+      ring.animate([
+        { opacity: 1, offset: 0 }, { opacity: 1, offset: .72 }, { opacity: 0, offset: 1 }
+      ], { duration: DUR, fill: 'forwards' });
+    }
+  }).catch(function(){});
+  vt.finished.then(function(){}, function(){}).then(function(){
+    if (ring && ring.parentNode) { ring.parentNode.removeChild(ring); }
+    if (uiThemeVT === vt) { uiThemeVT = null; root.classList.remove('ui-theme-vt'); }
+  });
+}
 function uiApplyTheme(theme, persist){
   uiState.theme = theme;
   var spec = uiActiveSpec(theme);
   /* 只有主题真的变了才播放动画；首次加载和重复应用同一主题都不播 */
   var animKey = theme + '|' + spec.base;
-  if (uiState.themeKey && uiState.themeKey !== animKey) { uiThemeAnimate(); }
+  var animate = !!(uiState.themeKey && uiState.themeKey !== animKey);
   uiState.themeKey = animKey;
-  document.documentElement.setAttribute('data-theme', spec.base);
+  var tok = ++uiThemeTok;
   var custom = uiFindCustom(theme);
-  uiThemeNode().textContent = (custom || (theme !== 'light' && theme !== 'dark'))
+  var css = (custom || (theme !== 'light' && theme !== 'dark'))
     ? uiThemeRule(uiSpecTokens(spec)) : '';
-  uiApplyDynamic(spec);
-  uiPaintThemeSeg();
-  uiRenderPresets();      /* 让预设卡片的高亮跟着当前主题走 */
-  uiRenderThemeGrid();
+  function paint(){
+    if (tok !== uiThemeTok) { return; }          /* 已被更新的一次切换取代 */
+    document.documentElement.setAttribute('data-theme', spec.base);
+    uiThemeNode().textContent = css;
+    uiApplyDynamic(spec);
+    uiPaintThemeSeg();
+    uiRenderPresets();      /* 让预设卡片的高亮跟着当前主题走 */
+    uiRenderThemeGrid();
+  }
+  if (animate) { uiThemeReveal(paint); } else { paint(); }
   if (persist !== false) { uiSend('UI_THEME:' + theme); }
 }
 /* 编辑器实时预览（换色、换特效都立刻可见）*/
