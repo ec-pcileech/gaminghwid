@@ -4524,7 +4524,8 @@ var LOGO_GLB_B64 = "Z2xURgIAAAAA1AEAjAMAAEpTT057ImFzc2V0Ijp7InZlcnNpb24iOiIyLjAi
 var logoGL = (function(){
   var gl = null, canvas = null, mesh = null, prog = null;
   var pb = null, nb = null, ib = null;
-  var aPos = -1, aNrm = -1, uMVP = null, uModel = null, uEye = null;
+  var aPos = -1, aNrm = -1, uMVP = null, uModel = null, uEye = null, uA = null, uB = null;
+  var parts = null;   /* 拆开的 3 个独立部件：{ib,n,c:[cx,cy,cz],role} */
   var raf = 0, t0 = 0, ok = false;
 
   function b64buf(b64){
@@ -4624,6 +4625,71 @@ var logoGL = (function(){
     var c = Math.cos(a), s = Math.sin(a);
     return new Float32Array([c,s,0,0, -s,c,0,0, 0,0,1,0, 0,0,0,1]);
   }
+  function m4trans(x, y, z){
+    return new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, x,y,z,1]);
+  }
+  /* 把网格按 XY 位置焊接后做连通分量：正面/侧面/背面同属一块，得到 3 个独立部件 */
+  function splitParts(m){
+    var pos = m.pos, idx = m.idx, nv = pos.length / 3, key = {}, vid = new Array(nv), nk = 0, i;
+    for (i = 0; i < nv; i++) {
+      var k = Math.round(pos[i*3] * 2000) + ',' + Math.round(pos[i*3+1] * 2000);
+      if (key[k] === undefined) key[k] = nk++;
+      vid[i] = key[k];
+    }
+    var par = []; for (i = 0; i < nk; i++) par.push(i);
+    function f(x){ while (par[x] !== x) { par[x] = par[par[x]]; x = par[x]; } return x; }
+    for (i = 0; i + 2 < idx.length; i += 3) {
+      var a = f(vid[idx[i]]), b = f(vid[idx[i+1]]), c = f(vid[idx[i+2]]);
+      par[b] = a; par[c] = a;
+    }
+    var map = {}, list = [];
+    for (i = 0; i + 2 < idx.length; i += 3) {
+      var r = f(vid[idx[i]]);
+      if (!map[r]) { map[r] = { tri: [], mn: [1e9,1e9,1e9], mx: [-1e9,-1e9,-1e9] }; list.push(map[r]); }
+      var g = map[r];
+      for (var q = 0; q < 3; q++) {
+        var v = idx[i+q]; g.tri.push(v);
+        for (var d = 0; d < 3; d++) {
+          var p = pos[v*3+d];
+          if (p < g.mn[d]) g.mn[d] = p;
+          if (p > g.mx[d]) g.mx[d] = p;
+        }
+      }
+    }
+    list.forEach(function(g){
+      g.c = [(g.mn[0]+g.mx[0])/2, (g.mn[1]+g.mx[1])/2, (g.mn[2]+g.mx[2])/2];
+    });
+    /* 正面与侧壁/背面的顶点并不共用，会被拆成多块：中心很近的合并成同一个部件 */
+    var merged = [];
+    list.forEach(function(g){
+      for (var j = 0; j < merged.length; j++) {
+        var h = merged[j];
+        if (Math.hypot(h.c[0] - g.c[0], h.c[1] - g.c[1]) < 0.12) {
+          h.tri = h.tri.concat(g.tri);
+          for (var d = 0; d < 3; d++) {
+            if (g.mn[d] < h.mn[d]) h.mn[d] = g.mn[d];
+            if (g.mx[d] > h.mx[d]) h.mx[d] = g.mx[d];
+          }
+          h.c = [(h.mn[0]+h.mx[0])/2, (h.mn[1]+h.mx[1])/2, (h.mn[2]+h.mx[2])/2];
+          return;
+        }
+      }
+      merged.push(g);
+    });
+    list = merged;
+    /* 角色：最上面的是上横条；剩下的左边是主体 T 形，右边是下横条 */
+    list.sort(function(a, b){ return b.c[1] - a.c[1]; });
+    if (list.length === 3) {
+      var rest = list.slice(1).sort(function(a, b){ return a.c[0] - b.c[0]; });
+      list = [list[0], rest[0], rest[1]];
+    }
+    return list.map(function(g){
+      var ib = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(g.tri), gl.STATIC_DRAW);
+      return { ib: ib, n: g.tri.length, c: g.c };
+    });
+  }
   function m4scale(s){
     return new Float32Array([s,0,0,0, 0,s,0,0, 0,0,s,0, 0,0,0,1]);
   }
@@ -4644,7 +4710,7 @@ var logoGL = (function(){
       'void main(){vec4 w=uModel*vec4(aPos,1.0);vW=w.xyz;' +
       'vN=mat3(uModel[0].xyz,uModel[1].xyz,uModel[2].xyz)*aNrm;' +
       'gl_Position=uMVP*vec4(aPos,1.0);}';
-    var fs = 'precision highp float;varying vec3 vN;varying vec3 vW;uniform vec3 uEye;' +
+    var fs = 'precision highp float;varying vec3 vN;varying vec3 vW;uniform vec3 uEye;uniform float uA;uniform float uB;' +
       'void main(){vec3 N=normalize(vN);vec3 V=normalize(uEye-vW);' +
       'vec3 L1=normalize(vec3(-0.42,0.78,0.72));vec3 L2=normalize(vec3(0.65,0.18,0.58));' +
       'float d1=max(dot(N,L1),0.0);float d2=max(dot(N,L2),0.0);' +
@@ -4653,7 +4719,7 @@ var logoGL = (function(){
       'vec3 base=vec3(0.78,0.82,0.88);' +'float grad=clamp(vW.y*0.9+0.55,0.0,1.0);' +
       'vec3 col=base*(0.34+0.50*d1+0.16*d2)*(0.80+0.28*grad);' +
       'float bev=smoothstep(0.35,0.82,N.z)*(1.0-smoothstep(0.90,0.995,N.z));' +'col+=vec3(1.0)*spec*0.75;col+=vec3(0.82,0.90,1.0)*fres*0.55;col+=vec3(0.95,0.98,1.0)*bev*0.45;' +
-      'col*=0.94+0.06*max(N.z,0.0);gl_FragColor=vec4(col,1.0);}';
+      'col*=0.94+0.06*max(N.z,0.0);col*=uB;gl_FragColor=vec4(col*uA,uA);}';
     var v = shader(gl.VERTEX_SHADER, vs), f = shader(gl.FRAGMENT_SHADER, fs);
     if (!v || !f) return false;
     prog = gl.createProgram();
@@ -4664,6 +4730,8 @@ var logoGL = (function(){
     uMVP = gl.getUniformLocation(prog, 'uMVP');
     uModel = gl.getUniformLocation(prog, 'uModel');
     uEye = gl.getUniformLocation(prog, 'uEye');
+    uA = gl.getUniformLocation(prog, 'uA');
+    uB = gl.getUniformLocation(prog, 'uB');
 
     pb = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, pb);
@@ -4674,12 +4742,13 @@ var logoGL = (function(){
     ib = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.idx, gl.STATIC_DRAW);
+    try { parts = splitParts(mesh); } catch (e) { parts = null; }
 
     gl.enable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
     gl.clearColor(0, 0, 0, 0);
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
     var logo3d = document.getElementById('logo3d');
     if (logo3d) logo3d.classList.add('webgl');
@@ -4687,17 +4756,25 @@ var logoGL = (function(){
     return true;
   }
 
-  function draw(rx, ry, rz, sc){
+  /* 每个部件的入场参数：从各自方向飞来、翻转着合拢（对应参考图：上横条 → 主体 → 下横条）
+     off = 起始位移(模型单位)，rot = 起始旋转(度, x/y/z)，st = 起飞时刻(占总时长比例) */
+  var FLY = [
+    { off: [ 0.34,  0.52, -1.25], rot: [ 55, -150,  70], st: 0.00 },
+    { off: [-0.62, -0.12, -1.20], rot: [-35,  160, -80], st: 0.07 },
+    { off: [ 0.46, -0.58, -1.10], rot: [ 60, -170, 105], st: 0.17 }
+  ];
+  var FLY_DUR = 0.52;
+
+  /* pieces: null = 拼好的整体；否则 [{off,rot,a,b}] 与 parts 一一对应 */
+  function draw(rx, ry, rz, sc, pieces){
     if (!init()) return;
     var model = m4mul(m4mul(m4rotX(rx), m4rotY(ry)), m4mul(m4rotZ(rz), m4scale(sc)));
     var view = m4look([0, 0, 3.2], [0, 0, 0], [0, 1, 0]);
     var proj = m4persp(30 * Math.PI / 180, 1, 0.1, 20);
-    var mvp = m4mul(m4mul(proj, view), model);
+    var vp = m4mul(proj, view);
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.useProgram(prog);
-    gl.uniformMatrix4fv(uMVP, false, mvp);
-    gl.uniformMatrix4fv(uModel, false, model);
     gl.uniform3f(uEye, 0, 0, 3.2);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, pb);
@@ -4706,28 +4783,65 @@ var logoGL = (function(){
     gl.bindBuffer(gl.ARRAY_BUFFER, nb);
     gl.enableVertexAttribArray(aNrm);
     gl.vertexAttribPointer(aNrm, 3, gl.FLOAT, false, 0, 0);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
-    gl.drawElements(gl.TRIANGLES, mesh.idx.length, gl.UNSIGNED_SHORT, 0);
+
+    function go(m, a, b, ibuf, n){
+      gl.uniformMatrix4fv(uModel, false, m);
+      gl.uniformMatrix4fv(uMVP, false, m4mul(vp, m));
+      gl.uniform1f(uA, a);
+      gl.uniform1f(uB, b);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibuf);
+      gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
+    }
+    if (!pieces || !parts || parts.length !== pieces.length) {
+      go(model, 1, 1, ib, mesh.idx.length);
+      return;
+    }
+    for (var i = 0; i < parts.length; i++) {
+      var P = pieces[i], c = parts[i].c, D = Math.PI / 180;
+      if (P.a <= 0.003) continue;
+      /* 绕部件自身中心旋转，再平移到飞行位置 */
+      var pm = m4mul(m4trans(c[0] + P.off[0], c[1] + P.off[1], c[2] + P.off[2]),
+               m4mul(m4mul(m4rotZ(P.rot[2] * D), m4rotY(P.rot[1] * D)), m4mul(m4rotX(P.rot[0] * D),
+               m4trans(-c[0], -c[1], -c[2]))));
+      go(m4mul(model, pm), P.a, P.b, parts[i].ib, parts[i].n);
+    }
   }
 
   function playIn(){
     if (!init()) return;
     cancelAnimationFrame(raf);
     t0 = performance.now();
+    var TOTAL = 2000;
+    function clamp01(x){ return x < 0 ? 0 : x > 1 ? 1 : x; }
     var step = function(ts){
-      var t = Math.min(1, (ts - t0) / 2000);
-      var e = 1 - Math.pow(1 - t, 3);
-      var ry = 60 - 68 * e;
-      var rx = 14 - 7 * e;
-      draw(rx * Math.PI / 180, ry * Math.PI / 180, 0, 1.10 + 0.25 * e);
+      var t = Math.min(1, (ts - t0) / TOTAL);
+      /* 整体姿态：边合拢边转正，和 finalPose 在 t=1 时完全一致 */
+      var g = 1 - Math.pow(1 - clamp01(t / 0.85), 3);
+      var ry = 36 - 44 * g, rx = 12 - 5 * g, sc = 1.18 + 0.17 * g;
+      /* 合拢完成后的一次金属高光闪动 */
+      var flash = Math.sin(Math.PI * clamp01((t - 0.58) / 0.34));
+      var pieces = FLY.map(function(F){
+        var u = clamp01((t - F.st) / FLY_DUR);
+        var e = 1 - Math.pow(1 - u, 3);          /* easeOutCubic：快速飞近，慢慢吸附 */
+        var k = 1 - e;
+        return {
+          off: [F.off[0] * k, F.off[1] * k, F.off[2] * k],
+          rot: [F.rot[0] * k, F.rot[1] * k, F.rot[2] * k],
+          a: clamp01(u * 3.2),                    /* 先从暗处淡入 */
+          b: (0.50 + 0.50 * e) * (1 + 0.42 * flash)
+        };
+      });
+      draw(rx * Math.PI / 180, ry * Math.PI / 180, 0, sc, pieces);
       if (t < 1) raf = requestAnimationFrame(step);
+      else finalPose();
     };
     raf = requestAnimationFrame(step);
   }
 
   function finalPose(){
     if (!init()) return;
-    draw(7 * Math.PI / 180, -8 * Math.PI / 180, 0, 1.35);
+    cancelAnimationFrame(raf);
+    draw(7 * Math.PI / 180, -8 * Math.PI / 180, 0, 1.35, null);
   }
 
   return { playIn:playIn, final:finalPose };
