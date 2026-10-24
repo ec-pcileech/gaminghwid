@@ -7142,8 +7142,16 @@ body.dragging .qp-drop-hint{display:block}
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
   color:#fff;box-shadow:0 4px 14px var(--accent-glow);
 }
+/* 商店内的卡片 / 列表即时切换 */
+.sec-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.store-view-switch{display:flex;align-items:center;gap:3px;padding:3px;border:1px solid var(--border);border-radius:var(--radius-full);background:var(--surface);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex:none}
+.store-view-btn{display:grid;place-items:center;width:30px;height:30px;padding:0;border:1px solid transparent;border-radius:var(--radius-full);background:transparent;color:var(--text-3);cursor:pointer;transition:background var(--tr),color var(--tr),border-color var(--tr),box-shadow var(--tr),transform var(--tr)}
+.store-view-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.store-view-btn:hover{color:var(--text);background:var(--surface-2);transform:translateY(-1px)}
+.store-view-btn.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent;box-shadow:0 3px 10px var(--accent-glow)}
+.store-view-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:760px){.sec-tools{width:100%;justify-content:flex-start}.store-view-switch{order:0}.genre-wrap{order:1}.sec-filter{order:2;max-width:100%;overflow-x:auto}.sec-filter button{padding:6px 10px;white-space:nowrap}}
 /* ── Genres 筛选：按钮挨着 All/Owned/… 左边，弹层右对齐（左右侧栏都不会跑出窗口） ── */
-.sec-tools{display:flex;align-items:stretch;gap:8px}
 .genre-wrap{position:relative;display:flex}
 .genre-btn{
   display:flex;align-items:center;gap:7px;
@@ -8506,6 +8514,14 @@ __UI_CSS__
         <span class="sec-count" id="gameCount">0</span>
         <div class="sec-spacer"></div>
         <div class="sec-tools">
+          <div class="store-view-switch" id="storeViewSwitch" role="group" aria-label="Game display mode">
+            <button class="store-view-btn" type="button" data-store-layout="grid" data-ui-title="layoutGrid" title="Cards" aria-label="Cards" aria-pressed="true" onclick="setLayout('grid')">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></svg>
+          </button>
+          <button class="store-view-btn" type="button" data-store-layout="list" data-ui-title="layoutList" title="List" aria-label="List" aria-pressed="false" onclick="setLayout('list')">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><rect x="3" y="4" width="3.5" height="4" rx=".7"/><rect x="3" y="10" width="3.5" height="4" rx=".7"/><rect x="3" y="16" width="3.5" height="4" rx=".7"/></svg>
+          </button>
+          </div>
           <div class="genre-wrap" id="genreWrap">
             <button class="genre-btn" id="genreBtn" type="button" onclick="toggleGenrePop(event)"
               aria-haspopup="true" aria-expanded="false">
@@ -10248,11 +10264,19 @@ __UI_SCRIPT__
     document.querySelectorAll('#layoutOpts .layout-opt').forEach(function(b){
       b.classList.toggle('active', b.getAttribute('data-layout') === LAYOUT);
     });
+    document.querySelectorAll('#storeViewSwitch [data-store-layout]').forEach(function(b){
+      var active = b.getAttribute('data-store-layout') === LAYOUT;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      var key = active ? 'layout' + (LAYOUT === 'list' ? 'List' : 'Grid') : 'layout' + (b.getAttribute('data-store-layout') === 'list' ? 'List' : 'Grid');
+      b.title = uiT(key);
+      b.setAttribute('aria-label', uiT(key));
+    });
     renderColsOpts();
   }
   function setLayout(mode){
     mode = (mode === 'list') ? 'list' : 'grid';
-    if (mode === LAYOUT) return;
+    if (mode === LAYOUT) { renderLayoutOpts(); return; }
     LAYOUT = mode;
     wv('UI_LAYOUT:' + LAYOUT);
     renderLayoutOpts();
