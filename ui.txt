@@ -7151,34 +7151,40 @@ body.dragging .qp-drop-hint{display:block}
 .store-view-btn.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent;box-shadow:0 3px 10px var(--accent-glow)}
 .store-view-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media(max-width:760px){.sec-tools{width:100%;justify-content:flex-start}.store-view-switch{order:0}.genre-wrap{order:1}.sec-filter{order:2;max-width:100%;overflow-x:auto}.sec-filter button{padding:6px 10px;white-space:nowrap}}
-/* ── Genres 筛选：按钮挨着 All/Owned/… 左边，弹层右对齐（左右侧栏都不会跑出窗口） ── */
-.genre-wrap{position:relative;display:flex}
+/* ── 类型筛选：单图标圆形按钮；弹出菜单带指向按钮的箭头 ── */
+.genre-wrap{position:relative;display:flex;align-items:center}
 .genre-btn{
-  display:flex;align-items:center;gap:7px;
-  padding:0 12px;border-radius:var(--radius-full);
+  position:relative;display:grid;place-items:center;flex:none;
+  width:38px;height:38px;padding:0;border-radius:50%;
   background:var(--surface);border:1px solid var(--border);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   font-size:12px;font-weight:600;color:var(--text-3);
-  white-space:nowrap;transition:all var(--tr);
+  white-space:nowrap;cursor:pointer;transition:all var(--tr);
 }
-.genre-btn:hover{color:var(--text);border-color:var(--border-2)}
+.genre-btn:hover{color:var(--text);border-color:var(--border-2);background:var(--surface-2);transform:translateY(-1px)}
 .genre-btn.active{
   background:linear-gradient(135deg,var(--accent),var(--accent-2));
   border-color:transparent;color:#fff;box-shadow:0 4px 14px var(--accent-glow);
 }
-.genre-btn > svg{width:14px;height:14px;flex-shrink:0;fill:none;stroke:currentColor;
+.genre-btn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.genre-btn > svg{width:17px;height:17px;flex-shrink:0;fill:none;stroke:currentColor;
   stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.genre-btn .genre-caret{width:12px;height:12px;opacity:.75;transition:transform var(--tr)}
-.genre-btn.open .genre-caret{transform:rotate(180deg)}
+.genre-btn .genre-btn-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.genre-btn .genre-caret{display:none}
 .genre-pop{
-  position:absolute;top:calc(100% + 8px);right:0;z-index:40;
+  position:absolute;top:calc(100% + 10px);right:0;z-index:40;
   min-width:176px;max-height:264px;overflow-y:auto;
   padding:6px;border-radius:var(--radius);
   background:var(--surface-3);border:1px solid var(--border-2);
   box-shadow:var(--shadow-2);
   backdrop-filter:blur(24px) saturate(160%);-webkit-backdrop-filter:blur(24px) saturate(160%);
+  transform-origin:calc(100% - 19px) 0;
   animation:genrePopIn .16s cubic-bezier(.2,.8,.2,1);
 }
+/* 双层小箭头：外层跟随弹窗边框，内层匹配弹窗背景 */
+.genre-pop::before,.genre-pop::after{content:"";position:sticky;display:block;pointer-events:none;float:right;width:0;height:0;margin-right:8px;border-left:7px solid transparent;border-right:7px solid transparent}
+.genre-pop::before{margin-top:-19px;margin-bottom:5px;border-bottom:8px solid var(--border-2)}
+.genre-pop::after{margin-top:-12px;margin-bottom:4px;margin-right:9px;border-left-width:6px;border-right-width:6px;border-bottom:7px solid var(--surface-3)}
 .genre-pop[hidden]{display:none}
 @keyframes genrePopIn{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
 .genre-pop button{
@@ -8525,9 +8531,8 @@ __UI_CSS__
           <div class="genre-wrap" id="genreWrap">
             <button class="genre-btn" id="genreBtn" type="button" onclick="toggleGenrePop(event)"
               aria-haspopup="true" aria-expanded="false">
-              <svg viewBox="0 0 24 24"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
-              <span id="genreBtnTxt" data-ui="genres">Genres</span>
-              <svg class="genre-caret" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></svg>
+              <span id="genreBtnTxt" class="genre-btn-label" data-ui="genres">Genres</span>
             </button>
             <div class="genre-pop" id="genrePop" hidden></div>
           </div>
@@ -10142,14 +10147,18 @@ __UI_SCRIPT__
     var txt = document.getElementById('genreBtnTxt');
     if (!btn || !txt) return;
     if (GENRE) {
-      /* 选了类型就把按钮文字换成类型名，并摘掉 data-ui，免得被 i18n 覆盖 */
+      /* 按钮视觉上只显示筛选图标；文字保留为无障碍标签与提示 */
       txt.removeAttribute('data-ui');
       txt.textContent = tagT(GENRE);
       btn.classList.add('active');
+      btn.setAttribute('aria-label', uiT('genres') + ': ' + tagT(GENRE));
+      btn.setAttribute('title', uiT('genres') + ': ' + tagT(GENRE));
     } else {
       txt.setAttribute('data-ui', 'genres');
       txt.textContent = uiT('genres');
       btn.classList.remove('active');
+      btn.setAttribute('aria-label', uiT('genres'));
+      btn.setAttribute('title', uiT('genres'));
     }
   }
   function renderGenrePop(){
