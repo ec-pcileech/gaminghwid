@@ -1722,7 +1722,7 @@ var UI_T = {
     c_surface4:'面板 4', c_border:'边框', c_borderStrong:'边框加强',
     c_text:'正文', c_textDim:'次级文字', c_textMute:'弱化文字',
     c_accent:'强调色', c_accentHi:'强调色亮部', c_accent3:'第三强调色' },
-  ru:{ settings:'Настройки', changelog:'Журнал обновлений', back:'Назад', close:'Закрыть', navMain:'Основное',
+  ru:{pluginActiveTree:\'Включённые плагины\',pluginResources:\'Ресурсы разработчика\',pluginApiDocsLabel:\'Документация API\',pluginSelectHint:\'Выберите включённый плагин слева\',pluginPanelHint:\'Полная панель плагина появится здесь\',pluginPanelLabel:\'Панель плагина\',pluginNoActive:\'Нет включённых плагинов\',pluginNoActiveHint:\'Сначала включите плагин в разделе «Мои плагины»\',pluginNoDescription:\'Описание отсутствует\',pluginEnable:\'Включить плагин\',pluginDisable:\'Выключить плагин\',pluginExpand:'Раскрыть плагин',pluginCollapse:'Свернуть плагин',pluginHeroSub:\'Импортируйте плагины и управляйте их состоянием. Панели доступны в Profile → Plugins.\', settings:'Настройки', changelog:'Журнал обновлений', back:'Назад', close:'Закрыть', navMain:'Основное',
     language:'Язык', languageSub:'Выберите язык интерфейса',
     appearance:'Оформление', appearanceSub:'Как должен выглядеть STARLINE',
     systemTheme:'Системная', lightTheme:'Светлая', darkTheme:'Тёмная',
@@ -1784,7 +1784,7 @@ var UI_T = {
     c_surface4:'Поверхность 4', c_border:'Граница', c_borderStrong:'Граница сильная',
     c_text:'Текст', c_textDim:'Текст приглушённый', c_textMute:'Текст бледный',
     c_accent:'Акцент', c_accentHi:'Акцент яркий', c_accent3:'Акцент 3' },
-  de:{ settings:'Einstellungen', changelog:'Änderungsprotokoll', back:'Zurück', close:'Schließen', navMain:'Hauptmenü',
+  de:{pluginActiveTree:\'Aktive Plugins\',pluginResources:\'Entwicklerressourcen\',pluginApiDocsLabel:\'API-Dokumentation\',pluginSelectHint:\'Wähle links ein aktiviertes Plugin\',pluginPanelHint:\'Das vollständige Plugin-Panel erscheint hier\',pluginPanelLabel:\'Plugin-Panel\',pluginNoActive:\'Keine aktiven Plugins\',pluginNoActiveHint:\'Aktiviere zuerst ein Plugin unter „Meine Plugins“\',pluginNoDescription:\'Keine Beschreibung vorhanden\',pluginEnable:\'Plugin aktivieren\',pluginDisable:\'Plugin deaktivieren\',pluginExpand:'Plugin aufklappen',pluginCollapse:'Plugin einklappen',pluginHeroSub:\'Importiere Plugins und verwalte ihren Status. Die Panels findest du unter Profil → Plugins.\', settings:'Einstellungen', changelog:'Änderungsprotokoll', back:'Zurück', close:'Schließen', navMain:'Hauptmenü',
     language:'Sprache', languageSub:'Sprache der Oberfläche wählen',
     appearance:'Aussehen', appearanceSub:'So soll STARLINE aussehen',
     systemTheme:'System', lightTheme:'Hell', darkTheme:'Dunkel',
@@ -1845,7 +1845,7 @@ var UI_T = {
     c_surface4:'Fläche 4', c_border:'Rahmen', c_borderStrong:'Rahmen kräftig',
     c_text:'Text', c_textDim:'Text gedimmt', c_textMute:'Text blass',
     c_accent:'Akzent', c_accentHi:'Akzent hell', c_accent3:'Akzent 3' },
-  ja:{ settings:'設定', changelog:'更新履歴', back:'戻る', close:'閉じる', navMain:'メイン',
+  ja:{pluginActiveTree:\'有効なプラグイン\',pluginResources:\'開発者向けリソース\',pluginApiDocsLabel:\'API ドキュメント\',pluginSelectHint:\'左側から有効なプラグインを選択\',pluginPanelHint:\'プラグインの全パネルがここに表示されます\',pluginPanelLabel:\'プラグインパネル\',pluginNoActive:\'有効なプラグインはありません\',pluginNoActiveHint:\'「マイプラグイン」で先に有効化してください\',pluginNoDescription:\'説明はありません\',pluginEnable:\'プラグインを有効化\',pluginDisable:\'プラグインを無効化\',pluginExpand:'プラグインを展開',pluginCollapse:'プラグインを折りたたむ',pluginHeroSub:\'プラグインをインポートして有効状態を管理します。パネルは Profile → Plugins に表示されます。\', settings:'設定', changelog:'更新履歴', back:'戻る', close:'閉じる', navMain:'メイン',
     language:'言語', languageSub:'インターフェースの言語を選択',
     appearance:'外観', appearanceSub:'STARLINE の見た目を選択',
     systemTheme:'システム', lightTheme:'ライト', darkTheme:'ダーク',
@@ -1905,7 +1905,7 @@ var UI_T = {
     c_surface4:'サーフェス 4', c_border:'ボーダー', c_borderStrong:'ボーダー強',
     c_text:'テキスト', c_textDim:'テキスト（淡）', c_textMute:'テキスト（最淡）',
     c_accent:'アクセント', c_accentHi:'アクセント（明）', c_accent3:'アクセント 3' },
-  es:{ settings:'Ajustes', changelog:'Registro de cambios', back:'Volver', close:'Cerrar', navMain:'Principal',
+  es:{pluginActiveTree:\'Complementos activos\',pluginResources:\'Recursos para desarrolladores\',pluginApiDocsLabel:\'Documentación de API\',pluginSelectHint:\'Selecciona un complemento activo a la izquierda\',pluginPanelHint:\'El panel completo del complemento aparecerá aquí\',pluginPanelLabel:\'Panel del complemento\',pluginNoActive:\'No hay complementos activos\',pluginNoActiveHint:\'Activa primero un complemento en «Mis complementos»\',pluginNoDescription:\'Sin descripción\',pluginEnable:\'Activar complemento\',pluginDisable:\'Desactivar complemento\',pluginExpand:'Expandir complemento',pluginCollapse:'Contraer complemento',pluginHeroSub:\'Importa complementos y administra su estado. Sus paneles están en Perfil → Plugins.\', settings:'Ajustes', changelog:'Registro de cambios', back:'Volver', close:'Cerrar', navMain:'Principal',
     language:'Idioma', languageSub:'Elige el idioma de la interfaz',
     appearance:'Apariencia', appearanceSub:'Elige el aspecto de STARLINE',
     systemTheme:'Sistema', lightTheme:'Claro', darkTheme:'Oscuro',
@@ -1967,7 +1967,7 @@ var UI_T = {
     c_surface4:'Superficie 4', c_border:'Borde', c_borderStrong:'Borde fuerte',
     c_text:'Texto', c_textDim:'Texto tenue', c_textMute:'Texto apagado',
     c_accent:'Acento', c_accentHi:'Acento claro', c_accent3:'Acento 3' },
-  tr:{ settings:'Ayarlar', changelog:'Güncelleme günlüğü', back:'Geri', close:'Kapat', navMain:'Ana menü',
+  tr:{pluginActiveTree:\'Etkin eklentiler\',pluginResources:\'Geliştirici kaynakları\',pluginApiDocsLabel:\'API belgeleri\',pluginSelectHint:\'Soldan etkin bir eklenti seçin\',pluginPanelHint:\'Eklentinin tüm paneli burada görüntülenir\',pluginPanelLabel:\'Eklenti paneli\',pluginNoActive:\'Etkin eklenti yok\',pluginNoActiveHint:\'Önce Eklentilerim bölümünden bir eklentiyi etkinleştirin\',pluginNoDescription:\'Açıklama yok\',pluginEnable:\'Eklentiyi etkinleştir\',pluginDisable:\'Eklentiyi devre dışı bırak\',pluginExpand:'Eklentiyi genişlet',pluginCollapse:'Eklentiyi daralt',pluginHeroSub:\'Eklentileri içe aktarın ve durumlarını yönetin. Paneller Profil → Plugins altında bulunur.\', settings:'Ayarlar', changelog:'Güncelleme günlüğü', back:'Geri', close:'Kapat', navMain:'Ana menü',
     language:'Dil', languageSub:'Arayüz dilini seçin',
     appearance:'Görünüm', appearanceSub:'STARLINE nasıl görünsün',
     systemTheme:'Sistem', lightTheme:'Açık', darkTheme:'Koyu',
@@ -2028,7 +2028,7 @@ var UI_T = {
     c_surface4:'Yüzey 4', c_border:'Kenarlık', c_borderStrong:'Kenarlık güçlü',
     c_text:'Metin', c_textDim:'Metin soluk', c_textMute:'Metin çok soluk',
     c_accent:'Vurgu', c_accentHi:'Vurgu parlak', c_accent3:'Vurgu 3' },
-  pt:{ settings:'Configurações', changelog:'Histórico de atualizações', back:'Voltar', close:'Fechar', navMain:'Principal',
+  pt:{pluginActiveTree:\'Plugins ativados\',pluginResources:\'Recursos para desenvolvedores\',pluginApiDocsLabel:\'Documentação da API\',pluginSelectHint:\'Selecione um plugin ativado à esquerda\',pluginPanelHint:\'O painel completo do plugin será exibido aqui\',pluginPanelLabel:\'Painel do plugin\',pluginNoActive:\'Nenhum plugin ativado\',pluginNoActiveHint:\'Ative um plugin primeiro em “Meus plugins”\',pluginNoDescription:\'Sem descrição\',pluginEnable:\'Ativar plugin\',pluginDisable:\'Desativar plugin\',pluginExpand:'Expandir plugin',pluginCollapse:'Recolher plugin',pluginHeroSub:\'Importe plugins e gerencie seu estado. Os painéis ficam em Perfil → Plugins.\', settings:'Configurações', changelog:'Histórico de atualizações', back:'Voltar', close:'Fechar', navMain:'Principal',
     language:'Idioma', languageSub:'Escolha o idioma da interface',
     appearance:'Aparência', appearanceSub:'Escolha a aparência do STARLINE',
     systemTheme:'Sistema', lightTheme:'Claro', darkTheme:'Escuro',
@@ -2094,8 +2094,8 @@ var UI_T = {
 /* ── 插件页面文案：作为 UI_T 的正式键，自动进入自定义翻译编辑器 ── */
 (function(){
   var P={
-    en:{plugins:'Plugins',pluginHeroTitle:'Plugins',pluginHeroSub:'Import, enable and manage extensions. Plugins can add their own panels and interactions.',pluginImport:'Import plugin',pluginInstalled:'Installed',pluginEnabled:'Enabled',pluginPanels:'Extension panels',pluginMine:'My plugins',pluginLocal:'Stored on this device',pluginGuide:'Plugin developer guide',pluginGuideTitle:'Plugin format',pluginGuideSub:'Save the JavaScript below as a .js file, then choose Import plugin. Only import code you trust.',pluginGuideNote:'Plugins can execute JavaScript in this UI page. Only import trusted files. Plugin data is stored in this WebView local storage.',pluginEmptyTitle:'No plugins installed yet',pluginEmptySub:'Import a .js file to add an extension, or read the developer guide first.',pluginView:'View panel',pluginUninstall:'Uninstall',pluginOn:'Enabled',pluginOff:'Disabled',pluginEnableFirst:'Enable this plugin first.',pluginNoRender:'This plugin does not provide a render(container, api) panel.',pluginPanelError:'Plugin panel error: ',pluginPanelRunError:'Plugin panel failed: ',pluginOperationError:'Plugin action failed: ',pluginStorageError:'Could not save plugins: local storage is full.',pluginJsOnly:'Plugin files must be .js files.',pluginReadError:'Could not read plugin file.',pluginExecError:'Plugin execution failed: ',pluginObjectError:'Plugin file must return a plugin object.',pluginBadId:'Plugin ID may contain only letters, numbers, dots, underscores and hyphens.',pluginExists:'This plugin already exists. Replace it?',pluginImported:'Plugin imported (disabled by default): ',pluginUninstalled:'Uninstalled: ',pluginEnableFailed:'Could not enable plugin: ',pluginDropTitle:'Release to import plugin',pluginDropSub:'Supports .js plugin files',pluginDropJsonTitle:'Release to import translation file',pluginDropJsonSub:'Supports STARLINE translation .json files',pluginJsonBad:'Import failed: invalid STARLINE translation JSON.',pluginJsonDone:'Translation imported into the editor. Review it, then click Save & apply.',pluginJsonReadError:'Could not read JSON file.',pluginDropUnsupported:'Unsupported file type. Use a .json translation file or .js plugin.',pluginDropNeedPage:'Open the Plugins page before dropping a .js file.',pluginConfirmUninstall:'Uninstall plugin "{name}"?',pluginHello:'Hello from plugin!'},
-    zh:{plugins:'插件',pluginHeroTitle:'插件',pluginHeroSub:'导入、启用和管理扩展。插件可以添加自己的面板与交互。',pluginImport:'导入插件',pluginInstalled:'已安装',pluginEnabled:'已启用',pluginPanels:'扩展面板',pluginMine:'我的插件',pluginLocal:'仅在本机保存',pluginGuide:'插件开发说明',pluginGuideTitle:'插件开发格式',pluginGuideSub:'将下面的 JavaScript 保存为 .js 文件，再点击「导入插件」。只导入你信任的插件代码。',pluginGuideNote:'插件代码拥有当前页面的 JavaScript 权限。请只导入你信任的文件。插件数据保存在当前 WebView 的本地存储中。',pluginEmptyTitle:'还没有安装插件',pluginEmptySub:'导入 .js 文件即可添加扩展；也可以先查看插件开发说明。',pluginView:'查看面板',pluginUninstall:'卸载',pluginOn:'已启用',pluginOff:'已停用',pluginEnableFirst:'请先启用此插件。',pluginNoRender:'该插件没有提供 render(container, api) 面板。',pluginPanelError:'插件面板错误：',pluginPanelRunError:'插件面板运行失败：',pluginOperationError:'插件操作失败：',pluginStorageError:'插件保存失败：本地存储空间不足。',pluginJsOnly:'插件文件必须是 .js 文件。',pluginReadError:'读取插件文件失败。',pluginExecError:'插件代码执行失败：',pluginObjectError:'插件文件必须返回 plugin 对象。',pluginBadId:'插件 ID 只能包含字母、数字、点、下划线和连字符。',pluginExists:'该插件已存在，是否覆盖？',pluginImported:'已导入插件（默认停用）：',pluginUninstalled:'已卸载：',pluginEnableFailed:'插件启用失败：',pluginDropTitle:'松开鼠标以导入插件',pluginDropSub:'支持 .js 插件文件',pluginDropJsonTitle:'松开鼠标以导入翻译档案',pluginDropJsonSub:'支持 STARLINE 翻译档案 .json',pluginJsonBad:'导入失败：不是有效的 STARLINE 翻译 JSON 档案。',pluginJsonDone:'翻译档案已导入编辑器；请检查后点击「保存并应用」。',pluginJsonReadError:'读取 JSON 文件失败。',pluginDropUnsupported:'不支持的文件类型：请使用 .json 翻译档案或 .js 插件。',pluginDropNeedPage:'请先打开「插件」页面，再拖入 .js 文件。',pluginConfirmUninstall:'确定卸载插件「{name}」？',pluginHello:'插件你好！'},
+    en:{plugins:'Plugins',pluginHeroTitle:'Plugins',pluginActiveTree:'Enabled plugins',pluginResources:'Developer resources',pluginApiDocsLabel:'API documentation',pluginSelectHint:'Select an enabled plugin on the left',pluginPanelHint:'The complete plugin panel appears here',pluginPanelLabel:'Plugin panel',pluginNoActive:'No enabled plugins',pluginNoActiveHint:'Enable a plugin in My Plugins to see its panel here',pluginNoDescription:'No description provided',pluginEnable:'Enable plugin',pluginDisable:'Disable plugin',pluginExpand:'Expand plugin',pluginCollapse:'Collapse plugin',pluginHeroSub:'Import plugins and manage their enabled state. Plugin panels are shown under Profile → Plugins.',pluginImport:'Import plugin',pluginInstalled:'Installed',pluginEnabled:'Enabled',pluginPanels:'Extension panels',pluginMine:'My plugins',pluginLocal:'Stored on this device',pluginGuide:'Plugin developer guide',pluginGuideTitle:'Plugin format',pluginGuideSub:'Save the JavaScript below as a .js file, then choose Import plugin. Only import code you trust.',pluginGuideNote:'Plugins can execute JavaScript in this UI page. Only import trusted files. Plugin data is stored in this WebView local storage.',pluginEmptyTitle:'No plugins installed yet',pluginEmptySub:'Import a .js file to add an extension, or read the developer guide first.',pluginView:'View panel',pluginUninstall:'Uninstall',pluginOn:'Enabled',pluginOff:'Disabled',pluginEnableFirst:'Enable this plugin first.',pluginNoRender:'This plugin does not provide a render(container, api) panel.',pluginPanelError:'Plugin panel error: ',pluginPanelRunError:'Plugin panel failed: ',pluginOperationError:'Plugin action failed: ',pluginStorageError:'Could not save plugins: local storage is full.',pluginJsOnly:'Plugin files must be .js files.',pluginReadError:'Could not read plugin file.',pluginExecError:'Plugin execution failed: ',pluginObjectError:'Plugin file must return a plugin object.',pluginBadId:'Plugin ID may contain only letters, numbers, dots, underscores and hyphens.',pluginExists:'This plugin already exists. Replace it?',pluginImported:'Plugin imported (disabled by default): ',pluginUninstalled:'Uninstalled: ',pluginEnableFailed:'Could not enable plugin: ',pluginDropTitle:'Release to import plugin',pluginDropSub:'Supports .js plugin files',pluginDropJsonTitle:'Release to import translation file',pluginDropJsonSub:'Supports STARLINE translation .json files',pluginJsonBad:'Import failed: invalid STARLINE translation JSON.',pluginJsonDone:'Translation imported into the editor. Review it, then click Save & apply.',pluginJsonReadError:'Could not read JSON file.',pluginDropUnsupported:'Unsupported file type. Use a .json translation file or .js plugin.',pluginDropNeedPage:'Open the Plugins page before dropping a .js file.',pluginConfirmUninstall:'Uninstall plugin "{name}"?',pluginHello:'Hello from plugin!'},
+    zh:{plugins:'插件',pluginHeroTitle:'插件',pluginActiveTree:'已启用插件',pluginResources:'开发资源',pluginApiDocsLabel:'API 文档',pluginSelectHint:'从左侧选择一个已启用的插件',pluginPanelHint:'插件的完整面板会显示在这里',pluginPanelLabel:'插件面板',pluginNoActive:'当前没有已启用的插件',pluginNoActiveHint:'请先在「我的插件」中开启插件',pluginNoDescription:'暂无插件描述',pluginEnable:'开启插件',pluginDisable:'关闭插件',pluginExpand:'展开插件',pluginCollapse:'折叠插件',pluginHeroSub:'导入插件并管理开启状态。插件面板请前往 Profile → Plugins。',pluginImport:'导入插件',pluginInstalled:'已安装',pluginEnabled:'已启用',pluginPanels:'扩展面板',pluginMine:'我的插件',pluginLocal:'仅在本机保存',pluginGuide:'插件开发说明',pluginGuideTitle:'插件开发格式',pluginGuideSub:'将下面的 JavaScript 保存为 .js 文件，再点击「导入插件」。只导入你信任的插件代码。',pluginGuideNote:'插件代码拥有当前页面的 JavaScript 权限。请只导入你信任的文件。插件数据保存在当前 WebView 的本地存储中。',pluginEmptyTitle:'还没有安装插件',pluginEmptySub:'导入 .js 文件即可添加扩展；也可以先查看插件开发说明。',pluginView:'查看面板',pluginUninstall:'卸载',pluginOn:'已启用',pluginOff:'已停用',pluginEnableFirst:'请先启用此插件。',pluginNoRender:'该插件没有提供 render(container, api) 面板。',pluginPanelError:'插件面板错误：',pluginPanelRunError:'插件面板运行失败：',pluginOperationError:'插件操作失败：',pluginStorageError:'插件保存失败：本地存储空间不足。',pluginJsOnly:'插件文件必须是 .js 文件。',pluginReadError:'读取插件文件失败。',pluginExecError:'插件代码执行失败：',pluginObjectError:'插件文件必须返回 plugin 对象。',pluginBadId:'插件 ID 只能包含字母、数字、点、下划线和连字符。',pluginExists:'该插件已存在，是否覆盖？',pluginImported:'已导入插件（默认停用）：',pluginUninstalled:'已卸载：',pluginEnableFailed:'插件启用失败：',pluginDropTitle:'松开鼠标以导入插件',pluginDropSub:'支持 .js 插件文件',pluginDropJsonTitle:'松开鼠标以导入翻译档案',pluginDropJsonSub:'支持 STARLINE 翻译档案 .json',pluginJsonBad:'导入失败：不是有效的 STARLINE 翻译 JSON 档案。',pluginJsonDone:'翻译档案已导入编辑器；请检查后点击「保存并应用」。',pluginJsonReadError:'读取 JSON 文件失败。',pluginDropUnsupported:'不支持的文件类型：请使用 .json 翻译档案或 .js 插件。',pluginDropNeedPage:'请先打开「插件」页面，再拖入 .js 文件。',pluginConfirmUninstall:'确定卸载插件「{name}」？',pluginHello:'插件你好！'},
     ru:{plugins:'Плагины',pluginHeroTitle:'Плагины',pluginHeroSub:'Импортируйте, включайте и управляйте расширениями с собственными панелями и действиями.',pluginImport:'Импортировать плагин',pluginInstalled:'Установлено',pluginEnabled:'Включено',pluginPanels:'Панели расширений',pluginMine:'Мои плагины',pluginLocal:'Хранится на этом устройстве',pluginGuide:'Руководство разработчика',pluginGuideTitle:'Формат плагина',pluginGuideSub:'Сохраните код JavaScript ниже в файл .js и выберите импорт. Импортируйте только доверенный код.',pluginGuideNote:'Плагины выполняют JavaScript на этой странице. Импортируйте только доверенные файлы. Данные хранятся в локальном хранилище WebView.',pluginEmptyTitle:'Плагины ещё не установлены',pluginEmptySub:'Импортируйте файл .js или сначала прочитайте руководство.',pluginView:'Открыть панель',pluginUninstall:'Удалить',pluginOn:'Включён',pluginOff:'Выключен',pluginEnableFirst:'Сначала включите этот плагин.',pluginNoRender:'У плагина нет панели render(container, api).',pluginPanelError:'Ошибка панели плагина: ',pluginPanelRunError:'Сбой панели плагина: ',pluginOperationError:'Ошибка действия плагина: ',pluginStorageError:'Не удалось сохранить плагины: хранилище заполнено.',pluginJsOnly:'Файл плагина должен иметь расширение .js.',pluginReadError:'Не удалось прочитать файл плагина.',pluginExecError:'Ошибка выполнения плагина: ',pluginObjectError:'Файл должен возвращать объект plugin.',pluginBadId:'ID может содержать только буквы, цифры, точки, подчёркивания и дефисы.',pluginExists:'Плагин уже существует. Заменить?',pluginImported:'Плагин импортирован (по умолчанию выключен): ',pluginUninstalled:'Удалён: ',pluginEnableFailed:'Не удалось включить плагин: ',pluginDropTitle:'Отпустите, чтобы импортировать плагин',pluginDropSub:'Поддерживаются файлы .js',pluginDropJsonTitle:'Отпустите, чтобы импортировать перевод',pluginDropJsonSub:'Поддерживаются файлы перевода STARLINE .json',pluginJsonBad:'Ошибка: неверный JSON перевода STARLINE.',pluginJsonDone:'Перевод импортирован в редактор. Проверьте его и нажмите «Сохранить и применить».',pluginJsonReadError:'Не удалось прочитать JSON.',pluginDropUnsupported:'Неподдерживаемый тип. Используйте .json или .js.',pluginDropNeedPage:'Сначала откройте страницу «Плагины».',pluginConfirmUninstall:'Удалить плагин «{name}»?',pluginHello:'Привет от плагина!'},
     de:{plugins:'Plugins',pluginHeroTitle:'Plugins',pluginHeroSub:'Erweiterungen importieren, aktivieren und verwalten. Plugins können eigene Bereiche und Interaktionen hinzufügen.',pluginImport:'Plugin importieren',pluginInstalled:'Installiert',pluginEnabled:'Aktiv',pluginPanels:'Erweiterungsbereiche',pluginMine:'Meine Plugins',pluginLocal:'Lokal auf diesem Gerät gespeichert',pluginGuide:'Plugin-Entwicklerhilfe',pluginGuideTitle:'Plugin-Format',pluginGuideSub:'Speichere den JavaScript-Code als .js-Datei und wähle „Plugin importieren“. Importiere nur vertrauenswürdigen Code.',pluginGuideNote:'Plugins können JavaScript auf dieser UI-Seite ausführen. Importiere nur vertrauenswürdige Dateien. Daten werden im lokalen WebView-Speicher abgelegt.',pluginEmptyTitle:'Noch keine Plugins installiert',pluginEmptySub:'Importiere eine .js-Datei oder lies zuerst die Entwicklerhilfe.',pluginView:'Bereich anzeigen',pluginUninstall:'Deinstallieren',pluginOn:'Aktiviert',pluginOff:'Deaktiviert',pluginEnableFirst:'Aktiviere zuerst dieses Plugin.',pluginNoRender:'Dieses Plugin stellt kein render(container, api)-Panel bereit.',pluginPanelError:'Plugin-Panel-Fehler: ',pluginPanelRunError:'Plugin-Panel fehlgeschlagen: ',pluginOperationError:'Plugin-Aktion fehlgeschlagen: ',pluginStorageError:'Plugins konnten nicht gespeichert werden: Speicher voll.',pluginJsOnly:'Plugin-Dateien müssen .js-Dateien sein.',pluginReadError:'Plugin-Datei konnte nicht gelesen werden.',pluginExecError:'Plugin-Ausführung fehlgeschlagen: ',pluginObjectError:'Die Datei muss ein plugin-Objekt zurückgeben.',pluginBadId:'Die ID darf nur Buchstaben, Zahlen, Punkte, Unterstriche und Bindestriche enthalten.',pluginExists:'Dieses Plugin existiert bereits. Ersetzen?',pluginImported:'Plugin importiert (standardmäßig deaktiviert): ',pluginUninstalled:'Deinstalliert: ',pluginEnableFailed:'Plugin konnte nicht aktiviert werden: ',pluginDropTitle:'Loslassen, um Plugin zu importieren',pluginDropSub:'Unterstützt .js-Plugin-Dateien',pluginDropJsonTitle:'Loslassen, um Übersetzung zu importieren',pluginDropJsonSub:'Unterstützt STARLINE-Übersetzungsdateien (.json)',pluginJsonBad:'Ungültige STARLINE-Übersetzungsdatei.',pluginJsonDone:'Übersetzung importiert. Prüfe sie und klicke auf „Speichern & anwenden“.',pluginJsonReadError:'JSON-Datei konnte nicht gelesen werden.',pluginDropUnsupported:'Nicht unterstützter Dateityp. Verwende .json oder .js.',pluginDropNeedPage:'Öffne zuerst die Plugin-Seite.',pluginConfirmUninstall:'Plugin „{name}“ deinstallieren?',pluginHello:'Hallo vom Plugin!'},
     ja:{plugins:'プラグイン',pluginHeroTitle:'プラグイン',pluginHeroSub:'拡張機能をインポート、有効化、管理できます。独自のパネルや操作を追加できます。',pluginImport:'プラグインをインポート',pluginInstalled:'インストール済み',pluginEnabled:'有効',pluginPanels:'拡張パネル',pluginMine:'マイプラグイン',pluginLocal:'この端末に保存',pluginGuide:'開発ガイド',pluginGuideTitle:'プラグイン形式',pluginGuideSub:'下の JavaScript を .js ファイルとして保存し、インポートしてください。信頼できるコードのみ使用してください。',pluginGuideNote:'プラグインはこの UI ページで JavaScript を実行できます。信頼できるファイルのみ読み込んでください。データは WebView のローカルストレージに保存されます。',pluginEmptyTitle:'プラグインはまだありません',pluginEmptySub:'.js ファイルをインポートするか、開発ガイドを確認してください。',pluginView:'パネルを表示',pluginUninstall:'アンインストール',pluginOn:'有効',pluginOff:'無効',pluginEnableFirst:'先にこのプラグインを有効にしてください。',pluginNoRender:'このプラグインには render(container, api) パネルがありません。',pluginPanelError:'パネルエラー：',pluginPanelRunError:'パネルの実行に失敗：',pluginOperationError:'プラグイン操作に失敗：',pluginStorageError:'保存できません。ローカルストレージの容量不足です。',pluginJsOnly:'プラグインは .js ファイルである必要があります。',pluginReadError:'プラグインファイルを読み込めません。',pluginExecError:'プラグインの実行エラー：',pluginObjectError:'ファイルは plugin オブジェクトを返す必要があります。',pluginBadId:'ID は英数字、ドット、アンダースコア、ハイフンのみ使用できます。',pluginExists:'このプラグインは既にあります。置き換えますか？',pluginImported:'インポートしました（初期状態は無効）：',pluginUninstalled:'アンインストール済み：',pluginEnableFailed:'有効化できません：',pluginDropTitle:'離してプラグインをインポート',pluginDropSub:'.js ファイルに対応',pluginDropJsonTitle:'離して翻訳ファイルをインポート',pluginDropJsonSub:'STARLINE 翻訳 .json に対応',pluginJsonBad:'STARLINE 翻訳 JSON が無効です。',pluginJsonDone:'翻訳をエディターに読み込みました。確認して「保存して適用」を押してください。',pluginJsonReadError:'JSON を読み込めません。',pluginDropUnsupported:'未対応のファイル形式です。.json または .js を使用してください。',pluginDropNeedPage:'先にプラグインページを開いてください。',pluginConfirmUninstall:'プラグイン「{name}」を削除しますか？',pluginHello:'プラグインからこんにちは！'},
@@ -8400,6 +8400,43 @@ __UI_CSS__
 .plugin-tree-section{margin-top:2px}.plugin-tree-section-title{display:flex;align-items:center;gap:8px;padding:10px 8px 7px;color:var(--text-2);font-size:11px;font-weight:800;letter-spacing:.02em}.plugin-tree-section-title svg{width:14px;height:14px;fill:none;stroke:var(--text-3);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.plugin-tree-divider{height:1px;background:var(--border);margin:12px 3px 4px}.plugin-tree-resource{display:flex;align-items:center;gap:9px;width:100%;padding:9px 8px;margin:2px 0;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--text-2);text-align:left;cursor:pointer;font:inherit;transition:background .18s,border-color .18s}.plugin-tree-resource:hover{background:var(--surface);color:var(--text)}.plugin-tree-resource.active{background:var(--accent-soft);border-color:var(--accent);color:var(--text)}.plugin-tree-resource-icon{width:28px;height:28px;display:grid;place-items:center;flex:none;border-radius:8px;background:var(--surface-3);color:var(--accent-2);font:700 10px var(--font-mono,monospace)}.plugin-tree-resource>span:nth-child(2){display:grid;gap:3px;min-width:0;flex:1}.plugin-tree-resource strong{font-size:11px;font-weight:750}.plugin-tree-resource small{font-size:9px;color:var(--text-3)}.plugin-tree-resource>svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;flex:none}
 @media(max-width:760px){.plugins-tree-layout{grid-template-columns:minmax(0,1fr)}.plugins-tree{max-height:320px;overflow:auto}.plugins-workspace{padding:14px}.plugins-tree-children{margin-left:20px}}
 
+
+.profile-subtabs{display:flex;gap:8px;padding:16px 24px 0;border-bottom:1px solid var(--border);margin-bottom:18px}
+.profile-subtab{display:flex;align-items:center;gap:8px;padding:10px 14px;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--text-2);font:inherit;font-size:13px;cursor:pointer;transition:color .18s,border-color .18s}
+.profile-subtab:hover,.profile-subtab.active{color:var(--text);border-bottom-color:var(--accent)}
+.profile-subtab b{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#fff;font-size:10px;display:inline-flex;align-items:center;justify-content:center}
+.profile-plugins-view{padding:0 24px 28px;min-height:460px}
+.profile-plugin-layout{display:grid;grid-template-columns:minmax(220px,270px) minmax(0,1fr);gap:16px;align-items:start}
+.profile-plugin-tree{padding:12px;border:1px solid var(--border);border-radius:14px;background:var(--surface-1);min-width:0}
+.profile-plugin-tree-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 7px 10px;color:var(--text-2);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+.profile-plugin-tree-head span{font-variant-numeric:tabular-nums}
+.profile-plugin-tree-divider{height:1px;background:var(--border);margin:12px 2px}
+.profile-plugin-workspace{min-width:0;min-height:420px;padding:16px;border:1px solid var(--border);border-radius:14px;background:var(--surface-1)}
+.profile-plugin-node{margin:2px 0}
+.profile-plugin-node-row{display:flex;align-items:center;gap:7px;width:100%;padding:9px 8px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--text);text-align:left;cursor:pointer;font:inherit;font-size:12px}
+.profile-plugin-node-row:hover{background:var(--surface-2)}
+.profile-plugin-node.selected>.profile-plugin-node-row{background:var(--surface-2);border-color:var(--border);color:var(--text)}
+.profile-plugin-node-row svg{width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7}
+.profile-plugin-node .plugin-tree-children{margin:2px 0 6px 19px;padding-left:9px;border-left:1px solid var(--border)}
+.profile-plugin-node .plugin-tree-action{width:100%}
+.plugin-manage-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.plugin-manage-card{min-width:0;padding:15px;border:1px solid var(--border);border-radius:13px;background:var(--surface-1);display:flex;align-items:center;gap:12px;transition:border-color .18s,background .18s}
+.plugin-manage-card:hover{border-color:var(--border-strong,var(--border));background:var(--surface-2)}
+.plugin-manage-icon{width:38px;height:38px;display:grid;place-items:center;flex:none;border-radius:11px;background:var(--surface-2);color:var(--text-2)}
+.plugin-manage-icon svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6}
+.plugin-manage-info{flex:1;min-width:0}.plugin-manage-name{font-size:13px;font-weight:650;overflow-wrap:anywhere}.plugin-manage-meta{font-size:10px;color:var(--text-3,var(--text-2));margin-top:4px;overflow-wrap:anywhere}.plugin-manage-desc{font-size:11px;color:var(--text-2);margin-top:5px;line-height:1.5;overflow-wrap:anywhere}
+.plugin-manage-card .plugin-tree-toggle{flex:none}
+.plugin-manage-empty{grid-column:1/-1;padding:32px 16px;text-align:center;color:var(--text-2);border:1px dashed var(--border);border-radius:13px;font-size:12px;line-height:1.8}
+@media(max-width:760px){.profile-plugin-layout{grid-template-columns:minmax(0,1fr)}.profile-plugin-workspace{min-height:320px}.plugin-manage-list{grid-template-columns:minmax(0,1fr)}.profile-plugins-view{padding-left:14px;padding-right:14px}.profile-subtabs{padding-left:14px;padding-right:14px}}
+
+.profile-plugin-node-row{display:flex;align-items:center;gap:3px;padding:2px;border-radius:9px}
+.profile-plugin-expander{width:23px;height:30px;display:grid;place-items:center;flex:none;border:0;border-radius:6px;background:transparent;color:var(--text-2);cursor:pointer}
+.profile-plugin-expander svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;transition:transform .16s}
+.profile-plugin-node.expanded .profile-plugin-expander svg{transform:rotate(90deg)}
+.profile-plugin-select{display:flex;align-items:center;gap:8px;flex:1;min-width:0;padding:8px 7px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--text);text-align:left;cursor:pointer;font:inherit;font-size:12px}
+.profile-plugin-select>span{flex:1;min-width:0;overflow-wrap:anywhere}
+.profile-plugin-select-arrow{opacity:.55}
+.profile-plugin-node.selected>.profile-plugin-node-row .profile-plugin-select{background:var(--surface-2);border-color:var(--border)}
 </style>
 </head>
 <body class="__UI_INTRO_CLASS__">
@@ -8596,7 +8633,11 @@ __UI_CSS__
     </button>
 
     <div class="page" id="profilePage" hidden>
-      <div class="profile-wrap">
+      <div class="profile-subtabs" role="tablist" aria-label="Profile sections">
+        <button type="button" class="profile-subtab active" id="profileAccountTab" role="tab" aria-selected="true" onclick="showProfileSection('account')"><span data-ui="profile">Profile</span></button>
+        <button type="button" class="profile-subtab" id="profilePluginsTab" role="tab" aria-selected="false" onclick="showProfileSection('plugins')"><span data-ui="plugins">Plugins</span><b id="profileEnabledPluginCount" hidden>0</b></button>
+      </div>
+      <div class="profile-wrap" id="profileAccountView">
         <div class="profile-hero"></div>
         <div class="profile-header">
           <div class="profile-avatar" id="profileAvatar" onclick="pickAvatar()">
@@ -8892,34 +8933,22 @@ __UI_CSS__
           </div>
         </div>
       </div>
-    </div>
-
-
-    <!-- 管理面板（只有 role=admin 才进得来）：用户 / 订阅 / HWID 工单 -->
-    <div class="page" id="pluginsPage" hidden>
-      <div class="plugins-wrap">
-        <div class="plugins-hero">
-          <div class="plugins-kicker"><span class="plugins-kicker-dot"></span> STARLINE EXTENSIONS</div>
-          <div class="plugins-hero-row"><div><h1 data-ui="pluginHeroTitle">插件</h1><p data-ui="pluginHeroSub">导入、启用和管理扩展。插件可以添加自己的面板与交互。</p></div>
-            <button class="ui-btn plugins-import-btn" type="button" onclick="document.getElementById('pluginFileInput').click()"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg><span data-ui="pluginImport">导入插件</span></button></div>
-          <div class="plugins-stats"><div><b id="pluginCount">0</b><span data-ui="pluginInstalled">已安装</span></div><div><b id="pluginEnabledCount">0</b><span data-ui="pluginEnabled">已启用</span></div><div><b id="pluginWidgetCount">0</b><span data-ui="pluginPanels">扩展面板</span></div></div>
-        </div>
-        <div class="plugins-toolbar"><div><strong data-ui="pluginMine">我的插件</strong><span data-ui="pluginLocal">仅在本机保存</span></div></div>
-        <div class="plugins-tree-layout">
-          <aside class="plugins-tree" aria-label="插件树">
-            <div class="plugins-tree-head"><strong>插件树 / EXTENSIONS</strong><button type="button" class="ui-btn" onclick="document.getElementById('pluginFileInput').click()" data-ui="pluginImport">导入插件</button></div>
-            <div class="plugin-tree-section"><div class="plugin-tree-section-title"><svg viewBox="0 0 24 24"><path d="M4 5h6l2 2h8v12H4z"/></svg><span data-ui="pluginMine">我的插件</span></div><div id="pluginList" role="tree"></div></div>
-            <div class="plugin-tree-divider"></div>
-            <div class="plugin-tree-section-title"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h5"/></svg><span>开发资源</span></div>
-            <button type="button" class="plugin-tree-resource" onclick="pluginOpenResource('api')" id="pluginApiDocsBtn"><span class="plugin-tree-resource-icon">{ }</span><span><strong>API 文档</strong><small>Plugin API Reference</small></span><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
+      <section id="profilePluginsView" class="profile-plugins-view" hidden>
+        <div class="profile-plugin-layout">
+          <aside class="profile-plugin-tree" aria-label="Enabled plugins tree">
+            <div class="profile-plugin-tree-head"><strong data-ui="pluginActiveTree">已启用插件</strong><span id="profilePluginCount">0</span></div>
+            <div id="profilePluginTree" role="tree"></div>
+            <div class="profile-plugin-tree-divider"></div>
+            <div class="profile-plugin-tree-head"><strong data-ui="pluginResources">开发资源</strong></div>
+            <button type="button" class="plugin-tree-resource" onclick="pluginOpenResource('api')" id="pluginApiDocsBtn"><span class="plugin-tree-resource-icon">{ }</span><span><strong data-ui="pluginApiDocsLabel">API 文档</strong><small>Plugin API Reference</small></span><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
             <button type="button" class="plugin-tree-resource" onclick="pluginOpenResource('guide')" id="pluginGuideBtn"><span class="plugin-tree-resource-icon">JS</span><span><strong data-ui="pluginGuide">插件开发文档</strong><small>Plugin Development Guide</small></span><svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg></button>
           </aside>
-          <section class="plugins-workspace" aria-label="插件控制面板">
-            <div id="pluginTreeDetail" class="plugin-workspace-empty"><div><svg viewBox="0 0 24 24"><path d="M4 5h6l2 2h8v12H4z"/><path d="M8 11h8M8 15h5"/></svg><div>从左侧插件树选择一个插件</div><div>插件面板、状态与控制选项会显示在这里</div></div></div>
+          <section class="profile-plugin-workspace" aria-label="Plugin panel workspace">
+            <div id="profilePluginDetail" class="plugin-workspace-empty"><div><svg viewBox="0 0 24 24"><path d="M4 5h6l2 2h8v12H4z"/><path d="M8 11h8M8 15h5"/></svg><div data-ui="pluginSelectHint">从左侧选择一个已启用的插件</div><div data-ui="pluginPanelHint">插件的完整面板会显示在这里</div></div></div>
             <div id="pluginWidgets" style="display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:14px"></div>
             <section class="plugin-guide" id="pluginApiDocs" hidden><div class="plugin-guide-head"><div><strong id="pluginApiTitle">Plugin API Reference</strong><p id="pluginApiSub">Browse APIs, copy individual signatures, or export the complete reference.</p></div><button class="ui-icon-btn" onclick="pluginShowApiDocs(false)" aria-label="Close">×</button></div><div id="pluginApiTools" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px"></div><div id="pluginApiCatalog" style="display:grid;gap:10px"></div></section>
-        <section class="plugin-guide" id="pluginGuide" hidden><div class="plugin-guide-head"><div><strong data-ui="pluginGuideTitle">插件开发格式</strong><p data-ui="pluginGuideSub">将下面的 JavaScript 保存为 .js 文件，再点击「导入插件」。只导入你信任的插件代码。</p></div><button class="ui-icon-btn" onclick="pluginShowGuide(false)" aria-label="关闭">×</button></div>
-          <pre><code>const plugin = {
+            <section class="plugin-guide" id="pluginGuide" hidden><div class="plugin-guide-head"><div><strong data-ui="pluginGuideTitle">插件开发格式</strong><p data-ui="pluginGuideSub">将下面的 JavaScript 保存为 .js 文件，再点击「导入插件」。只导入你信任的插件代码。</p></div><button class="ui-icon-btn" onclick="pluginShowGuide(false)" aria-label="关闭">×</button></div>
+              <pre><code>const plugin = {
   id: 'hello-panel',
   name: 'Hello Panel',
   version: '1.0.0',
@@ -8932,9 +8961,24 @@ __UI_CSS__
   deactivate(api) {}
 };
 return plugin;</code></pre>
-          <div class="plugin-guide-note" data-ui="pluginGuideNote">插件代码拥有当前页面的 JavaScript 权限。请只导入你信任的文件。插件数据保存在当前 WebView 的本地存储中。</div></section>
+              <div class="plugin-guide-note" data-ui="pluginGuideNote">插件代码拥有当前页面的 JavaScript 权限。请只导入你信任的文件。插件数据保存在当前 WebView 的本地存储中。</div></section>
           </section>
         </div>
+      </section>
+    </div>
+
+
+    <!-- 管理面板（只有 role=admin 才进得来）：用户 / 订阅 / HWID 工单 -->
+    <div class="page" id="pluginsPage" hidden>
+      <div class="plugins-wrap">
+        <div class="plugins-hero">
+          <div class="plugins-kicker"><span class="plugins-kicker-dot"></span> STARLINE EXTENSIONS</div>
+          <div class="plugins-hero-row"><div><h1 data-ui="pluginMine">My Plugins</h1><p data-ui="pluginHeroSub">导入插件并管理开启状态。插件面板请前往 Profile → Plugins。</p></div>
+            <button class="ui-btn plugins-import-btn" type="button" onclick="document.getElementById('pluginFileInput').click()"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg><span data-ui="pluginImport">Import plugin</span></button></div>
+          <div class="plugins-stats"><div><b id="pluginCount">0</b><span data-ui="pluginInstalled">Installed</span></div><div><b id="pluginEnabledCount">0</b><span data-ui="pluginEnabled">Enabled</span></div><div><b id="pluginWidgetCount">0</b><span data-ui="pluginPanels">Extension panels</span></div></div>
+        </div>
+        <div class="plugins-toolbar"><div><strong data-ui="pluginMine">My plugins</strong><span data-ui="pluginLocal">Stored on this device</span></div></div>
+        <div id="pluginList" class="plugin-manage-list" role="list"></div>
         <input type="file" id="pluginFileInput" accept=".js,text/javascript,application/javascript" hidden>
       </div>
     </div>
@@ -12441,6 +12485,7 @@ __UI_SCRIPT__
     document.getElementById('adminPage').hidden = true;
     if(document.getElementById('pluginsPage'))document.getElementById('pluginsPage').hidden = true;
     document.getElementById('profilePage').hidden = false;
+    if(typeof window.showProfileSection==='function')window.showProfileSection('account');
     setActiveNav('navProfile');
     renderAvatarGrid();
     renderProfileLangs();
@@ -14241,7 +14286,7 @@ __UI_SCRIPT__
 <script id="starline-plugin-system">
 (function(){
   'use strict';
-  var STORE='starline.plugins.v1', installed=[], runtime={}, pluginNodes={}, panelCount=0, selectedPluginId='', expandedPluginIds={};
+  var STORE='starline.plugins.v1', installed=[], runtime={}, pluginNodes={}, panelCount=0, selectedPluginId='', expandedPluginIds={}, profilePluginExpanded={};
   var $=function(id){return document.getElementById(id);};
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   function t(key){try{return typeof window.uiT==='function'?window.uiT(key):key;}catch(e){return key;}}
@@ -14342,7 +14387,7 @@ __UI_SCRIPT__
   function deactivate(rec){var r=runtime[rec.id];if(r){try{if(typeof r.plugin.deactivate==='function')r.plugin.deactivate(r.api);if(r.api&&typeof r.api.destroy==='function')r.api.destroy();}catch(e){}delete runtime[rec.id];}var nodes=pluginNodes[rec.id]||[];nodes.forEach(function(n){try{if(n&&n.remove)n.remove();}catch(e){}});delete pluginNodes[rec.id];updateStats();}
   function updateStats(){var host=$('pluginWidgets');panelCount=host?host.children.length:0;if($('pluginCount'))$('pluginCount').textContent=installed.length;if($('pluginEnabledCount'))$('pluginEnabledCount').textContent=installed.filter(function(x){return x.enabled;}).length;if($('pluginWidgetCount'))$('pluginWidgetCount').textContent=panelCount;var b=$('sbPluginBadge');if(b){var n=installed.filter(function(x){return x.enabled;}).length;b.textContent=n;b.hidden=!n;}}
   function showPluginWorkspace(mode, rec){
-    var detail=$('pluginTreeDetail'),docs=$('pluginApiDocs'),guide=$('pluginGuide'),widgets=$('pluginWidgets');
+    var detail=$('profilePluginDetail'),docs=$('pluginApiDocs'),guide=$('pluginGuide'),widgets=$('pluginWidgets');
     if(docs)docs.hidden=mode!=='api';if(guide)guide.hidden=mode!=='guide';
     if(widgets)widgets.hidden=mode==='api'||mode==='guide';
     var apiBtn=$('pluginApiDocsBtn'),guideBtn=$('pluginGuideBtn');
@@ -14352,34 +14397,45 @@ __UI_SCRIPT__
     if(detail)detail.hidden=false;if(widgets)widgets.hidden=false;
   }
   window.pluginOpenResource=function(which){
-    showPluginWorkspace(which==='api'?'api':'guide');
+    if($('profilePage')&&$('profilePage').hidden)window.showProfile();
+    window.showProfileSection('plugins');showPluginWorkspace(which==='api'?'api':'guide');
   };
-  function render(){
-    var list=$('pluginList'),detail=$('pluginTreeDetail'),widgets=$('pluginWidgets');if(!list)return;
-    list.innerHTML='';
-    if(!installed.length){list.innerHTML='<div class="plugin-tree-empty">'+esc(t('pluginEmptyTitle'))+'<br>'+esc(t('pluginEmptySub'))+'</div>';if(detail)detail.innerHTML='<div class="plugin-workspace-empty"><div>尚未安装插件<br>点击上方「导入插件」添加 .js 文件</div></div>';if(widgets)widgets.innerHTML='';updateStats();return;}
-    if(!installed.some(function(x){return x.id===selectedPluginId;}))selectedPluginId=installed[0].id;
-    installed.forEach(function(rec){
-      var node=document.createElement('div');node.className='plugin-tree-node'+(rec.id===selectedPluginId?' selected':'')+(rec.enabled?' expanded':'');node.setAttribute('role','treeitem');node.setAttribute('aria-expanded',rec.enabled?'true':'false');
-      node.innerHTML='<div class="plugin-tree-row"><span class="plugin-tree-glyph"><svg viewBox="0 0 24 24"><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/><rect x="6" y="6" width="12" height="12" rx="3"/></svg></span><button type="button" class="plugin-tree-select"><span style="min-width:0;flex:1"><span class="plugin-tree-label">'+esc(rec.name)+'</span><span class="plugin-tree-version">v'+esc(rec.version||'1.0.0')+'</span></span></button><label class="plugin-tree-toggle" title="'+(rec.enabled?'关闭插件':'开启插件')+'"><input type="checkbox" data-act="toggle" '+(rec.enabled?'checked':'')+' aria-label="'+(rec.enabled?'关闭插件':'开启插件')+'"><span class="plugin-tree-toggle-track"><i></i></span></label></div>'+
-      (rec.enabled?'<div class="plugin-tree-children"><button type="button" class="plugin-tree-action '+(rec.id===selectedPluginId?'active':'')+'" data-act="panel"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M8 9h13"/></svg><span>插件面板</span><span class="plugin-tree-child-dot"></span></button>'+(rec.lastError?'<div style="padding:5px 8px;color:var(--err);font-size:10px;line-height:1.5">'+esc(rec.lastError)+'</div>':'')+'</div>':'');
-      node.querySelector('.plugin-tree-select').addEventListener('click',function(){if(rec.enabled){selectedPluginId=rec.id;showPluginWorkspace('plugin');render();}});
-      var toggle=node.querySelector('[data-act="toggle"]');toggle.addEventListener('change',function(e){if(e.target.checked){rec.enabled=true;rec.lastError='';activate(rec);}else{deactivate(rec);rec.enabled=false;}selectedPluginId=rec.id;write();showPluginWorkspace('plugin');render();});
-      var panel=node.querySelector('[data-act="panel"]');if(panel)panel.addEventListener('click',function(){selectedPluginId=rec.id;showPluginWorkspace('plugin');render();});
-      list.appendChild(node);
+  function renderProfilePluginTree(){
+    var tree=$('profilePluginTree'),detail=$('profilePluginDetail');if(!tree)return;
+    tree.innerHTML='';var active=installed.filter(function(x){return x.enabled;});
+    var count=$('profilePluginCount');if(count)count.textContent=active.length;
+    var badge=$('profileEnabledPluginCount');if(badge){badge.textContent=active.length;badge.hidden=!active.length;}
+    if(!active.some(function(x){return x.id===selectedPluginId;}))selectedPluginId=active.length?active[0].id:'';
+    if(!active.length){tree.innerHTML='<div class="plugin-manage-empty">'+esc(t('pluginNoActive'))+'</div>';if(detail)detail.innerHTML='<div class="plugin-workspace-empty"><div>'+esc(t('pluginNoActiveHint'))+'</div></div>';return;}
+    active.forEach(function(rec){
+      var node=document.createElement('div');var expanded=profilePluginExpanded[rec.id]!==false;node.className='profile-plugin-node'+(rec.id===selectedPluginId?' selected':'')+(expanded?' expanded':'');node.setAttribute('role','treeitem');node.setAttribute('aria-expanded',expanded?'true':'false');
+      var row=document.createElement('div');row.className='profile-plugin-node-row';
+      var exp=document.createElement('button');exp.type='button';exp.className='profile-plugin-expander';exp.setAttribute('aria-label',expanded?t('pluginCollapse'):t('pluginExpand'));exp.innerHTML='<svg viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>';exp.addEventListener('click',function(e){e.stopPropagation();profilePluginExpanded[rec.id]=!expanded;renderProfilePluginTree();});
+      var select=document.createElement('button');select.type='button';select.className='profile-plugin-select';select.innerHTML='<svg viewBox="0 0 24 24"><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/><rect x="6" y="6" width="12" height="12" rx="3"/></svg><span>'+esc(rec.name)+'</span><svg class="profile-plugin-select-arrow" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></svg>';
+      select.addEventListener('click',function(){selectedPluginId=rec.id;showPluginWorkspace('plugin');renderProfilePluginTree();});row.append(exp,select);node.appendChild(row);
+      var child=document.createElement('div');child.className='plugin-tree-children';child.hidden=!expanded;var panel=document.createElement('button');panel.type='button';panel.className='plugin-tree-action active';panel.innerHTML='<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 4v16M8 9h13"/></svg><span>'+esc(t('pluginPanelLabel'))+'</span><span class="plugin-tree-child-dot"></span>';panel.addEventListener('click',function(){selectedPluginId=rec.id;showPluginWorkspace('plugin');renderProfilePluginTree();});child.appendChild(panel);node.appendChild(child);tree.appendChild(node);
     });
-    if(detail){
-      var rec=installed.find(function(x){return x.id===selectedPluginId;});
-      if(!rec){detail.innerHTML='<div class="plugin-workspace-empty">选择左侧已启用的插件面板</div>';}
-      else{
-        detail.innerHTML='<div class="plugin-workspace-head"><div class="plugin-icon"><svg viewBox="0 0 24 24"><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/><rect x="6" y="6" width="12" height="12" rx="3"/></svg></div><div style="min-width:0;flex:1"><div class="plugin-card-title">'+esc(rec.name)+'</div><div class="plugin-workspace-meta">'+esc(rec.id)+' · v'+esc(rec.version||'1.0.0')+' · '+(rec.enabled?esc(t('pluginOn')):esc(t('pluginOff')))+'</div><div class="plugin-workspace-desc">'+esc(rec.description||'暂无插件描述')+'</div></div></div><div id="pluginSelectedRender" class="plugin-workspace-body"></div>';
-        var area=$('pluginSelectedRender');
-        if(!rec.enabled){area.innerHTML='<div class="plugin-workspace-empty"><div>此插件当前已停用。<br>开启左侧开关后，插件面板会出现在该插件节点下。</div></div>';}
-        else{try{var runtimeRec=runtime[rec.id]||instantiate(rec);runtime[rec.id]=runtimeRec;if(typeof runtimeRec.plugin.render==='function')runtimeRec.plugin.render(area,runtimeRec.api);else area.innerHTML='<div class="plugin-workspace-empty"><div>'+esc(t('pluginNoRender'))+'</div></div>';}catch(e){area.innerHTML='<div style="color:var(--err);font-size:12px;line-height:1.6">'+esc(t('pluginPanelError')+e.message)+'</div>';}}
-      }
-    }
-    showPluginWorkspace('plugin');updateStats();
+    var rec=active.find(function(x){return x.id===selectedPluginId;});if(!rec)return;
+    if(detail){detail.innerHTML='<div class="plugin-workspace-head"><div class="plugin-icon"><svg viewBox="0 0 24 24"><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/><rect x="6" y="6" width="12" height="12" rx="3"/></svg></div><div style="min-width:0;flex:1"><div class="plugin-card-title">'+esc(rec.name)+'</div><div class="plugin-workspace-meta">'+esc(rec.id)+' · v'+esc(rec.version||'1.0.0')+' · '+esc(t('pluginOn'))+'</div><div class="plugin-workspace-desc">'+esc(rec.description||t('pluginNoDescription'))+'</div></div></div><div id="pluginSelectedRender" class="plugin-workspace-body"></div>';
+      var area=$('pluginSelectedRender');try{var runtimeRec=runtime[rec.id]||instantiate(rec);runtime[rec.id]=runtimeRec;if(typeof runtimeRec.plugin.render==='function')runtimeRec.plugin.render(area,runtimeRec.api);else area.innerHTML='<div class="plugin-workspace-empty"><div>'+esc(t('pluginNoRender'))+'</div></div>';}catch(e){area.innerHTML='<div style="color:var(--err);font-size:12px;line-height:1.6">'+esc(t('pluginPanelError')+e.message)+'</div>';}}
   }
+  function render(){
+    var list=$('pluginList');if(!list)return;list.innerHTML='';
+    if(!installed.length){list.innerHTML='<div class="plugin-manage-empty">'+esc(t('pluginEmptyTitle'))+'<br>'+esc(t('pluginEmptySub'))+'</div>';updateStats();renderProfilePluginTree();return;}
+    installed.forEach(function(rec){
+      var card=document.createElement('article');card.className='plugin-manage-card';card.setAttribute('role','listitem');
+      card.innerHTML='<div class="plugin-manage-icon"><svg viewBox="0 0 24 24"><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/><rect x="6" y="6" width="12" height="12" rx="3"/></svg></div><div class="plugin-manage-info"><div class="plugin-manage-name">'+esc(rec.name)+'</div><div class="plugin-manage-meta">'+esc(rec.id)+' · v'+esc(rec.version||'1.0.0')+'</div>'+(rec.description?'<div class="plugin-manage-desc">'+esc(rec.description)+'</div>':'')+(rec.lastError?'<div class="plugin-manage-desc" style="color:var(--err)">'+esc(rec.lastError)+'</div>':'')+'</div><label class="plugin-tree-toggle" title="'+esc(t(rec.enabled?'pluginDisable':'pluginEnable'))+'"><input type="checkbox" data-act="toggle" '+(rec.enabled?'checked':'')+' aria-label="'+esc(t(rec.enabled?'pluginDisable':'pluginEnable'))+'"><span class="plugin-tree-toggle-track"><i></i></span></label>';
+      var toggle=card.querySelector('[data-act="toggle"]');toggle.addEventListener('change',function(e){if(e.target.checked){rec.enabled=true;rec.lastError='';activate(rec);}else{deactivate(rec);rec.enabled=false;}write();render();updateStats();});list.appendChild(card);
+    });
+    updateStats();renderProfilePluginTree();
+  }
+  window.showProfileSection=function(section){
+    var plugins=section==='plugins',account=$('profileAccountView'),view=$('profilePluginsView'),a=$('profileAccountTab'),b=$('profilePluginsTab');
+    if(account)account.hidden=plugins;if(view)view.hidden=!plugins;
+    if(a){a.classList.toggle('active',!plugins);a.setAttribute('aria-selected',!plugins?'true':'false');}
+    if(b){b.classList.toggle('active',plugins);b.setAttribute('aria-selected',plugins?'true':'false');}
+    if(plugins){renderProfilePluginTree();showPluginWorkspace('plugin');}
+  };
   function importSource(name,source){
     if(!/\.js$/i.test(name)){toast(t('pluginJsOnly'));return;}
     var rec={id:'',name:name.replace(/\.js$/i,''),version:'1.0.0',description:'',source:source,enabled:false};
