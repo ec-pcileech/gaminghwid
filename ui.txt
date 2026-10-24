@@ -5080,39 +5080,37 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 }
 .toast{
   --toast-c:var(--accent-2);--toast-bg:var(--accent-soft);
-  position:relative;overflow:hidden;pointer-events:auto;
-  display:flex;align-items:center;gap:12px;
-  min-width:240px;max-width:460px;
-  padding:9px 22px 9px 9px;
-  border-radius:var(--radius-full);
-  background:rgba(var(--ov),.62);
-  backdrop-filter:blur(24px) saturate(180%);
-  -webkit-backdrop-filter:blur(24px) saturate(180%);
-  border:1px solid var(--border-2);
-  color:var(--text);font-size:13px;font-weight:600;letter-spacing:.1px;
-  box-shadow:var(--shadow-3),0 0 34px var(--toast-bg);
-  animation:toastIn .42s cubic-bezier(.2,.9,.3,1.15);
+  position:relative;pointer-events:auto;
+  display:flex;align-items:center;gap:11px;
+  min-width:280px;max-width:min(420px,calc(100vw - 48px));
+  padding:9px 10px 9px 9px;
+  border-radius:14px;
+  background:var(--surface-solid,#17171b);
+  border:1px solid var(--border);
+  color:var(--text);font-size:12.5px;font-weight:600;line-height:1.35;
+  box-shadow:var(--shadow-3);
+  animation:toastIn .4s cubic-bezier(.2,.9,.3,1);
 }
-.toast.ok{--toast-c:var(--ok);--toast-bg:rgba(16,185,129,.22)}
-.toast.err{--toast-c:var(--err);--toast-bg:rgba(239,68,68,.22)}
-.toast.warn{--toast-c:var(--warn);--toast-bg:rgba(245,158,11,.22)}
-.toast-ico{
-  width:30px;height:30px;border-radius:50%;flex-shrink:0;
-  display:grid;place-items:center;
-  background:var(--toast-bg);color:var(--toast-c);
-}
-.toast-ico svg{width:15px;height:15px;fill:none;stroke:currentColor;
-  stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.toast-txt{flex:1;min-width:0;line-height:1.35;word-break:break-word}
-.toast::after{
-  content:'';position:absolute;left:22px;right:22px;bottom:0;height:2px;
-  border-radius:2px;background:var(--toast-c);opacity:.75;
-  transform-origin:left center;
-  animation:toastBar var(--toast-ms,3200ms) linear forwards;
-}
-@keyframes toastBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.toast.ok{--toast-c:var(--ok);--toast-bg:rgba(16,185,129,.2)}
+.toast.err{--toast-c:var(--err);--toast-bg:rgba(239,68,68,.2)}
+.toast.warn{--toast-c:var(--warn);--toast-bg:rgba(245,158,11,.2)}
+.toast-ico{position:relative;width:34px;height:34px;flex:none;display:grid;place-items:center;color:var(--toast-c)}
+.toast-ico svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.toast-ring{position:absolute;inset:0;width:34px;height:34px;transform:rotate(-90deg)}
+.toast-ring circle{fill:none;stroke-width:2.4}
+.toast-ring .tk{stroke:var(--border-2)}
+.toast-ring .bar{stroke:var(--toast-c);stroke-linecap:round;stroke-dasharray:88;stroke-dashoffset:0;animation:toastRing var(--toast-ms,3200ms) linear forwards}
+.toast.paused .toast-ring .bar{animation-play-state:paused}
+@keyframes toastRing{to{stroke-dashoffset:88}}
+.toast-txt{flex:1;min-width:0;word-break:break-word}
+.toast-acts{display:flex;gap:6px;flex:none}
+.toast-act{border:0;border-radius:8px;padding:6px 11px;background:var(--toast-bg);color:var(--toast-c);font:700 11.5px var(--font,inherit);cursor:pointer;transition:filter .15s,transform .15s}
+.toast-act:hover{filter:brightness(1.25)}
+.toast-act:active{transform:scale(.95)}
+.toast-act:focus-visible{outline:2px solid var(--toast-c);outline-offset:1px}
+.toast-act.ghost{background:transparent;color:var(--text-2)}
 @keyframes toastIn{
-  from{opacity:0;transform:translateY(28px) scale(.9)}
+  from{opacity:0;transform:translateY(28px) scale(.92)}
   to{opacity:1;transform:none}
 }
 .toast.out{animation:toastOut .3s cubic-bezier(.4,0,1,1) forwards}
@@ -5697,22 +5695,45 @@ var TOAST_ICONS = {
   warn: '<path d="M12 3.5L2.5 20h19L12 3.5z"/><path d="M12 10v4.5"/><path d="M12 17.6v.01"/>',
   info: '<circle cx="12" cy="12" r="9"/><path d="M12 11.4v5.1"/><circle cx="12" cy="7.9" r="1.15" fill="currentColor" stroke="none"/>'
 };
-function toast(text, type, ms){
+function toast(text, type, ms, opts){
   type = TOAST_ICONS[type] ? type : 'info';
-  ms = ms || 3200;
+  opts = opts || {};
+  var acts = opts.actions || (opts.action ? [opts.action] : []);
+  ms = ms || (acts.length ? 6000 : 3200);
   var wrap = document.getElementById('toastWrap');
-  if (!wrap) { return; }
+  if (!wrap) { return function(){}; }
   while (wrap.children.length >= 3) { wrap.removeChild(wrap.firstChild); }
   var t = document.createElement('div');
   t.className = 'toast ' + type;
+  t.setAttribute('role', type === 'err' ? 'alert' : 'status');
   t.style.setProperty('--toast-ms', ms + 'ms');
-  t.innerHTML = '<span class="toast-ico"><svg viewBox="0 0 24 24">' + TOAST_ICONS[type] + '</svg></span><span class="toast-txt"></span>';
-  t.lastChild.textContent = text;
-  wrap.appendChild(t);
-  setTimeout(function(){
+  t.innerHTML = '<span class="toast-ico"><svg class="toast-ring" viewBox="0 0 34 34"><circle class="tk" cx="17" cy="17" r="14"/><circle class="bar" cx="17" cy="17" r="14"/></svg><svg class="ic" viewBox="0 0 24 24">' + TOAST_ICONS[type] + '</svg></span><span class="toast-txt"></span>';
+  t.querySelector('.toast-txt').textContent = text;
+  var timer = 0, left = ms, started = 0, done = false;
+  function close(){
+    if (done) { return; }
+    done = true; clearTimeout(timer);
     t.classList.add('out');
     setTimeout(function(){ if (t.parentNode) { t.parentNode.removeChild(t); } }, 300);
-  }, ms);
+  }
+  function arm(){ started = Date.now(); clearTimeout(timer); timer = setTimeout(close, left); }
+  if (acts.length) {
+    var box = document.createElement('span'); box.className = 'toast-acts';
+    acts.forEach(function(a){
+      if (!a || !a.label) { return; }
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'toast-act' + (a.ghost ? ' ghost' : ''); b.textContent = a.label;
+      b.addEventListener('click', function(e){ e.stopPropagation(); close(); try { if (a.run) { a.run(); } } catch (err) {} });
+      box.appendChild(b);
+    });
+    t.appendChild(box);
+    /* 带按钮的提示：鼠标停在上面时暂停倒计时，方便点击 */
+    t.addEventListener('mouseenter', function(){ if (done) { return; } clearTimeout(timer); left -= Date.now() - started; t.classList.add('paused'); });
+    t.addEventListener('mouseleave', function(){ if (done) { return; } t.classList.remove('paused'); arm(); });
+  }
+  wrap.appendChild(t);
+  arm();
+  return close;
 }
 function showErr(msg) {
   /* 别让键盘输入继续落到后面的输入框上 */
@@ -8236,39 +8257,37 @@ body.dragging .qp-drop-hint{display:block}
 }
 .toast{
   --toast-c:var(--accent-2);--toast-bg:var(--accent-soft);
-  position:relative;overflow:hidden;pointer-events:auto;
-  display:flex;align-items:center;gap:12px;
-  min-width:240px;max-width:460px;
-  padding:9px 22px 9px 9px;
-  border-radius:var(--radius-full);
-  background:rgba(var(--ov),.62);
-  backdrop-filter:blur(24px) saturate(180%);
-  -webkit-backdrop-filter:blur(24px) saturate(180%);
-  border:1px solid var(--border-2);
-  color:var(--text);font-size:13px;font-weight:600;letter-spacing:.1px;
-  box-shadow:var(--shadow-3),0 0 34px var(--toast-bg);
-  animation:toastIn .42s cubic-bezier(.2,.9,.3,1.15);
+  position:relative;pointer-events:auto;
+  display:flex;align-items:center;gap:11px;
+  min-width:280px;max-width:min(420px,calc(100vw - 48px));
+  padding:9px 10px 9px 9px;
+  border-radius:14px;
+  background:var(--surface-solid,#17171b);
+  border:1px solid var(--border);
+  color:var(--text);font-size:12.5px;font-weight:600;line-height:1.35;
+  box-shadow:var(--shadow-3);
+  animation:toastIn .4s cubic-bezier(.2,.9,.3,1);
 }
-.toast.ok{--toast-c:var(--ok);--toast-bg:rgba(16,185,129,.22)}
-.toast.err{--toast-c:var(--err);--toast-bg:rgba(239,68,68,.22)}
-.toast.warn{--toast-c:var(--warn);--toast-bg:rgba(245,158,11,.22)}
-.toast-ico{
-  width:30px;height:30px;border-radius:50%;flex-shrink:0;
-  display:grid;place-items:center;
-  background:var(--toast-bg);color:var(--toast-c);
-}
-.toast-ico svg{width:15px;height:15px;fill:none;stroke:currentColor;
-  stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.toast-txt{flex:1;min-width:0;line-height:1.35;word-break:break-word}
-.toast::after{
-  content:'';position:absolute;left:22px;right:22px;bottom:0;height:2px;
-  border-radius:2px;background:var(--toast-c);opacity:.75;
-  transform-origin:left center;
-  animation:toastBar var(--toast-ms,3200ms) linear forwards;
-}
-@keyframes toastBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+.toast.ok{--toast-c:var(--ok);--toast-bg:rgba(16,185,129,.2)}
+.toast.err{--toast-c:var(--err);--toast-bg:rgba(239,68,68,.2)}
+.toast.warn{--toast-c:var(--warn);--toast-bg:rgba(245,158,11,.2)}
+.toast-ico{position:relative;width:34px;height:34px;flex:none;display:grid;place-items:center;color:var(--toast-c)}
+.toast-ico svg.ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.toast-ring{position:absolute;inset:0;width:34px;height:34px;transform:rotate(-90deg)}
+.toast-ring circle{fill:none;stroke-width:2.4}
+.toast-ring .tk{stroke:var(--border-2)}
+.toast-ring .bar{stroke:var(--toast-c);stroke-linecap:round;stroke-dasharray:88;stroke-dashoffset:0;animation:toastRing var(--toast-ms,3200ms) linear forwards}
+.toast.paused .toast-ring .bar{animation-play-state:paused}
+@keyframes toastRing{to{stroke-dashoffset:88}}
+.toast-txt{flex:1;min-width:0;word-break:break-word}
+.toast-acts{display:flex;gap:6px;flex:none}
+.toast-act{border:0;border-radius:8px;padding:6px 11px;background:var(--toast-bg);color:var(--toast-c);font:700 11.5px var(--font,inherit);cursor:pointer;transition:filter .15s,transform .15s}
+.toast-act:hover{filter:brightness(1.25)}
+.toast-act:active{transform:scale(.95)}
+.toast-act:focus-visible{outline:2px solid var(--toast-c);outline-offset:1px}
+.toast-act.ghost{background:transparent;color:var(--text-2)}
 @keyframes toastIn{
-  from{opacity:0;transform:translateY(28px) scale(.9)}
+  from{opacity:0;transform:translateY(28px) scale(.92)}
   to{opacity:1;transform:none}
 }
 .toast.out{animation:toastOut .3s cubic-bezier(.4,0,1,1) forwards}
@@ -9844,7 +9863,12 @@ __UI_SCRIPT__
     var added = false;
     if (i >= 0) {
       WISHLIST.splice(i, 1);
-      toast(uiT('wishRemoved'), 'info', 2000);
+      toast(uiT('wishRemoved'), 'info', 5000, {action:{label:uiT('toastUndo'), run:function(){
+        if (WISHLIST.indexOf(g) >= 0) return;
+        WISHLIST.splice(Math.min(i, WISHLIST.length), 0, g);
+        saveWishlist(); renderHeroWish(); renderGrid();
+        if (CURRENT_GAME) renderDetailWish();
+      }}});
     } else {
       WISHLIST.push(g);
       added = true;
@@ -9957,23 +9981,49 @@ __UI_SCRIPT__
     warn: '<path d="M12 3.5L2.5 20h19L12 3.5z"/><path d="M12 10v4.5"/><path d="M12 17.6v.01"/>',
     info: '<circle cx="12" cy="12" r="9"/><path d="M12 11.4v5.1"/><circle cx="12" cy="7.9" r="1.15" fill="currentColor" stroke="none"/>'
   };
-  function toast(text, type, ms){
+  function toast(text, type, ms, opts){
     type = TOAST_ICONS[type] ? type : 'info';
-    ms = ms || 3200;
+    opts = opts || {};
+    var acts = opts.actions || (opts.action ? [opts.action] : []);
+    ms = ms || (acts.length ? 6000 : 3200);
     var wrap = document.getElementById('toastWrap');
-    while (wrap.children.length >= 3) wrap.removeChild(wrap.firstChild);
+    if (!wrap) { return function(){}; }
+    while (wrap.children.length >= 3) { wrap.removeChild(wrap.firstChild); }
     var t = document.createElement('div');
     t.className = 'toast ' + type;
+    t.setAttribute('role', type === 'err' ? 'alert' : 'status');
     t.style.setProperty('--toast-ms', ms + 'ms');
-    t.innerHTML = '<span class="toast-ico"><svg viewBox="0 0 24 24">' + TOAST_ICONS[type] + '</svg></span><span class="toast-txt"></span>';
-    t.lastChild.textContent = text;
-    wrap.appendChild(t);
-    setTimeout(function(){
+    t.innerHTML = '<span class="toast-ico"><svg class="toast-ring" viewBox="0 0 34 34"><circle class="tk" cx="17" cy="17" r="14"/><circle class="bar" cx="17" cy="17" r="14"/></svg><svg class="ic" viewBox="0 0 24 24">' + TOAST_ICONS[type] + '</svg></span><span class="toast-txt"></span>';
+    t.querySelector('.toast-txt').textContent = text;
+    var timer = 0, left = ms, started = 0, done = false;
+    function close(){
+      if (done) { return; }
+      done = true; clearTimeout(timer);
       t.classList.add('out');
-      setTimeout(function(){ if (t.parentNode) t.parentNode.removeChild(t); }, 300);
-    }, ms);
+      setTimeout(function(){ if (t.parentNode) { t.parentNode.removeChild(t); } }, 300);
+    }
+    function arm(){ started = Date.now(); clearTimeout(timer); timer = setTimeout(close, left); }
+    if (acts.length) {
+      var box = document.createElement('span'); box.className = 'toast-acts';
+      acts.forEach(function(a){
+        if (!a || !a.label) { return; }
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'toast-act' + (a.ghost ? ' ghost' : ''); b.textContent = a.label;
+        b.addEventListener('click', function(e){ e.stopPropagation(); close(); try { if (a.run) { a.run(); } } catch (err) {} });
+        box.appendChild(b);
+      });
+      t.appendChild(box);
+      /* 带按钮的提示：鼠标停在上面时暂停倒计时，方便点击 */
+      t.addEventListener('mouseenter', function(){ if (done) { return; } clearTimeout(timer); left -= Date.now() - started; t.classList.add('paused'); });
+      t.addEventListener('mouseleave', function(){ if (done) { return; } t.classList.remove('paused'); arm(); });
+    }
+    wrap.appendChild(t);
+    arm();
+    return close;
   }
 
+
+  window.uiToast = function(text, type, ms, opts){ return toast(text, type, ms, opts); };
 
   function fmtDuration(sec){
     if (sec < 0) return 'LIFETIME';
@@ -12925,8 +12975,13 @@ __UI_SCRIPT__
       var parts = msg.split(':');
       var reason = '';
       if (parts.length > 2) reason = parts.slice(2).join(':');
+      var retryG = CURRENT_GAME;
       if (CURRENT_GAME) LAUNCHING[CURRENT_GAME] = false;
-      toast(uiT('injectFail') + uiErrText(reason), 'err');
+      toast(uiT('injectFail') + uiErrText(reason), 'err', 7000, retryG ? {action:{label:uiT('toastRetry'), run:function(){
+        var need = CURRENT_GAME !== retryG;
+        if (need && typeof openDetail === 'function') openDetail(retryG);
+        setTimeout(function(){ if (CURRENT_GAME === retryG) doInject(); }, need ? 360 : 0);
+      }}} : null);
       cancelInject();
       sbTaskFinish('err', uiT('injectFail') + uiErrText(reason), 7000);
     }
@@ -14424,7 +14479,7 @@ __UI_SCRIPT__
   function fmt(key,vars){var v=t(key);Object.keys(vars||{}).forEach(function(k){v=v.replace('{'+k+'}',vars[k]);});return v;}
   /* ── 插件界面文案：写入各内置语言与英文，英文键会自动出现在「自定义翻译」编辑器里 ── */
   (function(){
-    var codes=["en", "zh", "ru", "de", "ja", "es", "tr", "pt"],TX={"pluginTabExpand": ["Expand plugins", "展开插件", "Развернуть плагины", "Plugins ausklappen", "プラグインを展開", "Expandir complementos", "Eklentileri genişlet", "Expandir plugins"], "pluginTabCollapse": ["Collapse plugins", "收起插件", "Свернуть плагины", "Plugins einklappen", "プラグインを折りたたむ", "Contraer complementos", "Eklentileri daralt", "Recolher plugins"], "pluginTabHint": ["Enabled plugins appear in the list under My plugins in the sidebar.", "已启用的插件会显示在侧边栏「我的插件」下方的列表中。", "Включённые плагины отображаются в списке под пунктом «Мои плагины» в боковой панели.", "Aktivierte Plugins erscheinen in der Seitenleiste in der Liste unter „Meine Plugins“.", "有効にしたプラグインは、サイドバーの「マイプラグイン」の下に一覧表示されます。", "Los complementos activados aparecen en la lista bajo «Mis complementos» en la barra lateral.", "Etkinleştirilen eklentiler, kenar çubuğunda Eklentilerim altındaki listede görünür.", "Os plugins ativados aparecem na lista abaixo de «Meus plugins» na barra lateral."], "pluginToggleOn": ["Enable plugin", "开启插件", "Включить плагин", "Plugin aktivieren", "プラグインを有効にする", "Activar complemento", "Eklentiyi etkinleştir", "Ativar plugin"], "pluginToggleOff": ["Disable plugin", "关闭插件", "Выключить плагин", "Plugin deaktivieren", "プラグインを無効にする", "Desactivar complemento", "Eklentiyi devre dışı bırak", "Desativar plugin"], "pluginNoDesc": ["No description provided", "暂无插件描述", "Описание отсутствует", "Keine Beschreibung vorhanden", "説明はありません", "Sin descripción", "Açıklama yok", "Sem descrição"], "pluginDevResources": ["Developer resources", "开发资源", "Ресурсы для разработчиков", "Entwicklerressourcen", "開発リソース", "Recursos para desarrolladores", "Geliştirici kaynakları", "Recursos para desenvolvedores"], "pluginApiBtn": ["API reference", "API 文档", "Справочник API", "API-Referenz", "API リファレンス", "Referencia de la API", "API başvurusu", "Referência da API"], "pluginApiBtnSub": ["Signatures, permissions and examples", "接口签名、权限与示例", "Сигнатуры, разрешения и примеры", "Signaturen, Berechtigungen und Beispiele", "シグネチャ・権限・使用例", "Firmas, permisos y ejemplos", "İmzalar, izinler ve örnekler", "Assinaturas, permissões e exemplos"], "pluginGuideBtnSub": ["Write and import your first plugin", "编写并导入你的第一个插件", "Создайте и импортируйте свой первый плагин", "Schreibe und importiere dein erstes Plugin", "最初のプラグインを作成してインポート", "Crea e importa tu primer complemento", "İlk eklentini yaz ve içe aktar", "Crie e importe seu primeiro plugin"], "pluginClose": ["Close", "关闭", "Закрыть", "Schließen", "閉じる", "Cerrar", "Kapat", "Fechar"], "pluginDlgOk": ["OK", "确定", "ОК", "OK", "OK", "Aceptar", "Tamam", "OK"], "pluginDlgCancel": ["Cancel", "取消", "Отмена", "Abbrechen", "キャンセル", "Cancelar", "İptal", "Cancelar"], "pluginFileTooBig": ["File exceeds size limit ({mb} MB).", "文件超过大小限制（{mb} MB）。", "Файл превышает ограничение размера ({mb} МБ).", "Die Datei überschreitet das Größenlimit ({mb} MB).", "ファイルがサイズ上限（{mb} MB）を超えています。", "El archivo supera el límite de tamaño ({mb} MB).", "Dosya boyut sınırını aşıyor ({mb} MB).", "O arquivo excede o limite de tamanho ({mb} MB)."]},CATS={"Core": "核心", "Appearance": "外观", "Localization": "本地化", "Navigation": "导航", "UI": "界面", "DOM": "DOM", "Storage": "存储", "Events": "事件", "Timers": "计时器", "Utilities": "工具", "Network": "网络", "Permissions": "权限", "Dialogs": "对话框", "Lifecycle": "生命周期", "Logging": "日志", "Settings": "设置", "Host": "宿主", "Compatibility": "兼容性", "Commands": "命令", "Status": "状态"},DZ=["只读元数据属性，用于标识宿主应用、API 版本和当前插件。", "返回应用名称、API 版本、插件标识、当前语言与主题。", "显示一条简短的界面提示。", "返回当前主题值。", "在宿主界面支持时切换界面主题。", "返回当前界面语言代码。", "通过现有语言控制器与宿主桥接切换界面语言。", "返回当前插件界面环境的基础区域设置信息。", "在可检测时返回当前可见页面的标识。", "导航到受支持的页面：store、profile、plugins（我的插件）或 plugin（本插件自己的面板）；其他值会触发 starline:navigate 事件。", "添加插件自己的面板。render 会收到 (container, api)，并返回可移除的面板句柄。", "创建带样式的按钮。处理函数会收到 (event, api)。", "创建 DOM 元素。支持 text、className、style 与 on* 事件属性；子节点可以是节点或文本。", "向文档添加插件专属 CSS，插件停用时该样式会被自动移除。", "返回第一个匹配的元素，找不到则返回 null。建议优先使用插件自己的容器。", "返回所有匹配元素组成的数组。", "读取第一个匹配元素的文本内容。", "设置第一个匹配元素的文本内容，找不到则返回 false。", "从该插件专属命名空间的存储中读取 JSON 数据。", "持久化可 JSON 序列化的插件数据，返回是否成功。", "从该插件的存储命名空间中删除一个键。", "仅清除属于该插件的所有存储键。", "返回 localStorage 的大致用量以及该插件的配置前缀。", "订阅该插件 API 发出的事件，返回取消订阅函数。", "移除通过 api.on 注册的处理函数。", "在本地发出插件事件，并派发 starline:plugin-event 窗口事件。", "监听窗口事件；不带前缀的名称会自动加上 starline:，返回取消订阅函数。", "安排一次性回调；插件停用时计时器会被自动清理。", "安排重复回调；插件停用时计时器会被自动清理。", "取消由 setTimeout 或 setInterval 创建的计时器。", "将文本复制到剪贴板，返回表示是否成功的 Promise<boolean>。", "通过 Blob URL 将文本内容作为文件下载。", "显示系统原生确认对话框并返回布尔值。", "显示系统原生文本输入框，返回字符串或 null。", "需要 network 权限和宿主提供的请求代理，不会回退到直接 fetch。", "检查已安装插件清单所授予的权限集合。", "界面创建类 API 会返回幂等的生命周期句柄。", "非阻塞的应用内对话框。旧版 confirm/prompt 仍保留但已弃用。", "注册插件自己的文案包，并按当前语言解析，缺失时回退到英文。", "订阅可见性事件，返回取消订阅函数。", "自动添加插件 id 前缀；error 还会触发 starline:plugin-error。", "构建插件设置面板；修改会保存到插件配置并触发 starline:plugin-settings-changed。", "需要 cross-plugin 权限，且目标 id 在 crossPlugin 允许列表中；否则输出警告并返回空操作的取消函数。", "需要 clipboard-read 权限；失败或被拒绝时返回 null。请在用户手势中调用。", "打开系统文件选择器；取消选择或文件过大时返回 null。", "检测宿主能力并返回主题令牌，同时更新 --starline-* CSS 变量。", "检查所支持的语义化版本范围。宿主应在激活前拒绝不兼容的插件。", "在宿主提供命令提供器时进行注册；id 必须以该插件 id 开头。", "添加徽标/状态界面；每个插件最多三个状态项。", "幂等地清理监听器、计时器、面板、命令和状态项。通常由插件宿主自动处理。"],DE=["Read-only metadata properties identifying the host app, API version and current plugin.", "Returns app name, API version, plugin identity, current language and theme.", "Displays a short UI notification.", "Returns the current theme value.", "Changes the UI theme when supported by the host UI.", "Returns the current UI language code.", "Changes the UI language through the existing language controller and host bridge.", "Returns basic locale metadata for the current plugin UI context.", "Returns the currently visible page identifier when detectable.", "Navigates to supported pages: store, profile, plugins (My plugins) or plugin (this plugin's own panel); otherwise emits starline:navigate.", "Adds a plugin-owned panel. render receives (container, api). Returns a removable panel handle.", "Creates a styled button. Handler receives (event, api).", "Creates a DOM element. Supports text, className, style and on* event attributes; children may be nodes or text.", "Adds plugin-scoped CSS to the document. The style is removed when the plugin is deactivated.", "Returns the first matching element or null. Prefer plugin-owned containers.", "Returns an array of matching elements.", "Reads text content from the first matching element.", "Sets text content on the first matching element. Returns false if not found.", "Reads JSON data from storage namespaced to this plugin.", "Persists JSON-compatible plugin data. Returns success boolean.", "Removes one key from this plugin’s storage namespace.", "Removes all stored keys belonging to this plugin only.", "Returns approximate localStorage usage and this plugin’s config prefix.", "Subscribes to an event emitted by this plugin API. Returns an unsubscribe function.", "Removes a handler registered with api.on.", "Emits a plugin event locally and dispatches a starline:plugin-event window event.", "Listens to a window event; bare names are prefixed with starline:. Returns an unsubscribe function.", "Schedules a one-shot callback; timer is cleaned up when the plugin deactivates.", "Schedules a repeating callback; timer is cleaned up when the plugin deactivates.", "Cancels a timer created with setTimeout or setInterval.", "Copies text to clipboard. Returns a Promise<boolean> indicating whether copy succeeded.", "Downloads text content as a file using a Blob URL.", "Shows a native confirmation dialog and returns a boolean.", "Shows a native text prompt and returns a string or null.", "Requires network permission and a host-provided request proxy. Does not fall back to direct fetch.", "Checks the installed manifest permission grant set.", "UI creation APIs return idempotent lifecycle handles.", "Non-blocking in-app dialogs. Legacy confirm/prompt remain but are deprecated.", "Registers plugin-owned message bundles and resolves by current language with English fallback.", "Subscribes to visibility events and returns unsubscribe functions.", "Adds a plugin id prefix; error also emits starline:plugin-error.", "Builds a plugin settings panel; changes persist to plugin config and emit starline:plugin-settings-changed.", "Requires cross-plugin permission and target id in crossPlugin allowlist; otherwise warns and returns a no-op unsubscribe.", "Requires clipboard-read; failure or denied access returns null. Invoke from a user gesture.", "Opens the native file picker; cancellation or oversized files return null.", "Feature-detects host capabilities and returns theme tokens while updating --starline-* CSS variables.", "Checks the supported semantic version range. Hosts should reject incompatible plugins before activation.", "Registers with host command provider when available; ids must start with this plugin id.", "Adds badge/status UI; each plugin is limited to three status items.", "Idempotently clears listeners, timers, panels, commands and status items. Usually handled by the plugin host."],AL={"pluginApiTitle": ["Plugin API Reference", "插件 API 文档", "Справочник Plugin API", "Plugin-API-Referenz", "プラグイン API リファレンス", "Referencia de Plugin API", "Eklenti API Başvurusu", "Referência da Plugin API"], "pluginApiSub": ["Browse each API, copy its signature or example, or export the complete reference.", "查看每个 API 的用途、签名与示例；可单独复制，也可导出完整文档。", "Просматривайте описание и примеры API, копируйте отдельные элементы или экспортируйте всю документацию.", "APIs und Beispiele ansehen, einzelne Einträge kopieren oder die gesamte Dokumentation exportieren.", "API の説明と例を確認し、個別コピーまたは全ドキュメントの書き出しができます。", "Consulta las API y sus ejemplos, copia elementos individuales o exporta toda la documentación.", "API açıklamalarını inceleyin, tek tek kopyalayın veya tüm belgeleri dışa aktarın.", "Consulte APIs e exemplos, copie itens individuais ou exporte toda a documentação."], "pluginApiCopy": ["Copy API", "复制 API", "Копировать API", "API kopieren", "API をコピー", "Copiar API", "API’yi kopyala", "Copiar API"], "pluginApiCopyExample": ["Copy example", "复制示例", "Копировать пример", "Beispiel kopieren", "例をコピー", "Copiar ejemplo", "Örneği kopyala", "Copiar exemplo"], "pluginApiCopyAll": ["Copy all API docs", "复制全部 API 文档", "Копировать всю документацию", "Gesamte API-Doku kopieren", "API 全文をコピー", "Copiar toda la documentación", "Tüm API belgelerini kopyala", "Copiar toda a documentação"], "pluginApiDownloadDocs": ["Download API docs", "下载 API 文档", "Скачать документацию", "API-Doku herunterladen", "API 文書をダウンロード", "Descargar documentación", "API belgelerini indir", "Baixar documentação"], "pluginApiDownloadTemplate": ["Download starter template", "下载开发模板", "Скачать шаблон", "Startvorlage herunterladen", "テンプレートをダウンロード", "Descargar plantilla", "Başlangıç şablonunu indir", "Baixar modelo inicial"], "pluginApiSignature": ["Signature", "接口签名", "Сигнатура", "Signatur", "シグネチャ", "Firma", "İmza", "Assinatura"], "pluginApiExample": ["Example", "使用示例", "Пример", "Beispiel", "使用例", "Ejemplo", "Örnek", "Exemplo"], "pluginApiCopied": ["Copied to clipboard", "已复制到剪贴板", "Скопировано", "In Zwischenablage kopiert", "クリップボードにコピーしました", "Copiado al portapapeles", "Panoya kopyalandı", "Copiado para a área de transferência"], "pluginApiCopyFailed": ["Could not copy; select and copy manually.", "复制失败，请手动选择复制。", "Не удалось скопировать.", "Kopieren fehlgeschlagen.", "コピーできませんでした。", "No se pudo copiar.", "Kopyalanamadı.", "Não foi possível copiar."], "pluginApiWarning": ["Security: imported plugins execute JavaScript in this WebView. DOM and storage APIs are powerful; only install trusted code.", "安全提示：导入的插件会在当前 WebView 中执行 JavaScript。DOM 和存储接口权限较高，请只安装可信代码。", "Безопасность: плагины выполняют JavaScript в WebView. Устанавливайте только доверенный код.", "Sicherheit: Plugins führen JavaScript in dieser WebView aus. Installiere nur vertrauenswürdigen Code.", "安全性：プラグインは WebView 内で JavaScript を実行します。信頼できるコードのみ導入してください。", "Seguridad: los plugins ejecutan JavaScript en WebView. Instala solo código de confianza.", "Güvenlik: eklentiler WebView içinde JavaScript çalıştırır. Yalnızca güvenilir kod yükleyin.", "Segurança: plugins executam JavaScript nesta WebView. Instale apenas código confiável."]};
+    var codes=["en", "zh", "ru", "de", "ja", "es", "tr", "pt"],TX={"pluginEnableNow": ["Enable", "启用", "Включить", "Aktivieren", "有効にする", "Activar", "Etkinleştir", "Ativar"],"pluginTabExpand": ["Expand plugins", "展开插件", "Развернуть плагины", "Plugins ausklappen", "プラグインを展開", "Expandir complementos", "Eklentileri genişlet", "Expandir plugins"], "pluginTabCollapse": ["Collapse plugins", "收起插件", "Свернуть плагины", "Plugins einklappen", "プラグインを折りたたむ", "Contraer complementos", "Eklentileri daralt", "Recolher plugins"], "pluginTabHint": ["Enabled plugins appear in the list under My plugins in the sidebar.", "已启用的插件会显示在侧边栏「我的插件」下方的列表中。", "Включённые плагины отображаются в списке под пунктом «Мои плагины» в боковой панели.", "Aktivierte Plugins erscheinen in der Seitenleiste in der Liste unter „Meine Plugins“.", "有効にしたプラグインは、サイドバーの「マイプラグイン」の下に一覧表示されます。", "Los complementos activados aparecen en la lista bajo «Mis complementos» en la barra lateral.", "Etkinleştirilen eklentiler, kenar çubuğunda Eklentilerim altındaki listede görünür.", "Os plugins ativados aparecem na lista abaixo de «Meus plugins» na barra lateral."], "pluginToggleOn": ["Enable plugin", "开启插件", "Включить плагин", "Plugin aktivieren", "プラグインを有効にする", "Activar complemento", "Eklentiyi etkinleştir", "Ativar plugin"], "pluginToggleOff": ["Disable plugin", "关闭插件", "Выключить плагин", "Plugin deaktivieren", "プラグインを無効にする", "Desactivar complemento", "Eklentiyi devre dışı bırak", "Desativar plugin"], "pluginNoDesc": ["No description provided", "暂无插件描述", "Описание отсутствует", "Keine Beschreibung vorhanden", "説明はありません", "Sin descripción", "Açıklama yok", "Sem descrição"], "pluginDevResources": ["Developer resources", "开发资源", "Ресурсы для разработчиков", "Entwicklerressourcen", "開発リソース", "Recursos para desarrolladores", "Geliştirici kaynakları", "Recursos para desenvolvedores"], "pluginApiBtn": ["API reference", "API 文档", "Справочник API", "API-Referenz", "API リファレンス", "Referencia de la API", "API başvurusu", "Referência da API"], "pluginApiBtnSub": ["Signatures, permissions and examples", "接口签名、权限与示例", "Сигнатуры, разрешения и примеры", "Signaturen, Berechtigungen und Beispiele", "シグネチャ・権限・使用例", "Firmas, permisos y ejemplos", "İmzalar, izinler ve örnekler", "Assinaturas, permissões e exemplos"], "pluginGuideBtnSub": ["Write and import your first plugin", "编写并导入你的第一个插件", "Создайте и импортируйте свой первый плагин", "Schreibe und importiere dein erstes Plugin", "最初のプラグインを作成してインポート", "Crea e importa tu primer complemento", "İlk eklentini yaz ve içe aktar", "Crie e importe seu primeiro plugin"], "pluginClose": ["Close", "关闭", "Закрыть", "Schließen", "閉じる", "Cerrar", "Kapat", "Fechar"], "pluginDlgOk": ["OK", "确定", "ОК", "OK", "OK", "Aceptar", "Tamam", "OK"], "pluginDlgCancel": ["Cancel", "取消", "Отмена", "Abbrechen", "キャンセル", "Cancelar", "İptal", "Cancelar"], "pluginFileTooBig": ["File exceeds size limit ({mb} MB).", "文件超过大小限制（{mb} MB）。", "Файл превышает ограничение размера ({mb} МБ).", "Die Datei überschreitet das Größenlimit ({mb} MB).", "ファイルがサイズ上限（{mb} MB）を超えています。", "El archivo supera el límite de tamaño ({mb} MB).", "Dosya boyut sınırını aşıyor ({mb} MB).", "O arquivo excede o limite de tamanho ({mb} MB)."]},CATS={"Core": "核心", "Appearance": "外观", "Localization": "本地化", "Navigation": "导航", "UI": "界面", "DOM": "DOM", "Storage": "存储", "Events": "事件", "Timers": "计时器", "Utilities": "工具", "Network": "网络", "Permissions": "权限", "Dialogs": "对话框", "Lifecycle": "生命周期", "Logging": "日志", "Settings": "设置", "Host": "宿主", "Compatibility": "兼容性", "Commands": "命令", "Status": "状态"},DZ=["只读元数据属性，用于标识宿主应用、API 版本和当前插件。", "返回应用名称、API 版本、插件标识、当前语言与主题。", "显示一条简短的界面提示。", "返回当前主题值。", "在宿主界面支持时切换界面主题。", "返回当前界面语言代码。", "通过现有语言控制器与宿主桥接切换界面语言。", "返回当前插件界面环境的基础区域设置信息。", "在可检测时返回当前可见页面的标识。", "导航到受支持的页面：store、profile、plugins（我的插件）或 plugin（本插件自己的面板）；其他值会触发 starline:navigate 事件。", "添加插件自己的面板。render 会收到 (container, api)，并返回可移除的面板句柄。", "创建带样式的按钮。处理函数会收到 (event, api)。", "创建 DOM 元素。支持 text、className、style 与 on* 事件属性；子节点可以是节点或文本。", "向文档添加插件专属 CSS，插件停用时该样式会被自动移除。", "返回第一个匹配的元素，找不到则返回 null。建议优先使用插件自己的容器。", "返回所有匹配元素组成的数组。", "读取第一个匹配元素的文本内容。", "设置第一个匹配元素的文本内容，找不到则返回 false。", "从该插件专属命名空间的存储中读取 JSON 数据。", "持久化可 JSON 序列化的插件数据，返回是否成功。", "从该插件的存储命名空间中删除一个键。", "仅清除属于该插件的所有存储键。", "返回 localStorage 的大致用量以及该插件的配置前缀。", "订阅该插件 API 发出的事件，返回取消订阅函数。", "移除通过 api.on 注册的处理函数。", "在本地发出插件事件，并派发 starline:plugin-event 窗口事件。", "监听窗口事件；不带前缀的名称会自动加上 starline:，返回取消订阅函数。", "安排一次性回调；插件停用时计时器会被自动清理。", "安排重复回调；插件停用时计时器会被自动清理。", "取消由 setTimeout 或 setInterval 创建的计时器。", "将文本复制到剪贴板，返回表示是否成功的 Promise<boolean>。", "通过 Blob URL 将文本内容作为文件下载。", "显示系统原生确认对话框并返回布尔值。", "显示系统原生文本输入框，返回字符串或 null。", "需要 network 权限和宿主提供的请求代理，不会回退到直接 fetch。", "检查已安装插件清单所授予的权限集合。", "界面创建类 API 会返回幂等的生命周期句柄。", "非阻塞的应用内对话框。旧版 confirm/prompt 仍保留但已弃用。", "注册插件自己的文案包，并按当前语言解析，缺失时回退到英文。", "订阅可见性事件，返回取消订阅函数。", "自动添加插件 id 前缀；error 还会触发 starline:plugin-error。", "构建插件设置面板；修改会保存到插件配置并触发 starline:plugin-settings-changed。", "需要 cross-plugin 权限，且目标 id 在 crossPlugin 允许列表中；否则输出警告并返回空操作的取消函数。", "需要 clipboard-read 权限；失败或被拒绝时返回 null。请在用户手势中调用。", "打开系统文件选择器；取消选择或文件过大时返回 null。", "检测宿主能力并返回主题令牌，同时更新 --starline-* CSS 变量。", "检查所支持的语义化版本范围。宿主应在激活前拒绝不兼容的插件。", "在宿主提供命令提供器时进行注册；id 必须以该插件 id 开头。", "添加徽标/状态界面；每个插件最多三个状态项。", "幂等地清理监听器、计时器、面板、命令和状态项。通常由插件宿主自动处理。"],DE=["Read-only metadata properties identifying the host app, API version and current plugin.", "Returns app name, API version, plugin identity, current language and theme.", "Displays a short UI notification.", "Returns the current theme value.", "Changes the UI theme when supported by the host UI.", "Returns the current UI language code.", "Changes the UI language through the existing language controller and host bridge.", "Returns basic locale metadata for the current plugin UI context.", "Returns the currently visible page identifier when detectable.", "Navigates to supported pages: store, profile, plugins (My plugins) or plugin (this plugin's own panel); otherwise emits starline:navigate.", "Adds a plugin-owned panel. render receives (container, api). Returns a removable panel handle.", "Creates a styled button. Handler receives (event, api).", "Creates a DOM element. Supports text, className, style and on* event attributes; children may be nodes or text.", "Adds plugin-scoped CSS to the document. The style is removed when the plugin is deactivated.", "Returns the first matching element or null. Prefer plugin-owned containers.", "Returns an array of matching elements.", "Reads text content from the first matching element.", "Sets text content on the first matching element. Returns false if not found.", "Reads JSON data from storage namespaced to this plugin.", "Persists JSON-compatible plugin data. Returns success boolean.", "Removes one key from this plugin’s storage namespace.", "Removes all stored keys belonging to this plugin only.", "Returns approximate localStorage usage and this plugin’s config prefix.", "Subscribes to an event emitted by this plugin API. Returns an unsubscribe function.", "Removes a handler registered with api.on.", "Emits a plugin event locally and dispatches a starline:plugin-event window event.", "Listens to a window event; bare names are prefixed with starline:. Returns an unsubscribe function.", "Schedules a one-shot callback; timer is cleaned up when the plugin deactivates.", "Schedules a repeating callback; timer is cleaned up when the plugin deactivates.", "Cancels a timer created with setTimeout or setInterval.", "Copies text to clipboard. Returns a Promise<boolean> indicating whether copy succeeded.", "Downloads text content as a file using a Blob URL.", "Shows a native confirmation dialog and returns a boolean.", "Shows a native text prompt and returns a string or null.", "Requires network permission and a host-provided request proxy. Does not fall back to direct fetch.", "Checks the installed manifest permission grant set.", "UI creation APIs return idempotent lifecycle handles.", "Non-blocking in-app dialogs. Legacy confirm/prompt remain but are deprecated.", "Registers plugin-owned message bundles and resolves by current language with English fallback.", "Subscribes to visibility events and returns unsubscribe functions.", "Adds a plugin id prefix; error also emits starline:plugin-error.", "Builds a plugin settings panel; changes persist to plugin config and emit starline:plugin-settings-changed.", "Requires cross-plugin permission and target id in crossPlugin allowlist; otherwise warns and returns a no-op unsubscribe.", "Requires clipboard-read; failure or denied access returns null. Invoke from a user gesture.", "Opens the native file picker; cancellation or oversized files return null.", "Feature-detects host capabilities and returns theme tokens while updating --starline-* CSS variables.", "Checks the supported semantic version range. Hosts should reject incompatible plugins before activation.", "Registers with host command provider when available; ids must start with this plugin id.", "Adds badge/status UI; each plugin is limited to three status items.", "Idempotently clears listeners, timers, panels, commands and status items. Usually handled by the plugin host."],AL={"pluginApiTitle": ["Plugin API Reference", "插件 API 文档", "Справочник Plugin API", "Plugin-API-Referenz", "プラグイン API リファレンス", "Referencia de Plugin API", "Eklenti API Başvurusu", "Referência da Plugin API"], "pluginApiSub": ["Browse each API, copy its signature or example, or export the complete reference.", "查看每个 API 的用途、签名与示例；可单独复制，也可导出完整文档。", "Просматривайте описание и примеры API, копируйте отдельные элементы или экспортируйте всю документацию.", "APIs und Beispiele ansehen, einzelne Einträge kopieren oder die gesamte Dokumentation exportieren.", "API の説明と例を確認し、個別コピーまたは全ドキュメントの書き出しができます。", "Consulta las API y sus ejemplos, copia elementos individuales o exporta toda la documentación.", "API açıklamalarını inceleyin, tek tek kopyalayın veya tüm belgeleri dışa aktarın.", "Consulte APIs e exemplos, copie itens individuais ou exporte toda a documentação."], "pluginApiCopy": ["Copy API", "复制 API", "Копировать API", "API kopieren", "API をコピー", "Copiar API", "API’yi kopyala", "Copiar API"], "pluginApiCopyExample": ["Copy example", "复制示例", "Копировать пример", "Beispiel kopieren", "例をコピー", "Copiar ejemplo", "Örneği kopyala", "Copiar exemplo"], "pluginApiCopyAll": ["Copy all API docs", "复制全部 API 文档", "Копировать всю документацию", "Gesamte API-Doku kopieren", "API 全文をコピー", "Copiar toda la documentación", "Tüm API belgelerini kopyala", "Copiar toda a documentação"], "pluginApiDownloadDocs": ["Download API docs", "下载 API 文档", "Скачать документацию", "API-Doku herunterladen", "API 文書をダウンロード", "Descargar documentación", "API belgelerini indir", "Baixar documentação"], "pluginApiDownloadTemplate": ["Download starter template", "下载开发模板", "Скачать шаблон", "Startvorlage herunterladen", "テンプレートをダウンロード", "Descargar plantilla", "Başlangıç şablonunu indir", "Baixar modelo inicial"], "pluginApiSignature": ["Signature", "接口签名", "Сигнатура", "Signatur", "シグネチャ", "Firma", "İmza", "Assinatura"], "pluginApiExample": ["Example", "使用示例", "Пример", "Beispiel", "使用例", "Ejemplo", "Örnek", "Exemplo"], "pluginApiCopied": ["Copied to clipboard", "已复制到剪贴板", "Скопировано", "In Zwischenablage kopiert", "クリップボードにコピーしました", "Copiado al portapapeles", "Panoya kopyalandı", "Copiado para a área de transferência"], "pluginApiCopyFailed": ["Could not copy; select and copy manually.", "复制失败，请手动选择复制。", "Не удалось скопировать.", "Kopieren fehlgeschlagen.", "コピーできませんでした。", "No se pudo copiar.", "Kopyalanamadı.", "Não foi possível copiar."], "pluginApiWarning": ["Security: imported plugins execute JavaScript in this WebView. DOM and storage APIs are powerful; only install trusted code.", "安全提示：导入的插件会在当前 WebView 中执行 JavaScript。DOM 和存储接口权限较高，请只安装可信代码。", "Безопасность: плагины выполняют JavaScript в WebView. Устанавливайте только доверенный код.", "Sicherheit: Plugins führen JavaScript in dieser WebView aus. Installiere nur vertrauenswürdigen Code.", "安全性：プラグインは WebView 内で JavaScript を実行します。信頼できるコードのみ導入してください。", "Seguridad: los plugins ejecutan JavaScript en WebView. Instala solo código de confianza.", "Güvenlik: eklentiler WebView içinde JavaScript çalıştırır. Yalnızca güvenilir kod yükleyin.", "Segurança: plugins executam JavaScript nesta WebView. Instale apenas código confiável."]};
     function put(code,k,v){if(typeof v==='string'&&v!==''&&typeof UI_T!=='undefined'&&UI_T[code])UI_T[code][k]=v;}
     Object.keys(TX).forEach(function(k){codes.forEach(function(c,i){put(c,k,TX[k][i]);});});
     Object.keys(AL).forEach(function(k){codes.forEach(function(c,i){put(c,k,AL[k][i]);});});
@@ -14432,7 +14487,7 @@ __UI_SCRIPT__
     DE.forEach(function(d,i){put('en','pluginApiD'+i,d);put('zh','pluginApiD'+i,DZ[i]);});
     try{if(typeof uiRenderI18n==='function')uiRenderI18n();}catch(e){}
   })();
-  function toast(msg){if(typeof window.uiToast==='function'){window.uiToast(msg);return;}var n=document.createElement('div');n.textContent=msg;n.style.cssText='position:fixed;z-index:2147483647;right:22px;bottom:22px;padding:11px 15px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);color:var(--text);box-shadow:var(--shadow-lg);font:600 12px var(--font);';document.body.appendChild(n);setTimeout(function(){n.remove();},2600);}
+  function toast(msg,type,ms,opts){if(typeof window.uiToast==='function'){window.uiToast(msg,type,ms,opts);return;}var n=document.createElement('div');n.textContent=msg;n.style.cssText='position:fixed;z-index:2147483647;right:22px;bottom:22px;padding:11px 15px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);color:var(--text);box-shadow:var(--shadow-lg);font:600 12px var(--font);';document.body.appendChild(n);setTimeout(function(){n.remove();},2600);}
   function read(){try{var a=JSON.parse(localStorage.getItem(STORE)||'[]');return Array.isArray(a)?a.filter(function(x){return x&&typeof x.source==='string'&&x.id;}):[];}catch(e){return [];}}
   function write(){try{localStorage.setItem(STORE,JSON.stringify(installed));}catch(e){toast(t('pluginStorageError'));}}
   function createAPI(rec){
@@ -14720,7 +14775,13 @@ __UI_SCRIPT__
     var old=byId(rec.id);
     function commit(){
       if(old){deactivate(old);installed=installed.filter(function(x){return x.id!==rec.id;});}
-      installed.push(rec);write();render();toast(t('pluginImported')+rec.name);
+      installed.push(rec);write();render();
+      toast(t('pluginImported')+rec.name,'ok',6000,{action:{label:t('pluginEnableNow'),run:function(){
+        if(rec.enabled||!byId(rec.id))return;
+        rec.enabled=true;rec.lastError='';activate(rec);
+        if(rec.enabled){sideOpen=true;try{localStorage.setItem('starline.plugins.tabOpen','1');}catch(err){}}
+        write();render();
+      }}});
     }
     if(old){dialogBox('confirm',t('pluginExists'),{title:rec.name},'').then(function(ok){if(ok)commit();});}else{commit();}
   }
@@ -14842,6 +14903,22 @@ __UI_SCRIPT__
     toast(t('pluginDropUnsupported'));
   });
   window.addEventListener('dragend',hideOverlay);window.addEventListener('blur',hideOverlay);
+})();
+</script>
+
+<script>
+/* 提示条操作按钮文字 */
+(function(){
+  var L={
+    en:{toastUndo:'Undo',toastRetry:'Retry'},zh:{toastUndo:'撤销',toastRetry:'重试'},
+    ru:{toastUndo:'Отменить',toastRetry:'Повторить'},es:{toastUndo:'Deshacer',toastRetry:'Reintentar'},
+    de:{toastUndo:'Rückgängig',toastRetry:'Erneut'},fr:{toastUndo:'Annuler',toastRetry:'Réessayer'},
+    ja:{toastUndo:'元に戻す',toastRetry:'再試行'},ko:{toastUndo:'실행 취소',toastRetry:'다시 시도'},
+    vn:{toastUndo:'Hoàn tác',toastRetry:'Thử lại'},tr:{toastUndo:'Geri al',toastRetry:'Tekrar dene'},
+    pt:{toastUndo:'Desfazer',toastRetry:'Tentar de novo'}
+  };
+  if(typeof UI_T==='undefined')return;
+  Object.keys(L).forEach(function(c){if(!UI_T[c])UI_T[c]={};Object.keys(L[c]).forEach(function(k){UI_T[c][k]=L[c][k];});});
 })();
 </script>
 
