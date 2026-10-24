@@ -63,15 +63,12 @@
     radial-gradient(46% 42% at 8% 92%,rgba(34,211,238,.16),transparent 70%);
   --lg-sp:cubic-bezier(.32,.72,0,1);
 }
-/* 主题切换动画：切换瞬间临时给全局加过渡，颜色平滑渐变（尊重「减少动态效果」） */
+/* 主题切换动画：不支持 View Transition 时的退路——全局颜色平滑渐变 */
 html.ui-theme-anim,html.ui-theme-anim *,html.ui-theme-anim *::before,html.ui-theme-anim *::after{
   transition:background-color .45s cubic-bezier(.4,0,.2,1),color .45s cubic-bezier(.4,0,.2,1),
     border-color .45s cubic-bezier(.4,0,.2,1),fill .45s cubic-bezier(.4,0,.2,1),
     stroke .45s cubic-bezier(.4,0,.2,1),box-shadow .45s cubic-bezier(.4,0,.2,1),
     outline-color .45s cubic-bezier(.4,0,.2,1),opacity .3s ease !important;
-}
-@media (prefers-reduced-motion:reduce){
-  html.ui-theme-anim,html.ui-theme-anim *,html.ui-theme-anim *::before,html.ui-theme-anim *::after{transition:none !important}
 }
 /* 水滴扩散换主题（View Transition） */
 @property --ui-r{syntax:'<length>';inherits:false;initial-value:0px}
@@ -2577,7 +2574,6 @@ function uiApplyDynamic(spec){
 var uiThemeAnimTimer = null;
 function uiThemeAnimate(){
   var root = document.documentElement;
-  try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; } } catch (e) {}
   root.classList.add('ui-theme-anim');
   clearTimeout(uiThemeAnimTimer);
   uiThemeAnimTimer = setTimeout(function(){ root.classList.remove('ui-theme-anim'); }, 560);
@@ -2588,9 +2584,6 @@ var uiThemeVT = null;
    圆内是新主题、圆外仍是旧主题，直到铺满整个 APP。靠 View Transition 抓取新旧两张快照 */
 function uiThemeReveal(paint){
   var root = document.documentElement;
-  var reduce = false;
-  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-  if (reduce) { paint(); return; }
   if (typeof document.startViewTransition !== 'function') { uiThemeAnimate(); paint(); return; }
   if (uiThemeVT) { try { uiThemeVT.skipTransition(); } catch (e) {} }
 
