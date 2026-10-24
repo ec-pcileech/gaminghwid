@@ -6,7 +6,7 @@
 #  APP_VERSION  最新 APP 版本号；和客户端当前版本不一致就弹更新窗口
 #  APP_DOWNLOAD 新版本 exe 直链；只保存在客户端内存，界面拿不到这个地址
 #  ────────────────────────────────────────────────────────────────────────
-#APP_VERSION 3.1.1
+#APP_VERSION 3.1.2
 #APP_DOWNLOAD https://github.com/ec-pcileech/gaminghwid/releases/latest/download/STARLINE.exe
 #
 #  格式说明
