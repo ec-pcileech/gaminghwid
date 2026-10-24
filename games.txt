@@ -7,7 +7,7 @@
 #  APP_DOWNLOAD 新版本 exe 直链；只保存在客户端内存，界面拿不到这个地址
 #  ────────────────────────────────────────────────────────────────────────
 #APP_VERSION 3.1.2
-#APP_DOWNLOAD https://github.com/ec-pcileech/gaminghwid/releases/latest/download/STARLINE.exe
+#APP_DOWNLOAD https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/STARLINE.exe
 #
 #  格式说明
 #  ─────────
