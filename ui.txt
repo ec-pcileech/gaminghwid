@@ -3316,6 +3316,8 @@ function uiCloseView(){
 }
 /* 统一的 ESC 处理：先收浮层，再退回上一级 */
 function uiEscBack(){
+  var lgp = document.getElementById('lgPop');
+  if (lgp && !lgp.hidden && typeof window.lgClose === 'function') { window.lgClose(); return true; }
   var skp = document.getElementById('skPop');
   if (skp && !skp.hidden && typeof window.skClose === 'function') { window.skClose(); return true; }
   var pane = document.getElementById('uiColorPane');
@@ -6198,6 +6200,49 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
   background:var(--surface-3);border:1px solid var(--border);
   font:600 10px/1 var(--font-mono);color:var(--text-2);
 }
+/* 消息区块折叠 */
+.sk-foldbtn{width:100%;border:0;background:none;cursor:pointer;text-align:left;border-radius:10px;transition:background var(--tr-fast),color var(--tr-fast)}
+.sk-foldbtn:hover,.sk-foldbtn:focus-visible{background:var(--accent-soft);color:var(--text-2);outline:none}
+.sk-pop .sk-foldbtn .sk-caret{transition:transform var(--tr-fast)}
+.sk-sec:not(.sk-fold-on) > .sk-foldbtn .sk-caret{transform:rotate(90deg)}
+.sk-fold-body{display:grid;grid-template-rows:1fr;transition:grid-template-rows .24s cubic-bezier(.4,0,.2,1)}
+.sk-fold-in{min-height:0;overflow:hidden}
+.sk-sec.sk-fold-on > .sk-fold-body{grid-template-rows:0fr}
+/* 右上角语言按钮 + 带箭头的语言弹窗 */
+.tb-lang.open{border-color:var(--accent);background:var(--accent-soft)}
+.lg-flag{display:block;flex-shrink:0;width:24px;height:18px;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px var(--border-2)}
+.tb-lang .lg-flag svg,.lg-pop .lg-flag svg{display:block;width:100%;height:100%;fill:initial;stroke:none}
+.lg-pop{
+  position:fixed;top:0;left:0;z-index:2147483100;
+  min-width:176px;max-width:calc(100vw - 24px);padding:6px;
+  border-radius:var(--radius-lg);background:var(--surface-solid);border:1px solid var(--border-2);
+  box-shadow:var(--shadow-3);color:var(--text);text-align:left;cursor:default;
+  font-family:var(--font);font-size:13px;line-height:1.5;-webkit-app-region:no-drag;
+  transform-origin:calc(var(--lg-ar,24px) + 6px) -8px;
+  animation:lgPopIn .18s cubic-bezier(.2,.8,.2,1);
+}
+.lg-pop[hidden]{display:none}
+@keyframes lgPopIn{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:none}}
+.lg-pop::before{
+  content:"";position:absolute;top:-7px;left:var(--lg-ar,24px);
+  width:12px;height:12px;box-sizing:border-box;background:var(--surface-solid);
+  border-left:1px solid var(--border-2);border-top:1px solid var(--border-2);
+  border-top-left-radius:3px;transform:rotate(45deg);
+}
+.lg-item{
+  position:relative;display:flex;align-items:center;gap:5px;width:100%;padding:7px 10px;
+  border:0;border-radius:10px;background:none;text-align:left;color:var(--text-2);cursor:pointer;
+  font:500 13px/1.35 var(--font);white-space:nowrap;
+  transition:background var(--tr-fast),color var(--tr-fast);
+}
+.lg-item:hover,.lg-item:focus-visible{background:var(--accent-soft);color:var(--text);outline:none}
+.lg-item:focus-visible{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.lg-item.active{color:var(--text);font-weight:600}
+.lg-item .lg-flag{width:20px;height:15px}
+.lg-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.lg-ck{width:13px;height:13px;flex-shrink:0;margin-left:8px;fill:none;stroke:var(--accent-2);stroke-width:2.6;
+  stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.lg-item.active .lg-ck{opacity:1}
 .tb-spacer{flex:1}
 .tb-actions{display:flex;gap:8px;align-items:center;-webkit-app-region:no-drag}
 .tb-btn{
@@ -7987,6 +8032,7 @@ __UI_CSS__
       </div>
       <div class="tb-spacer"></div>
       <div class="tb-actions">
+        <button class="tb-btn tb-lang" id="tbLang" type="button" title="Language" data-ui-title="language" aria-haspopup="listbox" aria-expanded="false" aria-controls="lgPop"></button>
         <button class="tb-btn" onclick="uiToggleTheme()" title="Toggle theme" data-ui-title="toggleTheme">
           <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
@@ -12846,6 +12892,7 @@ __UI_SCRIPT__
   <div class="sk-foot"><kbd>Esc</kbd><span id="skTip">close</span></div>
 </div>
 <div class="sk-det" id="skDet" role="dialog" hidden><div class="sk-det-in" id="skDetBody"></div></div>
+<div class="lg-pop" id="lgPop" role="listbox" hidden></div>
 <script>
 /* ═══════ 搜索栏 Ctrl+K：主题切换 / 消息树 / FAQ / 全部游戏；消息点开后在右侧弹出带箭头的内容框 ═══════ */
 (function(){
@@ -12878,6 +12925,7 @@ __UI_SCRIPT__
   var MOON='<svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
   var SUN='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
 
+  var secFolded=false;     /* 「消息」整块是否收起 */
   var openReq={};          /* 消息树里每个请求的展开状态（刷新后保留） */
   var activeRow=null;
 
@@ -12910,11 +12958,11 @@ __UI_SCRIPT__
 
   function msgsHtml(){
     var list=inbox(),total=0;
-    var h='<div class="sk-sec" id="skMsgSec"><div class="sk-h"><span>'+esc(uiT('inboxTitle'))+'</span>';
+    var h='<div class="sk-sec'+(secFolded?' sk-fold-on':'')+'" id="skMsgSec"><button type="button" class="sk-h sk-foldbtn" data-act="fold" aria-expanded="'+(!secFolded)+'">'+CARET+'<span>'+esc(uiT('inboxTitle'))+'</span>';
     list.forEach(function(r){total+=unreadOf(r);});
-    h+='<b>'+(total?total+' '+esc(uiT('inboxNew')):list.length)+'</b></div>';
+    h+='<b>'+(total?total+' '+esc(uiT('inboxNew')):list.length)+'</b></button><div class="sk-fold-body"><div class="sk-fold-in">';
     if(!list.length){
-      h+='<div class="sk-none">'+esc(uiT(typeof INBOX!=='undefined'&&INBOX===null?'inboxLoading':'inboxEmpty'))+'</div></div>';
+      h+='<div class="sk-none">'+esc(uiT(typeof INBOX!=='undefined'&&INBOX===null?'inboxLoading':'inboxEmpty'))+'</div></div></div></div>';
       return h;
     }
     list.forEach(function(r,i){
@@ -12932,7 +12980,7 @@ __UI_SCRIPT__
       if(!rp.length)h+='<div class="sk-kid sk-wait">'+esc(uiT('inboxWaiting'))+'</div>';
       h+='</div></div>';
     });
-    return h+'</div>';
+    return h+'</div></div></div>';
   }
 
   function faqHtml(){
@@ -13068,6 +13116,13 @@ __UI_SCRIPT__
   kbd.addEventListener('click',function(e){e.stopPropagation();if(pop.hidden)open();else close();});
 
   scroll.addEventListener('click',function(e){
+    var fb=e.target.closest?e.target.closest('.sk-foldbtn'):null;
+    if(fb){
+      var sec=fb.parentNode;sec.classList.toggle('sk-fold-on');
+      secFolded=sec.classList.contains('sk-fold-on');
+      fb.setAttribute('aria-expanded',String(!secFolded));
+      hideDet();return;
+    }
     var b=e.target.closest?e.target.closest('.sk-item'):null;if(!b)return;
     var act=b.getAttribute('data-act');
     if(act==='theme'){
@@ -13082,7 +13137,7 @@ __UI_SCRIPT__
       if(rep===null){
         var g=b.parentNode;g.classList.toggle('open');
         openReq[g.getAttribute('data-k')]=g.classList.contains('open');
-        showDet(b,reqDetail(r));
+        if(g.classList.contains('open'))showDet(b,reqDetail(r));else hideDet();
       }else{
         var p=(r.replies||[])[parseInt(rep,10)];if(!p)return;
         showDet(b,repDetail(r,p));
@@ -13147,6 +13202,80 @@ __UI_SCRIPT__
     return r;
   };
   labels();
+})();
+</script>
+<script>
+/* ═══════ 顶栏语言按钮：国旗 → 点击在下方弹出带箭头的语言列表（国旗 · 5px · 语言名称） ═══════ */
+(function(){
+  var btn=document.getElementById('tbLang'),pop=document.getElementById('lgPop');
+  if(!btn||!pop||typeof UI_LANGS==='undefined')return;
+  document.body.appendChild(pop);
+  var CK='<svg class="lg-ck" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+
+  function cur(){return (typeof uiState!=='undefined'&&uiState.lang)||document.documentElement.lang||'en';}
+  function find(code){for(var i=0;i<UI_LANGS.length;i++)if(UI_LANGS[i].code===code)return UI_LANGS[i];return null;}
+  function flag(l){return '<span class="lg-flag">'+uiFlagSvg(l.flag)+'</span>';}
+
+  function paintBtn(){
+    var l=find(cur())||UI_LANGS[0];
+    btn.innerHTML=flag(l);
+    try{btn.title=uiT('language');}catch(e){}
+  }
+  function render(){
+    var c=cur(),h='';
+    UI_LANGS.forEach(function(l){
+      h+='<button type="button" role="option" class="lg-item'+(l.code===c?' active':'')+'" data-lang="'+l.code+'" lang="'+l.code+'" aria-selected="'+(l.code===c)+'">'
+        +flag(l)+'<span class="lg-name">'+uiEsc(l.native)+'</span>'+CK+'</button>';
+    });
+    pop.innerHTML=h;
+  }
+  /* 箭头对准国旗按钮中心，弹窗在按钮正下方 */
+  function place(){
+    var br=btn.getBoundingClientRect(),vw=document.documentElement.clientWidth;
+    var w=pop.offsetWidth,cx=br.left+br.width/2;
+    var left=Math.max(12,Math.min(Math.round(cx-w/2),vw-12-w));
+    pop.style.left=left+'px';pop.style.top=Math.round(br.bottom+12)+'px';
+    pop.style.setProperty('--lg-ar',Math.max(14,Math.min(w-26,Math.round(cx-left-6)))+'px');
+  }
+  function open(){
+    render();pop.hidden=false;place();
+    btn.classList.add('open');btn.setAttribute('aria-expanded','true');
+  }
+  function close(){
+    if(pop.hidden)return;
+    pop.hidden=true;btn.classList.remove('open');btn.setAttribute('aria-expanded','false');
+  }
+  window.lgClose=close;
+
+  btn.addEventListener('click',function(e){e.stopPropagation();if(pop.hidden)open();else close();});
+  pop.addEventListener('click',function(e){
+    var b=e.target.closest?e.target.closest('.lg-item'):null;if(!b)return;
+    var code=b.getAttribute('data-lang');close();
+    if(code&&code!==cur()&&typeof uiSetLang==='function')uiSetLang(code);
+  });
+  document.addEventListener('mousedown',function(e){
+    if(pop.hidden)return;
+    var t=e.target;if(btn.contains(t)||pop.contains(t))return;
+    close();
+  },true);
+  document.addEventListener('keydown',function(e){
+    if(pop.hidden||(e.key!=='ArrowDown'&&e.key!=='ArrowUp'))return;
+    var items=Array.prototype.slice.call(pop.querySelectorAll('.lg-item'));if(!items.length)return;
+    e.preventDefault();
+    var i=items.indexOf(document.activeElement);
+    i=(e.key==='ArrowDown')?(i+1)%items.length:(i<=0?items.length-1:i-1);
+    items[i].focus();
+  });
+  window.addEventListener('resize',function(){if(!pop.hidden)place();});
+
+  /* 语言变化（含设置页、宿主推送）时同步按钮上的国旗和列表选中态 */
+  var prev=window.onUiLangChanged;
+  window.onUiLangChanged=function(){
+    var r=typeof prev==='function'?prev.apply(this,arguments):undefined;
+    paintBtn();if(!pop.hidden){render();place();}
+    return r;
+  };
+  paintBtn();
 })();
 </script>
 </body>
