@@ -6609,7 +6609,16 @@ html.ui-resizing,html.ui-resizing *{cursor:nwse-resize !important;-webkit-user-s
   box-shadow:0 8px 24px var(--accent-glow,rgba(59,130,246,.35));outline:none;
 }
 #storeBackTop:active{transform:translateY(0) scale(.96)}
-#storeBackTop svg{display:block;width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+/* 新增：环形滚动进度，显示当前在商店页面中的大致位置 */
+#storeBackTop::before{
+  content:"";position:absolute;inset:-4px;border-radius:17px;pointer-events:none;
+  background:conic-gradient(var(--accent) var(--scroll-progress,0%),transparent 0);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.5px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1.5px));
+  opacity:.92;transition:opacity .18s ease;
+}
+#storeBackTop:not(.visible)::before{opacity:0}
+#storeBackTop svg{position:relative;z-index:1;display:block;width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:640px){#storeBackTop{right:16px;bottom:16px;width:42px;height:42px;border-radius:12px}}
 @media(prefers-reduced-motion:reduce){#storeBackTop{transition:opacity .12s,visibility .12s}}
 
@@ -14035,20 +14044,49 @@ __UI_SCRIPT__
   var token = 0;
   var threshold = 180;
 
+  function cancelAutoScroll(){
+    if (!raf) return;
+    cancelAnimationFrame(raf);
+    raf = 0;
+    token++;
+  }
   function updateButton(){
     var onStore = !page.hidden && page.classList.contains('page');
+    var maxScroll = Math.max(1, page.scrollHeight - page.clientHeight);
+    var progress = Math.max(0, Math.min(100, page.scrollTop / maxScroll * 100));
+    btn.style.setProperty('--scroll-progress', progress.toFixed(2) + '%');
     btn.classList.toggle('visible', onStore && page.scrollTop > threshold);
     btn.setAttribute('aria-hidden', onStore && page.scrollTop > threshold ? 'false' : 'true');
   }
 
   page.addEventListener('scroll', updateButton, {passive:true});
   window.addEventListener('resize', updateButton, {passive:true});
+  /* 用户主动滚动时立即中断自动动画，不和鼠标/触控操作抢控制权 */
+  page.addEventListener('wheel', cancelAutoScroll, {passive:true});
+  page.addEventListener('touchstart', cancelAutoScroll, {passive:true});
+  page.addEventListener('pointerdown', function(e){ if(e.target !== btn && !btn.contains(e.target)) cancelAutoScroll(); }, {passive:true});
+
+  /* 键盘辅助：商店页按 Ctrl+Home 可快速回到顶部，输入框中不拦截快捷键 */
+  document.addEventListener('keydown', function(e){
+    var target = e.target;
+    var editing = target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+    if (editing || e.defaultPrevented || !e.ctrlKey || e.key !== 'Home') return;
+    if (page.hidden || !page.classList.contains('page') || page.scrollTop <= 0) return;
+    e.preventDefault();
+    btn.click();
+  });
 
   btn.addEventListener('click', function(){
-    if (raf) cancelAnimationFrame(raf);
+    cancelAutoScroll();
     var myToken = ++token;
     var start = page.scrollTop;
     if (start <= 0) { updateButton(); return; }
+    /* 尊重系统的减少动态效果设置 */
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      page.scrollTop = 0;
+      updateButton();
+      return;
+    }
     var startTime = 0;
     /* ease-in：前段较缓，越接近顶部速度越快 */
     var duration = Math.max(420, Math.min(1250, 480 + start * 0.22));
