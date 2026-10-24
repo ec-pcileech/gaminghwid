@@ -6387,7 +6387,7 @@ bgfxApply();
   </header>
   <div class="world-content">
     <section class="world-map-panel">
-      <div class="world-map-caption"><span>GLOBAL NETWORK</span><span class="world-map-hint">Hover over a country to inspect</span></div>
+      <div class="world-map-caption"><span>GLOBAL NETWORK</span><span class="world-map-hint">Drag to rotate · hover a marker</span></div>
       <div class="world-map-stage">
         <canvas id="worldGlobeCanvas" aria-label="Interactive 3D particle globe showing simulated online players by country" role="img"></canvas>
         <div id="worldCountryTip" class="world-country-tip" hidden></div>
@@ -6416,15 +6416,15 @@ bgfxApply();
 .world-map-panel{background:linear-gradient(145deg,var(--surface),var(--surface-2))}
 .world-map-caption{height:48px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:1.1px;color:var(--text-2)}
 .world-map-hint{font-size:11px;font-weight:400;letter-spacing:0;color:var(--text-3)}
-.world-map-stage{position:relative;min-height:380px;height:calc(100% - 84px);display:flex;align-items:center;justify-content:center;padding:10px;background:radial-gradient(ellipse at center,rgba(24,83,132,.16),transparent 66%)}
-#worldGlobeCanvas{display:block;width:min(100%,820px);height:100%;min-height:360px;max-height:calc(100vh - 220px);cursor:grab;touch-action:pan-y}
+.world-map-stage{position:relative;min-height:380px;height:calc(100% - 84px);display:flex;align-items:center;justify-content:center;padding:10px;background:radial-gradient(ellipse at center,var(--accent-soft),transparent 66%)}
+#worldGlobeCanvas{display:block;width:min(100%,820px);height:100%;min-height:360px;max-height:calc(100vh - 220px);cursor:grab;touch-action:none}
 #worldGlobeCanvas:active{cursor:grabbing}
 #worldVectorMap{width:100%;max-height:100%;min-height:300px;color:var(--text);overflow:visible}
 .world-continent path{fill:var(--surface-3);stroke:var(--text-3);stroke-opacity:.35;stroke-width:1.2;stroke-linejoin:round;transition:fill .2s}
 .world-country-mark{cursor:pointer;stroke:rgba(255,255,255,.7);stroke-width:1.5;transition:r .15s,filter .15s}
 .world-country-mark:hover,.world-country-mark.active{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 7px currentColor)}
 .world-legend{height:36px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:9px;color:var(--text-3);letter-spacing:.5px}
-.world-legend i{width:25px;height:7px;border-radius:3px}.legend-low{background:#f6b7a8}.legend-mid{background:#f47762}.legend-high{background:#e7473c}.legend-hot{background:#a91024}
+.world-legend i{width:25px;height:7px;border-radius:3px}.legend-low{background:#ffb080;box-shadow:0 0 8px rgba(255,176,128,.6)}.legend-mid{background:#ff7040;box-shadow:0 0 8px rgba(255,112,64,.6)}.legend-high{background:#e43426;box-shadow:0 0 8px rgba(228,52,38,.6)}.legend-hot{background:#960a1e;box-shadow:0 0 8px rgba(150,10,30,.7)}
 .world-country-tip{position:absolute;z-index:4;min-width:170px;padding:12px 14px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);box-shadow:var(--shadow-2);pointer-events:none}.world-country-tip:before{content:"";position:absolute;left:-6px;top:var(--tip-arrow-y,50%);width:10px;height:10px;transform:translateY(-50%) rotate(45deg);background:var(--surface-solid);border-left:1px solid var(--border-2);border-bottom:1px solid var(--border-2)}.world-country-tip.tip-left:before{left:auto;right:-6px;transform:translateY(-50%) rotate(225deg)}.world-tip-title{display:flex;align-items:center;gap:8px}.world-tip-title img{width:24px;height:17px;object-fit:cover;border-radius:3px}.world-tip-title strong{font-size:13px}
 .world-country-tip strong{display:block;font-size:13px}.world-country-tip span{display:block;margin-top:5px;color:var(--text-3);font-size:10px}.world-country-tip b{display:block;margin-top:3px;font:700 19px var(--font-mono,monospace);color:var(--text)}
 .world-side-panel{display:flex;flex-direction:column}.world-side-title{padding:17px 16px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1px;font-weight:700;color:var(--text-2)}.world-side-title small{font-size:9px;color:var(--accent);letter-spacing:.8px}
@@ -6438,6 +6438,7 @@ bgfxApply();
 (function(){
   var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage');
   if(!openBtn||!page||page.dataset.globeReady)return; page.dataset.globeReady='1';
+  /* ───────── 国家数据：[名称, 国旗, 纬度, 经度] ───────── */
   var raw=[
     ['United States','🇺🇸',39,-98],['Canada','🇨🇦',56,-106],['Mexico','🇲🇽',23,-102],['Guatemala','🇬🇹',15,-90],['Cuba','🇨🇺',22,-79],['Panama','🇵🇦',9,-80],['Costa Rica','🇨🇷',10,-84],['Jamaica','🇯🇲',18,-77],['Haiti','🇭🇹',19,-72],['Dominican Republic','🇩🇴',19,-70],['Colombia','🇨🇴',4,-72],['Venezuela','🇻🇪',8,-66],['Ecuador','🇪🇨',-2,-77],['Peru','🇵🇪',-10,-76],['Bolivia','🇧🇴',-17,-65],['Chile','🇨🇱',-30,-71],['Argentina','🇦🇷',-38,-64],['Uruguay','🇺🇾',-33,-56],['Paraguay','🇵🇾',-23,-58],['Brazil','🇧🇷',-10,-52],
     ['Iceland','🇮🇸',65,-19],['Ireland','🇮🇪',53,-8],['United Kingdom','🇬🇧',54,-2],['Portugal','🇵🇹',39,-8],['Spain','🇪🇸',40,-4],['France','🇫🇷',46,2],['Belgium','🇧🇪',50,4],['Netherlands','🇳🇱',52,5],['Germany','🇩🇪',51,10],['Switzerland','🇨🇭',47,8],['Italy','🇮🇹',42,12],['Norway','🇳🇴',62,10],['Sweden','🇸🇪',60,18],['Finland','🇫🇮',64,26],['Denmark','🇩🇰',56,10],['Poland','🇵🇱',52,20],['Czechia','🇨🇿',49,15],['Austria','🇦🇹',47,14],['Hungary','🇭🇺',47,19],['Romania','🇷🇴',46,25],['Greece','🇬🇷',39,22],['Ukraine','🇺🇦',49,32],['Türkiye','🇹🇷',39,35],['Russia','🇷🇺',60,90],
@@ -6449,46 +6450,180 @@ bgfxApply();
     ['Bahamas','🇧🇸',24,-76],['Belize','🇧🇿',17,-88],['Honduras','🇭🇳',15,-86],['El Salvador','🇸🇻',14,-89],['Nicaragua','🇳🇮',13,-85],['Trinidad and Tobago','🇹🇹',11,-61],['Barbados','🇧🇧',13,-59],['Guyana','🇬🇾',5,-59],['Suriname','🇸🇷',4,-56],['Grenada','🇬🇩',12,-61],['Antigua and Barbuda','🇦🇬',17,-62],['Dominica','🇩🇲',15,-61],['Saint Lucia','🇱🇨',14,-61],['Saint Vincent and the Grenadines','🇻🇨',13,-61],['Samoa','🇼🇸',-13,-172],['Tonga','🇹🇴',-21,-175],['Vanuatu','🇻🇺',-16,167],['Solomon Islands','🇸🇧',-9,160],['Kiribati','🇰🇮',1,173],['Tuvalu','🇹🇻',-8,178],['Marshall Islands','🇲🇭',7,171],['Micronesia','🇫🇲',7,158],['Palau','🇵🇼',7,134],['Nauru','🇳🇷',-1,167],['Cook Islands','🇨🇰',-21,-159],['Niue','🇳🇺',-19,-170],['Monaco','🇲🇨',44,7],['San Marino','🇸🇲',44,12],['Liechtenstein','🇱🇮',47,9],['Montenegro','🇲🇪',42,19],['North Macedonia','🇲🇰',41,22],['Kosovo','🇽🇰',42,21]
 
   ];
-  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:15+Math.floor(Math.random()*4485)};});
-  var total=countries.reduce(function(a,c){return a+c.count;},0);document.getElementById('worldTotal').textContent=total.toLocaleString();
-  var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement;
-  var W=900,H=560,rot=0,tilt=-.08,dragging=false,lastX=0,lastY=0,points=[],hoverIndex=-1,raf=0;
-  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
-  function color(n){var t=Math.max(0,Math.min(1,(n-15)/4485));var stops=[[246,183,168],[244,119,98],[231,71,60],[169,16,36]];var p=t*3,i=Math.min(2,Math.floor(p)),f=p-i;var a=stops[i],b=stops[i+1];return 'rgb('+a.map(function(v,j){return Math.round(v+(b[j]-v)*f);}).join(',')+')';}
+  /* ───────── 真实陆地掩码：Natural Earth 50m，0.5° 栅格，行程编码(36 进制，水→陆交替) ───────── */
+  var MW=720,MH=360,MASK_RLE='7fj,6,1,v,gv,11,x,1f,ge,7,1,16,8,8,1,1,3,1m,g5,1k,5,28,2,2,5,9,3w,1,9,1,b8,5,4,1b,7,2,1,2r,3h,1,9,7,b,1,1e,2,8,2,9c,b,2,17,4,2v,3b,d,5,6,1,3,1,5,2,4,s,3,o,a,91,1,6,i,2,6,1,r,5,2u,1w,i,14,4,1,1,5,3,4,7,1s,c,92,1,5,1f,c,2n,1k,7,1,1,2,4,1,h,2q,1,u,h,8l,5,f,1,2,i,1,k,h,2m,1o,k,3,5,3u,c,2,4,1,1,81,3,a,a,3,4,5,13,6,2v,1p,m,47,5,2,a,7v,7,9,b,3,6,5,8,2,o,5,2w,3,1,1p,1,2,c,3,6,48,b,2,1,1,1,7o,9,8,1,6,3,1,3,4,7,5,1,5,4,1,f,d,2w,1v,9,5,7,4d,4,7j,7,7,1,d,2,h,2,8,2,4,j,c,2,1,2x,1t,7,a,1,4d,9,7e,a,3,2,8,2,8,1,5,3,2,1,3,8,2,2,1,p,e,2s,3,2,1x,2,2q,6,1s,d,1,7,6z,9,1,2,1,8,5,4,7,4,1,9,4,d,7,2,7,4,j,2r,2,1,4f,e,1i,4,2,v,1e,1,5j,1,1,1,1,3,2,c,2,9,4,c,5,1,4,7,8,9,2,1,13,28,4b,e,1g,1a,17,1,2,f,5g,o,1,3,6,6,2,6,2,q,16,26,1,3,43,b,14,1,a,1h,1b,g,2,9,5a,9,s,5,3,o,1a,23,46,a,1f,1h,1f,3,6,1,a,5,4q,b,1,3,1b,1,20,23,45,8,1i,1c,3,4,1h,2,5a,h,i,4,7,8,3,a,5,6,3,4,1,6,18,1z,45,8,1b,1i,2,8,4,2,e,3,v,5,55,l,c,7,7,7,1,1,2,9,4,6,1,i,16,1v,47,7,q,3,i,25,9,b,p,4,53,r,2,3,2,6,5,c,2,7,5,6,2,a,1,8,14,1w,45,7,q,7,5,1,7,1,2,2p,n,8,4z,d,2,k,1,6,6,b,2,4,7,8,1,l,13,1v,44,7,q,9,4,1,3,7,2,2o,j,l,4r,9,3,t,9,7,2,4,7,x,1,1,y,1v,43,8,p,9,2,4,1,2z,5,2,d,l,1o,5,15,3,1s,3,8,r,b,1,4,7,7,11,y,1,1,1j,1,7,q,1,3d,1,1,6,l,b,2,i,1,2m,4,14,1i,2,14,g,1w,t,e,8,7,14,t,1m,3,5,2f,g,1b,8,i,d,2,i,1,48,25,w,z,3,l,v,9,a,7,15,p,1u,2a,2,3,j,1j,2,f,b,3,4s,22,18,d,1,2,d,2,3,2,4,8,w,5,3,2,8,1,1,b,7,3,3,1,1,1,l,o,6,1,1l,2a,u,1h,8,6,c,2,4u,4,3,7,4,2,d,13,1f,4,z,5,i,1,9,5,8,2,9,1,1,7,8,5,1,2,l,q,2,4,1h,28,1,2,12,p,4,k,a,5,9,3,5a,4,h,1,3,o,2w,2,g,1,1,1,5,2,1,1,8,2,8,1,4,5,8,a,1,1,g,t,1,2,1f,29,1a,m,2,6,3,7,4,1,f,2,9,3,5,1,5v,l,2x,b,8,c,5,3,d,2,1,1,8,a,4,2,f,q,1d,2d,1,1,1d,a,5,7,1b,2,64,m,33,2,o,1,f,2,b,8,5,1,2,1,h,m,16,2n,1g,6,5,4,1d,3,65,m,4l,9,3,6,j,i,15,2n,1j,5,3,4,1d,4,6d,i,4h,h,o,g,13,2m,1k,7,1i,3,6i,7,6,3,48,1,5,h,f,1,a,g,11,n,4,5,1,3,5,1j,17,4,7,3,7q,1,h,5,4j,1,3,1,1,j,d,4,6,i,y,p,5,2,d,1h,19,a,7t,7,8,a,4g,2,5,c,l,4,4,l,p,z,i,1f,j,7,j,b,7s,9,6,c,4e,2,9,7,q,r,n,x,k,1e,l,6,l,3,5,2,7r,e,1,o,42,3,a,7,3,6,h,q,n,11,e,1e,n,4,p,3,7u,m,1,i,3y,6,6,3,4,g,g,q,m,10,2,1,9,1e,1,1,n,3,8p,l,3,9,2,1,41,a,2,c,2,b,8,1,6,r,k,2p,o,3,8t,v,43,g,3,f,1,6,9,2,1,t,h,2p,o,5,8t,u,42,h,2,6,2,2,a,9,5,w,g,1x,2,n,p,7,7x,1,p,z,42,p,2,3,c,d,2,u,f,1y,1,n,p,8,7n,1,8,1,l,13,40,w,e,18,d,2n,p,8,7i,7,4,3,j,18,r,1,6,3,2w,x,h,17,b,2n,p,7,7i,8,2,3,j,15,4,1,p,2,8,2,1,1,2u,y,g,2,1,6,1,12,5,2b,1,c,r,2,2,2,9,6,70,d,b,5,2,1a,1,4,2,2,i,2,5,g,2m,y,g,8,3,14,1,2p,s,d,1,4,71,d,5,1x,g,4,3,n,2h,x,i,7,4,3d,1,f,r,a,6o,4,2,1,1,2,1,5,7,a,7,1x,3,2,c,v,2i,t,k,4,7,3b,1,h,8,3,d,9,6o,z,6,2,2,24,7,2,2,u,2g,u,v,33,2,1,5,j,4,6,b,a,2,2,6i,z,7,28,5,2,4,w,2g,v,u,31,2,1,8,r,a,4,1,6,1,3,6h,x,c,25,5,3,4,x,4,1,2b,2,1,s,u,30,1,1,9,m,3,3,a,2,2,5,4,1,6f,y,d,23,5,5,1,11,2m,o,u,32,8,l,5,4,9,8,6j,z,e,21,5,1a,2n,f,3,4,v,32,7,l,6,3,7,a,6i,z,g,1x,5,1f,2o,c,1,5,x,30,9,k,d,d,6g,11,d,1y,2,2,1,1,1,1g,2u,9,12,2t,6,1,7,k,8,4,1,c,6e,13,d,8,1,1l,4,1o,2,2,2q,5,18,2q,6,1,8,j,4,1,2,a,3,3,6f,4,1,z,d,1s,1,1t,1,4,2p,5,18,2n,9,1,1,2,7,h,5,2,4,3,6s,2,3,5,1,p,a,1t,2,1u,3,2,2p,6,19,2l,8,6,6,e,2,1,7c,4,1,q,8,1q,3,1y,2,3,2q,4,1a,2k,8,3,a,9,7p,p,8,3s,1,4,2q,3,1b,2j,8,3,c,6,7q,p,5,1i,2,2c,1,5,2m,6,1a,2i,8,4,c,6,7q,q,4,1b,4,2o,2n,2,1b,2j,5,5,e,4,7s,q,3,44,3w,2,3,2v,b,2,7p,2,3,q,2,44,3v,3,3,2u,b,2,7q,3,4,o,1,47,3s,5,2,2u,4,a,7q,3,4,m,2,4a,3c,5,3,a,5,2,1,30,7t,3,4,50,39,2,3,3,4,6,a,2v,7x,3,5,51,34,2,8,a,b,2r,2,1,7y,3,2,54,33,1,9,b,c,2o,82,4,2,55,3c,a,e,2o,80,5,1,56,3b,6,1,b,2,2,3,2s,7v,6,2,56,3c,6,1,e,1,2u,26,2,5l,7,3,55,3g,1,3,39,1t,1,8,5,5k,8,1,57,3k,39,1r,6,4,5,5k,o,1,4s,39,1,8,3b,s,2,x,5,5t,9,2,a,2,4v,36,2,7,3e,s,4,u,8,3,5,5i,a,3,8,1,4x,34,3,4,3i,k,1,7,5,s,j,5f,b,5,4,1,4y,32,7,2,36,1,c,i,5,7,4,q,m,5c,c,8,50,30,3f,p,3,3,8,7,5,n,o,59,c,a,50,30,3f,o,c,1,2,7,7,l,q,51,2,2,d,8,53,30,3f,p,a,2,4,6,8,j,r,4y,i,2,4,2,54,31,3e,o,b,2,5,8,7,h,9,7,b,4x,k,2,5a,2x,3h,m,e,1,7,7,6,m,1,c,8,4y,k,3,58,2w,3j,k,e,4,8,8,3,b,1,4,3,54,1,g,l,3,58,2t,3m,j,g,3,a,4,1,2,2,9,4,59,3,e,m,4,58,2s,3m,i,5,2,a,3,b,2,6,7,4,1,1,57,4,5,1,7,o,4,58,2r,3m,j,h,2,d,2,7,6,5,56,5,2,6,4,p,4,59,2p,3n,j,w,2,7,7,5,52,7,1,7,7,m,4,5b,2o,3o,h,r,1,2,4,8,8,3,54,d,8,m,3,5c,2n,3p,h,q,6,a,6,1,2,3,55,3,1,8,1,1,6,j,5,5d,2l,3q,f,l,2,7,4,c,3,4,1,3,5b,8,6,e,1,2,6,5e,2k,3v,9,9,h,7,1,d,3,8,59,9,7,e,9,5e,2l,3v,2,b,k,y,1,3,2,4,3,4,4q,b,6,d,9,5g,2k,3v,2,8,o,1d,4p,d,6,a,2,1,a,5g,2h,3x,7,2,p,p,6,c,3,4,4n,e,6,6,g,5h,2h,3w,z,17,2,5,4n,d,5,6,g,5k,2e,3x,z,1e,4q,c,1,4,1,3,4,1,7,5t,28,3y,11,1d,4q,j,3,1,5,1,2,5x,25,3x,14,1b,4s,a,2,5,8,62,24,3x,1a,e,4,o,4s,f,1,1,5,1,1,64,21,3y,1e,9,8,l,4u,h,3,67,20,3z,1e,9,b,i,4v,g,3,68,3,3,1t,3y,1i,6,g,4,5,2,4x,h,1,6a,3,3,1r,3z,1l,3,5o,6s,3,3,1g,2,9,40,7a,i,1,6b,3,3,1a,8,2,2,5,3y,39,3,41,6t,4,1,10,7,4,c,4,3x,39,5,3z,6v,3,2,x,p,5,3h,1,7,1,5,3b,5,3x,6x,3,2,u,r,5,3j,1,4,1,4,3d,5,3x,f,1,6f,5,3,s,s,5,3r,2l,4,r,5,3v,6x,5,3,q,u,5,3p,2n,3,s,6,3s,6z,5,3,q,t,5,2,1,3m,2n,4,s,7,5,2,3i,g,1,6m,3,3,p,u,4,5,1,3h,2q,4,s,b,1,1,3i,f,1,6o,2,3,p,v,3,3n,2q,4,s,1,1,9,1,2,3h,73,3,5,m,x,2,3m,2s,4,t,7,3,8,6,1,3,2,2y,4,1,6z,4,5,l,12,2,3h,2s,4,t,6,4,l,2w,4,2,71,3,5,k,13,1,3g,2u,4,t,1,9,k,2u,5,3,72,3,5,j,13,1,3f,2v,6,13,j,2s,5,3,75,1,6,i,u,1,d,1,3a,2v,6,15,j,2p,6,3,7d,h,r,9,3i,2x,6,15,j,2m,8,3,7d,h,q,3,2,8,3e,2z,5,16,i,2j,c,1,7f,g,p,1,3,1,5,6,3c,30,4,15,k,14,4,17,50,1,2u,g,f,7,g,5,5,1,34,30,4,14,m,4,1,t,a,w,3,3,54,2,2t,h,d,7,i,6,38,31,4,13,n,2,3,s,b,t,5,2,57,1,2s,i,c,7,j,7,37,30,5,10,t,s,c,s,7,1,57,2,2r,i,b,7,s,7,2z,30,6,z,t,r,f,p,6,4,56,2,2s,i,a,7,t,8,2x,30,7,y,t,p,h,p,5,4,83,i,5,1,1,8,q,1,2,9,2w,31,6,w,w,n,j,o,5,4,84,w,i,4,4,9,2,1,2,4,2r,31,6,u,x,m,l,o,5,2,l,4,7j,s,l,1,b,1,32,32,6,r,z,l,m,o,s,4,7l,q,3z,33,7,q,z,j,o,p,r,4,7n,o,3z,34,6,n,12,j,o,q,p,5,7q,k,1h,2,2h,34,6,k,16,h,o,4,3,l,o,4,7u,2,5,j,3r,34,1,1,4,k,16,e,t,1,4,m,n,3,83,j,3b,1,d,36,5,i,19,c,z,n,m,3,84,j,3n,39,4,e,1c,c,z,n,m,4,84,i,3o,39,3,c,1f,c,z,n,m,5,85,e,3p,3a,2,9,1i,c,z,n,m,2,1,5,85,b,3p,3b,1,6,1l,c,o,1,b,3,2,h,m,2,3,2,89,8,3p,3g,h,1,16,b,o,1,b,3,2,h,m,2,3,3,89,7,n,2,31,3c,k,1,16,a,p,1,a,4,4,f,n,1,3,2,1,2,88,6,m,2,2,2,2z,3a,f,2,1c,9,p,1,a,4,6,d,p,1,4,2,89,5,j,5,1,5,2x,3b,9,6,1d,9,11,2,7,c,l,1,4,2,2,3,89,5,g,f,7,4,2,1,2k,3a,3,c,1d,8,10,3,8,9,m,2,4,6,8a,6,f,k,2,4,1,2,2l,3n,1e,7,12,2,a,5,o,1,6,7,89,6,e,7,2,j,2n,3m,1e,6,2,1,10,2,b,3,o,1,7,4,2,1,8c,4,4,4,3,w,2m,3l,1f,5,2,2,y,4,9,3,o,1,8,2,4,1,8d,8,1,3,1,w,2n,3k,1g,4,3,2,y,4,9,2,o,1,d,4,8d,6,3,12,2k,3j,1i,2,3,4,n,1,9,5,x,1,a,8,8g,3,3,13,2k,3i,1n,5,y,3,17,9,8h,1,5,13,2k,3g,1o,5,n,1,b,2,x,1,9,1,3,5,8o,13,2l,3e,1p,4,z,4,u,2,9,1,3,3,1,1,8o,15,2k,r,4,2h,1q,3,11,5,r,4,c,3,8q,1c,2f,m,8,2g,2k,1,9,6,q,5,d,1,8q,1e,2e,i,b,2f,2l,5,5,7,o,8,92,1f,2e,5,8,1,f,2d,2n,5,5,6,m,8,94,1g,37,2,4,26,2o,5,4,6,l,9,g,1,8n,1h,3b,1,1,24,2q,5,4,5,9,1,a,9,95,1h,3b,1,2,22,2s,5,3,5,j,9,95,1j,3d,21,2q,1,3,5,3,4,g,d,93,1k,3c,21,2w,6,2,4,e,e,k,1,8h,1m,3b,1z,2z,7,2,3,9,3,1,e,j,1,8i,1m,3b,1y,2x,2,2,8,1,2,9,k,4,1,6,1,5,3,8e,1o,3b,1w,30,1,2,9,b,k,2,a,5,2,8f,1p,34,1,4,1w,34,a,a,h,5,1,6,1,7,1,7t,1,l,1s,37,1w,35,9,1,1,8,h,4,1,e,2,4,3,7m,3,j,1w,32,1w,37,7,b,h,4,2,2,4,7,3,4,1,1,5,3,1,7y,1z,31,1u,35,1,3,8,a,f,4,9,e,8,81,21,2z,1t,37,1,2,8,1,2,8,d,5,6,2,1,2,3,3,1,4,1,3,5,3,1,1,3,7t,21,30,1r,39,1,2,b,7,d,5,6,k,5,4,7,d,1,7d,26,1,2,2s,1p,3b,1,1,c,1,2,3,d,4,7,c,4,4,6,2,b,h,1,76,2b,2r,1n,3f,9,3,1,7,3,1,6,4,4,1,3,7,2,1,7,3,l,h,1,72,2d,2r,1m,3g,8,h,4,6,2,1,3,8,1,2,1,4,1,3,o,g,1,6z,2f,2r,1k,3i,7,r,2,2,3,o,k,d,3,6z,2h,2p,1k,3j,6,r,2,2,1,1,2,p,k,b,3,70,2j,2n,1i,1,1,3k,4,r,2,2,3,t,h,a,2,5,1,6w,2k,2m,1i,3n,1,1,1,1h,1,2,2,6,i,2,7,6,2,6v,2k,2n,1i,3o,6,1f,2,7,j,3,2,9,2,6w,2i,2n,1i,3n,9,2,3,18,1,8,i,g,1,1,1,6u,2j,2m,1i,3q,e,10,1,d,h,k,1,6u,2i,2n,1i,3r,e,n,1,9,1,d,j,i,1,3,1,6s,2g,2o,1h,3y,a,1,1,1,4,2,2,3,5,p,c,5,5,h,2,2,2,6q,2g,2o,1h,45,1,1,1,1,6,1,6,5,4,r,6,6,4,i,2,4,1,6p,2e,2p,1h,4g,1,8,4,u,4,8,5,1,1,4,1,e,1,1,1,6o,2e,2p,1i,4e,3,6,3,19,5,1,1,h,3,6q,2c,2r,1i,4f,1,6,2,1b,5,7b,2a,2t,1i,4l,1,11,1,12,2,6o,29,2t,1i,4z,1,1,1,1,2,i,2,7r,28,2u,1i,5,1,4t,3,2,3,g,2,7s,27,2u,1i,h,1,4j,c,9,4,7r,26,2u,1j,h,2,4h,c,a,4,7s,24,2u,1k,g,3,4g,d,a,4,2g,1,5b,23,2v,1k,f,4,4f,f,9,4,7s,23,2v,1l,e,5,47,4,3,d,1,1,9,6,7r,22,2u,1m,d,6,45,7,2,c,c,7,17,1,6j,21,2u,1m,c,7,44,n,b,8,16,2,6k,1z,2u,1l,a,a,44,p,9,8,19,1,6j,1y,2t,1l,9,b,43,t,6,9,17,2,n,1,5z,1v,2t,1k,a,b,41,1,1,w,3,a,18,1,k,3,60,1u,2t,1i,b,b,41,z,3,a,3l,1,4b,1t,2t,1g,d,b,41,1c,18,1,i,3,65,1q,2v,1e,e,b,41,1d,1q,2,66,1q,2v,1d,f,b,40,1e,19,1,6o,1q,2w,1a,h,a,40,1g,7x,1p,2y,18,j,9,3z,1j,7v,1p,2y,18,i,9,i,1,3c,1q,u,1,6y,1o,30,17,i,9,3s,1t,v,2,3,1,6t,1m,31,17,h,a,d,2,3b,1w,v,2,6v,1n,32,17,f,b,3o,1y,w,2,6u,1m,33,17,f,a,3n,22,w,1,6t,1l,35,16,f,a,3n,23,7p,1g,3a,16,g,9,3n,23,7p,1f,3b,16,g,8,3o,24,7o,1b,3f,16,g,8,3o,25,7n,1a,3g,15,i,7,3o,26,7m,19,3h,12,l,5,3q,28,7j,19,3j,10,4h,27,7k,19,3j,10,4g,28,7k,19,3j,10,4h,28,7j,19,3j,10,4i,27,7j,19,3k,z,4i,27,7i,1a,3l,x,4j,27,7i,19,3n,v,4l,26,7i,18,3o,u,4n,25,7i,17,3q,s,4o,25,7i,17,3q,s,4o,25,7h,17,3s,q,4p,24,7j,15,3t,p,4r,23,7j,13,3w,n,4s,s,4,17,7j,13,3w,m,4t,o,b,13,7k,12,3x,l,4u,j,i,11,7j,13,3x,j,4w,h,l,y,7l,11,40,g,4x,i,m,4,1,s,7l,11,40,7,5,1,50,9,v,3,2,r,7m,s,2,6,43,2,5b,5,x,2,2,2,1,p,18,1,6c,v,as,1,2,o,19,3,69,w,ar,3,2,n,1a,2,69,w,ax,l,1c,2,68,x,aw,l,1d,1,1,1,65,x,ax,l,1d,3,65,w,az,j,1e,4,2,2,60,w,b1,d,1i,8,60,t,b8,2,3,3,1j,7,61,n,d4,7,62,n,bf,1,1p,5,62,n,bp,1,1h,4,62,o,bh,2,4,2,1b,2,1,1,2,3,63,i,2,2,bj,8,1b,8,64,i,bo,7,1a,6,66,2,1,j,bl,7,19,6,67,2,1,j,bm,5,19,6,68,2,1,h,bo,4,19,6,l,1,5q,g,d0,8,6a,i,cy,7,6c,i,cy,8,6c,g,cz,8,6c,f,d0,9,6b,g,d1,6,6d,h,d1,1,6j,i,cy,1,6h,k,jg,j,jh,h,7k,1,by,g,7k,4,bw,g,7m,1,bx,e,jm,d,d2,1,6l,c,h,1,2,1,j3,c,g,6,j2,d,f,1,2,1,j5,c,jp,6,1,5,jp,6,1,5,jr,b,1m,3,i1,d,1,1,1j,1,i4,6,6on,1,13s,1,jv,1,k5,2,1,3,jo,1,2,5,jp,1,2,8,jm,7,jt,5,95,1,al,1,1,6,91,1,n,2,9z,1,2,9,67,c,28,1,6,1,1,9,a,8,v,8,2,2,2,1,8k,3,1,5,69,1,2,e,1k,2,4,16,2,b,d,a,5,p,8a,8,67,2,2,l,1e,3d,85,1,2,4,65,1a,2,1,n,3n,85,4,5z,1j,h,3t,7v,2,6,8,5d,2,c,1o,g,4a,7d,6,4,b,59,5,9,1o,f,4j,70,2,3,8,1,d,4b,2,x,a,2,1o,9,1,3,4p,6x,1,6,6,1,d,39,1,8,1,5,1,9,1,6,8,4,1,5,1,8,2,6,24,9,4x,2,1,6q,6,5,5,1,d,1,1,2x,5,4,3,9,1,1,w,3,7,6,2b,5,50,1,b,6m,b,1,d,2q,1,2,3,2,8,1,3,5,3s,6,5f,51,1,2,2,2,1,16,f,1,d,2r,4f,5,5l,4u,d,19,9,3,d,2n,1,2,4e,4,5l,4t,3,l,2,1,3,w,3,1,1,5,e,2g,1,4,4i,2,5o,3h,3,1a,z,8,5,6,5,4,n,2g,a8,3m,6,2,5,2,1,w,2c,28,1,8,a5,3g,1,d,2,2,4,7,2,3,3,3,3,i,29,28,1,6,2,2,a1,3a,b,3,v,3,3,k,25,2g,a2,1,1,34,25,2,23,2g,a3,2v,2,1,4f,29,af,2n,4i,27,ao,2k,2,1,2,2,3x,6,8,27,aq,26,a,7,6,2,3w,2d,ay,6,1,1x,4r,1f,3,m,b2,5,5,1v,4f,5,1,f,1,z,b,g,ba,1n,3,c,42,3,8,f,5,y,e,e,b6,4,1,1l,9,g,3x,2,8,9,6,1,3,x,f,d,5,2,4,1,an,22,6,k,42,9,3,5,4,9,2,i,g,m,5,4,ag,2q,45,j,1,7,6,c,k,p,an,2t,44,1,1,3,5,b,1,2,6,b,b,q,ay,1y,3,b,50,1f,b9,2h,54,14,bf,2e,54,f,h,3,bl,1t,1,g,56,9,ch,17,d,3,2,a,5d,4,cn,1a,j3,f,ju,o,o,jz,1,5ip';
+  var mask=new Uint8Array(MW*MH);
+  (function(){var runs=MASK_RLE.split(','),p=0,v=0,i,n;for(i=0;i<runs.length;i++){n=parseInt(runs[i],36);if(v)mask.fill(1,p,p+n);p+=n;v^=1;}})();
+  function landAt(i,j){if(j<0||j>=MH)return 0;i=((i%MW)+MW)%MW;return mask[j*MW+i];}
+
+  /* ───────── 在线人数：全球总数随机 120 ~ 1000，按权重分配到各国，总和严格等于总数 ───────── */
+  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:0,ph:Math.random()*6.283};});
+  var T=120+Math.floor(Math.random()*881);
+  (function(){
+    var w=countries.map(function(){return Math.pow(Math.random(),3)+.015;}),ws=w.reduce(function(a,b){return a+b;},0),used=0,rem=[];
+    countries.forEach(function(c,i){var e=w[i]/ws*T;c.count=Math.floor(e);used+=c.count;rem.push({i:i,f:e-c.count});});
+    rem.sort(function(a,b){return b.f-a.f;});
+    for(var k=0;k<T-used;k++)countries[rem[k].i].count++;
+  })();
+  var active=countries.filter(function(c){return c.count>0;});
+  var maxCount=active.reduce(function(m,c){return Math.max(m,c.count);},1);
+  document.getElementById('worldTotal').textContent=T.toLocaleString();
+
+  /* ───────── 颜色：人数 浅橙红 → 深红 ───────── */
+  var STOPS=[[255,176,128],[255,112,64],[228,52,38],[150,10,30]];
+  function heat(n){var t=Math.sqrt(Math.max(0,Math.min(1,n/maxCount))),p=t*3,i=Math.min(2,Math.floor(p)),f=p-i,a=STOPS[i],b=STOPS[i+1];return [0,1,2].map(function(j){return Math.round(a[j]+(b[j]-a[j])*f);});}
+  active.forEach(function(c){c.rgb=heat(c.count);c.rad=2.6+5.4*Math.sqrt(c.count/maxCount);});
+  function rgba(c,a){return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')';}
+  function glowSprite(c,size,core){var cv=document.createElement('canvas');cv.width=cv.height=size;var g=cv.getContext('2d'),h=size/2,gr=g.createRadialGradient(h,h,0,h,h,h);gr.addColorStop(0,rgba(core||c,1));gr.addColorStop(.2,rgba(c,.8));gr.addColorStop(.5,rgba(c,.24));gr.addColorStop(1,rgba(c,0));g.fillStyle=gr;g.fillRect(0,0,size,size);return cv;}
+  active.forEach(function(c){c.halo=glowSprite(c.rgb,64,[255,236,224]);});
+  function parseCol(s,fb){s=(s||'').trim();var m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(s);if(m){var h=m[1];if(h.length===3)h=h.replace(/./g,'$&$&');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}m=/rgba?\(([^)]+)\)/i.exec(s);if(m){var p=m[1].split(/[\s,\/]+/).map(parseFloat);if(p.length>=3&&!isNaN(p[0]))return [p[0],p[1],p[2]];}return fb;}
+  function mix(a,b,t){return [0,1,2].map(function(i){return Math.round(a[i]+(b[i]-a[i])*t);});}
+  var theme={key:'',acc:[59,130,246],light:false,sprite:null};
+  function readTheme(){
+    var cs=getComputedStyle(page),acc=parseCol(cs.getPropertyValue('--accent'),[59,130,246]),light=document.documentElement.getAttribute('data-theme')==='light',key=acc.join(',')+'|'+light;
+    if(key===theme.key)return;theme.key=key;theme.acc=acc;theme.light=light;
+    theme.sprite=glowSprite(acc,32,light?acc:mix(acc,[255,255,255],.6));
+  }
+
+  /* ───────── 粒子：斐波那契球面均匀采样，陆地(含海岸加亮)沿真实经纬度保留，海洋仅留稀疏暗点 ───────── */
+  var N=15000,GA=Math.PI*(3-Math.sqrt(5)),PX=[],PY=[],PZ=[],PK=[],PS=[];
+  for(var i=0;i<N;i++){
+    var y=1-2*(i+.5)/N,rr=Math.sqrt(1-y*y),th=GA*i,x=Math.cos(th)*rr,z=Math.sin(th)*rr;
+    var lat=Math.asin(y)*180/Math.PI,lon=Math.atan2(x,z)*180/Math.PI;
+    var mi=Math.min(MW-1,Math.floor((lon+180)/360*MW)),mj=Math.min(MH-1,Math.floor((90-lat)/180*MH));
+    var land=mask[mj*MW+mi],kind;
+    if(land){kind=(!landAt(mi+2,mj)||!landAt(mi-2,mj)||!landAt(mi,mj+2)||!landAt(mi,mj-2))?2:1;}
+    else{if(Math.random()>.2)continue;kind=0;}
+    PX.push(x);PY.push(y);PZ.push(z);PK.push(kind);PS.push(Math.random()*6.283);
+  }
+  var PN=PX.length;
   function xyz(lat,lon){var la=lat*Math.PI/180,lo=lon*Math.PI/180;return {x:Math.cos(la)*Math.sin(lo),y:Math.sin(la),z:Math.cos(la)*Math.cos(lo)};}
-  // Build a dense spherical point cloud, then retain points over approximate real-world land silhouettes.
-  var landPolys=[ [[-168,72],[-130,70],[-105,55],[-80,50],[-52,25],[-82,7],[-108,20],[-125,38],[-150,55]], [[-81,12],[-50,8],[-35,-10],[-48,-35],[-70,-55],[-79,-25]], [[-11,72],[35,70],[65,55],[40,35],[28,5],[10,-35],[-5,-34],[-18,5],[-10,35]], [[30,72],[70,75],[120,60],[160,55],[180,40],[140,10],[105,0],[75,8],[50,30]], [[112,-11],[154,-12],[153,-39],[130,-45],[113,-28]], [[-25,65],[-13,63],[-18,52],[-30,55]], [[43,-13],[51,-15],[49,-26],[43,-24]], [[-180,68],[-150,65],[-140,55],[-165,52]], [[95,20],[125,18],[140,-5],[120,-10],[105,0]] ];
-  function inPoly(lon,lat,poly){var inside=false;for(var i=0,j=poly.length-1;i<poly.length;j=i++){var xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];var cross=((yi>lat)!=(yj>lat))&&(lon<(xj-xi)*(lat-yi)/(yj-yi+1e-9)+xi);if(cross)inside=!inside;}return inside;}
-  // The number of particles scales with the number of represented countries and their online counts.
-  var particleCount=Math.min(2800,Math.max(1250,countries.length*23));
-  for(var i=0;i<particleCount;i++){var lat=Math.asin(2*Math.random()-1)*180/Math.PI,lon=Math.random()*360-180;var land=landPolys.some(function(poly){return inPoly(lon,lat,poly);});if(!land&&Math.random()>.04)continue;var nearest=0,best=1e9;countries.forEach(function(c,j){var d=Math.pow(c.lat-lat,2)+Math.pow((((c.lon-lon+540)%360)-180)*Math.cos(lat*Math.PI/180),2);if(d<best){best=d;nearest=j;}});points.push({v:xyz(lat,lon),country:nearest,land:land,size:land?(.75+Math.random()*1.2):(.35+Math.random()*.6),phase:Math.random()*6.28});}
-  function project(v,cx,cy,r){var x=v.x*Math.cos(rot)+v.z*Math.sin(rot),z=v.z*Math.cos(rot)-v.x*Math.sin(rot),y=v.y*Math.cos(tilt)-z*Math.sin(tilt);z=v.y*Math.sin(tilt)+z*Math.cos(tilt);return {x:cx+x*r,y:cy-y*r,z:z};}
+  active.forEach(function(c){c.v=xyz(c.lat,c.lon);});
+
+  /* ───────── 状态 ───────── */
+  var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement;
+  var W=900,H=560,rot=-1.2,tilt=.28,vel=0,dragging=false,lastX=0,lastY=0,downX=0,downY=0,moved=0,hoverIndex=-1,raf=0,frame=0,focus=null;
+  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
+  function geom(){var r=Math.min(W,H)*.42;return {r:r,cx:W/2,cy:H/2,sc:Math.max(.7,Math.min(1.45,r/300))};}
+  function proj(v,g){var cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(tilt),st=Math.sin(tilt),x=v.x*cr+v.z*sr,z0=v.z*cr-v.x*sr,y=v.y*ct-z0*st,z=v.y*st+z0*ct;return {x:g.cx+x*g.r,y:g.cy-y*g.r,z:z};}
   function resize(){var dpr=Math.min(2,window.devicePixelRatio||1),rect=canvas.getBoundingClientRect();W=Math.max(300,rect.width);H=Math.max(300,rect.height);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
-  function draw(){if(!page.classList.contains('open')){raf=0;return;}if(!dragging)rot+=.0018;ctx.clearRect(0,0,W,H);var r=Math.min(W*.38,H*.43),cx=W*.49,cy=H*.5;
-    var glow=ctx.createRadialGradient(cx-r*.25,cy-r*.35,r*.05,cx,cy,r*1.35);glow.addColorStop(0,'rgba(26,119,183,.18)');glow.addColorStop(.7,'rgba(10,65,112,.08)');glow.addColorStop(1,'rgba(8,24,45,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
-    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='rgba(6,22,42,.22)';ctx.fill();ctx.strokeStyle='rgba(72,170,226,.42)';ctx.lineWidth=1;ctx.stroke();
-    // Geographic vector land silhouettes beneath the particle layer.
-    ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
-    landPolys.forEach(function(poly){var visible=[],allFront=true;poly.forEach(function(pt){var q=project(xyz(pt[1],pt[0]),cx,cy,r);visible.push(q);if(q.z<0)allFront=false;});if(!allFront)return;ctx.beginPath();visible.forEach(function(q,j){if(j===0)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y);});ctx.closePath();ctx.fillStyle='rgba(25,105,158,.10)';ctx.fill();ctx.strokeStyle='rgba(83,174,235,.30)';ctx.lineWidth=1;ctx.stroke();});ctx.restore();
-    var projected=points.map(function(p){var q=project(p.v,cx,cy,r);q.p=p;return q;}).sort(function(a,b){return a.z-b.z;});
-    projected.forEach(function(q){if(q.z<-.12)return;var c=countries[q.p.country],alpha=.22+((q.z+1)/2)*.78;ctx.beginPath();ctx.arc(q.x,q.y,q.p.size*(.65+q.z*.35),0,Math.PI*2);ctx.fillStyle=q.p.land?color(c.count):'rgba(86,177,230,'+(alpha*.35)+')';ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;});
-    // Glowing country anchors are positioned from each country's real geographic latitude/longitude.
-    countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var rr=2.2+Math.min(4,c.count/900);ctx.beginPath();ctx.arc(q.x,q.y,rr+3,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.globalAlpha=.18;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(q.x,q.y,rr,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.fill();if(i===hoverIndex){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}}
-    );
+
+  /* ───────── 绘制 ───────── */
+  function draw(now){
+    if(!page.classList.contains('open')){raf=0;return;}
+    if(frame++%45===0)readTheme();
+    var t=now/1000,g=geom(),cx=g.cx,cy=g.cy,R=g.r,sc=g.sc,light=theme.light,acc=theme.acc;
+    /* 旋转：拖动 > 聚焦动画 > 惯性 > 悬停暂停 > 自转 */
+    if(!dragging){
+      if(focus){var dr=focus.rot-rot,dt=focus.tilt-tilt;rot+=dr*.09;tilt+=dt*.09;vel=0;if(Math.abs(dr)<.002&&Math.abs(dt)<.002)focus=null;}
+      else if(Math.abs(vel)>.0003){rot+=vel;vel*=.94;}
+      else if(hoverIndex<0)rot+=.0018;
+    }
+    ctx.clearRect(0,0,W,H);
+    ctx.globalCompositeOperation='source-over';
+    /* 球体底色 + 大气光晕 */
+    var base=ctx.createRadialGradient(cx-R*.3,cy-R*.35,R*.1,cx,cy,R);
+    base.addColorStop(0,rgba(acc,light?.10:.14));base.addColorStop(1,rgba(acc,light?.02:.03));
+    ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.fillStyle=base;ctx.fill();
+    var atm=ctx.createRadialGradient(cx,cy,R*.97,cx,cy,R*1.24);
+    atm.addColorStop(0,rgba(acc,light?.22:.34));atm.addColorStop(.35,rgba(acc,light?.07:.12));atm.addColorStop(1,rgba(acc,0));
+    ctx.fillStyle=atm;ctx.beginPath();ctx.arc(cx,cy,R*1.24,0,6.2832);ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.strokeStyle=rgba(acc,light?.35:.28);ctx.lineWidth=1;ctx.stroke();
+    ctx.globalCompositeOperation=light?'source-over':'lighter';
+    /* 粒子 */
+    var cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(tilt),st=Math.sin(tilt),spr=theme.sprite;
+    for(var i=0;i<PN;i++){
+      var X=PX[i],Y=PY[i],Z=PZ[i],x=X*cr+Z*sr,z0=Z*cr-X*sr,yy=Y*ct-z0*st,z=Y*st+z0*ct,k=PK[i],d,a;
+      if(z<0){if(k===0||light)continue;a=.07;d=2.4*sc;}
+      else{
+        var tw=1+.2*Math.sin(t*2.1+PS[i]);
+        if(k===0){a=.10+.18*z;d=2.2*sc*tw;}
+        else if(k===1){a=.30+.70*z;d=(3.3+1.5*z)*sc*tw;}
+        else{a=.55+.45*z;d=(4.6+1.8*z)*sc*tw;}
+      }
+      ctx.globalAlpha=a;ctx.drawImage(spr,cx+x*R-d/2,cy-yy*R-d/2,d,d);
+    }
+    ctx.globalAlpha=1;
+    /* 国家在线标记：发光光晕 + 实心核 + 脉冲环 */
+    var vis=[];
+    for(var j=0;j<active.length;j++){var c=active[j],q=proj(c.v,g);if(q.z>.02){q.c=c;q.i=countries.indexOf(c);vis.push(q);}}
+    vis.sort(function(a,b){return a.z-b.z;});
+    vis.forEach(function(q){
+      var c=q.c,hov=q.i===hoverIndex,fade=Math.min(1,q.z/.3),rd=c.rad*sc*(hov?1.25:1),pu=.88+.12*Math.sin(t*2.4+c.ph),hs=rd*(hov?9:6.4)*pu;
+      ctx.globalCompositeOperation=light?'source-over':'lighter';
+      ctx.globalAlpha=fade*(light?.55:.9);ctx.drawImage(c.halo,q.x-hs/2,q.y-hs/2,hs,hs);
+      var p=((t*.55+c.ph/6.283)%1);
+      ctx.globalAlpha=fade*(1-p)*.55;ctx.beginPath();ctx.arc(q.x,q.y,rd+p*rd*2.8,0,6.2832);ctx.strokeStyle=rgba(c.rgb,1);ctx.lineWidth=1.2;ctx.stroke();
+      ctx.globalCompositeOperation='source-over';
+      ctx.globalAlpha=fade;ctx.beginPath();ctx.arc(q.x,q.y,rd*.62,0,6.2832);ctx.fillStyle=rgba(c.rgb,1);ctx.fill();
+      ctx.lineWidth=1;ctx.strokeStyle='rgba(255,236,224,'+(hov?.95:.55)+')';ctx.stroke();
+      if(hov){ctx.beginPath();ctx.arc(q.x,q.y,rd+3.5,0,6.2832);ctx.strokeStyle='#fff';ctx.lineWidth=1.6;ctx.stroke();}
+    });
+    ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+    if(hoverIndex>=0&&!tip.hidden){var hq=proj(countries[hoverIndex].v||xyz(countries[hoverIndex].lat,countries[hoverIndex].lon),g);if(hq.z<=.02){tip.hidden=true;}else positionTip(hoverIndex);}
     raf=requestAnimationFrame(draw);
   }
-  function renderList(){countries.map(function(c,i){return {c:c,i:i};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png" loading="lazy"><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';row.addEventListener('mouseenter',function(){selectCountry(i,true);});row.addEventListener('focus',function(){selectCountry(i,true);});row.addEventListener('click',function(){selectCountry(i,true);});list.appendChild(row);});}
-  function positionTip(i){var c=countries[i],rect=canvas.getBoundingClientRect(),r=Math.min(W*.38,H*.43),q=project(xyz(c.lat,c.lon),W*.49,H*.5,r);var stageRect=stage.getBoundingClientRect(),anchorX=rect.left-stageRect.left+q.x,anchorY=rect.top-stageRect.top+q.y;var left=Math.max(8,Math.min(stageRect.width-tip.offsetWidth-8,anchorX+12));var top=Math.max(8,Math.min(stageRect.height-tip.offsetHeight-8,anchorY-tip.offsetHeight/2));tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.toggle('tip-left',left<anchorX-tip.offsetWidth);tip.style.setProperty('--tip-arrow-y',Math.max(12,Math.min(tip.offsetHeight-12,anchorY-top))+'px');}
-  function selectCountry(i,showTip){hoverIndex=i;list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});if(showTip){var c=countries[i];tip.hidden=false;tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';positionTip(i);requestAnimationFrame(function(){positionTip(i);});}}
-  function findCountryAt(clientX,clientY){var rect=canvas.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top,r=Math.min(W*.38,H*.43),cx=W*.49,cy=H*.5,best=24,idx=-1;countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var d=Math.hypot(q.x-x,q.y-y);if(d<best){best=d;idx=i;}});return idx;}
-  canvas.addEventListener('mousemove',function(e){if(dragging){rot+=(e.clientX-lastX)*.008;tilt=Math.max(-.8,Math.min(.8,tilt+(e.clientY-lastY)*.005));lastX=e.clientX;lastY=e.clientY;return;}var i=findCountryAt(e.clientX,e.clientY);if(i>=0)selectCountry(i,true);else{hoverIndex=-1;tip.hidden=true;}});
-  canvas.addEventListener('mousedown',function(e){dragging=true;lastX=e.clientX;lastY=e.clientY;});window.addEventListener('mouseup',function(){dragging=false;});
-  canvas.addEventListener('touchstart',function(e){if(e.touches[0]){dragging=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;}},{passive:true});canvas.addEventListener('touchend',function(){dragging=false;});
-  function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';resize();if(!raf)raf=requestAnimationFrame(draw);}
-  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';tip.hidden=true;if(raf){cancelAnimationFrame(raf);raf=0;}}
-  renderList();openBtn.addEventListener('click',show);document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
+
+  /* ───────── 列表 / 悬浮提示 ───────── */
+  function renderList(){
+    active.map(function(c){return {c:c,i:countries.indexOf(c)};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){
+      var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;
+      row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png" loading="lazy"><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';
+      row.addEventListener('mouseenter',function(){selectCountry(i,true);});
+      row.addEventListener('focus',function(){selectCountry(i,true);});
+      row.addEventListener('click',function(){focusCountry(i);});
+      list.appendChild(row);
+    });
+    list.addEventListener('mouseleave',function(){clearHover();});
+  }
+  function positionTip(i){
+    var c=countries[i],g=geom(),rect=canvas.getBoundingClientRect(),q=proj(c.v||xyz(c.lat,c.lon),g),stageRect=stage.getBoundingClientRect(),
+        ax=rect.left-stageRect.left+q.x,ay=rect.top-stageRect.top+q.y,
+        left=Math.max(8,Math.min(stageRect.width-tip.offsetWidth-8,ax+16)),top=Math.max(8,Math.min(stageRect.height-tip.offsetHeight-8,ay-tip.offsetHeight/2));
+    tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.toggle('tip-left',left<ax-tip.offsetWidth);
+    tip.style.setProperty('--tip-arrow-y',Math.max(12,Math.min(tip.offsetHeight-12,ay-top))+'px');
+  }
+  function selectCountry(i,showTip){
+    hoverIndex=i;
+    list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});
+    if(showTip){var c=countries[i];tip.hidden=false;
+      tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';
+      var q=proj(c.v,geom());if(q.z<=.02){tip.hidden=true;return;}positionTip(i);}
+  }
+  function clearHover(){hoverIndex=-1;tip.hidden=true;list.querySelectorAll('.world-country-row.active').forEach(function(n){n.classList.remove('active');});}
+  function focusCountry(i){
+    var c=countries[i];selectCountry(i,false);
+    var tr=-c.lon*Math.PI/180,d=((tr-rot+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
+    focus={rot:rot+d,tilt:Math.max(-.8,Math.min(.8,c.lat*Math.PI/180*.85))};
+    tip.hidden=false;tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';
+  }
+  function findCountryAt(clientX,clientY){
+    var rect=canvas.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top,g=geom(),best=1e9,idx=-1;
+    active.forEach(function(c){var q=proj(c.v,g);if(q.z<=.02)return;var lim=Math.max(13,c.rad*g.sc+7),d=Math.hypot(q.x-x,q.y-y);if(d<lim&&d<best){best=d;idx=countries.indexOf(c);}});
+    return idx;
+  }
+
+  /* ───────── 交互：指针拖动旋转 / 悬停 / 点击聚焦 ───────── */
+  canvas.addEventListener('pointerdown',function(e){dragging=true;moved=0;downX=lastX=e.clientX;downY=lastY=e.clientY;vel=0;focus=null;try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
+  canvas.addEventListener('pointermove',function(e){
+    if(dragging){var dx=e.clientX-lastX,dy=e.clientY-lastY;rot+=dx*.0065;vel=dx*.0065;tilt=Math.max(-.9,Math.min(.9,tilt+dy*.005));lastX=e.clientX;lastY=e.clientY;moved=Math.max(moved,Math.hypot(e.clientX-downX,e.clientY-downY));if(moved>4){tip.hidden=true;}return;}
+    var i=findCountryAt(e.clientX,e.clientY);
+    if(i>=0){if(i!==hoverIndex||tip.hidden)selectCountry(i,true);canvas.style.cursor='pointer';}
+    else{if(hoverIndex>=0)clearHover();canvas.style.cursor='';}
+  });
+  function endDrag(e){if(!dragging)return;dragging=false;if(moved<=4){var i=findCountryAt(e.clientX,e.clientY);if(i>=0)focusCountry(i);}}
+  canvas.addEventListener('pointerup',endDrag);
+  canvas.addEventListener('pointercancel',function(){dragging=false;});
+  canvas.addEventListener('pointerleave',function(){if(!dragging)clearHover();});
+
+  function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';readTheme();resize();if(!raf)raf=requestAnimationFrame(draw);}
+  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';clearHover();dragging=false;if(raf){cancelAnimationFrame(raf);raf=0;}}
+  renderList();openBtn.addEventListener('click',show);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});
+  window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
 })();
 </script>
+
 
 </body>
 </html>
@@ -6788,7 +6923,7 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 .topbar-search:focus-within .sk-kbd{transform:translateY(calc(-50% - 1px))}
 .topbar-search:focus-within .sk-kbd:active{transform:translateY(calc(-50% - 1px)) scale(.95)}
 /* 世界在线地图入口：与 Ctrl+K 分离，Ctrl+K 自身不再有额外胶囊底 */
-.world-map-btn{flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;align-self:center;margin-left:0;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-2);cursor:pointer;transition:all var(--tr);-webkit-app-region:no-drag;box-shadow:var(--shadow-1)}
+.world-map-btn{flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;align-self:center;margin-left:-8px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-2);cursor:pointer;transition:all var(--tr);-webkit-app-region:no-drag;box-shadow:var(--shadow-1)}
 .world-map-btn:hover{color:var(--accent-2);border-color:var(--accent);background:var(--accent-soft);transform:translateY(-1px)}
 .world-map-btn svg{position:static!important;transform:none!important;width:19px!important;height:19px!important;stroke:currentColor!important;pointer-events:none}
 .world-map-btn:active{transform:scale(.96)}
@@ -15510,7 +15645,7 @@ __UI_SCRIPT__
   </header>
   <div class="world-content">
     <section class="world-map-panel">
-      <div class="world-map-caption"><span>GLOBAL NETWORK</span><span class="world-map-hint">Hover over a country to inspect</span></div>
+      <div class="world-map-caption"><span>GLOBAL NETWORK</span><span class="world-map-hint">Drag to rotate · hover a marker</span></div>
       <div class="world-map-stage">
         <canvas id="worldGlobeCanvas" aria-label="Interactive 3D particle globe showing simulated online players by country" role="img"></canvas>
         <div id="worldCountryTip" class="world-country-tip" hidden></div>
@@ -15539,15 +15674,15 @@ __UI_SCRIPT__
 .world-map-panel{background:linear-gradient(145deg,var(--surface),var(--surface-2))}
 .world-map-caption{height:48px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:1.1px;color:var(--text-2)}
 .world-map-hint{font-size:11px;font-weight:400;letter-spacing:0;color:var(--text-3)}
-.world-map-stage{position:relative;min-height:380px;height:calc(100% - 84px);display:flex;align-items:center;justify-content:center;padding:10px;background:radial-gradient(ellipse at center,rgba(24,83,132,.16),transparent 66%)}
-#worldGlobeCanvas{display:block;width:min(100%,820px);height:100%;min-height:360px;max-height:calc(100vh - 220px);cursor:grab;touch-action:pan-y}
+.world-map-stage{position:relative;min-height:380px;height:calc(100% - 84px);display:flex;align-items:center;justify-content:center;padding:10px;background:radial-gradient(ellipse at center,var(--accent-soft),transparent 66%)}
+#worldGlobeCanvas{display:block;width:min(100%,820px);height:100%;min-height:360px;max-height:calc(100vh - 220px);cursor:grab;touch-action:none}
 #worldGlobeCanvas:active{cursor:grabbing}
 #worldVectorMap{width:100%;max-height:100%;min-height:300px;color:var(--text);overflow:visible}
 .world-continent path{fill:var(--surface-3);stroke:var(--text-3);stroke-opacity:.35;stroke-width:1.2;stroke-linejoin:round;transition:fill .2s}
 .world-country-mark{cursor:pointer;stroke:rgba(255,255,255,.7);stroke-width:1.5;transition:r .15s,filter .15s}
 .world-country-mark:hover,.world-country-mark.active{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 7px currentColor)}
 .world-legend{height:36px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:9px;color:var(--text-3);letter-spacing:.5px}
-.world-legend i{width:25px;height:7px;border-radius:3px}.legend-low{background:#f6b7a8}.legend-mid{background:#f47762}.legend-high{background:#e7473c}.legend-hot{background:#a91024}
+.world-legend i{width:25px;height:7px;border-radius:3px}.legend-low{background:#ffb080;box-shadow:0 0 8px rgba(255,176,128,.6)}.legend-mid{background:#ff7040;box-shadow:0 0 8px rgba(255,112,64,.6)}.legend-high{background:#e43426;box-shadow:0 0 8px rgba(228,52,38,.6)}.legend-hot{background:#960a1e;box-shadow:0 0 8px rgba(150,10,30,.7)}
 .world-country-tip{position:absolute;z-index:4;min-width:170px;padding:12px 14px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);box-shadow:var(--shadow-2);pointer-events:none}.world-country-tip:before{content:"";position:absolute;left:-6px;top:var(--tip-arrow-y,50%);width:10px;height:10px;transform:translateY(-50%) rotate(45deg);background:var(--surface-solid);border-left:1px solid var(--border-2);border-bottom:1px solid var(--border-2)}.world-country-tip.tip-left:before{left:auto;right:-6px;transform:translateY(-50%) rotate(225deg)}.world-tip-title{display:flex;align-items:center;gap:8px}.world-tip-title img{width:24px;height:17px;object-fit:cover;border-radius:3px}.world-tip-title strong{font-size:13px}
 .world-country-tip strong{display:block;font-size:13px}.world-country-tip span{display:block;margin-top:5px;color:var(--text-3);font-size:10px}.world-country-tip b{display:block;margin-top:3px;font:700 19px var(--font-mono,monospace);color:var(--text)}
 .world-side-panel{display:flex;flex-direction:column}.world-side-title{padding:17px 16px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1px;font-weight:700;color:var(--text-2)}.world-side-title small{font-size:9px;color:var(--accent);letter-spacing:.8px}
@@ -15561,6 +15696,7 @@ __UI_SCRIPT__
 (function(){
   var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage');
   if(!openBtn||!page||page.dataset.globeReady)return; page.dataset.globeReady='1';
+  /* ───────── 国家数据：[名称, 国旗, 纬度, 经度] ───────── */
   var raw=[
     ['United States','🇺🇸',39,-98],['Canada','🇨🇦',56,-106],['Mexico','🇲🇽',23,-102],['Guatemala','🇬🇹',15,-90],['Cuba','🇨🇺',22,-79],['Panama','🇵🇦',9,-80],['Costa Rica','🇨🇷',10,-84],['Jamaica','🇯🇲',18,-77],['Haiti','🇭🇹',19,-72],['Dominican Republic','🇩🇴',19,-70],['Colombia','🇨🇴',4,-72],['Venezuela','🇻🇪',8,-66],['Ecuador','🇪🇨',-2,-77],['Peru','🇵🇪',-10,-76],['Bolivia','🇧🇴',-17,-65],['Chile','🇨🇱',-30,-71],['Argentina','🇦🇷',-38,-64],['Uruguay','🇺🇾',-33,-56],['Paraguay','🇵🇾',-23,-58],['Brazil','🇧🇷',-10,-52],
     ['Iceland','🇮🇸',65,-19],['Ireland','🇮🇪',53,-8],['United Kingdom','🇬🇧',54,-2],['Portugal','🇵🇹',39,-8],['Spain','🇪🇸',40,-4],['France','🇫🇷',46,2],['Belgium','🇧🇪',50,4],['Netherlands','🇳🇱',52,5],['Germany','🇩🇪',51,10],['Switzerland','🇨🇭',47,8],['Italy','🇮🇹',42,12],['Norway','🇳🇴',62,10],['Sweden','🇸🇪',60,18],['Finland','🇫🇮',64,26],['Denmark','🇩🇰',56,10],['Poland','🇵🇱',52,20],['Czechia','🇨🇿',49,15],['Austria','🇦🇹',47,14],['Hungary','🇭🇺',47,19],['Romania','🇷🇴',46,25],['Greece','🇬🇷',39,22],['Ukraine','🇺🇦',49,32],['Türkiye','🇹🇷',39,35],['Russia','🇷🇺',60,90],
@@ -15572,46 +15708,180 @@ __UI_SCRIPT__
     ['Bahamas','🇧🇸',24,-76],['Belize','🇧🇿',17,-88],['Honduras','🇭🇳',15,-86],['El Salvador','🇸🇻',14,-89],['Nicaragua','🇳🇮',13,-85],['Trinidad and Tobago','🇹🇹',11,-61],['Barbados','🇧🇧',13,-59],['Guyana','🇬🇾',5,-59],['Suriname','🇸🇷',4,-56],['Grenada','🇬🇩',12,-61],['Antigua and Barbuda','🇦🇬',17,-62],['Dominica','🇩🇲',15,-61],['Saint Lucia','🇱🇨',14,-61],['Saint Vincent and the Grenadines','🇻🇨',13,-61],['Samoa','🇼🇸',-13,-172],['Tonga','🇹🇴',-21,-175],['Vanuatu','🇻🇺',-16,167],['Solomon Islands','🇸🇧',-9,160],['Kiribati','🇰🇮',1,173],['Tuvalu','🇹🇻',-8,178],['Marshall Islands','🇲🇭',7,171],['Micronesia','🇫🇲',7,158],['Palau','🇵🇼',7,134],['Nauru','🇳🇷',-1,167],['Cook Islands','🇨🇰',-21,-159],['Niue','🇳🇺',-19,-170],['Monaco','🇲🇨',44,7],['San Marino','🇸🇲',44,12],['Liechtenstein','🇱🇮',47,9],['Montenegro','🇲🇪',42,19],['North Macedonia','🇲🇰',41,22],['Kosovo','🇽🇰',42,21]
 
   ];
-  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:15+Math.floor(Math.random()*4485)};});
-  var total=countries.reduce(function(a,c){return a+c.count;},0);document.getElementById('worldTotal').textContent=total.toLocaleString();
-  var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement;
-  var W=900,H=560,rot=0,tilt=-.08,dragging=false,lastX=0,lastY=0,points=[],hoverIndex=-1,raf=0;
-  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
-  function color(n){var t=Math.max(0,Math.min(1,(n-15)/4485));var stops=[[246,183,168],[244,119,98],[231,71,60],[169,16,36]];var p=t*3,i=Math.min(2,Math.floor(p)),f=p-i;var a=stops[i],b=stops[i+1];return 'rgb('+a.map(function(v,j){return Math.round(v+(b[j]-v)*f);}).join(',')+')';}
+  /* ───────── 真实陆地掩码：Natural Earth 50m，0.5° 栅格，行程编码(36 进制，水→陆交替) ───────── */
+  var MW=720,MH=360,MASK_RLE='7fj,6,1,v,gv,11,x,1f,ge,7,1,16,8,8,1,1,3,1m,g5,1k,5,28,2,2,5,9,3w,1,9,1,b8,5,4,1b,7,2,1,2r,3h,1,9,7,b,1,1e,2,8,2,9c,b,2,17,4,2v,3b,d,5,6,1,3,1,5,2,4,s,3,o,a,91,1,6,i,2,6,1,r,5,2u,1w,i,14,4,1,1,5,3,4,7,1s,c,92,1,5,1f,c,2n,1k,7,1,1,2,4,1,h,2q,1,u,h,8l,5,f,1,2,i,1,k,h,2m,1o,k,3,5,3u,c,2,4,1,1,81,3,a,a,3,4,5,13,6,2v,1p,m,47,5,2,a,7v,7,9,b,3,6,5,8,2,o,5,2w,3,1,1p,1,2,c,3,6,48,b,2,1,1,1,7o,9,8,1,6,3,1,3,4,7,5,1,5,4,1,f,d,2w,1v,9,5,7,4d,4,7j,7,7,1,d,2,h,2,8,2,4,j,c,2,1,2x,1t,7,a,1,4d,9,7e,a,3,2,8,2,8,1,5,3,2,1,3,8,2,2,1,p,e,2s,3,2,1x,2,2q,6,1s,d,1,7,6z,9,1,2,1,8,5,4,7,4,1,9,4,d,7,2,7,4,j,2r,2,1,4f,e,1i,4,2,v,1e,1,5j,1,1,1,1,3,2,c,2,9,4,c,5,1,4,7,8,9,2,1,13,28,4b,e,1g,1a,17,1,2,f,5g,o,1,3,6,6,2,6,2,q,16,26,1,3,43,b,14,1,a,1h,1b,g,2,9,5a,9,s,5,3,o,1a,23,46,a,1f,1h,1f,3,6,1,a,5,4q,b,1,3,1b,1,20,23,45,8,1i,1c,3,4,1h,2,5a,h,i,4,7,8,3,a,5,6,3,4,1,6,18,1z,45,8,1b,1i,2,8,4,2,e,3,v,5,55,l,c,7,7,7,1,1,2,9,4,6,1,i,16,1v,47,7,q,3,i,25,9,b,p,4,53,r,2,3,2,6,5,c,2,7,5,6,2,a,1,8,14,1w,45,7,q,7,5,1,7,1,2,2p,n,8,4z,d,2,k,1,6,6,b,2,4,7,8,1,l,13,1v,44,7,q,9,4,1,3,7,2,2o,j,l,4r,9,3,t,9,7,2,4,7,x,1,1,y,1v,43,8,p,9,2,4,1,2z,5,2,d,l,1o,5,15,3,1s,3,8,r,b,1,4,7,7,11,y,1,1,1j,1,7,q,1,3d,1,1,6,l,b,2,i,1,2m,4,14,1i,2,14,g,1w,t,e,8,7,14,t,1m,3,5,2f,g,1b,8,i,d,2,i,1,48,25,w,z,3,l,v,9,a,7,15,p,1u,2a,2,3,j,1j,2,f,b,3,4s,22,18,d,1,2,d,2,3,2,4,8,w,5,3,2,8,1,1,b,7,3,3,1,1,1,l,o,6,1,1l,2a,u,1h,8,6,c,2,4u,4,3,7,4,2,d,13,1f,4,z,5,i,1,9,5,8,2,9,1,1,7,8,5,1,2,l,q,2,4,1h,28,1,2,12,p,4,k,a,5,9,3,5a,4,h,1,3,o,2w,2,g,1,1,1,5,2,1,1,8,2,8,1,4,5,8,a,1,1,g,t,1,2,1f,29,1a,m,2,6,3,7,4,1,f,2,9,3,5,1,5v,l,2x,b,8,c,5,3,d,2,1,1,8,a,4,2,f,q,1d,2d,1,1,1d,a,5,7,1b,2,64,m,33,2,o,1,f,2,b,8,5,1,2,1,h,m,16,2n,1g,6,5,4,1d,3,65,m,4l,9,3,6,j,i,15,2n,1j,5,3,4,1d,4,6d,i,4h,h,o,g,13,2m,1k,7,1i,3,6i,7,6,3,48,1,5,h,f,1,a,g,11,n,4,5,1,3,5,1j,17,4,7,3,7q,1,h,5,4j,1,3,1,1,j,d,4,6,i,y,p,5,2,d,1h,19,a,7t,7,8,a,4g,2,5,c,l,4,4,l,p,z,i,1f,j,7,j,b,7s,9,6,c,4e,2,9,7,q,r,n,x,k,1e,l,6,l,3,5,2,7r,e,1,o,42,3,a,7,3,6,h,q,n,11,e,1e,n,4,p,3,7u,m,1,i,3y,6,6,3,4,g,g,q,m,10,2,1,9,1e,1,1,n,3,8p,l,3,9,2,1,41,a,2,c,2,b,8,1,6,r,k,2p,o,3,8t,v,43,g,3,f,1,6,9,2,1,t,h,2p,o,5,8t,u,42,h,2,6,2,2,a,9,5,w,g,1x,2,n,p,7,7x,1,p,z,42,p,2,3,c,d,2,u,f,1y,1,n,p,8,7n,1,8,1,l,13,40,w,e,18,d,2n,p,8,7i,7,4,3,j,18,r,1,6,3,2w,x,h,17,b,2n,p,7,7i,8,2,3,j,15,4,1,p,2,8,2,1,1,2u,y,g,2,1,6,1,12,5,2b,1,c,r,2,2,2,9,6,70,d,b,5,2,1a,1,4,2,2,i,2,5,g,2m,y,g,8,3,14,1,2p,s,d,1,4,71,d,5,1x,g,4,3,n,2h,x,i,7,4,3d,1,f,r,a,6o,4,2,1,1,2,1,5,7,a,7,1x,3,2,c,v,2i,t,k,4,7,3b,1,h,8,3,d,9,6o,z,6,2,2,24,7,2,2,u,2g,u,v,33,2,1,5,j,4,6,b,a,2,2,6i,z,7,28,5,2,4,w,2g,v,u,31,2,1,8,r,a,4,1,6,1,3,6h,x,c,25,5,3,4,x,4,1,2b,2,1,s,u,30,1,1,9,m,3,3,a,2,2,5,4,1,6f,y,d,23,5,5,1,11,2m,o,u,32,8,l,5,4,9,8,6j,z,e,21,5,1a,2n,f,3,4,v,32,7,l,6,3,7,a,6i,z,g,1x,5,1f,2o,c,1,5,x,30,9,k,d,d,6g,11,d,1y,2,2,1,1,1,1g,2u,9,12,2t,6,1,7,k,8,4,1,c,6e,13,d,8,1,1l,4,1o,2,2,2q,5,18,2q,6,1,8,j,4,1,2,a,3,3,6f,4,1,z,d,1s,1,1t,1,4,2p,5,18,2n,9,1,1,2,7,h,5,2,4,3,6s,2,3,5,1,p,a,1t,2,1u,3,2,2p,6,19,2l,8,6,6,e,2,1,7c,4,1,q,8,1q,3,1y,2,3,2q,4,1a,2k,8,3,a,9,7p,p,8,3s,1,4,2q,3,1b,2j,8,3,c,6,7q,p,5,1i,2,2c,1,5,2m,6,1a,2i,8,4,c,6,7q,q,4,1b,4,2o,2n,2,1b,2j,5,5,e,4,7s,q,3,44,3w,2,3,2v,b,2,7p,2,3,q,2,44,3v,3,3,2u,b,2,7q,3,4,o,1,47,3s,5,2,2u,4,a,7q,3,4,m,2,4a,3c,5,3,a,5,2,1,30,7t,3,4,50,39,2,3,3,4,6,a,2v,7x,3,5,51,34,2,8,a,b,2r,2,1,7y,3,2,54,33,1,9,b,c,2o,82,4,2,55,3c,a,e,2o,80,5,1,56,3b,6,1,b,2,2,3,2s,7v,6,2,56,3c,6,1,e,1,2u,26,2,5l,7,3,55,3g,1,3,39,1t,1,8,5,5k,8,1,57,3k,39,1r,6,4,5,5k,o,1,4s,39,1,8,3b,s,2,x,5,5t,9,2,a,2,4v,36,2,7,3e,s,4,u,8,3,5,5i,a,3,8,1,4x,34,3,4,3i,k,1,7,5,s,j,5f,b,5,4,1,4y,32,7,2,36,1,c,i,5,7,4,q,m,5c,c,8,50,30,3f,p,3,3,8,7,5,n,o,59,c,a,50,30,3f,o,c,1,2,7,7,l,q,51,2,2,d,8,53,30,3f,p,a,2,4,6,8,j,r,4y,i,2,4,2,54,31,3e,o,b,2,5,8,7,h,9,7,b,4x,k,2,5a,2x,3h,m,e,1,7,7,6,m,1,c,8,4y,k,3,58,2w,3j,k,e,4,8,8,3,b,1,4,3,54,1,g,l,3,58,2t,3m,j,g,3,a,4,1,2,2,9,4,59,3,e,m,4,58,2s,3m,i,5,2,a,3,b,2,6,7,4,1,1,57,4,5,1,7,o,4,58,2r,3m,j,h,2,d,2,7,6,5,56,5,2,6,4,p,4,59,2p,3n,j,w,2,7,7,5,52,7,1,7,7,m,4,5b,2o,3o,h,r,1,2,4,8,8,3,54,d,8,m,3,5c,2n,3p,h,q,6,a,6,1,2,3,55,3,1,8,1,1,6,j,5,5d,2l,3q,f,l,2,7,4,c,3,4,1,3,5b,8,6,e,1,2,6,5e,2k,3v,9,9,h,7,1,d,3,8,59,9,7,e,9,5e,2l,3v,2,b,k,y,1,3,2,4,3,4,4q,b,6,d,9,5g,2k,3v,2,8,o,1d,4p,d,6,a,2,1,a,5g,2h,3x,7,2,p,p,6,c,3,4,4n,e,6,6,g,5h,2h,3w,z,17,2,5,4n,d,5,6,g,5k,2e,3x,z,1e,4q,c,1,4,1,3,4,1,7,5t,28,3y,11,1d,4q,j,3,1,5,1,2,5x,25,3x,14,1b,4s,a,2,5,8,62,24,3x,1a,e,4,o,4s,f,1,1,5,1,1,64,21,3y,1e,9,8,l,4u,h,3,67,20,3z,1e,9,b,i,4v,g,3,68,3,3,1t,3y,1i,6,g,4,5,2,4x,h,1,6a,3,3,1r,3z,1l,3,5o,6s,3,3,1g,2,9,40,7a,i,1,6b,3,3,1a,8,2,2,5,3y,39,3,41,6t,4,1,10,7,4,c,4,3x,39,5,3z,6v,3,2,x,p,5,3h,1,7,1,5,3b,5,3x,6x,3,2,u,r,5,3j,1,4,1,4,3d,5,3x,f,1,6f,5,3,s,s,5,3r,2l,4,r,5,3v,6x,5,3,q,u,5,3p,2n,3,s,6,3s,6z,5,3,q,t,5,2,1,3m,2n,4,s,7,5,2,3i,g,1,6m,3,3,p,u,4,5,1,3h,2q,4,s,b,1,1,3i,f,1,6o,2,3,p,v,3,3n,2q,4,s,1,1,9,1,2,3h,73,3,5,m,x,2,3m,2s,4,t,7,3,8,6,1,3,2,2y,4,1,6z,4,5,l,12,2,3h,2s,4,t,6,4,l,2w,4,2,71,3,5,k,13,1,3g,2u,4,t,1,9,k,2u,5,3,72,3,5,j,13,1,3f,2v,6,13,j,2s,5,3,75,1,6,i,u,1,d,1,3a,2v,6,15,j,2p,6,3,7d,h,r,9,3i,2x,6,15,j,2m,8,3,7d,h,q,3,2,8,3e,2z,5,16,i,2j,c,1,7f,g,p,1,3,1,5,6,3c,30,4,15,k,14,4,17,50,1,2u,g,f,7,g,5,5,1,34,30,4,14,m,4,1,t,a,w,3,3,54,2,2t,h,d,7,i,6,38,31,4,13,n,2,3,s,b,t,5,2,57,1,2s,i,c,7,j,7,37,30,5,10,t,s,c,s,7,1,57,2,2r,i,b,7,s,7,2z,30,6,z,t,r,f,p,6,4,56,2,2s,i,a,7,t,8,2x,30,7,y,t,p,h,p,5,4,83,i,5,1,1,8,q,1,2,9,2w,31,6,w,w,n,j,o,5,4,84,w,i,4,4,9,2,1,2,4,2r,31,6,u,x,m,l,o,5,2,l,4,7j,s,l,1,b,1,32,32,6,r,z,l,m,o,s,4,7l,q,3z,33,7,q,z,j,o,p,r,4,7n,o,3z,34,6,n,12,j,o,q,p,5,7q,k,1h,2,2h,34,6,k,16,h,o,4,3,l,o,4,7u,2,5,j,3r,34,1,1,4,k,16,e,t,1,4,m,n,3,83,j,3b,1,d,36,5,i,19,c,z,n,m,3,84,j,3n,39,4,e,1c,c,z,n,m,4,84,i,3o,39,3,c,1f,c,z,n,m,5,85,e,3p,3a,2,9,1i,c,z,n,m,2,1,5,85,b,3p,3b,1,6,1l,c,o,1,b,3,2,h,m,2,3,2,89,8,3p,3g,h,1,16,b,o,1,b,3,2,h,m,2,3,3,89,7,n,2,31,3c,k,1,16,a,p,1,a,4,4,f,n,1,3,2,1,2,88,6,m,2,2,2,2z,3a,f,2,1c,9,p,1,a,4,6,d,p,1,4,2,89,5,j,5,1,5,2x,3b,9,6,1d,9,11,2,7,c,l,1,4,2,2,3,89,5,g,f,7,4,2,1,2k,3a,3,c,1d,8,10,3,8,9,m,2,4,6,8a,6,f,k,2,4,1,2,2l,3n,1e,7,12,2,a,5,o,1,6,7,89,6,e,7,2,j,2n,3m,1e,6,2,1,10,2,b,3,o,1,7,4,2,1,8c,4,4,4,3,w,2m,3l,1f,5,2,2,y,4,9,3,o,1,8,2,4,1,8d,8,1,3,1,w,2n,3k,1g,4,3,2,y,4,9,2,o,1,d,4,8d,6,3,12,2k,3j,1i,2,3,4,n,1,9,5,x,1,a,8,8g,3,3,13,2k,3i,1n,5,y,3,17,9,8h,1,5,13,2k,3g,1o,5,n,1,b,2,x,1,9,1,3,5,8o,13,2l,3e,1p,4,z,4,u,2,9,1,3,3,1,1,8o,15,2k,r,4,2h,1q,3,11,5,r,4,c,3,8q,1c,2f,m,8,2g,2k,1,9,6,q,5,d,1,8q,1e,2e,i,b,2f,2l,5,5,7,o,8,92,1f,2e,5,8,1,f,2d,2n,5,5,6,m,8,94,1g,37,2,4,26,2o,5,4,6,l,9,g,1,8n,1h,3b,1,1,24,2q,5,4,5,9,1,a,9,95,1h,3b,1,2,22,2s,5,3,5,j,9,95,1j,3d,21,2q,1,3,5,3,4,g,d,93,1k,3c,21,2w,6,2,4,e,e,k,1,8h,1m,3b,1z,2z,7,2,3,9,3,1,e,j,1,8i,1m,3b,1y,2x,2,2,8,1,2,9,k,4,1,6,1,5,3,8e,1o,3b,1w,30,1,2,9,b,k,2,a,5,2,8f,1p,34,1,4,1w,34,a,a,h,5,1,6,1,7,1,7t,1,l,1s,37,1w,35,9,1,1,8,h,4,1,e,2,4,3,7m,3,j,1w,32,1w,37,7,b,h,4,2,2,4,7,3,4,1,1,5,3,1,7y,1z,31,1u,35,1,3,8,a,f,4,9,e,8,81,21,2z,1t,37,1,2,8,1,2,8,d,5,6,2,1,2,3,3,1,4,1,3,5,3,1,1,3,7t,21,30,1r,39,1,2,b,7,d,5,6,k,5,4,7,d,1,7d,26,1,2,2s,1p,3b,1,1,c,1,2,3,d,4,7,c,4,4,6,2,b,h,1,76,2b,2r,1n,3f,9,3,1,7,3,1,6,4,4,1,3,7,2,1,7,3,l,h,1,72,2d,2r,1m,3g,8,h,4,6,2,1,3,8,1,2,1,4,1,3,o,g,1,6z,2f,2r,1k,3i,7,r,2,2,3,o,k,d,3,6z,2h,2p,1k,3j,6,r,2,2,1,1,2,p,k,b,3,70,2j,2n,1i,1,1,3k,4,r,2,2,3,t,h,a,2,5,1,6w,2k,2m,1i,3n,1,1,1,1h,1,2,2,6,i,2,7,6,2,6v,2k,2n,1i,3o,6,1f,2,7,j,3,2,9,2,6w,2i,2n,1i,3n,9,2,3,18,1,8,i,g,1,1,1,6u,2j,2m,1i,3q,e,10,1,d,h,k,1,6u,2i,2n,1i,3r,e,n,1,9,1,d,j,i,1,3,1,6s,2g,2o,1h,3y,a,1,1,1,4,2,2,3,5,p,c,5,5,h,2,2,2,6q,2g,2o,1h,45,1,1,1,1,6,1,6,5,4,r,6,6,4,i,2,4,1,6p,2e,2p,1h,4g,1,8,4,u,4,8,5,1,1,4,1,e,1,1,1,6o,2e,2p,1i,4e,3,6,3,19,5,1,1,h,3,6q,2c,2r,1i,4f,1,6,2,1b,5,7b,2a,2t,1i,4l,1,11,1,12,2,6o,29,2t,1i,4z,1,1,1,1,2,i,2,7r,28,2u,1i,5,1,4t,3,2,3,g,2,7s,27,2u,1i,h,1,4j,c,9,4,7r,26,2u,1j,h,2,4h,c,a,4,7s,24,2u,1k,g,3,4g,d,a,4,2g,1,5b,23,2v,1k,f,4,4f,f,9,4,7s,23,2v,1l,e,5,47,4,3,d,1,1,9,6,7r,22,2u,1m,d,6,45,7,2,c,c,7,17,1,6j,21,2u,1m,c,7,44,n,b,8,16,2,6k,1z,2u,1l,a,a,44,p,9,8,19,1,6j,1y,2t,1l,9,b,43,t,6,9,17,2,n,1,5z,1v,2t,1k,a,b,41,1,1,w,3,a,18,1,k,3,60,1u,2t,1i,b,b,41,z,3,a,3l,1,4b,1t,2t,1g,d,b,41,1c,18,1,i,3,65,1q,2v,1e,e,b,41,1d,1q,2,66,1q,2v,1d,f,b,40,1e,19,1,6o,1q,2w,1a,h,a,40,1g,7x,1p,2y,18,j,9,3z,1j,7v,1p,2y,18,i,9,i,1,3c,1q,u,1,6y,1o,30,17,i,9,3s,1t,v,2,3,1,6t,1m,31,17,h,a,d,2,3b,1w,v,2,6v,1n,32,17,f,b,3o,1y,w,2,6u,1m,33,17,f,a,3n,22,w,1,6t,1l,35,16,f,a,3n,23,7p,1g,3a,16,g,9,3n,23,7p,1f,3b,16,g,8,3o,24,7o,1b,3f,16,g,8,3o,25,7n,1a,3g,15,i,7,3o,26,7m,19,3h,12,l,5,3q,28,7j,19,3j,10,4h,27,7k,19,3j,10,4g,28,7k,19,3j,10,4h,28,7j,19,3j,10,4i,27,7j,19,3k,z,4i,27,7i,1a,3l,x,4j,27,7i,19,3n,v,4l,26,7i,18,3o,u,4n,25,7i,17,3q,s,4o,25,7i,17,3q,s,4o,25,7h,17,3s,q,4p,24,7j,15,3t,p,4r,23,7j,13,3w,n,4s,s,4,17,7j,13,3w,m,4t,o,b,13,7k,12,3x,l,4u,j,i,11,7j,13,3x,j,4w,h,l,y,7l,11,40,g,4x,i,m,4,1,s,7l,11,40,7,5,1,50,9,v,3,2,r,7m,s,2,6,43,2,5b,5,x,2,2,2,1,p,18,1,6c,v,as,1,2,o,19,3,69,w,ar,3,2,n,1a,2,69,w,ax,l,1c,2,68,x,aw,l,1d,1,1,1,65,x,ax,l,1d,3,65,w,az,j,1e,4,2,2,60,w,b1,d,1i,8,60,t,b8,2,3,3,1j,7,61,n,d4,7,62,n,bf,1,1p,5,62,n,bp,1,1h,4,62,o,bh,2,4,2,1b,2,1,1,2,3,63,i,2,2,bj,8,1b,8,64,i,bo,7,1a,6,66,2,1,j,bl,7,19,6,67,2,1,j,bm,5,19,6,68,2,1,h,bo,4,19,6,l,1,5q,g,d0,8,6a,i,cy,7,6c,i,cy,8,6c,g,cz,8,6c,f,d0,9,6b,g,d1,6,6d,h,d1,1,6j,i,cy,1,6h,k,jg,j,jh,h,7k,1,by,g,7k,4,bw,g,7m,1,bx,e,jm,d,d2,1,6l,c,h,1,2,1,j3,c,g,6,j2,d,f,1,2,1,j5,c,jp,6,1,5,jp,6,1,5,jr,b,1m,3,i1,d,1,1,1j,1,i4,6,6on,1,13s,1,jv,1,k5,2,1,3,jo,1,2,5,jp,1,2,8,jm,7,jt,5,95,1,al,1,1,6,91,1,n,2,9z,1,2,9,67,c,28,1,6,1,1,9,a,8,v,8,2,2,2,1,8k,3,1,5,69,1,2,e,1k,2,4,16,2,b,d,a,5,p,8a,8,67,2,2,l,1e,3d,85,1,2,4,65,1a,2,1,n,3n,85,4,5z,1j,h,3t,7v,2,6,8,5d,2,c,1o,g,4a,7d,6,4,b,59,5,9,1o,f,4j,70,2,3,8,1,d,4b,2,x,a,2,1o,9,1,3,4p,6x,1,6,6,1,d,39,1,8,1,5,1,9,1,6,8,4,1,5,1,8,2,6,24,9,4x,2,1,6q,6,5,5,1,d,1,1,2x,5,4,3,9,1,1,w,3,7,6,2b,5,50,1,b,6m,b,1,d,2q,1,2,3,2,8,1,3,5,3s,6,5f,51,1,2,2,2,1,16,f,1,d,2r,4f,5,5l,4u,d,19,9,3,d,2n,1,2,4e,4,5l,4t,3,l,2,1,3,w,3,1,1,5,e,2g,1,4,4i,2,5o,3h,3,1a,z,8,5,6,5,4,n,2g,a8,3m,6,2,5,2,1,w,2c,28,1,8,a5,3g,1,d,2,2,4,7,2,3,3,3,3,i,29,28,1,6,2,2,a1,3a,b,3,v,3,3,k,25,2g,a2,1,1,34,25,2,23,2g,a3,2v,2,1,4f,29,af,2n,4i,27,ao,2k,2,1,2,2,3x,6,8,27,aq,26,a,7,6,2,3w,2d,ay,6,1,1x,4r,1f,3,m,b2,5,5,1v,4f,5,1,f,1,z,b,g,ba,1n,3,c,42,3,8,f,5,y,e,e,b6,4,1,1l,9,g,3x,2,8,9,6,1,3,x,f,d,5,2,4,1,an,22,6,k,42,9,3,5,4,9,2,i,g,m,5,4,ag,2q,45,j,1,7,6,c,k,p,an,2t,44,1,1,3,5,b,1,2,6,b,b,q,ay,1y,3,b,50,1f,b9,2h,54,14,bf,2e,54,f,h,3,bl,1t,1,g,56,9,ch,17,d,3,2,a,5d,4,cn,1a,j3,f,ju,o,o,jz,1,5ip';
+  var mask=new Uint8Array(MW*MH);
+  (function(){var runs=MASK_RLE.split(','),p=0,v=0,i,n;for(i=0;i<runs.length;i++){n=parseInt(runs[i],36);if(v)mask.fill(1,p,p+n);p+=n;v^=1;}})();
+  function landAt(i,j){if(j<0||j>=MH)return 0;i=((i%MW)+MW)%MW;return mask[j*MW+i];}
+
+  /* ───────── 在线人数：全球总数随机 120 ~ 1000，按权重分配到各国，总和严格等于总数 ───────── */
+  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:0,ph:Math.random()*6.283};});
+  var T=120+Math.floor(Math.random()*881);
+  (function(){
+    var w=countries.map(function(){return Math.pow(Math.random(),3)+.015;}),ws=w.reduce(function(a,b){return a+b;},0),used=0,rem=[];
+    countries.forEach(function(c,i){var e=w[i]/ws*T;c.count=Math.floor(e);used+=c.count;rem.push({i:i,f:e-c.count});});
+    rem.sort(function(a,b){return b.f-a.f;});
+    for(var k=0;k<T-used;k++)countries[rem[k].i].count++;
+  })();
+  var active=countries.filter(function(c){return c.count>0;});
+  var maxCount=active.reduce(function(m,c){return Math.max(m,c.count);},1);
+  document.getElementById('worldTotal').textContent=T.toLocaleString();
+
+  /* ───────── 颜色：人数 浅橙红 → 深红 ───────── */
+  var STOPS=[[255,176,128],[255,112,64],[228,52,38],[150,10,30]];
+  function heat(n){var t=Math.sqrt(Math.max(0,Math.min(1,n/maxCount))),p=t*3,i=Math.min(2,Math.floor(p)),f=p-i,a=STOPS[i],b=STOPS[i+1];return [0,1,2].map(function(j){return Math.round(a[j]+(b[j]-a[j])*f);});}
+  active.forEach(function(c){c.rgb=heat(c.count);c.rad=2.6+5.4*Math.sqrt(c.count/maxCount);});
+  function rgba(c,a){return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')';}
+  function glowSprite(c,size,core){var cv=document.createElement('canvas');cv.width=cv.height=size;var g=cv.getContext('2d'),h=size/2,gr=g.createRadialGradient(h,h,0,h,h,h);gr.addColorStop(0,rgba(core||c,1));gr.addColorStop(.2,rgba(c,.8));gr.addColorStop(.5,rgba(c,.24));gr.addColorStop(1,rgba(c,0));g.fillStyle=gr;g.fillRect(0,0,size,size);return cv;}
+  active.forEach(function(c){c.halo=glowSprite(c.rgb,64,[255,236,224]);});
+  function parseCol(s,fb){s=(s||'').trim();var m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(s);if(m){var h=m[1];if(h.length===3)h=h.replace(/./g,'$&$&');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}m=/rgba?\(([^)]+)\)/i.exec(s);if(m){var p=m[1].split(/[\s,\/]+/).map(parseFloat);if(p.length>=3&&!isNaN(p[0]))return [p[0],p[1],p[2]];}return fb;}
+  function mix(a,b,t){return [0,1,2].map(function(i){return Math.round(a[i]+(b[i]-a[i])*t);});}
+  var theme={key:'',acc:[59,130,246],light:false,sprite:null};
+  function readTheme(){
+    var cs=getComputedStyle(page),acc=parseCol(cs.getPropertyValue('--accent'),[59,130,246]),light=document.documentElement.getAttribute('data-theme')==='light',key=acc.join(',')+'|'+light;
+    if(key===theme.key)return;theme.key=key;theme.acc=acc;theme.light=light;
+    theme.sprite=glowSprite(acc,32,light?acc:mix(acc,[255,255,255],.6));
+  }
+
+  /* ───────── 粒子：斐波那契球面均匀采样，陆地(含海岸加亮)沿真实经纬度保留，海洋仅留稀疏暗点 ───────── */
+  var N=15000,GA=Math.PI*(3-Math.sqrt(5)),PX=[],PY=[],PZ=[],PK=[],PS=[];
+  for(var i=0;i<N;i++){
+    var y=1-2*(i+.5)/N,rr=Math.sqrt(1-y*y),th=GA*i,x=Math.cos(th)*rr,z=Math.sin(th)*rr;
+    var lat=Math.asin(y)*180/Math.PI,lon=Math.atan2(x,z)*180/Math.PI;
+    var mi=Math.min(MW-1,Math.floor((lon+180)/360*MW)),mj=Math.min(MH-1,Math.floor((90-lat)/180*MH));
+    var land=mask[mj*MW+mi],kind;
+    if(land){kind=(!landAt(mi+2,mj)||!landAt(mi-2,mj)||!landAt(mi,mj+2)||!landAt(mi,mj-2))?2:1;}
+    else{if(Math.random()>.2)continue;kind=0;}
+    PX.push(x);PY.push(y);PZ.push(z);PK.push(kind);PS.push(Math.random()*6.283);
+  }
+  var PN=PX.length;
   function xyz(lat,lon){var la=lat*Math.PI/180,lo=lon*Math.PI/180;return {x:Math.cos(la)*Math.sin(lo),y:Math.sin(la),z:Math.cos(la)*Math.cos(lo)};}
-  // Build a dense spherical point cloud, then retain points over approximate real-world land silhouettes.
-  var landPolys=[ [[-168,72],[-130,70],[-105,55],[-80,50],[-52,25],[-82,7],[-108,20],[-125,38],[-150,55]], [[-81,12],[-50,8],[-35,-10],[-48,-35],[-70,-55],[-79,-25]], [[-11,72],[35,70],[65,55],[40,35],[28,5],[10,-35],[-5,-34],[-18,5],[-10,35]], [[30,72],[70,75],[120,60],[160,55],[180,40],[140,10],[105,0],[75,8],[50,30]], [[112,-11],[154,-12],[153,-39],[130,-45],[113,-28]], [[-25,65],[-13,63],[-18,52],[-30,55]], [[43,-13],[51,-15],[49,-26],[43,-24]], [[-180,68],[-150,65],[-140,55],[-165,52]], [[95,20],[125,18],[140,-5],[120,-10],[105,0]] ];
-  function inPoly(lon,lat,poly){var inside=false;for(var i=0,j=poly.length-1;i<poly.length;j=i++){var xi=poly[i][0],yi=poly[i][1],xj=poly[j][0],yj=poly[j][1];var cross=((yi>lat)!=(yj>lat))&&(lon<(xj-xi)*(lat-yi)/(yj-yi+1e-9)+xi);if(cross)inside=!inside;}return inside;}
-  // The number of particles scales with the number of represented countries and their online counts.
-  var particleCount=Math.min(2800,Math.max(1250,countries.length*23));
-  for(var i=0;i<particleCount;i++){var lat=Math.asin(2*Math.random()-1)*180/Math.PI,lon=Math.random()*360-180;var land=landPolys.some(function(poly){return inPoly(lon,lat,poly);});if(!land&&Math.random()>.04)continue;var nearest=0,best=1e9;countries.forEach(function(c,j){var d=Math.pow(c.lat-lat,2)+Math.pow((((c.lon-lon+540)%360)-180)*Math.cos(lat*Math.PI/180),2);if(d<best){best=d;nearest=j;}});points.push({v:xyz(lat,lon),country:nearest,land:land,size:land?(.75+Math.random()*1.2):(.35+Math.random()*.6),phase:Math.random()*6.28});}
-  function project(v,cx,cy,r){var x=v.x*Math.cos(rot)+v.z*Math.sin(rot),z=v.z*Math.cos(rot)-v.x*Math.sin(rot),y=v.y*Math.cos(tilt)-z*Math.sin(tilt);z=v.y*Math.sin(tilt)+z*Math.cos(tilt);return {x:cx+x*r,y:cy-y*r,z:z};}
+  active.forEach(function(c){c.v=xyz(c.lat,c.lon);});
+
+  /* ───────── 状态 ───────── */
+  var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement;
+  var W=900,H=560,rot=-1.2,tilt=.28,vel=0,dragging=false,lastX=0,lastY=0,downX=0,downY=0,moved=0,hoverIndex=-1,raf=0,frame=0,focus=null;
+  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
+  function geom(){var r=Math.min(W,H)*.42;return {r:r,cx:W/2,cy:H/2,sc:Math.max(.7,Math.min(1.45,r/300))};}
+  function proj(v,g){var cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(tilt),st=Math.sin(tilt),x=v.x*cr+v.z*sr,z0=v.z*cr-v.x*sr,y=v.y*ct-z0*st,z=v.y*st+z0*ct;return {x:g.cx+x*g.r,y:g.cy-y*g.r,z:z};}
   function resize(){var dpr=Math.min(2,window.devicePixelRatio||1),rect=canvas.getBoundingClientRect();W=Math.max(300,rect.width);H=Math.max(300,rect.height);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
-  function draw(){if(!page.classList.contains('open')){raf=0;return;}if(!dragging)rot+=.0018;ctx.clearRect(0,0,W,H);var r=Math.min(W*.38,H*.43),cx=W*.49,cy=H*.5;
-    var glow=ctx.createRadialGradient(cx-r*.25,cy-r*.35,r*.05,cx,cy,r*1.35);glow.addColorStop(0,'rgba(26,119,183,.18)');glow.addColorStop(.7,'rgba(10,65,112,.08)');glow.addColorStop(1,'rgba(8,24,45,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
-    ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='rgba(6,22,42,.22)';ctx.fill();ctx.strokeStyle='rgba(72,170,226,.42)';ctx.lineWidth=1;ctx.stroke();
-    // Geographic vector land silhouettes beneath the particle layer.
-    ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
-    landPolys.forEach(function(poly){var visible=[],allFront=true;poly.forEach(function(pt){var q=project(xyz(pt[1],pt[0]),cx,cy,r);visible.push(q);if(q.z<0)allFront=false;});if(!allFront)return;ctx.beginPath();visible.forEach(function(q,j){if(j===0)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y);});ctx.closePath();ctx.fillStyle='rgba(25,105,158,.10)';ctx.fill();ctx.strokeStyle='rgba(83,174,235,.30)';ctx.lineWidth=1;ctx.stroke();});ctx.restore();
-    var projected=points.map(function(p){var q=project(p.v,cx,cy,r);q.p=p;return q;}).sort(function(a,b){return a.z-b.z;});
-    projected.forEach(function(q){if(q.z<-.12)return;var c=countries[q.p.country],alpha=.22+((q.z+1)/2)*.78;ctx.beginPath();ctx.arc(q.x,q.y,q.p.size*(.65+q.z*.35),0,Math.PI*2);ctx.fillStyle=q.p.land?color(c.count):'rgba(86,177,230,'+(alpha*.35)+')';ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;});
-    // Glowing country anchors are positioned from each country's real geographic latitude/longitude.
-    countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var rr=2.2+Math.min(4,c.count/900);ctx.beginPath();ctx.arc(q.x,q.y,rr+3,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.globalAlpha=.18;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(q.x,q.y,rr,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.fill();if(i===hoverIndex){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}}
-    );
+
+  /* ───────── 绘制 ───────── */
+  function draw(now){
+    if(!page.classList.contains('open')){raf=0;return;}
+    if(frame++%45===0)readTheme();
+    var t=now/1000,g=geom(),cx=g.cx,cy=g.cy,R=g.r,sc=g.sc,light=theme.light,acc=theme.acc;
+    /* 旋转：拖动 > 聚焦动画 > 惯性 > 悬停暂停 > 自转 */
+    if(!dragging){
+      if(focus){var dr=focus.rot-rot,dt=focus.tilt-tilt;rot+=dr*.09;tilt+=dt*.09;vel=0;if(Math.abs(dr)<.002&&Math.abs(dt)<.002)focus=null;}
+      else if(Math.abs(vel)>.0003){rot+=vel;vel*=.94;}
+      else if(hoverIndex<0)rot+=.0018;
+    }
+    ctx.clearRect(0,0,W,H);
+    ctx.globalCompositeOperation='source-over';
+    /* 球体底色 + 大气光晕 */
+    var base=ctx.createRadialGradient(cx-R*.3,cy-R*.35,R*.1,cx,cy,R);
+    base.addColorStop(0,rgba(acc,light?.10:.14));base.addColorStop(1,rgba(acc,light?.02:.03));
+    ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.fillStyle=base;ctx.fill();
+    var atm=ctx.createRadialGradient(cx,cy,R*.97,cx,cy,R*1.24);
+    atm.addColorStop(0,rgba(acc,light?.22:.34));atm.addColorStop(.35,rgba(acc,light?.07:.12));atm.addColorStop(1,rgba(acc,0));
+    ctx.fillStyle=atm;ctx.beginPath();ctx.arc(cx,cy,R*1.24,0,6.2832);ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.strokeStyle=rgba(acc,light?.35:.28);ctx.lineWidth=1;ctx.stroke();
+    ctx.globalCompositeOperation=light?'source-over':'lighter';
+    /* 粒子 */
+    var cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(tilt),st=Math.sin(tilt),spr=theme.sprite;
+    for(var i=0;i<PN;i++){
+      var X=PX[i],Y=PY[i],Z=PZ[i],x=X*cr+Z*sr,z0=Z*cr-X*sr,yy=Y*ct-z0*st,z=Y*st+z0*ct,k=PK[i],d,a;
+      if(z<0){if(k===0||light)continue;a=.07;d=2.4*sc;}
+      else{
+        var tw=1+.2*Math.sin(t*2.1+PS[i]);
+        if(k===0){a=.10+.18*z;d=2.2*sc*tw;}
+        else if(k===1){a=.30+.70*z;d=(3.3+1.5*z)*sc*tw;}
+        else{a=.55+.45*z;d=(4.6+1.8*z)*sc*tw;}
+      }
+      ctx.globalAlpha=a;ctx.drawImage(spr,cx+x*R-d/2,cy-yy*R-d/2,d,d);
+    }
+    ctx.globalAlpha=1;
+    /* 国家在线标记：发光光晕 + 实心核 + 脉冲环 */
+    var vis=[];
+    for(var j=0;j<active.length;j++){var c=active[j],q=proj(c.v,g);if(q.z>.02){q.c=c;q.i=countries.indexOf(c);vis.push(q);}}
+    vis.sort(function(a,b){return a.z-b.z;});
+    vis.forEach(function(q){
+      var c=q.c,hov=q.i===hoverIndex,fade=Math.min(1,q.z/.3),rd=c.rad*sc*(hov?1.25:1),pu=.88+.12*Math.sin(t*2.4+c.ph),hs=rd*(hov?9:6.4)*pu;
+      ctx.globalCompositeOperation=light?'source-over':'lighter';
+      ctx.globalAlpha=fade*(light?.55:.9);ctx.drawImage(c.halo,q.x-hs/2,q.y-hs/2,hs,hs);
+      var p=((t*.55+c.ph/6.283)%1);
+      ctx.globalAlpha=fade*(1-p)*.55;ctx.beginPath();ctx.arc(q.x,q.y,rd+p*rd*2.8,0,6.2832);ctx.strokeStyle=rgba(c.rgb,1);ctx.lineWidth=1.2;ctx.stroke();
+      ctx.globalCompositeOperation='source-over';
+      ctx.globalAlpha=fade;ctx.beginPath();ctx.arc(q.x,q.y,rd*.62,0,6.2832);ctx.fillStyle=rgba(c.rgb,1);ctx.fill();
+      ctx.lineWidth=1;ctx.strokeStyle='rgba(255,236,224,'+(hov?.95:.55)+')';ctx.stroke();
+      if(hov){ctx.beginPath();ctx.arc(q.x,q.y,rd+3.5,0,6.2832);ctx.strokeStyle='#fff';ctx.lineWidth=1.6;ctx.stroke();}
+    });
+    ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+    if(hoverIndex>=0&&!tip.hidden){var hq=proj(countries[hoverIndex].v||xyz(countries[hoverIndex].lat,countries[hoverIndex].lon),g);if(hq.z<=.02){tip.hidden=true;}else positionTip(hoverIndex);}
     raf=requestAnimationFrame(draw);
   }
-  function renderList(){countries.map(function(c,i){return {c:c,i:i};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png" loading="lazy"><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';row.addEventListener('mouseenter',function(){selectCountry(i,true);});row.addEventListener('focus',function(){selectCountry(i,true);});row.addEventListener('click',function(){selectCountry(i,true);});list.appendChild(row);});}
-  function positionTip(i){var c=countries[i],rect=canvas.getBoundingClientRect(),r=Math.min(W*.38,H*.43),q=project(xyz(c.lat,c.lon),W*.49,H*.5,r);var stageRect=stage.getBoundingClientRect(),anchorX=rect.left-stageRect.left+q.x,anchorY=rect.top-stageRect.top+q.y;var left=Math.max(8,Math.min(stageRect.width-tip.offsetWidth-8,anchorX+12));var top=Math.max(8,Math.min(stageRect.height-tip.offsetHeight-8,anchorY-tip.offsetHeight/2));tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.toggle('tip-left',left<anchorX-tip.offsetWidth);tip.style.setProperty('--tip-arrow-y',Math.max(12,Math.min(tip.offsetHeight-12,anchorY-top))+'px');}
-  function selectCountry(i,showTip){hoverIndex=i;list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});if(showTip){var c=countries[i];tip.hidden=false;tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';positionTip(i);requestAnimationFrame(function(){positionTip(i);});}}
-  function findCountryAt(clientX,clientY){var rect=canvas.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top,r=Math.min(W*.38,H*.43),cx=W*.49,cy=H*.5,best=24,idx=-1;countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var d=Math.hypot(q.x-x,q.y-y);if(d<best){best=d;idx=i;}});return idx;}
-  canvas.addEventListener('mousemove',function(e){if(dragging){rot+=(e.clientX-lastX)*.008;tilt=Math.max(-.8,Math.min(.8,tilt+(e.clientY-lastY)*.005));lastX=e.clientX;lastY=e.clientY;return;}var i=findCountryAt(e.clientX,e.clientY);if(i>=0)selectCountry(i,true);else{hoverIndex=-1;tip.hidden=true;}});
-  canvas.addEventListener('mousedown',function(e){dragging=true;lastX=e.clientX;lastY=e.clientY;});window.addEventListener('mouseup',function(){dragging=false;});
-  canvas.addEventListener('touchstart',function(e){if(e.touches[0]){dragging=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;}},{passive:true});canvas.addEventListener('touchend',function(){dragging=false;});
-  function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';resize();if(!raf)raf=requestAnimationFrame(draw);}
-  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';tip.hidden=true;if(raf){cancelAnimationFrame(raf);raf=0;}}
-  renderList();openBtn.addEventListener('click',show);document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
+
+  /* ───────── 列表 / 悬浮提示 ───────── */
+  function renderList(){
+    active.map(function(c){return {c:c,i:countries.indexOf(c)};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){
+      var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;
+      row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png" loading="lazy"><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';
+      row.addEventListener('mouseenter',function(){selectCountry(i,true);});
+      row.addEventListener('focus',function(){selectCountry(i,true);});
+      row.addEventListener('click',function(){focusCountry(i);});
+      list.appendChild(row);
+    });
+    list.addEventListener('mouseleave',function(){clearHover();});
+  }
+  function positionTip(i){
+    var c=countries[i],g=geom(),rect=canvas.getBoundingClientRect(),q=proj(c.v||xyz(c.lat,c.lon),g),stageRect=stage.getBoundingClientRect(),
+        ax=rect.left-stageRect.left+q.x,ay=rect.top-stageRect.top+q.y,
+        left=Math.max(8,Math.min(stageRect.width-tip.offsetWidth-8,ax+16)),top=Math.max(8,Math.min(stageRect.height-tip.offsetHeight-8,ay-tip.offsetHeight/2));
+    tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.toggle('tip-left',left<ax-tip.offsetWidth);
+    tip.style.setProperty('--tip-arrow-y',Math.max(12,Math.min(tip.offsetHeight-12,ay-top))+'px');
+  }
+  function selectCountry(i,showTip){
+    hoverIndex=i;
+    list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});
+    if(showTip){var c=countries[i];tip.hidden=false;
+      tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';
+      var q=proj(c.v,geom());if(q.z<=.02){tip.hidden=true;return;}positionTip(i);}
+  }
+  function clearHover(){hoverIndex=-1;tip.hidden=true;list.querySelectorAll('.world-country-row.active').forEach(function(n){n.classList.remove('active');});}
+  function focusCountry(i){
+    var c=countries[i];selectCountry(i,false);
+    var tr=-c.lon*Math.PI/180,d=((tr-rot+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
+    focus={rot:rot+d,tilt:Math.max(-.8,Math.min(.8,c.lat*Math.PI/180*.85))};
+    tip.hidden=false;tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';
+  }
+  function findCountryAt(clientX,clientY){
+    var rect=canvas.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top,g=geom(),best=1e9,idx=-1;
+    active.forEach(function(c){var q=proj(c.v,g);if(q.z<=.02)return;var lim=Math.max(13,c.rad*g.sc+7),d=Math.hypot(q.x-x,q.y-y);if(d<lim&&d<best){best=d;idx=countries.indexOf(c);}});
+    return idx;
+  }
+
+  /* ───────── 交互：指针拖动旋转 / 悬停 / 点击聚焦 ───────── */
+  canvas.addEventListener('pointerdown',function(e){dragging=true;moved=0;downX=lastX=e.clientX;downY=lastY=e.clientY;vel=0;focus=null;try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
+  canvas.addEventListener('pointermove',function(e){
+    if(dragging){var dx=e.clientX-lastX,dy=e.clientY-lastY;rot+=dx*.0065;vel=dx*.0065;tilt=Math.max(-.9,Math.min(.9,tilt+dy*.005));lastX=e.clientX;lastY=e.clientY;moved=Math.max(moved,Math.hypot(e.clientX-downX,e.clientY-downY));if(moved>4){tip.hidden=true;}return;}
+    var i=findCountryAt(e.clientX,e.clientY);
+    if(i>=0){if(i!==hoverIndex||tip.hidden)selectCountry(i,true);canvas.style.cursor='pointer';}
+    else{if(hoverIndex>=0)clearHover();canvas.style.cursor='';}
+  });
+  function endDrag(e){if(!dragging)return;dragging=false;if(moved<=4){var i=findCountryAt(e.clientX,e.clientY);if(i>=0)focusCountry(i);}}
+  canvas.addEventListener('pointerup',endDrag);
+  canvas.addEventListener('pointercancel',function(){dragging=false;});
+  canvas.addEventListener('pointerleave',function(){if(!dragging)clearHover();});
+
+  function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';readTheme();resize();if(!raf)raf=requestAnimationFrame(draw);}
+  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';clearHover();dragging=false;if(raf){cancelAnimationFrame(raf);raf=0;}}
+  renderList();openBtn.addEventListener('click',show);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});
+  window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
 })();
 </script>
+
 
 </body>
 </html>
