@@ -3507,6 +3507,7 @@ function uiSetLang(code, persist){
   uiState.lang = code;
   document.documentElement.lang = code;
   try{if(typeof window.pluginRefreshLabels==='function')window.pluginRefreshLabels();}catch(e){}
+  try{if(typeof window.ctRefreshLabels==='function')window.ctRefreshLabels();}catch(e){}
   uiRenderLangGrid(); uiRenderI18n(); uiRenderChangelog();
   if (typeof onUiLangChanged === 'function') { onUiLangChanged(code); }
   uiPaintPrices();
@@ -8776,10 +8777,10 @@ __UI_CSS__
   id: 'hello-panel',
   name: 'Hello Panel',
   version: '1.0.0',
-  description: '一个示例扩展面板',
-  activate(api) { api.toast('插件已启用'); },
+  description: 'An example extension panel',
+  activate(api) { api.toast('Plugin enabled'); },
   render(container, api) {
-    container.innerHTML = '&lt;button class="ui-btn"&gt;点击我&lt;/button&gt;';
+    container.innerHTML = '&lt;button class="ui-btn"&gt;Click me&lt;/button&gt;';
     container.querySelector('button').onclick = () =&gt; api.toast('Hello from plugin!');
   },
   deactivate(api) {}
@@ -14033,6 +14034,17 @@ __UI_SCRIPT__
     uiSetLang(saved.id);          /* 立刻切换到刚保存的语言，译文马上生效 */
     close(true);
   }
+  window.ctRefreshLabels=function(){
+    if(!root||root.hidden)return;
+    try{labels();}catch(e){}
+    if(E.ctArch&&!E.ctArch.hidden){
+      E.ctAT.textContent=t('ctArch');E.ctAS.textContent=t('ctArchSub');E.ctALTpl.textContent=t('ctTemplate');
+      E.ctABack.textContent=t('ctBack');E.ctACopy.textContent=t('ctCopy');E.ctADl.textContent=t('ctDownload');
+      E.ctAImp.textContent=t('ctImportFile');E.ctAApply.textContent=t('ctApply');
+      if(E.ctAMsg&&E.ctAMsg.textContent){/* 保留当前结果提示，避免切换语言时丢失操作状态 */}
+    }
+    try{renderRows(true);}catch(e){}
+  };
   window.uiOpenTransEditor=open;
   window.uiImportTranslationFileText=function(text){
     try{
@@ -14086,7 +14098,7 @@ __UI_SCRIPT__
     plugin.id=String(plugin.id||rec.id);plugin.name=String(plugin.name||rec.name||plugin.id);plugin.version=String(plugin.version||rec.version||'1.0.0');plugin.description=String(plugin.description||rec.description||'');
     return {plugin:plugin,api:api};
   }
-  function activate(rec){if(!rec.enabled)return;try{var r=instantiate(rec);runtime[rec.id]=r;if(typeof r.plugin.activate==='function')r.plugin.activate(r.api);}catch(e){rec.lastError=e.message;rec.enabled=false;write();toast(rec.name+' 启用失败');}}
+  function activate(rec){if(!rec.enabled)return;try{var r=instantiate(rec);runtime[rec.id]=r;if(typeof r.plugin.activate==='function')r.plugin.activate(r.api);}catch(e){rec.lastError=e.message;rec.enabled=false;write();toast(t('pluginEnableFailed')+' '+rec.name);}}
   function deactivate(rec){var r=runtime[rec.id];if(r){try{if(typeof r.plugin.deactivate==='function')r.plugin.deactivate(r.api);}catch(e){}delete runtime[rec.id];}var nodes=pluginNodes[rec.id]||[];nodes.forEach(function(n){try{if(n&&n.remove)n.remove();}catch(e){}});delete pluginNodes[rec.id];updateStats();}
   function updateStats(){var host=$('pluginWidgets');panelCount=host?host.children.length:0;if($('pluginCount'))$('pluginCount').textContent=installed.length;if($('pluginEnabledCount'))$('pluginEnabledCount').textContent=installed.filter(function(x){return x.enabled;}).length;if($('pluginWidgetCount'))$('pluginWidgetCount').textContent=panelCount;var b=$('sbPluginBadge');if(b){var n=installed.filter(function(x){return x.enabled;}).length;b.textContent=n;b.hidden=!n;}}
   function render(){var list=$('pluginList');if(!list)return;list.innerHTML='';panelCount=0;
