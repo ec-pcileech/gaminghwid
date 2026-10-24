@@ -1233,6 +1233,7 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
         </div>
       </div>
       <div class="lang-grid" id="uiLangGrid" role="group"></div>
+      <div class="ct-set-row"><button class="ui-btn" type="button" id="uiTransBtn" hidden onclick="if(window.uiOpenTransEditor)uiOpenTransEditor()" data-ui="ctNew">Custom translation…</button></div>
     </section>
     <section class="ui-card">
       <div class="ui-card-head">
@@ -1576,9 +1577,26 @@ var UI_FLAGS = {
 };
 
 
+/* 更多内置国旗（离线可用）；其余国旗代码走在线图片，失败时显示代码字母 */
+UI_FLAGS.vn='<rect width="24" height="18" fill="#da251d"/><path d="M12.00 4.30 L13.15 7.72 L16.76 7.75 L13.85 9.90 L14.94 13.35 L12.00 11.25 L9.06 13.35 L10.15 9.90 L7.24 7.75 L10.85 7.72Z" fill="#ffff00"/>';
+UI_FLAGS.fr='<rect width="24" height="18" fill="#fff"/><rect width="8" height="18" fill="#0055a4"/><rect x="16" width="8" height="18" fill="#ef4135"/>';
+UI_FLAGS.it='<rect width="24" height="18" fill="#fff"/><rect width="8" height="18" fill="#009246"/><rect x="16" width="8" height="18" fill="#ce2b37"/>';
+UI_FLAGS.ua='<rect width="24" height="18" fill="#ffd700"/><rect width="24" height="9" fill="#0057b7"/>';
+UI_FLAGS.pl='<rect width="24" height="18" fill="#dc143c"/><rect width="24" height="9" fill="#fff"/>';
+UI_FLAGS.nl='<rect width="24" height="18" fill="#fff"/><rect width="24" height="6" fill="#ae1c28"/><rect y="12" width="24" height="6" fill="#21468b"/>';
+UI_FLAGS.id='<rect width="24" height="18" fill="#fff"/><rect width="24" height="9" fill="#ce1126"/>';
+UI_FLAGS.th='<rect width="24" height="18" fill="#a51931"/><rect y="3" width="24" height="12" fill="#f4f5f8"/><rect y="6" width="24" height="6" fill="#2d2a4a"/>';
+var UI_FLAG_RE = /^[a-z]{2}(-[a-z0-9]{2,3})?$/;
 function uiFlagSvg(code){
+  code = String(code == null ? '' : code).toLowerCase();
   var inner = UI_FLAGS[code];
-  if (!inner) { return ''; }
+  if (!inner) {
+    if (!UI_FLAG_RE.test(code)) { return ''; }
+    inner = '<rect width="24" height="18" fill="#4b5263"/>' +
+      '<text x="12" y="12.2" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="sans-serif">' +
+      code.slice(0, 2).toUpperCase() + '</text>' +
+      '<image href="https://flagcdn.com/w80/' + code + '.png" width="24" height="18" preserveAspectRatio="none"/>';
+  }
   return '<svg class="lang-flag-svg" viewBox="0 0 24 18" aria-hidden="true" ' +
          'preserveAspectRatio="none">' + inner + '</svg>';
 }
@@ -2318,6 +2336,75 @@ var UI_CHANGELOG = [
   { v:'1.6.0', date:'2025-07-30',
     en:['First release as a single-file app.'] }
 ];
+/* ── 自定义语言：保存在本机（localStorage），同时通知宿主 UI_CUSTOMLANG:json ── */
+var UI_CUSTOM_KEY = 'starline.customLangs';
+var UI_CUSTOM_LANGS = [];
+function uiCustomClean(c){
+  if (!c || typeof c !== 'object') { return null; }
+  var id = String(c.id || '').toLowerCase().replace(/[^a-z0-9-]/g, '');
+  var flag = String(c.flag || '').toLowerCase();
+  var name = String(c.native || '').trim().slice(0, 24);
+  if (id.indexOf('x-') !== 0 || !UI_FLAG_RE.test(flag) || !name) { return null; }
+  var map = {};
+  if (c.map && typeof c.map === 'object') {
+    for (var k in c.map) {
+      if (typeof c.map[k] === 'string' && c.map[k].trim()) { map[k] = c.map[k]; }
+    }
+  }
+  return { id: id, flag: flag, native: name, map: map };
+}
+function uiCustomApply(c){
+  for (var i = UI_LANGS.length - 1; i >= 0; i--) {
+    if (UI_LANGS[i].code === c.id) { UI_LANGS.splice(i, 1); }
+  }
+  UI_LANGS.push({ code: c.id, flag: c.flag, native: c.native, latin: c.flag.toUpperCase(), custom: true });
+  var copy = {};
+  for (var k in c.map) { copy[k] = c.map[k]; }
+  UI_T[c.id] = copy;      /* 副本：其他脚本批量写入英文时不会弄脏已保存的翻译 */
+}
+function uiCustomReapply(){ for (var i = 0; i < UI_CUSTOM_LANGS.length; i++) { uiCustomApply(UI_CUSTOM_LANGS[i]); } }
+function uiCustomSave(){
+  var json = JSON.stringify(UI_CUSTOM_LANGS);
+  try { localStorage.setItem(UI_CUSTOM_KEY, json); } catch (e) {}
+  uiSend('UI_CUSTOMLANG:' + json);
+}
+function uiCustomFind(id){
+  for (var i = 0; i < UI_CUSTOM_LANGS.length; i++) { if (UI_CUSTOM_LANGS[i].id === id) { return UI_CUSTOM_LANGS[i]; } }
+  return null;
+}
+function uiCustomNewId(flag){
+  var base = 'x-' + flag, id = base, n = 2;
+  while (uiCustomFind(id)) { id = base + '-' + (n++); }
+  return id;
+}
+function uiCustomUpsert(c){
+  c = uiCustomClean(c); if (!c) { return null; }
+  var found = false;
+  for (var i = 0; i < UI_CUSTOM_LANGS.length; i++) {
+    if (UI_CUSTOM_LANGS[i].id === c.id) { UI_CUSTOM_LANGS[i] = c; found = true; }
+  }
+  if (!found) { UI_CUSTOM_LANGS.push(c); }
+  uiCustomApply(c); uiCustomSave();
+  if (typeof uiRenderLangGrid === 'function') { uiRenderLangGrid(); }
+  return c;
+}
+function uiCustomRemove(id){
+  if (typeof uiState !== 'undefined' && uiState.lang === id && typeof uiSetLang === 'function') { uiSetLang('en'); }
+  for (var i = UI_CUSTOM_LANGS.length - 1; i >= 0; i--) { if (UI_CUSTOM_LANGS[i].id === id) { UI_CUSTOM_LANGS.splice(i, 1); } }
+  for (var j = UI_LANGS.length - 1; j >= 0; j--) { if (UI_LANGS[j].code === id) { UI_LANGS.splice(j, 1); } }
+  delete UI_T[id];
+  uiCustomSave();
+  if (typeof uiRenderLangGrid === 'function') { uiRenderLangGrid(); }
+}
+(function(){
+  var list = null;
+  try { if (UI_CFG && UI_CFG.customLangs && UI_CFG.customLangs.length) { list = UI_CFG.customLangs; } } catch (e) {}
+  if (!list) { try { list = JSON.parse(localStorage.getItem(UI_CUSTOM_KEY) || '[]'); } catch (e) { list = []; } }
+  for (var i = 0; i < (list || []).length; i++) {
+    var c = uiCustomClean(list[i]);
+    if (c) { UI_CUSTOM_LANGS.push(c); uiCustomApply(c); }
+  }
+})();
 /* ════════════════════════════════════════════════════════════════
    共享 UI 主逻辑
    ════════════════════════════════════════════════════════════════ */
@@ -3412,6 +3499,8 @@ function uiCloseView(){
 }
 /* 统一的 ESC 处理：先收浮层，再退回上一级 */
 function uiEscBack(){
+  var ctv = document.getElementById('ctView');
+  if (ctv && !ctv.hidden && typeof window.ctClose === 'function') { window.ctClose(); return true; }
   var lgp = document.getElementById('lgPop');
   if (lgp && !lgp.hidden && typeof window.lgClose === 'function') { window.lgClose(); return true; }
   var skp = document.getElementById('skPop');
@@ -6350,6 +6439,72 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 #uiResizeGrip:hover,html.ui-resizing #uiResizeGrip{opacity:1;color:var(--accent-2)}
 #uiResizeGrip svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;pointer-events:none}
 html.ui-resizing,html.ui-resizing *{cursor:nwse-resize !important;-webkit-user-select:none;user-select:none}
+/* 自定义翻译：语言弹窗里的编辑图标 / 入口 */
+.lg-sep{height:1px;margin:4px 6px;background:var(--border)}
+.lg-edit{display:grid;place-items:center;width:20px;height:20px;margin-left:6px;border-radius:6px;color:var(--text-3);flex-shrink:0}
+.lg-edit:hover{background:var(--surface-3);color:var(--text)}
+.lg-edit svg,.lg-ico svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.lg-ico{display:grid;place-items:center;width:20px;height:15px;flex-shrink:0;color:var(--accent-2)}
+.lg-add{color:var(--text-3)}
+.ct-set-row{margin-top:12px}
+/* 自定义翻译编辑器 */
+.ct-view{position:fixed;inset:0;z-index:2147483200;display:flex;align-items:center;justify-content:center;padding:28px 24px;
+  background:rgba(var(--bg-rgb,10,10,12),.72);backdrop-filter:blur(16px) saturate(160%);-webkit-backdrop-filter:blur(16px) saturate(160%);
+  -webkit-app-region:no-drag;animation:ctFade .22s cubic-bezier(.2,.8,.2,1)}
+.ct-view[hidden]{display:none}
+@keyframes ctFade{from{opacity:0}to{opacity:1}}
+.ct-card{width:100%;max-width:1000px;height:100%;max-height:760px;display:flex;flex-direction:column;overflow:hidden;
+  border-radius:var(--radius-xl);background:var(--surface-solid);border:1px solid var(--border-2);box-shadow:var(--shadow-3);
+  color:var(--text);font-family:var(--font);font-size:13px;line-height:1.5;animation:ctPop .26s cubic-bezier(.2,.8,.2,1)}
+@keyframes ctPop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.ct-top{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.ct-title{flex:1;font:800 15px/1.2 var(--font)}
+.ct-x{width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface-2);color:var(--text-2);cursor:pointer;transition:all var(--tr-fast)}
+.ct-x:hover{color:var(--err);border-color:rgba(239,68,68,.4)}
+.ct-x svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
+.ct-meta{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--border)}
+.ct-fld{display:flex;flex-direction:column;gap:5px;font:700 11px/1 var(--font);letter-spacing:.05em;text-transform:uppercase;color:var(--text-3)}
+.ct-grow{flex:1;min-width:200px}
+.ct-in,.ct-ta{width:100%;box-sizing:border-box;border:1px solid var(--border-2);border-radius:var(--radius);background:var(--surface-2);color:var(--text);
+  font:500 13px/1.45 var(--font);outline:none;transition:border-color var(--tr-fast),box-shadow var(--tr-fast)}
+.ct-in{height:38px;padding:0 12px;text-transform:none;letter-spacing:0}
+.ct-ta{display:block;padding:8px 11px;resize:vertical;min-height:38px;max-height:220px}
+.ct-in:focus,.ct-ta:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.ct-flagrow{display:flex;align-items:center;gap:10px}
+.ct-flagrow .ct-in{width:110px;font-family:var(--font-mono)}
+.ct-prev{display:grid;place-items:center;width:52px;height:38px;border-radius:var(--radius);background:var(--surface-2);border:1px solid var(--border-2)}
+.ct-flag{display:block;width:36px;height:27px;border-radius:4px;overflow:hidden;box-shadow:0 0 0 1px var(--border-2)}
+.ct-flag svg{display:block;width:100%;height:100%;fill:initial;stroke:none}
+.ct-flag-empty{background:repeating-linear-gradient(45deg,var(--border),var(--border) 4px,transparent 4px,transparent 8px)}
+.ct-chip{display:flex;align-items:center;gap:5px;height:38px;padding:0 12px;border-radius:var(--radius);background:var(--accent-soft);color:var(--text);font:600 13px/1 var(--font);text-transform:none;letter-spacing:0}
+.ct-chip .ct-flag{width:20px;height:15px}
+.ct-stat{margin-left:auto;font:600 12px/1 var(--font-mono);color:var(--text-3);padding-bottom:12px}
+.ct-tools{display:flex;align-items:center;gap:14px;padding:10px 18px}
+.ct-tools .ct-in{flex:1;height:34px}
+.ct-chk{display:flex;align-items:center;gap:6px;color:var(--text-2);cursor:pointer;white-space:nowrap;user-select:none}
+.ct-chk input{accent-color:var(--accent)}
+.ct-cols,.ct-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ct-cols{padding:0 18px 6px;font:700 11px/1 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-3)}
+.ct-cols,.ct-row{padding-left:18px;padding-right:18px}
+.ct-list{flex:1;min-height:0;overflow-y:auto;padding-bottom:10px}
+.ct-list::-webkit-scrollbar{width:8px}.ct-list::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
+.ct-row{padding-top:5px;padding-bottom:5px;align-items:start}
+.ct-row:hover .ct-l{border-color:var(--border-2)}
+.ct-l{padding:8px 11px;border-radius:var(--radius);background:var(--surface-2);border:1px solid var(--border);min-height:38px;box-sizing:border-box}
+.ct-lt{white-space:pre-wrap;word-break:break-word;color:var(--text)}
+.ct-k{display:block;margin-top:3px;font:500 10.5px/1.2 var(--font-mono);color:var(--text-3)}
+.ct-none{padding:30px;text-align:center;color:var(--text-3)}
+.ct-foot{display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--border)}
+.ct-err{flex:1;min-width:0;font-size:12px;font-weight:600;color:var(--err)}
+.ct-hint{flex:1;font-size:11.5px;color:var(--text-3)}
+.ct-btn{height:36px;padding:0 18px;border-radius:var(--radius);border:1px solid var(--border-2);background:var(--surface-2);color:var(--text);font:700 13px/1 var(--font);cursor:pointer;transition:all var(--tr-fast)}
+.ct-btn:hover{background:var(--surface-3)}
+.ct-btn.pri{border:none;color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-3))}
+.ct-btn.pri:hover{opacity:.92}
+.ct-btn.danger{color:var(--err);border-color:rgba(239,68,68,.35)}
+.ct-btn.danger.arm{background:var(--err);color:#fff;border-color:transparent}
+.ct-btn[hidden]{display:none}
+@media (max-width:760px){.ct-cols,.ct-row{grid-template-columns:1fr}.ct-cols>div:last-child{display:none}}
 .tb-spacer{flex:1}
 .tb-actions{display:flex;gap:8px;align-items:center;-webkit-app-region:no-drag}
 .tb-btn{
@@ -13330,6 +13485,8 @@ __UI_SCRIPT__
   if(!btn||!pop||typeof UI_LANGS==='undefined')return;
   document.body.appendChild(pop);
   var CK='<svg class="lg-ck" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+  var PEN='<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+  var PLUS='<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
 
   function cur(){return (typeof uiState!=='undefined'&&uiState.lang)||document.documentElement.lang||'en';}
   function find(code){for(var i=0;i<UI_LANGS.length;i++)if(UI_LANGS[i].code===code)return UI_LANGS[i];return null;}
@@ -13344,8 +13501,11 @@ __UI_SCRIPT__
     var c=cur(),h='';
     UI_LANGS.forEach(function(l){
       h+='<button type="button" role="option" class="lg-item'+(l.code===c?' active':'')+'" data-lang="'+l.code+'" lang="'+l.code+'" aria-selected="'+(l.code===c)+'">'
-        +flag(l)+'<span class="lg-name">'+uiEsc(l.native)+'</span>'+CK+'</button>';
+        +flag(l)+'<span class="lg-name">'+uiEsc(l.native)+'</span>'
+        +(l.custom?'<span class="lg-edit" role="button" data-edit="'+l.code+'" title="'+uiEsc(uiT('ctEdit'))+'">'+PEN+'</span>':'')
+        +CK+'</button>';
     });
+    h+='<div class="lg-sep"></div><button type="button" class="lg-item lg-add" data-add="1"><span class="lg-ico">'+PLUS+'</span><span class="lg-name">'+uiEsc(uiT('ctNew'))+'</span></button>';
     pop.innerHTML=h;
   }
   /* 箭头对准国旗按钮中心，弹窗在按钮正下方 */
@@ -13368,6 +13528,10 @@ __UI_SCRIPT__
 
   btn.addEventListener('click',function(e){e.stopPropagation();if(pop.hidden)open();else close();});
   pop.addEventListener('click',function(e){
+    var ed=e.target.closest?e.target.closest('.lg-edit'):null;
+    if(ed){close();if(window.uiOpenTransEditor)uiOpenTransEditor(ed.getAttribute('data-edit'));return;}
+    var ad=e.target.closest?e.target.closest('.lg-add'):null;
+    if(ad){close();if(window.uiOpenTransEditor)uiOpenTransEditor();return;}
     var b=e.target.closest?e.target.closest('.lg-item'):null;if(!b)return;
     var code=b.getAttribute('data-lang');close();
     if(code&&code!==cur()&&typeof uiSetLang==='function')uiSetLang(code);
@@ -13440,6 +13604,185 @@ __UI_SCRIPT__
   g.addEventListener('lostpointercapture',end);
   /* 双击手柄：恢复为当前缩放对应的默认窗口大小 */
   g.addEventListener('dblclick',function(e){e.preventDefault();if(window.uiWinGeom)window.uiWinGeom.reset();});
+})();
+</script>
+<script>
+/* ═══════ 自定义翻译：顶部填国旗代码（带预览）+ 语言名称；左边当前文本，右边输入翻译 ═══════ */
+(function(){
+  if(typeof UI_LANGS==='undefined'||typeof uiCustomUpsert!=='function')return;
+  var T={
+    en:{ctTitle:'Custom translation',ctFlag:'Flag code',ctName:'Language name',ctNamePh:'e.g. Tiếng Việt',ctCurrent:'Current text',ctYours:'Your translation',
+        ctSearch:'Search text or key…',ctOnly:'Untranslated only',ctDone:'translated',ctSave:'Save & apply',ctDelete:'Delete language',ctDelSure:'Click again to delete',
+        ctNew:'Custom translation…',ctEdit:'Edit translation',ctErrFlag:'Enter a valid flag code, e.g. vn, fr, gb',ctErrName:'Enter the language name',
+        ctDirty:'Unsaved changes — press Esc again to discard',ctNone:'No matching texts',ctTypePh:'Type the translation…',ctHint:'Untranslated texts fall back to English.'},
+    zh:{ctTitle:'自定义翻译',ctFlag:'国旗代码',ctName:'语言名称',ctNamePh:'例如 Tiếng Việt',ctCurrent:'当前文本',ctYours:'你的翻译',
+        ctSearch:'搜索文本或键名…',ctOnly:'仅看未翻译',ctDone:'已翻译',ctSave:'保存并应用',ctDelete:'删除该语言',ctDelSure:'再点一次确认删除',
+        ctNew:'自定义翻译…',ctEdit:'编辑翻译',ctErrFlag:'请输入有效的国旗代码，例如 vn、fr、gb',ctErrName:'请输入语言名称',
+        ctDirty:'有未保存的修改 — 再按一次 Esc 放弃',ctNone:'没有匹配的文本',ctTypePh:'输入翻译…',ctHint:'未翻译的文本会回退显示英文。'},
+    ru:{ctTitle:'Свой перевод',ctFlag:'Код флага',ctName:'Название языка',ctNamePh:'напр. Tiếng Việt',ctCurrent:'Текущий текст',ctYours:'Ваш перевод',
+        ctSearch:'Поиск по тексту или ключу…',ctOnly:'Только непереведённые',ctDone:'переведено',ctSave:'Сохранить и применить',ctDelete:'Удалить язык',ctDelSure:'Нажмите ещё раз для удаления',
+        ctNew:'Свой перевод…',ctEdit:'Править перевод',ctErrFlag:'Введите корректный код флага, например vn, fr, gb',ctErrName:'Введите название языка',
+        ctDirty:'Есть несохранённые изменения — нажмите Esc ещё раз',ctNone:'Ничего не найдено',ctTypePh:'Введите перевод…',ctHint:'Непереведённые тексты показываются на английском.'},
+    de:{ctTitle:'Eigene Übersetzung',ctFlag:'Flaggencode',ctName:'Sprachname',ctNamePh:'z. B. Tiếng Việt',ctCurrent:'Aktueller Text',ctYours:'Deine Übersetzung',
+        ctSearch:'Text oder Schlüssel suchen…',ctOnly:'Nur unübersetzte',ctDone:'übersetzt',ctSave:'Speichern & anwenden',ctDelete:'Sprache löschen',ctDelSure:'Zum Löschen erneut klicken',
+        ctNew:'Eigene Übersetzung…',ctEdit:'Übersetzung bearbeiten',ctErrFlag:'Gültigen Flaggencode eingeben, z. B. vn, fr, gb',ctErrName:'Sprachnamen eingeben',
+        ctDirty:'Ungespeicherte Änderungen — Esc erneut drücken',ctNone:'Keine Treffer',ctTypePh:'Übersetzung eingeben…',ctHint:'Unübersetzte Texte erscheinen auf Englisch.'},
+    ja:{ctTitle:'カスタム翻訳',ctFlag:'国旗コード',ctName:'言語名',ctNamePh:'例: Tiếng Việt',ctCurrent:'現在のテキスト',ctYours:'あなたの翻訳',
+        ctSearch:'テキストまたはキーを検索…',ctOnly:'未翻訳のみ',ctDone:'翻訳済み',ctSave:'保存して適用',ctDelete:'この言語を削除',ctDelSure:'もう一度クリックで削除',
+        ctNew:'カスタム翻訳…',ctEdit:'翻訳を編集',ctErrFlag:'有効な国旗コードを入力してください（例: vn, fr, gb）',ctErrName:'言語名を入力してください',
+        ctDirty:'未保存の変更があります — もう一度 Esc で破棄',ctNone:'一致するテキストがありません',ctTypePh:'翻訳を入力…',ctHint:'未翻訳の文は英語で表示されます。'},
+    es:{ctTitle:'Traducción personalizada',ctFlag:'Código de bandera',ctName:'Nombre del idioma',ctNamePh:'p. ej. Tiếng Việt',ctCurrent:'Texto actual',ctYours:'Tu traducción',
+        ctSearch:'Buscar texto o clave…',ctOnly:'Solo sin traducir',ctDone:'traducido',ctSave:'Guardar y aplicar',ctDelete:'Eliminar idioma',ctDelSure:'Haz clic de nuevo para eliminar',
+        ctNew:'Traducción personalizada…',ctEdit:'Editar traducción',ctErrFlag:'Introduce un código de bandera válido, p. ej. vn, fr, gb',ctErrName:'Introduce el nombre del idioma',
+        ctDirty:'Cambios sin guardar — pulsa Esc otra vez',ctNone:'Sin resultados',ctTypePh:'Escribe la traducción…',ctHint:'Lo no traducido se muestra en inglés.'},
+    tr:{ctTitle:'Özel çeviri',ctFlag:'Bayrak kodu',ctName:'Dil adı',ctNamePh:'örn. Tiếng Việt',ctCurrent:'Geçerli metin',ctYours:'Çevirin',
+        ctSearch:'Metin veya anahtar ara…',ctOnly:'Yalnızca çevrilmemiş',ctDone:'çevrildi',ctSave:'Kaydet ve uygula',ctDelete:'Dili sil',ctDelSure:'Silmek için tekrar tıkla',
+        ctNew:'Özel çeviri…',ctEdit:'Çeviriyi düzenle',ctErrFlag:'Geçerli bir bayrak kodu gir, örn. vn, fr, gb',ctErrName:'Dil adını gir',
+        ctDirty:'Kaydedilmemiş değişiklikler — tekrar Esc',ctNone:'Eşleşen metin yok',ctTypePh:'Çeviriyi yaz…',ctHint:'Çevrilmeyenler İngilizce gösterilir.'},
+    pt:{ctTitle:'Tradução personalizada',ctFlag:'Código da bandeira',ctName:'Nome do idioma',ctNamePh:'ex.: Tiếng Việt',ctCurrent:'Texto atual',ctYours:'Sua tradução',
+        ctSearch:'Buscar texto ou chave…',ctOnly:'Só não traduzidos',ctDone:'traduzido',ctSave:'Salvar e aplicar',ctDelete:'Excluir idioma',ctDelSure:'Clique de novo para excluir',
+        ctNew:'Tradução personalizada…',ctEdit:'Editar tradução',ctErrFlag:'Informe um código de bandeira válido, ex.: vn, fr, gb',ctErrName:'Informe o nome do idioma',
+        ctDirty:'Alterações não salvas — pressione Esc de novo',ctNone:'Nada encontrado',ctTypePh:'Digite a tradução…',ctHint:'O que não for traduzido aparece em inglês.'}
+  };
+  for(var c in T){if(!UI_T[c])UI_T[c]={};for(var k in T[c])UI_T[c][k]=T[c][k];}
+  /* 其他脚本启动时会往所有语言表里批量写英文，这里把自定义语言恢复回来 */
+  uiCustomReapply();
+  if(String(uiState.lang).indexOf('x-')===0){
+    try{uiRenderI18n();uiRenderLangGrid();}catch(e){}
+    if(typeof onUiLangChanged==='function')onUiLangChanged(uiState.lang);
+  }
+  var sb=document.getElementById('uiTransBtn');if(sb)sb.hidden=false;
+
+  var root=null,E={},editId=null,draft={},orig='',keys=[],rows=[],shown=0,CHUNK=60,delArm=0,escArm=0;
+  function t(k){return uiT(k);}
+  function flagOf(code){return '<span class="ct-flag">'+uiFlagSvg(code)+'</span>';}
+
+  function build(){
+    root=document.createElement('div');root.className='ct-view';root.id='ctView';root.hidden=true;
+    root.innerHTML=
+      '<div class="ct-card" role="dialog" aria-modal="true">'
+      +'<div class="ct-top"><div class="ct-title" id="ctTitle"></div>'
+      +'<button type="button" class="ct-x" id="ctX"><svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button></div>'
+      +'<div class="ct-meta">'
+      +'<label class="ct-fld"><span id="ctLFlag"></span><span class="ct-flagrow"><input class="ct-in" id="ctFlag" maxlength="6" spellcheck="false" autocomplete="off" placeholder="vn"><span class="ct-prev" id="ctPrev"></span></span></label>'
+      +'<label class="ct-fld ct-grow"><span id="ctLName"></span><input class="ct-in" id="ctName" maxlength="24" spellcheck="false" autocomplete="off"></label>'
+      +'<div class="ct-chip" id="ctChip"></div>'
+      +'<div class="ct-stat" id="ctStat"></div></div>'
+      +'<div class="ct-tools"><input class="ct-in" id="ctSearch" spellcheck="false" autocomplete="off">'
+      +'<label class="ct-chk"><input type="checkbox" id="ctOnly"><span id="ctLOnly"></span></label></div>'
+      +'<div class="ct-cols"><div id="ctLCur"></div><div id="ctLYours"></div></div>'
+      +'<div class="ct-list" id="ctList"></div>'
+      +'<div class="ct-foot"><button type="button" class="ct-btn danger" id="ctDel" hidden></button>'
+      +'<span class="ct-hint" id="ctMsg"></span>'
+      +'<button type="button" class="ct-btn pri" id="ctSave"></button></div></div>';
+    document.body.appendChild(root);
+    ['ctTitle','ctX','ctLFlag','ctLName','ctFlag','ctPrev','ctName','ctChip','ctStat','ctSearch','ctOnly','ctLOnly','ctLCur','ctLYours','ctList','ctDel','ctMsg','ctSave'].forEach(function(i){E[i]=document.getElementById(i);});
+
+    E.ctX.addEventListener('click',function(){close(false);});
+    root.addEventListener('mousedown',function(e){if(e.target===root)close(false);});
+    E.ctFlag.addEventListener('input',function(){
+      var v=E.ctFlag.value.toLowerCase().replace(/[^a-z0-9-]/g,'');
+      if(v!==E.ctFlag.value)E.ctFlag.value=v;
+      preview();E.ctMsg.className='ct-hint';E.ctMsg.textContent=t('ctHint');
+    });
+    E.ctName.addEventListener('input',function(){preview();});
+    E.ctSearch.addEventListener('input',function(){renderRows(true);});
+    E.ctOnly.addEventListener('change',function(){renderRows(true);});
+    E.ctList.addEventListener('input',function(e){
+      var ta=e.target.closest?e.target.closest('textarea'):null;if(!ta)return;
+      var k=ta.getAttribute('data-k');
+      if(ta.value.trim())draft[k]=ta.value;else delete draft[k];
+      stat();
+    });
+    E.ctList.addEventListener('scroll',function(){
+      var l=E.ctList;
+      if(shown<rows.length&&l.scrollTop+l.clientHeight>=l.scrollHeight-240)appendRows();
+    });
+    E.ctSave.addEventListener('click',save);
+    E.ctDel.addEventListener('click',function(){
+      if(!editId)return;
+      if(Date.now()-delArm>3000){delArm=Date.now();E.ctDel.classList.add('arm');E.ctDel.textContent=t('ctDelSure');return;}
+      uiCustomRemove(editId);close(true);
+    });
+  }
+
+  function preview(){
+    var f=E.ctFlag.value.trim().toLowerCase(),ok=UI_FLAG_RE.test(f),n=E.ctName.value.trim();
+    E.ctPrev.innerHTML=ok?flagOf(f):'<span class="ct-flag ct-flag-empty"></span>';
+    E.ctChip.innerHTML=(ok?flagOf(f):'<span class="ct-flag ct-flag-empty"></span>')+'<span>'+uiEsc(n||'—')+'</span>';
+  }
+  function stat(){
+    var n=0;keys.forEach(function(k){if(draft[k])n++;});
+    E.ctStat.textContent=n+' / '+keys.length+' '+t('ctDone');
+  }
+  function snap(){return JSON.stringify([E.ctFlag.value.trim(),E.ctName.value.trim(),draft]);}
+  function dirty(){return snap()!==orig;}
+
+  function rowHtml(k){
+    var cur=uiT(k),rws=Math.max(1,Math.min(6,Math.ceil(cur.length/38)));
+    return '<div class="ct-row"><div class="ct-l"><div class="ct-lt">'+uiEsc(cur)+'</div><code class="ct-k">'+uiEsc(k)+'</code></div>'
+      +'<div><textarea class="ct-ta" data-k="'+uiEsc(k)+'" rows="'+rws+'" spellcheck="false" placeholder="'+uiEsc(t('ctTypePh'))+'">'+uiEsc(draft[k]||'')+'</textarea></div></div>';
+  }
+  function appendRows(){
+    var end=Math.min(rows.length,shown+CHUNK),h='';
+    for(var i=shown;i<end;i++)h+=rowHtml(rows[i]);
+    shown=end;E.ctList.insertAdjacentHTML('beforeend',h);
+  }
+  function renderRows(reset){
+    var q=E.ctSearch.value.trim().toLowerCase(),only=E.ctOnly.checked;
+    rows=keys.filter(function(k){
+      if(only&&draft[k])return false;
+      if(!q)return true;
+      return k.toLowerCase().indexOf(q)>=0||uiT(k).toLowerCase().indexOf(q)>=0||(draft[k]||'').toLowerCase().indexOf(q)>=0;
+    });
+    E.ctList.innerHTML='';shown=0;if(reset)E.ctList.scrollTop=0;
+    if(!rows.length){E.ctList.innerHTML='<div class="ct-none">'+uiEsc(t('ctNone'))+'</div>';return;}
+    appendRows();
+    /* 第一批不够撑满滚动区时继续补，保证能滚动加载 */
+    while(shown<rows.length&&E.ctList.scrollHeight<=E.ctList.clientHeight+40)appendRows();
+  }
+
+  function labels(){
+    E.ctTitle.textContent=t('ctTitle');E.ctLFlag.textContent=t('ctFlag');E.ctLName.textContent=t('ctName');
+    E.ctName.placeholder=t('ctNamePh');E.ctSearch.placeholder=t('ctSearch');E.ctLOnly.textContent=t('ctOnly');
+    E.ctLCur.textContent=t('ctCurrent');E.ctLYours.textContent=t('ctYours');
+    E.ctSave.textContent=t('ctSave');E.ctDel.textContent=t('ctDelete');E.ctDel.classList.remove('arm');
+    E.ctMsg.className='ct-hint';E.ctMsg.textContent=t('ctHint');
+  }
+
+  function open(id){
+    if(!root)build();
+    if(typeof window.lgClose==='function')window.lgClose();
+    if(typeof window.skClose==='function'){window.skClose();window.skClose();}
+    var c=id?uiCustomFind(id):null;editId=c?c.id:null;
+    draft={};if(c)for(var k in c.map)draft[k]=c.map[k];
+    keys=Object.keys(UI_T.en).filter(function(k){return typeof UI_T.en[k]==='string'&&UI_T.en[k]!=='';});
+    labels();
+    E.ctFlag.value=c?c.flag:'';E.ctName.value=c?c.native:'';
+    E.ctSearch.value='';E.ctOnly.checked=false;
+    E.ctDel.hidden=!c;delArm=0;escArm=0;
+    preview();stat();renderRows(true);
+    orig=snap();root.hidden=false;
+    try{(c?E.ctName:E.ctFlag).focus();}catch(e){}
+  }
+  function close(force){
+    if(!root||root.hidden)return;
+    if(!force&&dirty()&&Date.now()-escArm>3000){
+      escArm=Date.now();E.ctMsg.className='ct-err';E.ctMsg.textContent=t('ctDirty');return;
+    }
+    root.hidden=true;
+  }
+  function save(){
+    var f=E.ctFlag.value.trim().toLowerCase(),n=E.ctName.value.trim();
+    if(!UI_FLAG_RE.test(f)){E.ctMsg.className='ct-err';E.ctMsg.textContent=t('ctErrFlag');E.ctFlag.focus();return;}
+    if(!n){E.ctMsg.className='ct-err';E.ctMsg.textContent=t('ctErrName');E.ctName.focus();return;}
+    var saved=uiCustomUpsert({id:editId||uiCustomNewId(f),flag:f,native:n,map:draft});
+    if(!saved)return;
+    uiSetLang(saved.id);          /* 立刻切换到刚保存的语言，译文马上生效 */
+    close(true);
+  }
+  window.uiOpenTransEditor=open;
+  window.ctClose=function(){close(false);};
 })();
 </script>
 </body>
