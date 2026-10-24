@@ -3316,6 +3316,8 @@ function uiCloseView(){
 }
 /* 统一的 ESC 处理：先收浮层，再退回上一级 */
 function uiEscBack(){
+  var skp = document.getElementById('skPop');
+  if (skp && !skp.hidden && typeof window.skClose === 'function') { window.skClose(); return true; }
   var pane = document.getElementById('uiColorPane');
   if (pane && !pane.hidden) { uiCloseColorPane(); return true; }
   var faq = document.getElementById('faqPop');
@@ -6033,7 +6035,7 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 .topbar-search:focus-within svg{stroke:var(--accent-2)}
 .topbar-search input{
   position:relative;z-index:1;
-  width:100%;height:38px;padding:0 14px 0 40px;
+  width:100%;height:38px;padding:0 84px 0 40px;
   border-radius:var(--radius-full);
   background:var(--surface);
   backdrop-filter:blur(20px);
@@ -6048,6 +6050,98 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
   background:var(--surface-2);
   box-shadow:0 0 0 4px var(--accent-soft),0 8px 24px rgba(0,0,0,.2);
   transform:translateY(-1px);
+}
+/* ═══════ 搜索栏右侧 Ctrl+K 按钮 + 下方带箭头的弹窗（FAQ + 全部游戏） ═══════ */
+.sk-kbd{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:3;
+  display:flex;align-items:center;gap:4px;height:24px;padding:0 6px;
+  border-radius:var(--radius-full);border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text-3);cursor:pointer;
+  -webkit-app-region:no-drag;
+  transition:border-color var(--tr),color var(--tr),background var(--tr),transform var(--tr);
+}
+.sk-kbd kbd{
+  display:grid;place-items:center;min-width:18px;height:16px;padding:0 4px;
+  border-radius:5px;background:var(--surface-3);border:1px solid var(--border);
+  font:600 10px/1 var(--font-mono);color:var(--text-2);
+  transition:color var(--tr),border-color var(--tr);
+}
+.sk-kbd:hover,.sk-kbd.open{border-color:var(--accent);background:var(--accent-soft)}
+.sk-kbd:hover kbd,.sk-kbd.open kbd{color:var(--accent-2);border-color:var(--accent)}
+.sk-kbd:active{transform:translateY(-50%) scale(.95)}
+.topbar-search:focus-within .sk-kbd{transform:translateY(calc(-50% - 1px))}
+.topbar-search:focus-within .sk-kbd:active{transform:translateY(calc(-50% - 1px)) scale(.95)}
+.sk-pop{
+  position:absolute;top:calc(100% + 14px);right:0;z-index:130;
+  width:440px;max-width:calc(100vw - 48px);
+  border-radius:var(--radius-lg);
+  background:var(--surface-solid);border:1px solid var(--border-2);
+  box-shadow:var(--shadow-3);
+  color:var(--text);text-align:left;cursor:default;-webkit-app-region:no-drag;
+  transform-origin:calc(100% - var(--sk-ar,33px)) -8px;
+  animation:skPopIn .18s cubic-bezier(.2,.8,.2,1);
+}
+.sk-pop[hidden]{display:none}
+@keyframes skPopIn{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:none}}
+.sk-pop::before{
+  content:"";position:absolute;top:-7px;right:var(--sk-ar,33px);
+  width:12px;height:12px;box-sizing:border-box;
+  background:var(--surface-solid);
+  border-left:1px solid var(--border-2);border-top:1px solid var(--border-2);
+  border-top-left-radius:3px;transform:rotate(45deg);
+}
+.sk-scroll{position:relative;max-height:min(460px,calc(100vh - 170px));overflow-y:auto;padding:6px;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+.sk-scroll::-webkit-scrollbar{width:6px}
+.sk-scroll::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:3px}
+.sk-sec + .sk-sec{margin-top:4px;padding-top:4px;border-top:1px solid var(--border)}
+.sk-h{
+  display:flex;align-items:center;gap:8px;padding:8px 10px 6px;
+  font:700 11px/1 var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--text-3);
+}
+.sk-h b{margin-left:auto;font:600 10.5px/1 var(--font-mono);letter-spacing:0;color:var(--text-3)}
+.sk-item{
+  display:flex;align-items:center;gap:10px;width:100%;padding:7px 10px;
+  border-radius:10px;text-align:left;color:var(--text-2);
+  font:500 12.5px/1.35 var(--font);
+  transition:background var(--tr-fast),color var(--tr-fast);
+}
+.sk-item[hidden]{display:none}
+.sk-item:hover,.sk-item:focus-visible{background:var(--accent-soft);color:var(--text);outline:none}
+.sk-item:focus-visible{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.topbar-search .sk-pop svg,
+.topbar-search:focus-within .sk-pop svg{
+  position:static;transform:none;left:auto;top:auto;z-index:auto;
+  fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+  pointer-events:none;flex-shrink:0;
+}
+.sk-ic{
+  width:26px;height:26px;border-radius:8px;flex-shrink:0;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent-2);
+}
+.topbar-search .sk-pop .sk-ic svg{width:14px;height:14px}
+.sk-t{flex:1;min-width:0;white-space:normal}
+.topbar-search .sk-pop .sk-chev{width:13px;height:13px;color:var(--text-3);transition:transform var(--tr-fast),color var(--tr-fast)}
+.sk-item:hover .sk-chev{color:var(--accent-2);transform:translateX(2px)}
+.sk-th{
+  position:relative;width:46px;height:30px;border-radius:7px;flex-shrink:0;overflow:hidden;
+  background:var(--border);
+}
+.sk-th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.sk-gt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sk-gt b{font:600 13px/1.2 var(--font);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sk-gt em{font:500 11px/1.2 var(--font);font-style:normal;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar-search .sk-pop .sk-own{width:14px;height:14px;color:var(--ok);stroke-width:2.6}
+.sk-none{padding:14px 10px 10px;font-size:12px;color:var(--text-3);text-align:center}
+.sk-none[hidden]{display:none}
+.sk-foot{
+  display:flex;align-items:center;gap:8px;padding:8px 14px;
+  border-top:1px solid var(--border);font-size:11px;color:var(--text-3);
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+}
+.sk-foot kbd{
+  display:grid;place-items:center;min-width:18px;height:16px;padding:0 5px;border-radius:5px;
+  background:var(--surface-3);border:1px solid var(--border);
+  font:600 10px/1 var(--font-mono);color:var(--text-2);
 }
 .tb-spacer{flex:1}
 .tb-actions{display:flex;gap:8px;align-items:center;-webkit-app-region:no-drag}
@@ -7834,6 +7928,11 @@ __UI_CSS__
       <div class="topbar-search">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="searchInput" type="text" placeholder="Search games..." data-ui-ph="searchGames" autocomplete="off" spellcheck="false">
+        <button class="sk-kbd" id="skKbd" type="button" title="FAQ &amp; all games (Ctrl+K)" aria-haspopup="dialog" aria-expanded="false" aria-controls="skPop"><kbd>Ctrl</kbd><kbd>K</kbd></button>
+        <div class="sk-pop" id="skPop" role="dialog" aria-label="FAQ" hidden>
+          <div class="sk-scroll" id="skScroll"></div>
+          <div class="sk-foot"><kbd>Esc</kbd><span id="skTip">close</span></div>
+        </div>
       </div>
       <div class="tb-spacer"></div>
       <div class="tb-actions">
@@ -12689,6 +12788,156 @@ __UI_SCRIPT__
     if(window.IntersectionObserver)new IntersectionObserver(function(es){if(!es[0].isIntersecting)pause();}).observe(vp);
     return {pause:pause,seek:seek,play:play,time:function(){return t;}};
   }
+})();
+</script>
+<script>
+/* ═══════ 搜索栏 Ctrl+K：弹窗里放 FAQ + 全部游戏（点游戏直接进详情页，点 FAQ 打开对应解答） ═══════ */
+(function(){
+  var T={
+    en:{skGames:'All games',skNoMatch:'No matching games',skTip:'to close',skBtnTitle:'FAQ & all games (Ctrl+K)'},
+    zh:{skGames:'全部游戏',skNoMatch:'没有匹配的游戏',skTip:'关闭',skBtnTitle:'FAQ 与全部游戏（Ctrl+K）'},
+    ru:{skGames:'Все игры',skNoMatch:'Игры не найдены',skTip:'закрыть',skBtnTitle:'FAQ и все игры (Ctrl+K)'},
+    de:{skGames:'Alle Spiele',skNoMatch:'Keine passenden Spiele',skTip:'schließen',skBtnTitle:'FAQ & alle Spiele (Ctrl+K)'},
+    ja:{skGames:'すべてのゲーム',skNoMatch:'一致するゲームがありません',skTip:'閉じる',skBtnTitle:'FAQ とすべてのゲーム（Ctrl+K）'},
+    es:{skGames:'Todos los juegos',skNoMatch:'No hay juegos coincidentes',skTip:'cerrar',skBtnTitle:'FAQ y todos los juegos (Ctrl+K)'},
+    tr:{skGames:'Tüm oyunlar',skNoMatch:'Eşleşen oyun yok',skTip:'kapat',skBtnTitle:'SSS ve tüm oyunlar (Ctrl+K)'},
+    pt:{skGames:'Todos os jogos',skNoMatch:'Nenhum jogo encontrado',skTip:'fechar',skBtnTitle:'FAQ e todos os jogos (Ctrl+K)'}
+  };
+  for(var c in UI_T){var e=T[c]||T.en;for(var k in e)UI_T[c][k]=e[k];}
+
+  var FQ=['faqQ1','faqQ2','faqQ3','faqQ4'];
+  var box=document.querySelector('.topbar-search');
+  var pop=document.getElementById('skPop'),scroll=document.getElementById('skScroll');
+  var kbd=document.getElementById('skKbd'),input=document.getElementById('searchInput');
+  if(!box||!pop||!scroll||!kbd||!input)return;
+
+  var CHEV='<svg class="sk-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>';
+  var CHECK='<svg class="sk-own" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+  var QMARK='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.9M12 17.2v.01"/></svg>';
+
+  function labels(){
+    kbd.title=uiT('skBtnTitle');
+    var tip=document.getElementById('skTip');if(tip)tip.textContent=uiT('skTip');
+    pop.setAttribute('aria-label',uiT('faqTitle'));
+  }
+
+  function gameIds(){
+    var o=(typeof GRID_ORDER!=='undefined'&&GRID_ORDER&&GRID_ORDER.length)?GRID_ORDER:ORDER;
+    return o.filter(function(g){return GAMES[g];});
+  }
+
+  function build(){
+    var h='<div class="sk-sec"><div class="sk-h"><span>'+uiEsc(uiT('faqTitle'))+'</span></div>';
+    FQ.forEach(function(k,i){
+      h+='<button type="button" class="sk-item sk-faq" data-faq="'+i+'"><i class="sk-ic">'+QMARK+'</i>'
+        +'<span class="sk-t">'+uiEsc(uiT(k))+'</span>'+CHEV+'</button>';
+    });
+    h+='</div>';
+    var ids=gameIds();
+    h+='<div class="sk-sec"><div class="sk-h"><span>'+uiEsc(uiT('skGames'))+'</span><b id="skCount">'+ids.length+'</b></div><div id="skGames">';
+    ids.forEach(function(g){
+      var m=GAMES[g],img=m.img||m.poster||'';
+      h+='<button type="button" class="sk-item sk-game" data-game="'+uiEsc(g)+'">'
+        +'<span class="sk-th">'+(img?'<img src="'+uiEsc(img)+'" alt="" loading="lazy" onerror="this.remove()">':'')+'</span>'
+        +'<span class="sk-gt"><b>'+uiEsc(m.title||g)+'</b><em>'+uiEsc(m.dev||'')+'</em></span>'
+        +(hasLic(g)?CHECK:CHEV)+'</button>';
+    });
+    h+='</div><div class="sk-none" id="skNone" hidden>'+uiEsc(uiT('skNoMatch'))+'</div></div>';
+    scroll.innerHTML=h;
+  }
+
+  /* 搜索框里有字时，弹窗里的游戏列表同步过滤；清空就是全部游戏 */
+  function filter(){
+    var list=document.getElementById('skGames');if(!list)return;
+    var q=String(input.value||'').trim().toLowerCase(),n=0;
+    Array.prototype.forEach.call(list.children,function(b){
+      var id=b.getAttribute('data-game'),m=GAMES[id]||{};
+      var hit=!q||String(m.title||'').toLowerCase().indexOf(q)>=0
+                 ||String(m.dev||'').toLowerCase().indexOf(q)>=0
+                 ||String(id).toLowerCase().indexOf(q)>=0;
+      b.hidden=!hit;if(hit)n++;
+    });
+    var cnt=document.getElementById('skCount');if(cnt)cnt.textContent=n;
+    var none=document.getElementById('skNone');if(none)none.hidden=n>0;
+  }
+
+  /* 箭头对准 Ctrl+K 按钮的中心 */
+  function place(){
+    var br=kbd.getBoundingClientRect(),r=box.getBoundingClientRect();
+    var ar=Math.max(16,Math.round(r.right-(br.left+br.width/2)-6));
+    pop.style.setProperty('--sk-ar',ar+'px');
+  }
+
+  function blocked(){
+    if(!box.offsetParent)return true;
+    if(document.querySelector('.ui-view.open'))return true;
+    var f=document.getElementById('faqPop');if(f&&!f.hidden)return true;
+    return false;
+  }
+
+  function open(){
+    if(blocked())return;
+    labels();build();filter();place();
+    pop.hidden=false;kbd.classList.add('open');kbd.setAttribute('aria-expanded','true');
+    scroll.scrollTop=0;
+    try{input.focus();}catch(e){}
+  }
+  function close(){
+    if(pop.hidden)return;
+    pop.hidden=true;kbd.classList.remove('open');kbd.setAttribute('aria-expanded','false');
+  }
+  window.skOpen=open;window.skClose=close;
+
+  kbd.addEventListener('click',function(e){e.stopPropagation();if(pop.hidden)open();else close();});
+
+  scroll.addEventListener('click',function(e){
+    var b=e.target.closest?e.target.closest('.sk-item'):null;if(!b)return;
+    var fi=b.getAttribute('data-faq'),gid=b.getAttribute('data-game');
+    close();
+    if(fi!==null&&typeof window.faqAsk==='function'){window.faqAsk(parseInt(fi,10));}
+    else if(gid&&GAMES[gid]){openDetail(gid);}
+  });
+
+  input.addEventListener('input',function(){if(!pop.hidden)filter();});
+
+  document.addEventListener('mousedown',function(e){
+    if(pop.hidden)return;
+    if(box.contains(e.target))return;
+    close();
+  },true);
+
+  document.addEventListener('keydown',function(e){
+    /* Ctrl+K / ⌘K：开关弹窗 */
+    if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key==='k'||e.key==='K')){
+      if(blocked()&&pop.hidden)return;
+      e.preventDefault();
+      if(pop.hidden)open();else close();
+      return;
+    }
+    /* 弹窗开着时：上下键在 FAQ / 游戏条目间移动，回车触发 */
+    if(pop.hidden)return;
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      var items=Array.prototype.filter.call(pop.querySelectorAll('.sk-item'),function(b){return !b.hidden;});
+      if(!items.length)return;
+      e.preventDefault();
+      var i=items.indexOf(document.activeElement);
+      i=(e.key==='ArrowDown')?(i+1)%items.length:(i<=0?items.length-1:i-1);
+      items[i].focus();
+      if(items[i].scrollIntoView)items[i].scrollIntoView({block:'nearest'});
+    }
+  });
+
+  window.addEventListener('resize',function(){if(!pop.hidden)place();});
+
+  /* 语言切换时刷新按钮提示文案 */
+  var prevLang=window.onUiLangChanged;
+  window.onUiLangChanged=function(){
+    var r=typeof prevLang==='function'?prevLang.apply(this,arguments):undefined;
+    labels();
+    if(!pop.hidden){build();filter();}
+    return r;
+  };
+  labels();
 })();
 </script>
 </body>
