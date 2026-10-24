@@ -6009,101 +6009,7 @@ applyAdminGateText();   /* i18n 跑完后再套一次真实程序名 */
 bgfxApply();
 </script>
 
-<script>
-/* 商店增强：回到顶部 + 最近浏览历史（接入内置与自定义翻译） */
-(function(){
-  var labels={
-    en:{storeBackTop:'Back to top',storeRecent:'Recently viewed',storeRecentClear:'Clear',storeRecentEmpty:'No recently viewed games yet'},
-    zh:{storeBackTop:'回到顶部',storeRecent:'最近浏览',storeRecentClear:'清空',storeRecentEmpty:'还没有浏览过游戏'},
-    ru:{storeBackTop:'Наверх',storeRecent:'Недавно просмотренные',storeRecentClear:'Очистить',storeRecentEmpty:'Недавно просмотренных игр пока нет'},
-    es:{storeBackTop:'Volver arriba',storeRecent:'Vistos recientemente',storeRecentClear:'Borrar',storeRecentEmpty:'Todavía no has visto ningún juego'},
-    de:{storeBackTop:'Nach oben',storeRecent:'Zuletzt angesehen',storeRecentClear:'Leeren',storeRecentEmpty:'Noch keine Spiele angesehen'},
-    fr:{storeBackTop:'Retour en haut',storeRecent:'Récemment consultés',storeRecentClear:'Effacer',storeRecentEmpty:'Aucun jeu consulté récemment'},
-    ja:{storeBackTop:'トップへ戻る',storeRecent:'最近見たゲーム',storeRecentClear:'消去',storeRecentEmpty:'最近見たゲームはありません'},
-    ko:{storeBackTop:'맨 위로',storeRecent:'최근 본 게임',storeRecentClear:'지우기',storeRecentEmpty:'최근 본 게임이 없습니다'},
-    vn:{storeBackTop:'Lên đầu trang',storeRecent:'Đã xem gần đây',storeRecentClear:'Xóa',storeRecentEmpty:'Chưa xem trò chơi nào gần đây'},
-    tr:{storeBackTop:'Başa dön',storeRecent:'Son görüntülenenler',storeRecentClear:'Temizle',storeRecentEmpty:'Henüz görüntülenen oyun yok'},
-    pt:{storeBackTop:'Voltar ao topo',storeRecent:'Vistos recentemente',storeRecentClear:'Limpar',storeRecentEmpty:'Nenhum jogo visto recentemente'}
-  };
-  if(typeof UI_T!=='undefined'){
-    Object.keys(labels).forEach(function(code){if(!UI_T[code])UI_T[code]={};Object.keys(labels[code]).forEach(function(k){UI_T[code][k]=labels[code][k];});});
-    if(UI_T.en) Object.keys(labels.en).forEach(function(k){UI_T.en[k]=labels.en[k];});
-  }
-  var page=document.getElementById('storePage');
-  var btn=document.getElementById('storeBackTop');
-  var ring=document.getElementById('storeProgressValue');
-  var recentBtn=document.getElementById('storeRecentToggle');
-  var panel=document.getElementById('storeRecentPanel');
-  var listNode=document.getElementById('storeRecentList');
-  var clearBtn=document.getElementById('storeRecentClear');
-  var titleNode=document.getElementById('storeRecentTitle');
-  if(!page||!btn)return;
-  function tr(key,fallback){try{return typeof uiT==='function'?uiT(key):(fallback||key);}catch(e){return fallback||key;}}
-  function refreshLabels(){
-    var back=tr('storeBackTop','Back to top');btn.title=back;btn.setAttribute('aria-label',back);
-    if(recentBtn){var r=tr('storeRecent','Recently viewed');recentBtn.title=r;recentBtn.setAttribute('aria-label',r);}
-    if(titleNode)titleNode.textContent=tr('storeRecent','Recently viewed');
-    if(clearBtn)clearBtn.textContent=tr('storeRecentClear','Clear');
-    if(listNode)renderRecent();
-  }
-  btn.addEventListener('mouseenter',refreshLabels);btn.addEventListener('focus',refreshLabels);
-  if(recentBtn){recentBtn.addEventListener('mouseenter',refreshLabels);recentBtn.addEventListener('focus',refreshLabels);}
-  var raf=0,token=0,threshold=180;
-  function cancelAutoScroll(){if(!raf)return;cancelAnimationFrame(raf);raf=0;token++;}
-  function updateButton(){
-    var onStore=!page.hidden&&page.classList.contains('page');
-    var maxScroll=Math.max(1,page.scrollHeight-page.clientHeight);
-    var progress=Math.max(0,Math.min(1,page.scrollTop/maxScroll));
-    if(ring)ring.style.strokeDashoffset=(125.663706-125.663706*progress).toFixed(3);
-    btn.classList.toggle('visible',onStore&&page.scrollTop>threshold);
-    btn.setAttribute('aria-hidden',onStore&&page.scrollTop>threshold?'false':'true');
-    if(recentBtn){var showRecent=onStore&&recentGames.length>0;recentBtn.classList.toggle('visible',showRecent);recentBtn.setAttribute('aria-hidden',showRecent?'false':'true');if(!onStore)closeRecent();}
-  }
-  page.addEventListener('scroll',updateButton,{passive:true});window.addEventListener('resize',updateButton,{passive:true});
-  page.addEventListener('wheel',cancelAutoScroll,{passive:true});page.addEventListener('touchstart',cancelAutoScroll,{passive:true});
-  page.addEventListener('pointerdown',function(e){if(e.target!==btn&&!btn.contains(e.target))cancelAutoScroll();},{passive:true});
-  document.addEventListener('keydown',function(e){
-    var target=e.target,editing=target&&(target.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
-    if(editing||e.defaultPrevented||!e.ctrlKey||e.key!=='Home')return;
-    if(page.hidden||!page.classList.contains('page')||page.scrollTop<=0)return;e.preventDefault();btn.click();
-  });
-  btn.addEventListener('click',function(){
-    cancelAutoScroll();var myToken=++token,start=page.scrollTop;if(start<=0){updateButton();return;}
-    var startTime=0,duration=Math.max(420,Math.min(1250,480+start*.22));
-    function step(now){if(myToken!==token)return;if(!startTime)startTime=now;var t=Math.min(1,(now-startTime)/duration),eased=t*t*t;page.scrollTop=start*(1-eased);if(t<1&&page.scrollTop>.5){raf=requestAnimationFrame(step);}else{page.scrollTop=0;raf=0;updateButton();}}
-    raf=requestAnimationFrame(step);
-  });
 
-  /* 最近浏览：保留最近 8 款，只存游戏 ID，不存账号或个人信息 */
-  var recentKey='starline.store.recentGames',recentGames=[];
-  try{var saved=JSON.parse(localStorage.getItem(recentKey)||'[]');if(Array.isArray(saved))recentGames=saved.filter(function(id){return typeof id==='string'&&id;}).slice(0,8);}catch(e){}
-  function gameMeta(id){try{return typeof GAMES!=='undefined'?GAMES[id]:null;}catch(e){return null;}}
-  function storeRecentRemember(id){
-    if(!id||!gameMeta(id))return;recentGames=recentGames.filter(function(x){return x!==id;});recentGames.unshift(id);recentGames=recentGames.slice(0,8);
-    try{localStorage.setItem(recentKey,JSON.stringify(recentGames));}catch(e){}
-    renderRecent();updateButton();
-  }
-  function renderRecent(){
-    if(!listNode)return;var valid=recentGames.filter(function(id){return !!gameMeta(id);});recentGames=valid.slice(0,8);
-    if(!valid.length){listNode.innerHTML='<div class="store-recent-empty">'+escapeHtml(tr('storeRecentEmpty','No recently viewed games yet'))+'</div>';return;}
-    listNode.innerHTML=valid.map(function(id){var m=gameMeta(id)||{},name=String(m.title||id),img=String(m.poster||m.img||'');
-      return '<button class="store-recent-item" type="button" data-recent-game="'+escapeHtml(id)+'"><img class="store-recent-thumb" src="'+escapeHtml(img)+'" alt="" loading="lazy"><span class="store-recent-name">'+escapeHtml(name)+'</span></button>';
-    }).join('');
-  }
-  function escapeHtml(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-  function closeRecent(){if(!panel||!recentBtn)return;panel.classList.remove('open');panel.setAttribute('aria-hidden','true');recentBtn.setAttribute('aria-expanded','false');}
-  if(recentBtn&&panel){
-    recentBtn.addEventListener('click',function(e){e.stopPropagation();var open=!panel.classList.contains('open');panel.classList.toggle('open',open);panel.setAttribute('aria-hidden',open?'false':'true');recentBtn.setAttribute('aria-expanded',open?'true':'false');if(open)renderRecent();});
-    listNode.addEventListener('click',function(e){var item=e.target.closest('[data-recent-game]');if(!item)return;var id=item.getAttribute('data-recent-game');closeRecent();if(typeof openDetail==='function')openDetail(id);});
-    clearBtn.addEventListener('click',function(){recentGames=[];try{localStorage.removeItem(recentKey);}catch(e){}renderRecent();closeRecent();updateButton();});
-    document.addEventListener('pointerdown',function(e){if(panel.classList.contains('open')&&!panel.contains(e.target)&&e.target!==recentBtn&&!recentBtn.contains(e.target))closeRecent();});
-    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeRecent();});
-  }
-  window.storeRecentRemember=storeRecentRemember;
-  var observer=new MutationObserver(updateButton);observer.observe(page,{attributes:true,attributeFilter:['hidden','class']});
-  refreshLabels();renderRecent();updateButton();
-})();
-</script>
 </body>
 </html>
 #===DASHBOARD
@@ -14470,6 +14376,102 @@ __UI_SCRIPT__
     toast(t('pluginDropUnsupported'));
   });
   window.addEventListener('dragend',hideOverlay);window.addEventListener('blur',hideOverlay);
+})();
+</script>
+
+<script>
+/* 商店增强：回到顶部 + 最近浏览历史（接入内置与自定义翻译） */
+(function(){
+  var labels={
+    en:{storeBackTop:'Back to top',storeRecent:'Recently viewed',storeRecentClear:'Clear',storeRecentEmpty:'No recently viewed games yet'},
+    zh:{storeBackTop:'回到顶部',storeRecent:'最近浏览',storeRecentClear:'清空',storeRecentEmpty:'还没有浏览过游戏'},
+    ru:{storeBackTop:'Наверх',storeRecent:'Недавно просмотренные',storeRecentClear:'Очистить',storeRecentEmpty:'Недавно просмотренных игр пока нет'},
+    es:{storeBackTop:'Volver arriba',storeRecent:'Vistos recientemente',storeRecentClear:'Borrar',storeRecentEmpty:'Todavía no has visto ningún juego'},
+    de:{storeBackTop:'Nach oben',storeRecent:'Zuletzt angesehen',storeRecentClear:'Leeren',storeRecentEmpty:'Noch keine Spiele angesehen'},
+    fr:{storeBackTop:'Retour en haut',storeRecent:'Récemment consultés',storeRecentClear:'Effacer',storeRecentEmpty:'Aucun jeu consulté récemment'},
+    ja:{storeBackTop:'トップへ戻る',storeRecent:'最近見たゲーム',storeRecentClear:'消去',storeRecentEmpty:'最近見たゲームはありません'},
+    ko:{storeBackTop:'맨 위로',storeRecent:'최근 본 게임',storeRecentClear:'지우기',storeRecentEmpty:'최근 본 게임이 없습니다'},
+    vn:{storeBackTop:'Lên đầu trang',storeRecent:'Đã xem gần đây',storeRecentClear:'Xóa',storeRecentEmpty:'Chưa xem trò chơi nào gần đây'},
+    tr:{storeBackTop:'Başa dön',storeRecent:'Son görüntülenenler',storeRecentClear:'Temizle',storeRecentEmpty:'Henüz görüntülenen oyun yok'},
+    pt:{storeBackTop:'Voltar ao topo',storeRecent:'Vistos recentemente',storeRecentClear:'Limpar',storeRecentEmpty:'Nenhum jogo visto recentemente'}
+  };
+  if(typeof UI_T!=='undefined'){
+    Object.keys(labels).forEach(function(code){if(!UI_T[code])UI_T[code]={};Object.keys(labels[code]).forEach(function(k){UI_T[code][k]=labels[code][k];});});
+    if(UI_T.en) Object.keys(labels.en).forEach(function(k){UI_T.en[k]=labels.en[k];});
+  }
+  var page=document.getElementById('storePage');
+  var btn=document.getElementById('storeBackTop');
+  var ring=document.getElementById('storeProgressValue');
+  var recentBtn=document.getElementById('storeRecentToggle');
+  var panel=document.getElementById('storeRecentPanel');
+  var listNode=document.getElementById('storeRecentList');
+  var clearBtn=document.getElementById('storeRecentClear');
+  var titleNode=document.getElementById('storeRecentTitle');
+  if(!page||!btn)return;
+  function tr(key,fallback){try{return typeof uiT==='function'?uiT(key):(fallback||key);}catch(e){return fallback||key;}}
+  function refreshLabels(){
+    var back=tr('storeBackTop','Back to top');btn.title=back;btn.setAttribute('aria-label',back);
+    if(recentBtn){var r=tr('storeRecent','Recently viewed');recentBtn.title=r;recentBtn.setAttribute('aria-label',r);}
+    if(titleNode)titleNode.textContent=tr('storeRecent','Recently viewed');
+    if(clearBtn)clearBtn.textContent=tr('storeRecentClear','Clear');
+    if(listNode)renderRecent();
+  }
+  btn.addEventListener('mouseenter',refreshLabels);btn.addEventListener('focus',refreshLabels);
+  if(recentBtn){recentBtn.addEventListener('mouseenter',refreshLabels);recentBtn.addEventListener('focus',refreshLabels);}
+  var raf=0,token=0,threshold=180;
+  function cancelAutoScroll(){if(!raf)return;cancelAnimationFrame(raf);raf=0;token++;}
+  function updateButton(){
+    var onStore=!page.hidden&&page.classList.contains('page');
+    var maxScroll=Math.max(1,page.scrollHeight-page.clientHeight);
+    var progress=Math.max(0,Math.min(1,page.scrollTop/maxScroll));
+    if(ring)ring.style.strokeDashoffset=(125.663706-125.663706*progress).toFixed(3);
+    btn.classList.toggle('visible',onStore);
+    btn.setAttribute('aria-hidden',onStore?'false':'true');
+    if(recentBtn){var showRecent=onStore;recentBtn.classList.toggle('visible',showRecent);recentBtn.setAttribute('aria-hidden',showRecent?'false':'true');if(!onStore)closeRecent();}
+  }
+  page.addEventListener('scroll',updateButton,{passive:true});window.addEventListener('resize',updateButton,{passive:true});
+  page.addEventListener('wheel',cancelAutoScroll,{passive:true});page.addEventListener('touchstart',cancelAutoScroll,{passive:true});
+  page.addEventListener('pointerdown',function(e){if(e.target!==btn&&!btn.contains(e.target))cancelAutoScroll();},{passive:true});
+  document.addEventListener('keydown',function(e){
+    var target=e.target,editing=target&&(target.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+    if(editing||e.defaultPrevented||!e.ctrlKey||e.key!=='Home')return;
+    if(page.hidden||!page.classList.contains('page')||page.scrollTop<=0)return;e.preventDefault();btn.click();
+  });
+  btn.addEventListener('click',function(){
+    cancelAutoScroll();var myToken=++token,start=page.scrollTop;if(start<=0){updateButton();return;}
+    var startTime=0,duration=Math.max(420,Math.min(1250,480+start*.22));
+    function step(now){if(myToken!==token)return;if(!startTime)startTime=now;var t=Math.min(1,(now-startTime)/duration),eased=t*t*t;page.scrollTop=start*(1-eased);if(t<1&&page.scrollTop>.5){raf=requestAnimationFrame(step);}else{page.scrollTop=0;raf=0;updateButton();}}
+    raf=requestAnimationFrame(step);
+  });
+
+  /* 最近浏览：保留最近 8 款，只存游戏 ID，不存账号或个人信息 */
+  var recentKey='starline.store.recentGames',recentGames=[];
+  try{var saved=JSON.parse(localStorage.getItem(recentKey)||'[]');if(Array.isArray(saved))recentGames=saved.filter(function(id){return typeof id==='string'&&id;}).slice(0,8);}catch(e){}
+  function gameMeta(id){try{return typeof GAMES!=='undefined'?GAMES[id]:null;}catch(e){return null;}}
+  function storeRecentRemember(id){
+    if(!id||!gameMeta(id))return;recentGames=recentGames.filter(function(x){return x!==id;});recentGames.unshift(id);recentGames=recentGames.slice(0,8);
+    try{localStorage.setItem(recentKey,JSON.stringify(recentGames));}catch(e){}
+    renderRecent();updateButton();
+  }
+  function renderRecent(){
+    if(!listNode)return;var valid=recentGames.filter(function(id){return !!gameMeta(id);});recentGames=valid.slice(0,8);
+    if(!valid.length){listNode.innerHTML='<div class="store-recent-empty">'+escapeHtml(tr('storeRecentEmpty','No recently viewed games yet'))+'</div>';return;}
+    listNode.innerHTML=valid.map(function(id){var m=gameMeta(id)||{},name=String(m.title||id),img=String(m.poster||m.img||'');
+      return '<button class="store-recent-item" type="button" data-recent-game="'+escapeHtml(id)+'"><img class="store-recent-thumb" src="'+escapeHtml(img)+'" alt="" loading="lazy"><span class="store-recent-name">'+escapeHtml(name)+'</span></button>';
+    }).join('');
+  }
+  function escapeHtml(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function closeRecent(){if(!panel||!recentBtn)return;panel.classList.remove('open');panel.setAttribute('aria-hidden','true');recentBtn.setAttribute('aria-expanded','false');}
+  if(recentBtn&&panel){
+    recentBtn.addEventListener('click',function(e){e.stopPropagation();var open=!panel.classList.contains('open');panel.classList.toggle('open',open);panel.setAttribute('aria-hidden',open?'false':'true');recentBtn.setAttribute('aria-expanded',open?'true':'false');if(open)renderRecent();});
+    listNode.addEventListener('click',function(e){var item=e.target.closest('[data-recent-game]');if(!item)return;var id=item.getAttribute('data-recent-game');closeRecent();if(typeof openDetail==='function')openDetail(id);});
+    clearBtn.addEventListener('click',function(){recentGames=[];try{localStorage.removeItem(recentKey);}catch(e){}renderRecent();closeRecent();updateButton();});
+    document.addEventListener('pointerdown',function(e){if(panel.classList.contains('open')&&!panel.contains(e.target)&&e.target!==recentBtn&&!recentBtn.contains(e.target))closeRecent();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeRecent();});
+  }
+  window.storeRecentRemember=storeRecentRemember;
+  var observer=new MutationObserver(updateButton);observer.observe(page,{attributes:true,attributeFilter:['hidden','class']});
+  refreshLabels();renderRecent();updateButton();
 })();
 </script>
 </body>
