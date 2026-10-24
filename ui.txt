@@ -1087,6 +1087,97 @@ body[data-bgfx="off"]::before,body[data-bgstyle="image"]::before{display:none}
 .topbar-search input{
   backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
 }
+/* ═══ 登录成功 / 登录转场：3D 金属 Logo ═══════════════════════════════ */
+#logoFx{
+  position:fixed;inset:0;z-index:2147483300;display:none;flex-direction:column;
+  align-items:center;justify-content:center;overflow:hidden;perspective:1200px;
+  background:
+    radial-gradient(62% 48% at 50% 42%,rgba(100,150,255,.16),transparent 68%),
+    rgba(4,6,12,.94);
+  backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
+  opacity:0;transition:opacity .36s ease,background .8s ease,backdrop-filter .8s ease;
+}
+#logoFx.show{display:flex;opacity:1}
+body.logo-intro .app{visibility:hidden;opacity:0}
+body.logo-intro #logoFx{display:flex;opacity:1}
+.logo-fly{
+  position:relative;width:300px;height:300px;display:grid;place-items:center;
+  transform-origin:center center;will-change:transform;
+  transition:transform .98s cubic-bezier(.62,.02,.18,1);
+}
+.logo3d{
+  position:relative;width:240px;height:240px;transform-style:preserve-3d;will-change:transform;
+  animation:logo3dSpin 1.5s cubic-bezier(.22,.9,.25,1) both;
+}
+.logo3d-face,.logo3d-layer{position:absolute;inset:0}
+.logo3d-face{transform:translateZ(12px);filter:drop-shadow(0 20px 26px rgba(0,0,0,.55))}
+.logo3d-layer{transform-style:preserve-3d;pointer-events:none}
+.logo3d-face svg,.logo3d-layer svg{display:block;width:100%;height:100%}
+.logo3d-glow{
+  position:absolute;inset:-20%;border-radius:50%;pointer-events:none;transform:translateZ(-46px);
+  background:radial-gradient(circle,rgba(125,175,255,.34),transparent 62%);filter:blur(26px)
+}
+@keyframes logo3dSpin{
+  0%{opacity:0;transform:rotateX(24deg) rotateY(118deg) scale(.55)}
+  55%{opacity:1}
+  100%{opacity:1;transform:rotateX(7deg) rotateY(-8deg) scale(1)}
+}
+/* 仪表盘接手时保持正面，直接飞向侧栏，不再重新转一圈 */
+body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) scale(1)}
+.logo-fx-brand{
+  margin-top:6px;font-size:24px;font-weight:800;letter-spacing:8px;padding-left:8px;
+  text-transform:uppercase;color:rgba(255,255,255,.92);
+  text-shadow:0 0 26px rgba(140,185,255,.35)
+}
+.logo-fx-sub{
+  margin-top:6px;font-size:12.5px;font-weight:600;letter-spacing:.4px;color:rgba(255,255,255,.52);
+  transition:opacity .3s ease,transform .3s ease
+}
+#logoFx.to-menu{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;pointer-events:none}
+#logoFx.to-menu .logo-fx-brand,#logoFx.to-menu .logo-fx-sub{opacity:0;transform:translateY(10px)}
+#logoFx.to-menu .logo-fly{transform:translate(var(--tx,0px),var(--ty,0px)) scale(var(--ts,.13))}
+#logoFx.to-menu .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) scale(1)}
+.sb-logo.logo-arrived{animation:logoArrive .9s cubic-bezier(.2,.8,.2,1)}
+@keyframes logoArrive{
+  0%{transform:scale(.55);filter:brightness(2.1) drop-shadow(0 0 22px rgba(160,200,255,.9))}
+  55%{transform:scale(1.16);filter:brightness(1.35) drop-shadow(0 0 12px rgba(160,200,255,.55))}
+  100%{transform:none;filter:none}
+}
+/* ═══ APP 更新提示 ═════════════════════════════════════════════════════ */
+.upd-ovl{
+  position:fixed;inset:0;z-index:2147483400;display:none;place-items:center;
+  background:rgba(0,0,0,.52);backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+}
+.upd-ovl.show{display:grid;animation:updFade .24s ease}
+@keyframes updFade{from{opacity:0}to{opacity:1}}
+.upd-card{
+  width:min(430px,calc(100vw - 28px));padding:24px 24px 20px;border-radius:26px;
+  background:var(--lq-pop);border:1px solid var(--ui-border);color:var(--ui-text);
+  box-shadow:var(--lq-hi),0 30px 80px rgba(0,0,0,.55);font-family:var(--font);
+  animation:updIn .32s cubic-bezier(.34,1.32,.4,1)
+}
+@keyframes updIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+.upd-ico{
+  width:46px;height:46px;border-radius:16px;display:grid;place-items:center;margin-bottom:14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;
+  box-shadow:0 10px 26px var(--accent-glow)
+}
+.upd-ico svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.upd-title{font-size:18px;font-weight:800;letter-spacing:-.2px}
+.upd-sub{margin-top:5px;font-size:12.5px;line-height:1.55;color:var(--ui-text-mute)}
+.upd-vers{display:flex;align-items:center;gap:10px;margin-top:16px;font:700 13px var(--ui-mono,monospace)}
+.upd-vers span{padding:4px 10px;border-radius:999px;background:var(--ui-surface-2);border:1px solid var(--ui-border)}
+.upd-vers i{font-style:normal;color:var(--ui-text-mute)}
+.upd-vers #appUpdNew{color:var(--accent);border-color:var(--accent-soft);background:var(--accent-soft)}
+.upd-bar{display:none;height:7px;margin-top:16px;border-radius:999px;background:var(--lq-track);overflow:hidden}
+.upd-bar.show{display:block}
+.upd-bar i{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--accent),var(--accent-hi));transition:width .25s ease}
+.upd-status{min-height:0;margin-top:12px;font-size:12px;font-weight:600;color:var(--ui-text-mute)}
+.upd-status.err{color:var(--err)}
+.upd-status.ok{color:var(--ok)}
+.upd-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:18px}
+.upd-actions .btn{height:38px;padding:0 18px}
 #===MARKUP
 
 <div class="ui-view" id="uiSettingsView">
@@ -1357,6 +1448,63 @@ body[data-bgfx="off"]::before,body[data-bgstyle="image"]::before{display:none}
       </div>
     </div>
   </div></div>
+</div>
+
+<!-- 登录成功 / 登录转场的 3D 金属 Logo：居中旋转，然后飞到侧栏 Logo 位置 -->
+<div id="logoFx" aria-hidden="true">
+  <div class="logo-fly">
+    <div class="logo3d" id="logo3d">
+      <div class="logo3d-glow"></div>
+      <div class="logo3d-depth" id="logo3dDepth"></div>
+      <div class="logo3d-face" id="logo3dFace">
+        <svg viewBox="0 0 240 240" aria-hidden="true">
+          <defs>
+            <linearGradient id="logoMetal" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#ffffff"/>
+              <stop offset=".18" stop-color="#dce4ee"/>
+              <stop offset=".38" stop-color="#8e98a6"/>
+              <stop offset=".54" stop-color="#f4f8fd"/>
+              <stop offset=".72" stop-color="#a8b2bf"/>
+              <stop offset=".88" stop-color="#e9eef5"/>
+              <stop offset="1" stop-color="#ffffff"/>
+            </linearGradient>
+          </defs>
+          <g fill="none" stroke="url(#logoMetal)" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-7 120 120)">
+            <path d="M70 44 70 196"/>
+            <path d="M70 52 170 34"/>
+            <path d="M70 120 196 112"/>
+            <path d="M70 188 172 210"/>
+          </g>
+          <g fill="none" stroke="rgba(255,255,255,.38)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-7 120 120)">
+            <path d="M70 44 70 196"/>
+            <path d="M70 52 170 34"/>
+            <path d="M70 120 196 112"/>
+            <path d="M70 188 172 210"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+  <div class="logo-fx-brand">STARLINE</div>
+  <div class="logo-fx-sub" id="logoFxSub">Welcome</div>
+</div>
+
+<!-- APP 更新提示：下载地址只保存在宿主内存，界面永远拿不到 URL -->
+<div class="upd-ovl" id="appUpd" hidden>
+  <div class="upd-card">
+    <div class="upd-ico">
+      <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></svg>
+    </div>
+    <div class="upd-title" id="appUpdTitle">Update available</div>
+    <div class="upd-sub" id="appUpdSub">A new version is ready to install.</div>
+    <div class="upd-vers"><span id="appUpdCur">v—</span><i>&rarr;</i><span id="appUpdNew">v—</span></div>
+    <div class="upd-bar" id="appUpdBar"><i id="appUpdFill"></i></div>
+    <div class="upd-status" id="appUpdStat"></div>
+    <div class="upd-actions">
+      <button class="btn btn-ghost" type="button" id="appUpdLater" onclick="appUpdateLater()">Later</button>
+      <button class="btn btn-primary" type="button" id="appUpdGo" onclick="appUpdateGo()">Update now</button>
+    </div>
+  </div>
 </div>
 #===SCRIPT
 
@@ -1936,6 +2084,72 @@ var UI_T = {
     if (!UI_T[c]) continue;
     for (var k in X[c]) { if (!UI_T[c][k]) UI_T[c][k] = X[c][k]; }
   }
+
+/* ── APP 更新提示文案 ───────────────────────────────────────── */
+(function(){
+  var X = {
+    en:{ updTitle:'Update available', updSub:'A new version is ready to install.',
+         updNow:'Update now', updLater:'Later', updDownloading:'Downloading…',
+         updReady:'Download complete', updRestart:'Restart & update',
+         updNet:'Network connection failed',
+         updNetSub:'Could not check for updates. Check your connection and try again.',
+         updRetry:'Retry', updNone:"You're up to date", updNoSource:'Update source unavailable',
+         updChecking:'Checking…', updRestarting:'Restarting…' },
+    zh:{ updTitle:'发现新版本', updSub:'新版本已准备好安装。',
+         updNow:'立即更新', updLater:'稍后', updDownloading:'正在下载…',
+         updReady:'下载完成', updRestart:'重启并更新',
+         updNet:'网络连接失败',
+         updNetSub:'无法检查更新，请检查网络连接后重试。',
+         updRetry:'重试', updNone:'已是最新版本', updNoSource:'更新源不可用',
+         updChecking:'正在检查…', updRestarting:'正在重启…' },
+    ru:{ updTitle:'Доступно обновление', updSub:'Новая версия готова к установке.',
+         updNow:'Обновить', updLater:'Позже', updDownloading:'Загрузка…',
+         updReady:'Загрузка завершена', updRestart:'Перезапустить',
+         updNet:'Ошибка сети',
+         updNetSub:'Не удалось проверить обновления. Проверьте подключение.',
+         updRetry:'Повторить', updNone:'Установлена последняя версия', updNoSource:'Источник недоступен',
+         updChecking:'Проверка…', updRestarting:'Перезапуск…' },
+    de:{ updTitle:'Update verfügbar', updSub:'Eine neue Version kann installiert werden.',
+         updNow:'Jetzt aktualisieren', updLater:'Später', updDownloading:'Wird geladen…',
+         updReady:'Download abgeschlossen', updRestart:'Neu starten & aktualisieren',
+         updNet:'Netzwerkverbindung fehlgeschlagen',
+         updNetSub:'Updates konnten nicht geprüft werden. Verbindung prüfen und erneut versuchen.',
+         updRetry:'Erneut versuchen', updNone:'Aktuellste Version', updNoSource:'Update-Quelle nicht verfügbar',
+         updChecking:'Prüfen…', updRestarting:'Neustart…' },
+    ja:{ updTitle:'アップデートがあります', updSub:'新しいバージョンをインストールできます。',
+         updNow:'今すぐ更新', updLater:'あとで', updDownloading:'ダウンロード中…',
+         updReady:'ダウンロード完了', updRestart:'再起動して更新',
+         updNet:'ネットワーク接続に失敗しました',
+         updNetSub:'更新を確認できません。接続を確認して再試行してください。',
+         updRetry:'再試行', updNone:'最新版です', updNoSource:'更新元が利用できません',
+         updChecking:'確認中…', updRestarting:'再起動中…' },
+    es:{ updTitle:'Actualización disponible', updSub:'Una nueva versión está lista para instalar.',
+         updNow:'Actualizar', updLater:'Más tarde', updDownloading:'Descargando…',
+         updReady:'Descarga completada', updRestart:'Reiniciar y actualizar',
+         updNet:'Error de conexión',
+         updNetSub:'No se pudo comprobar. Revisa la conexión y reintenta.',
+         updRetry:'Reintentar', updNone:'Estás al día', updNoSource:'Origen no disponible',
+         updChecking:'Comprobando…', updRestarting:'Reiniciando…' },
+    tr:{ updTitle:'Güncelleme var', updSub:'Yeni sürüm kurulmaya hazır.',
+         updNow:'Şimdi güncelle', updLater:'Daha sonra', updDownloading:'İndiriliyor…',
+         updReady:'İndirme tamamlandı', updRestart:'Yeniden başlat ve güncelle',
+         updNet:'Ağ bağlantısı başarısız',
+         updNetSub:'Güncellemeler kontrol edilemedi. Bağlantını kontrol edip tekrar dene.',
+         updRetry:'Yeniden dene', updNone:'Güncelsiniz', updNoSource:'Güncelleme kaynağı yok',
+         updChecking:'Kontrol ediliyor…', updRestarting:'Yeniden başlatılıyor…' },
+    pt:{ updTitle:'Atualização disponível', updSub:'Uma nova versão está pronta para instalar.',
+         updNow:'Atualizar', updLater:'Depois', updDownloading:'Baixando…',
+         updReady:'Download concluído', updRestart:'Reiniciar e atualizar',
+         updNet:'Falha na conexão',
+         updNetSub:'Não foi possível verificar. Verifique a conexão e tente novamente.',
+         updRetry:'Tentar novamente', updNone:'Você está atualizado', updNoSource:'Origem indisponível',
+         updChecking:'Verificando…', updRestarting:'Reiniciando…' }
+  };
+  for (var c in X) {
+    if (!UI_T[c]) continue;
+    for (var k in X[c]) { UI_T[c][k] = X[c][k]; }
+  }
+})();
 })();
 
 /* ── 额外 i18n ─────────────────────────────────────────────── */
@@ -3497,6 +3711,9 @@ function uiInit(){
   uiRenewChipsDrag();
   uiListenHost();
 
+  var sv = document.getElementById('sbVer');
+  if (sv && UI_CFG && UI_CFG.appVersion) { sv.textContent = 'v' + UI_CFG.appVersion; }
+
   var inp = document.getElementById('renewKeyInput');
   if (inp) { inp.addEventListener('input', uiRenewInputChanged); }
 }
@@ -3923,6 +4140,254 @@ function decoInit(){
       if (BGFX_ON && BGFX_CANVAS[BGFX_STYLE]) bgfxReadColors();
     }).observe(document.documentElement, { attributes:true, attributeFilter:['style', 'class', 'data-theme'] });
   } catch (e) {}
+
+/* ═══ 登录成功 3D 金属 Logo：居中旋转 → 飞到侧栏 Logo 位置 ═══════════ */
+(function(){
+  var built = false;
+
+  function depthBuild(){
+    if (built) return;
+    var face = document.querySelector('#logo3dFace svg');
+    var host = document.getElementById('logo3dDepth');
+    if (!face || !host) return;
+    built = true;
+    for (var i = 1; i <= 16; i++) {
+      var layer = document.createElement('div');
+      layer.className = 'logo3d-layer';
+      layer.style.transform = 'translateZ(' + (12 - i * 1.7).toFixed(1) + 'px)';
+      var c = face.cloneNode(true);
+      var defs = c.querySelector('defs');
+      if (defs) defs.parentNode.removeChild(defs);
+      [].forEach.call(c.querySelectorAll('g'), function(g){
+        g.setAttribute('stroke', i < 3 ? '#7c8798' : '#39414f');
+      });
+      layer.appendChild(c);
+      host.appendChild(layer);
+    }
+  }
+
+  function show(){
+    var el = document.getElementById('logoFx');
+    if (!el) return null;
+    depthBuild();
+    el.hidden = false;
+    el.classList.remove('to-menu');
+    el.classList.add('show');
+    return el;
+  }
+
+  function login(name, done){
+    var el = show();
+    if (!el) { if (done) done(); return; }
+    var sub = document.getElementById('logoFxSub');
+    if (sub) {
+      var hello = uiT('accWelcome');
+      sub.textContent = (hello && hello !== 'accWelcome') ? (hello + (name ? ' · ' + name : '')) : (name || 'STARLINE');
+    }
+    try {
+      if (typeof wv === 'function') wv('LOGIN_FX');
+      else if (window.chrome && window.chrome.webview) window.chrome.webview.postMessage('LOGIN_FX');
+    } catch (e) {}
+    setTimeout(function(){ if (done) done(); }, 1550);
+  }
+
+  function toMenu(){
+    var el = document.getElementById('logoFx');
+    var target = document.querySelector('.sb-logo');
+    if (!el || !target) {
+      document.body.classList.remove('logo-intro');
+      return;
+    }
+    show();
+    var r = target.getBoundingClientRect();
+    var ts = Math.max(.08, Math.min(.3, r.width / 300));
+    var tx = (r.left + r.width / 2) - window.innerWidth / 2;
+    var ty = (r.top + r.height / 2) - window.innerHeight / 2;
+    el.style.setProperty('--tx', tx.toFixed(1) + 'px');
+    el.style.setProperty('--ty', ty.toFixed(1) + 'px');
+    el.style.setProperty('--ts', ts.toFixed(3));
+    /* 先让居中状态渲染一帧，再开始飞 */
+    void el.offsetWidth;
+    requestAnimationFrame(function(){
+      el.classList.add('to-menu');
+      setTimeout(function(){
+        el.classList.remove('show');
+        el.classList.remove('to-menu');
+        el.hidden = true;
+        document.body.classList.remove('logo-intro');
+        target.classList.add('logo-arrived');
+        setTimeout(function(){ target.classList.remove('logo-arrived'); }, 1000);
+      }, 1120);
+    });
+  }
+
+  function consumeLoginIntro(){
+    if (typeof UI_CFG !== 'undefined' && UI_CFG && UI_CFG.loginFx) {
+      setTimeout(toMenu, 260);
+      return true;
+    }
+    return false;
+  }
+
+  window.logoFx = { login:login, toMenu:toMenu, consumeLoginIntro:consumeLoginIntro };
+})();
+
+/* ═══ APP 更新提示：界面只发命令，永远拿不到下载地址 ═══════════════════ */
+var APP_UPD = { mode:'', step:'idle', shown:false, latest:'', downloadable:false };
+
+function appUpdateSeen(){
+  try { return sessionStorage.getItem('sl_app_upd_seen') === '1'; } catch (e) { return false; }
+}
+function appUpdateMarkSeen(){
+  try { sessionStorage.setItem('sl_app_upd_seen', '1'); } catch (e) {}
+}
+function appUpdateEl(id){ return document.getElementById(id); }
+function appUpdateSetStatus(txt, cls){
+  var el = appUpdateEl('appUpdStat');
+  if (!el) return;
+  el.textContent = txt || '';
+  el.className = 'upd-status' + (cls ? ' ' + cls : '');
+}
+function appUpdateGoText(txt){ var b = appUpdateEl('appUpdGo'); if (b) b.textContent = txt; }
+function appUpdateOpen(mode){
+  var ovl = appUpdateEl('appUpd');
+  if (!ovl) return;
+  APP_UPD.mode = mode;
+  APP_UPD.shown = true;
+  APP_UPD.step = 'idle';
+  var bar0 = appUpdateEl('appUpdBar');
+  if (bar0) bar0.classList.remove('show');
+  var fill0 = appUpdateEl('appUpdFill');
+  if (fill0) fill0.style.width = '0%';
+  var cur = appUpdateEl('appUpdCur'), nw = appUpdateEl('appUpdNew');
+  var title = appUpdateEl('appUpdTitle'), sub = appUpdateEl('appUpdSub');
+  var later = appUpdateEl('appUpdLater'), go = appUpdateEl('appUpdGo');
+  if (cur) cur.textContent = 'v' + ((typeof UI_CFG !== 'undefined' && UI_CFG && UI_CFG.appVersion) || '—');
+  if (mode === 'net') {
+    if (title) title.textContent = uiT('updNet');
+    if (sub) sub.textContent = uiT('updNetSub');
+    if (nw) nw.textContent = '—';
+    appUpdateSetStatus('', '');
+    if (go) { go.disabled = false; go.textContent = uiT('updRetry'); }
+  } else {
+    var latest = APP_UPD.latest || ((typeof UI_CFG !== 'undefined' && UI_CFG && UI_CFG.latestVersion) || '—');
+    if (title) title.textContent = uiT('updTitle');
+    if (sub) sub.textContent = uiT('updSub');
+    if (nw) nw.textContent = 'v' + latest;
+    appUpdateSetStatus(APP_UPD.downloadable === false ? uiT('updNoSource') : '', APP_UPD.downloadable === false ? 'err' : '');
+    if (go) {
+      go.disabled = APP_UPD.downloadable === false;
+      go.textContent = APP_UPD.downloadable === false ? uiT('updNoSource') : uiT('updNow');
+    }
+  }
+  if (later) later.disabled = false;
+  ovl.hidden = false;
+  ovl.classList.add('show');
+}
+function appUpdateHide(){
+  var ovl = appUpdateEl('appUpd');
+  if (ovl) { ovl.classList.remove('show'); ovl.hidden = true; }
+  APP_UPD.shown = false;
+}
+function appUpdateLater(){ appUpdateHide(); appUpdateMarkSeen(); }
+function appUpdateInit(){
+  if (typeof UI_CFG === 'undefined' || !UI_CFG) return;
+  if (appUpdateSeen()) return;
+  if (UI_CFG.updateAvailable) {
+    APP_UPD.latest = UI_CFG.latestVersion || '';
+    APP_UPD.downloadable = UI_CFG.updateDownloadable !== false;
+    appUpdateOpen('update');
+  } else if (UI_CFG.updateNetFail) {
+    appUpdateOpen('net');
+  }
+}
+function appUpdateGo(){
+  if (!APP_UPD.shown) return;
+  var go = appUpdateEl('appUpdGo');
+  if (APP_UPD.mode === 'net') {
+    if (go) { go.disabled = true; go.textContent = uiT('updChecking'); }
+    appUpdateSetStatus(uiT('updChecking'), '');
+    try { window.chrome.webview.postMessage('APP_UPDATE_CHECK'); } catch (e) {}
+    return;
+  }
+  if (APP_UPD.step === 'ready') {
+    APP_UPD.step = 'applying';
+    if (go) { go.disabled = true; go.textContent = uiT('updRestarting'); }
+    appUpdateSetStatus(uiT('updRestarting'), '');
+    try { window.chrome.webview.postMessage('APP_UPDATE_APPLY'); } catch (e) {}
+    return;
+  }
+  APP_UPD.step = 'downloading';
+  if (go) { go.disabled = true; go.textContent = uiT('updDownloading'); }
+  appUpdateSetStatus(uiT('updDownloading'), '');
+  var bar = appUpdateEl('appUpdBar'); if (bar) bar.classList.add('show');
+  var fill = appUpdateEl('appUpdFill'); if (fill) fill.style.width = '0%';
+  try { window.chrome.webview.postMessage('APP_UPDATE_DOWNLOAD'); } catch (e) {}
+}
+(function(){
+  if (!window.chrome || !window.chrome.webview) return;
+  window.chrome.webview.addEventListener('message', function(e){
+    var m = e && e.data;
+    if (typeof m !== 'string') return;
+    if (m === 'APP_UPDATE_NETFAIL') {
+      if (appUpdateSeen()) return;
+      if (!APP_UPD.shown) appUpdateOpen('net');
+      else if (APP_UPD.mode === 'net') {
+        var go = appUpdateEl('appUpdGo');
+        if (go) { go.disabled = false; go.textContent = uiT('updRetry'); }
+        appUpdateSetStatus(uiT('updNet'), 'err');
+      }
+      return;
+    }
+    if (m.indexOf('APP_UPDATE_STATE:') === 0) {
+      var p = m.slice(17).split('|');
+      APP_UPD.latest = p[0] || '';
+      APP_UPD.downloadable = (p[1] || '1') === '1';
+      if (!APP_UPD.shown && !appUpdateSeen()) appUpdateOpen('update');
+      else if (APP_UPD.shown && APP_UPD.mode === 'net') { appUpdateOpen('update'); }
+      else if (APP_UPD.shown && APP_UPD.mode === 'update') {
+        var nw = appUpdateEl('appUpdNew'); if (nw) nw.textContent = 'v' + APP_UPD.latest;
+        var b = appUpdateEl('appUpdGo');
+        if (b) { b.disabled = !APP_UPD.downloadable; b.textContent = APP_UPD.downloadable ? uiT('updNow') : uiT('updNoSource'); }
+        appUpdateSetStatus(APP_UPD.downloadable ? '' : uiT('updNoSource'), APP_UPD.downloadable ? '' : 'err');
+      }
+      return;
+    }
+    if (m === 'APP_UPDATE_NONE') {
+      if (APP_UPD.shown) {
+        appUpdateSetStatus(uiT('updNone'), 'ok');
+        setTimeout(appUpdateHide, 1200);
+      }
+      return;
+    }
+    if (m.indexOf('APP_UPDATE_PROG:') === 0) {
+      var pct = Math.max(0, Math.min(100, parseInt(m.slice(16), 10) || 0));
+      var bar = appUpdateEl('appUpdBar'); if (bar) bar.classList.add('show');
+      var fill = appUpdateEl('appUpdFill'); if (fill) fill.style.width = pct + '%';
+      var go = appUpdateEl('appUpdGo'); if (go) go.textContent = pct + '%';
+      return;
+    }
+    if (m === 'APP_UPDATE_READY') {
+      APP_UPD.step = 'ready';
+      var fill2 = appUpdateEl('appUpdFill'); if (fill2) fill2.style.width = '100%';
+      var go2 = appUpdateEl('appUpdGo');
+      if (go2) { go2.disabled = false; go2.textContent = uiT('updRestart'); }
+      appUpdateSetStatus(uiT('updReady'), 'ok');
+      return;
+    }
+    if (m.indexOf('APP_UPDATE_ERR:') === 0) {
+      var code = m.slice(15);
+      var go3 = appUpdateEl('appUpdGo');
+      APP_UPD.step = 'idle';
+      if (go3) {
+        go3.disabled = (code === 'URL');
+        go3.textContent = (code === 'APPLY') ? uiT('updRetry') : uiT('updRetry');
+      }
+      appUpdateSetStatus(uiT(code === 'URL' ? 'updNoSource' : 'updNet'), 'err');
+      return;
+    }
+  });
+})();
 #===LOGIN
 <!DOCTYPE html>
 <html lang="__UI_LANG_ATTR__" data-theme="__UI_THEME_ATTR__">
@@ -3968,7 +4433,7 @@ button{cursor:pointer;border:none;background:none;padding:0}
   --lg-star:255,255,255;
   --lg-tile-line:rgba(255,255,255,.06);--lg-tile-fill:rgba(255,255,255,.022);--lg-deco-line:rgba(255,255,255,.22);
   --lg-card-shadow:0 34px 90px rgba(0,0,0,.55),0 8px 24px rgba(0,0,0,.35);
-  --lg-card-h:740px;                 /* 卡片高度：登录和注册固定同一个尺寸（原来约 560px，再加 150px） */
+  --lg-card-h:640px;                 /* 与游戏商店窗口 1100×700 同一高度节奏，不再把卡片撑到 740 */
   --lg-vg:rgba(28,28,30,.9);
 }
 [data-theme="light"]{
@@ -4009,7 +4474,7 @@ body{background:var(--lg-bg)}
 /* 舞台：卡片居中，整页不可滚动（太矮的窗口由脚本整体缩小来适配） */
 .lg-stage{
   position:relative;z-index:1;width:100%;height:100%;min-height:0;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;padding:36px 18px 18px;
+  display:flex;align-items:center;justify-content:center;padding:24px 18px 16px;
   animation:lgIn .6s cubic-bezier(.2,.8,.2,1);
 }
 @keyframes lgIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
@@ -4017,7 +4482,7 @@ body{background:var(--lg-bg)}
 /* 卡片（.right 保留类名：脚本用它切换登录/注册） */
 .right{
   position:relative;flex-shrink:0;width:min(430px,100%);
-  display:flex;flex-direction:column;min-height:var(--lg-card-h);padding:44px 36px 30px;border-radius:32px;
+  display:flex;flex-direction:column;min-height:var(--lg-card-h);padding:34px 34px 24px;border-radius:30px;
   background:linear-gradient(180deg,var(--lg-card-a),var(--lg-card-b));
   box-shadow:var(--lg-card-shadow),inset 0 1px 0 rgba(255,255,255,.07);
   backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
@@ -4048,27 +4513,27 @@ body{background:var(--lg-bg)}
 .lg-line.r{left:calc(100% + 18px);background:linear-gradient(to right,var(--lg-deco-line),transparent)}
 
 .lg-logo{
-  position:relative;width:68px;height:68px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;
+  position:relative;width:58px;height:58px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;
   color:var(--lg-fg2);
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
   box-shadow:inset 0 0 0 1px var(--lg-btn-line),0 8px 22px rgba(0,0,0,.22);
 }
-.lg-logo svg{width:31px;height:31px;fill:currentColor}
-.lg-title{position:relative;text-align:center;font-size:36px;font-weight:600;letter-spacing:-.3px;color:var(--lg-fg)}
+.lg-logo svg{width:27px;height:27px;fill:none}
+.lg-title{position:relative;text-align:center;font-size:31px;font-weight:600;letter-spacing:-.3px;color:var(--lg-fg)}
 .right .acc-tabs,.right .form-title{display:none}
-.right .form-hint{position:relative;text-align:center;font-size:16px;color:var(--lg-fg3);margin:8px 0 30px;min-height:22px}
+.right .form-hint{position:relative;text-align:center;font-size:15px;color:var(--lg-fg3);margin:6px 0 22px;min-height:20px}
 
 input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
-.right .field{position:relative;display:block;margin-bottom:14px}
+.right .field{position:relative;display:block;margin-bottom:11px}
 .right .field.lg-form-top{margin-top:auto}
 .right .field[hidden]{display:none}
 .right .field-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .right .field-wrap{position:relative;display:flex;align-items:center}
 .right .field-icon{display:none}
 .right .key-input{
-  width:100%;height:60px;padding:0 54px 0 22px;border-radius:17px;border:1px solid transparent;
+  width:100%;height:54px;padding:0 50px 0 20px;border-radius:15px;border:1px solid transparent;
   background:var(--lg-field);color:var(--lg-fg);
-  font-family:var(--font);font-size:17px;letter-spacing:0;text-transform:none;outline:none;
+  font-family:var(--font);font-size:16px;letter-spacing:0;text-transform:none;outline:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
   transition:background var(--tr),border-color var(--tr),box-shadow var(--tr);
 }
@@ -4079,15 +4544,15 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 .right .key-input.is-ok{border-color:var(--ok);box-shadow:0 0 0 3px rgba(16,185,129,.16)}
 .right .key-input:-webkit-autofill{-webkit-text-fill-color:var(--lg-fg);caret-color:var(--lg-fg);transition:background-color 9999s ease 0s}
 .right .paste-btn{
-  position:absolute;right:11px;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  position:absolute;right:10px;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
   color:var(--lg-fg3);transition:color var(--tr),background var(--tr);
 }
-.right .paste-btn svg{width:21px;height:21px}
+.right .paste-btn svg{width:19px;height:19px}
 .right .paste-btn:hover{color:var(--lg-fg);background:var(--lg-field-hi)}
 
 .right .rem-row{
   position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;
-  margin:4px 3px 18px;width:auto;font-size:15.5px;color:var(--lg-fg3);
+  margin:2px 3px 13px;width:auto;font-size:14.5px;color:var(--lg-fg3);
   cursor:pointer;user-select:none;transition:color var(--tr);
 }
 .right .rem-row:hover{color:var(--lg-fg2)}
@@ -4108,10 +4573,10 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 
 /* 登录按钮：深色玻璃按钮。点击后收缩成圆形，里面转圈（不再有任何文字提示） */
 .right .act-btn{
-  position:relative;align-self:center;width:100%;height:60px;margin:0 0 12px;padding:0;border-radius:17px;
+  position:relative;align-self:center;width:100%;height:54px;margin:0 0 10px;padding:0;border-radius:15px;
   display:flex;align-items:center;justify-content:center;overflow:hidden;
   background:linear-gradient(180deg,var(--lg-btn-a),var(--lg-btn-b));
-  border:1px solid var(--lg-btn-line);color:var(--lg-fg3);font-size:17px;font-weight:600;
+  border:1px solid var(--lg-btn-line);color:var(--lg-fg3);font-size:16px;font-weight:600;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 6px 16px rgba(0,0,0,.18);
   transition:width .38s cubic-bezier(.4,0,.2,1),border-radius .38s cubic-bezier(.4,0,.2,1),
              color var(--tr),background var(--tr),border-color var(--tr),transform var(--tr);
@@ -4144,8 +4609,8 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 .right .foot-btn:hover{background:var(--lg-btn-hover);border-color:var(--lg-field-line);color:var(--lg-fg)}
 .right .foot-btn.close:hover{border-color:var(--ui-danger);color:var(--ui-danger);background:var(--ui-danger-soft)}
 
-.lg-switch{position:relative;margin-top:22px;text-align:center;font-size:14.5px;color:var(--lg-fg3)}
-.lg-switch button{margin-left:6px;font-size:14.5px;font-weight:700;color:var(--lg-fg2);transition:color var(--tr)}
+.lg-switch{position:relative;margin-top:14px;text-align:center;font-size:13.5px;color:var(--lg-fg3)}
+.lg-switch button{margin-left:6px;font-size:13.5px;font-weight:700;color:var(--lg-fg2);transition:color var(--tr)}
 .lg-switch button:hover{color:var(--lg-fg)}
 
 /* 提示条：和主界面 toast 完全一致（底部居中弹出） */
@@ -4485,7 +4950,7 @@ __UI_CSS__
       <i class="lg-line l"></i><i class="lg-line r"></i>
     </div>
     <div class="lg-logo">
-      <svg viewBox="0 0 24 24"><path d="M12 2.5C12.9 8 16 11.1 21.5 12C16 12.9 12.9 16 12 21.5C11.1 16 8 12.9 2.5 12C8 11.1 11.1 8 12 2.5Z"/></svg>
+      <svg viewBox="0 0 240 240" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-7 120 120)"><path d="M70 44 70 196"/><path d="M70 52 170 34"/><path d="M70 120 196 112"/><path d="M70 188 172 210"/></g></svg>
     </div>
     <div class="lg-title">STARLINE</div>
     <div class="acc-tabs" id="accTabs">
@@ -4949,12 +5414,17 @@ window.chrome.webview.addEventListener('message', function(e) {
   else if (msg.indexOf('ACC_OK:') === 0) {
     var parts = msg.slice(7).split('|'), name = parts[0], kind = parts[1];
     ACC_FIELDS.forEach(function(id){ var f = document.getElementById(id); if (f) { f.classList.add('is-ok'); } });
-    document.getElementById('sTitle').textContent = uiT(kind === 'new' ? 'accCreated' : 'accWelcome');
-    var meta = document.getElementById('sMeta');
-    meta.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg><span></span>';
-    meta.lastChild.textContent = name;
-    document.getElementById('sovl').classList.add('show');
-    setTimeout(function(){ wv('LAUNCH'); }, 1600);
+    /* 登录成功：3D 金属 Logo 居中旋转，然后交给仪表盘飞到侧栏 Logo 位置 */
+    if (window.logoFx) {
+      logoFx.login(name, function(){ wv('LAUNCH'); });
+    } else {
+      document.getElementById('sTitle').textContent = uiT(kind === 'new' ? 'accCreated' : 'accWelcome');
+      var meta = document.getElementById('sMeta');
+      meta.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg><span></span>';
+      meta.lastChild.textContent = name;
+      document.getElementById('sovl').classList.add('show');
+      setTimeout(function(){ wv('LAUNCH'); }, 1600);
+    }
   } else if (msg.indexOf('ACC_ERRTEXT:') === 0) {
     /* 网站直接回的错误文案，原样显示在提示窗口里 */
     accSetBusy(false);
@@ -5082,6 +5552,7 @@ function lgNoScroll(e){
 window.addEventListener('wheel', lgNoScroll, { passive: false });
 window.addEventListener('touchmove', lgNoScroll, { passive: false });
 uiInit();
+appUpdateInit();      /* 有新版 / 网络失败时，在登录页弹出更新窗口 */
 /* 账号存在网站上，不存在「本机有没有账号」这回事：一律先显示登录，
    新用户点上面的 Register 切过去 */
 accSetMode('login');
@@ -7068,7 +7539,7 @@ body.dragging .qp-drop-hint{display:block}
 __UI_CSS__
 </style>
 </head>
-<body>
+<body class="__UI_INTRO_CLASS__">
 <div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><div class="bgfx-layer" id="bgLayer"></div>
 <div id="fxLayer" aria-hidden="true"></div>
 <canvas id="decoCanvas" aria-hidden="true"></canvas></div>
@@ -7076,7 +7547,7 @@ __UI_CSS__
   <aside class="sidebar">
     <div class="sb-brand">
       <div class="sb-logo">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <svg viewBox="0 0 240 240" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="34" stroke-linecap="round" stroke-linejoin="round" transform="rotate(-7 120 120)"><path d="M70 44 70 196"/><path d="M70 52 170 34"/><path d="M70 120 196 112"/><path d="M70 188 172 210"/></g></svg>
       </div>
       <div class="sb-brand-text">
         <b>STARLINE</b>
@@ -11742,6 +12213,8 @@ __UI_SCRIPT__
   wv('GET_LICENSES');
   wv('SYNC_SUBS');      /* 登录后拉一次服务端订阅，管理员冻结/删除会立刻反映到本地 */
   wv('MYINFO');         /* 顺手刷新一次「实时组」 */
+  if (window.logoFx) logoFx.consumeLoginIntro();   /* 登录成功：3D Logo 飞到侧栏 */
+  else document.body.classList.remove('logo-intro');
 </script>
 <div class="faq-scrim" id="faqScrim" hidden onclick="faqClose()"></div>
 <div class="faq" id="faqPop" hidden role="dialog" aria-modal="true" aria-labelledby="faqTtl">
