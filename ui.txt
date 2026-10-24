@@ -2726,7 +2726,7 @@ var uiThemeVT = null;
    圆内是新主题、圆外仍是旧主题，直到铺满整个 APP。靠 View Transition 抓取新旧两张快照 */
 function uiThemeReveal(paint){
   var root = document.documentElement;
-  if (typeof document.startViewTransition !== 'function') { uiThemeAnimate(); paint(); return; }
+  if (typeof document.startViewTransition !== 'function') { if (window.logoSnd) logoSnd.drop(false); uiThemeAnimate(); paint(); return; }
   if (uiThemeVT) { try { uiThemeVT.skipTransition(); } catch (e) {} }
 
   var W = window.innerWidth, H = window.innerHeight, cx = W / 2, cy = H / 2;
@@ -2750,6 +2750,7 @@ function uiThemeReveal(paint){
   var EASE_HOLD = 'cubic-bezier(.4,0,.6,1)';
   var EASE_BURST = 'cubic-bezier(.32,0,.12,1)';
   vt.ready.then(function(){
+    if (window.logoSnd) logoSnd.drop(true);   /* 水滴声，和圆形动画同一时刻开始 */
     root.animate([
       { clipPath: 'circle(0px' + at, offset: 0,   easing: EASE_POP },
       { clipPath: 'circle(48px' + at, offset: .15, easing: EASE_HOLD },
@@ -4538,7 +4539,35 @@ var logoSnd = (function(){
       thud(t, 0.2, 180);
     } catch (e) {}
   }
-  return { intro:intro, fly:fly, arrive:arrive, unlock:init };
+  /* 水滴音：气泡式「噗」——正弦音高快速上扫再衰减，水里的小气泡就是这个声音 */
+  function plink(t, f0, f1, dur, vol, pan){
+    var os = ctx.createOscillator(), g = ctx.createGain();
+    os.type = 'sine';
+    os.frequency.setValueAtTime(f0, t);
+    os.frequency.exponentialRampToValueAtTime(f1, t + dur * 0.35);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    os.connect(g); g.connect(out(pan)); os.start(t); os.stop(t + dur + 0.05);
+  }
+  /* 切换主题的水滴：与 uiThemeReveal 的时间轴对齐
+     0ms 水珠冒出(圆 0→48px) → 约 250ms 爆开 → 圆形向外扩散到 1150ms
+     full=false 用于不支持 View Transition 的退路，只响一滴 */
+  function drop(full){
+    if (!init()) return;
+    try {
+      var t = ctx.currentTime + 0.02;
+      plink(t, 540, 1700, 0.17, 0.30, 0);                 /* 水珠落下的「滴」 */
+      plink(t + 0.012, 1080, 3400, 0.09, 0.06, 0);        /* 一层高频泛音，让水珠更清脆 */
+      if (!full) { plink(t + 0.09, 700, 1000, 0.2, 0.08, 0); return; }
+      plink(t + 0.25, 170, 460, 0.26, 0.34, 0);           /* 爆开：低沉的水泡「咕」 */
+      whoosh(t + 0.25, 0.9, 1100, 320, 0.17, -0.25, 0.25);/* 水面向四周扩散的哗声 */
+      plink(t + 0.44, 920, 1320, 0.2, 0.10, -0.45);       /* 三圈涟漪，越来越远、越来越轻 */
+      plink(t + 0.64, 780, 1120, 0.22, 0.07, 0.45);
+      plink(t + 0.88, 640, 900, 0.24, 0.045, -0.3);
+    } catch (e) {}
+  }
+  return { intro:intro, fly:fly, arrive:arrive, drop:drop, unlock:init };
 })();
 
 /* ═══ 登录成功 3D 金属 Logo：居中旋转 → 飞到侧栏 Logo 位置 ═══════════ */
