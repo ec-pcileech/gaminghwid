@@ -6379,10 +6379,9 @@ bgfxApply();
 
 
 <div id="worldOnlinePage" class="world-online-page" aria-hidden="true">
-  <header class="world-online-head">
-    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong>WORLD ACTIVITY</strong><small>Global player distribution · simulated data</small></div></div>
-    <div class="world-total-wrap"><span class="world-live-dot"></span><span>ONLINE NOW</span><strong id="worldTotal">—</strong></div>
-    <button id="worldMapClose" class="world-close" type="button" aria-label="Close world map">×</button>
+  <header class="world-online-head" onmousedown="if(event.button===0 && !event.target.closest('button')){window.uiDrag&&window.uiDrag(event)}">
+    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong>WORLD ACTIVITY</strong><small>Global player distribution</small></div></div>
+    <div class="world-total-wrap"><span>ONLINE NOW</span><strong id="worldTotal">—</strong></div>
   </header>
   <div class="world-content">
     <section class="world-map-panel">
@@ -6394,29 +6393,28 @@ bgfxApply();
       <div class="world-legend"><span>FEWER PLAYERS</span><i class="legend-low"></i><i class="legend-mid"></i><i class="legend-high"></i><i class="legend-hot"></i><span>MORE PLAYERS</span></div>
     </section>
     <aside class="world-side-panel">
-      <div class="world-side-title"><span>REGIONAL ACTIVITY</span><small>SIMULATED</small></div>
+      <div class="world-side-title"><span>REGIONAL ACTIVITY</span></div>
       <div id="worldCountryList" class="world-country-list"></div>
-      <div class="world-disclaimer">Numbers are fictional UI demo values, regenerated each time the app starts. They do not represent real users.</div>
     </aside>
   </div>
-  <footer class="world-foot"><span><i></i> Simulation active</span><span>Vector map · Country-level overview</span></footer>
+  <footer class="world-foot"><span class="world-esc-key"><kbd>ESC</kbd><span>返回</span></span></footer>
 </div>
 <style>
 .world-online-page{position:fixed;inset:0;z-index:2147483200;display:none;flex-direction:column;background:var(--bg,#0a0a0c);color:var(--text,#f4f4f5);font-family:var(--font,Inter,sans-serif);overflow:hidden}
 .world-online-page.open{display:flex;animation:worldPageIn .28s ease-out}
 @keyframes worldPageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.world-online-head{height:76px;flex-shrink:0;display:flex;align-items:center;gap:24px;padding:0 28px;border-bottom:1px solid var(--border);background:var(--surface-solid,#17171b)}
+.world-online-head{height:76px;flex-shrink:0;display:flex;align-items:center;gap:24px;padding:0 28px;border-bottom:1px solid var(--border);background:var(--surface-solid,#17171b);-webkit-app-region:drag;cursor:move}.world-online-head button,.world-online-head a{-webkit-app-region:no-drag}
 .world-brand{display:flex;align-items:center;gap:12px;min-width:250px}.world-brand-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:27px}
 .world-brand strong,.world-brand small{display:block}.world-brand strong{font-size:13px;letter-spacing:1.4px}.world-brand small{font-size:11px;color:var(--text-3);margin-top:3px}
 .world-total-wrap{margin-left:auto;display:flex;align-items:center;gap:9px;color:var(--text-3);font-size:10px;letter-spacing:1.2px}.world-total-wrap strong{font:700 23px var(--font-mono,monospace);letter-spacing:0;color:var(--text);margin-left:5px}
-.world-live-dot,.world-foot i{width:7px;height:7px;border-radius:50%;background:#35d399;box-shadow:0 0 10px #35d399;display:inline-block}
-.world-close{width:36px;height:36px;border:1px solid var(--border);border-radius:50%;background:var(--surface-2);color:var(--text-2);font-size:25px;cursor:pointer}.world-close:hover{color:var(--text);background:var(--surface-3)}
+.world-live-dot{display:none}
+.world-close{display:none!important}
 .world-content{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;padding:24px clamp(14px,3vw,42px);overflow:auto;max-width:1800px;width:100%;margin:0 auto}
 .world-map-panel,.world-side-panel{min-width:0;border:1px solid var(--border);border-radius:22px;background:var(--surface);box-shadow:var(--shadow-1);overflow:hidden}
 .world-map-panel{background:linear-gradient(145deg,var(--surface),var(--surface-2))}
 .world-map-caption{height:48px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:1.1px;color:var(--text-2)}
 .world-map-hint{font-size:11px;font-weight:400;letter-spacing:0;color:var(--text-3)}
-.world-map-stage{position:relative;min-height:380px;height:calc(100% - 85px);display:flex;align-items:center;justify-content:center;padding:10px;background:radial-gradient(ellipse at center,rgba(24,83,132,.16),transparent 66%)}
+.world-map-stage{position:relative;min-height:380px;height:calc(100% - 84px);display:flex;align-items:center;justify-content:center;padding:10px;background:radial-gradient(ellipse at center,rgba(24,83,132,.16),transparent 66%)}
 #worldGlobeCanvas{display:block;width:min(100%,820px);height:100%;min-height:360px;max-height:calc(100vh - 220px);cursor:grab;touch-action:pan-y}
 #worldGlobeCanvas:active{cursor:grabbing}
 #worldVectorMap{width:100%;max-height:100%;min-height:300px;color:var(--text);overflow:visible}
@@ -6425,19 +6423,19 @@ bgfxApply();
 .world-country-mark:hover,.world-country-mark.active{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 7px currentColor)}
 .world-legend{height:36px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:9px;color:var(--text-3);letter-spacing:.5px}
 .world-legend i{width:25px;height:7px;border-radius:3px}.legend-low{background:#f6b7a8}.legend-mid{background:#f47762}.legend-high{background:#e7473c}.legend-hot{background:#a91024}
-.world-country-tip{position:absolute;z-index:4;min-width:170px;padding:12px 14px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);box-shadow:var(--shadow-2);pointer-events:none}
+.world-country-tip{position:absolute;z-index:4;min-width:170px;padding:12px 14px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);box-shadow:var(--shadow-2);pointer-events:none}.world-country-tip:before{content:"";position:absolute;left:-6px;top:var(--tip-arrow-y,50%);width:10px;height:10px;transform:translateY(-50%) rotate(45deg);background:var(--surface-solid);border-left:1px solid var(--border-2);border-bottom:1px solid var(--border-2)}.world-country-tip.tip-left:before{left:auto;right:-6px;transform:translateY(-50%) rotate(225deg)}.world-tip-title{display:flex;align-items:center;gap:8px}.world-tip-title img{width:24px;height:17px;object-fit:cover;border-radius:3px}.world-tip-title strong{font-size:13px}
 .world-country-tip strong{display:block;font-size:13px}.world-country-tip span{display:block;margin-top:5px;color:var(--text-3);font-size:10px}.world-country-tip b{display:block;margin-top:3px;font:700 19px var(--font-mono,monospace);color:var(--text)}
 .world-side-panel{display:flex;flex-direction:column}.world-side-title{padding:17px 16px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1px;font-weight:700;color:var(--text-2)}.world-side-title small{font-size:9px;color:var(--accent);letter-spacing:.8px}
 .world-country-list{overflow:auto;padding:6px 10px;flex:1}.world-country-row{display:flex;align-items:center;gap:10px;padding:10px 7px;border-bottom:1px solid var(--border);border-radius:8px;cursor:pointer}.world-country-row:hover,.world-country-row.active{background:var(--surface-2)}
-.world-flag{font-size:20px;width:28px;text-align:center}.world-country-name{flex:1;min-width:0;font-size:12px;font-weight:600}.world-country-name small{display:block;font-size:10px;color:var(--text-3);font-weight:400;margin-top:2px}.world-country-count{font:600 12px var(--font-mono,monospace);text-align:right}.world-country-count small{display:block;font:10px var(--font, sans-serif);color:var(--text-3);margin-top:2px}
-.world-disclaimer{padding:12px 14px;font-size:10px;line-height:1.5;color:var(--text-3);border-top:1px solid var(--border)}
-.world-foot{height:34px;flex-shrink:0;padding:0 26px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);color:var(--text-3);font-size:10px}.world-foot span:first-child{display:flex;align-items:center;gap:7px}
+.world-flag{width:26px;height:18px;object-fit:cover;border-radius:3px;flex:0 0 26px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}.world-country-name{flex:1;min-width:0;font-size:12px;font-weight:600}.world-country-name small{display:block;font-size:10px;color:var(--text-3);font-weight:400;margin-top:2px}.world-country-count{font:600 12px var(--font-mono,monospace);text-align:right}.world-country-count small{display:block;font:10px var(--font, sans-serif);color:var(--text-3);margin-top:2px}
+.world-disclaimer{display:none!important}
+.world-foot{height:42px;flex-shrink:0;padding:0 26px;display:flex;align-items:center;justify-content:flex-end;color:var(--text-3);font-size:11px;background:transparent;border:0}.world-esc-key{display:flex;align-items:center;gap:8px}.world-esc-key kbd{padding:4px 8px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface-2);color:var(--text-2);font:600 10px var(--font-mono,monospace);box-shadow:0 2px 0 var(--border)}
 @media(max-width:760px){.world-online-head{height:64px;padding:0 14px;gap:10px}.world-brand{min-width:0}.world-brand small{display:none}.world-total-wrap{gap:5px}.world-total-wrap strong{font-size:17px}.world-content{grid-template-columns:1fr;padding:10px;gap:12px}.world-map-stage{height:auto;min-height:310px}#worldGlobeCanvas{min-height:300px;max-height:50vh}.world-side-panel{max-height:340px}.world-map-hint{display:none}.world-foot{padding:0 14px}}
 </style>
 <script>
 (function(){
-  var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage'),closeBtn=document.getElementById('worldMapClose');
-  if(!openBtn||!page||!closeBtn||page.dataset.globeReady)return; page.dataset.globeReady='1';
+  var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage');
+  if(!openBtn||!page||page.dataset.globeReady)return; page.dataset.globeReady='1';
   var raw=[
     ['United States','🇺🇸',39,-98],['Canada','🇨🇦',56,-106],['Mexico','🇲🇽',23,-102],['Guatemala','🇬🇹',15,-90],['Cuba','🇨🇺',22,-79],['Panama','🇵🇦',9,-80],['Costa Rica','🇨🇷',10,-84],['Jamaica','🇯🇲',18,-77],['Haiti','🇭🇹',19,-72],['Dominican Republic','🇩🇴',19,-70],['Colombia','🇨🇴',4,-72],['Venezuela','🇻🇪',8,-66],['Ecuador','🇪🇨',-2,-77],['Peru','🇵🇪',-10,-76],['Bolivia','🇧🇴',-17,-65],['Chile','🇨🇱',-30,-71],['Argentina','🇦🇷',-38,-64],['Uruguay','🇺🇾',-33,-56],['Paraguay','🇵🇾',-23,-58],['Brazil','🇧🇷',-10,-52],
     ['Iceland','🇮🇸',65,-19],['Ireland','🇮🇪',53,-8],['United Kingdom','🇬🇧',54,-2],['Portugal','🇵🇹',39,-8],['Spain','🇪🇸',40,-4],['France','🇫🇷',46,2],['Belgium','🇧🇪',50,4],['Netherlands','🇳🇱',52,5],['Germany','🇩🇪',51,10],['Switzerland','🇨🇭',47,8],['Italy','🇮🇹',42,12],['Norway','🇳🇴',62,10],['Sweden','🇸🇪',60,18],['Finland','🇫🇮',64,26],['Denmark','🇩🇰',56,10],['Poland','🇵🇱',52,20],['Czechia','🇨🇿',49,15],['Austria','🇦🇹',47,14],['Hungary','🇭🇺',47,19],['Romania','🇷🇴',46,25],['Greece','🇬🇷',39,22],['Ukraine','🇺🇦',49,32],['Türkiye','🇹🇷',39,35],['Russia','🇷🇺',60,90],
@@ -6449,11 +6447,12 @@ bgfxApply();
     ['Bahamas','🇧🇸',24,-76],['Belize','🇧🇿',17,-88],['Honduras','🇭🇳',15,-86],['El Salvador','🇸🇻',14,-89],['Nicaragua','🇳🇮',13,-85],['Trinidad and Tobago','🇹🇹',11,-61],['Barbados','🇧🇧',13,-59],['Guyana','🇬🇾',5,-59],['Suriname','🇸🇷',4,-56],['Grenada','🇬🇩',12,-61],['Antigua and Barbuda','🇦🇬',17,-62],['Dominica','🇩🇲',15,-61],['Saint Lucia','🇱🇨',14,-61],['Saint Vincent and the Grenadines','🇻🇨',13,-61],['Samoa','🇼🇸',-13,-172],['Tonga','🇹🇴',-21,-175],['Vanuatu','🇻🇺',-16,167],['Solomon Islands','🇸🇧',-9,160],['Kiribati','🇰🇮',1,173],['Tuvalu','🇹🇻',-8,178],['Marshall Islands','🇲🇭',7,171],['Micronesia','🇫🇲',7,158],['Palau','🇵🇼',7,134],['Nauru','🇳🇷',-1,167],['Cook Islands','🇨🇰',-21,-159],['Niue','🇳🇺',-19,-170],['Monaco','🇲🇨',44,7],['San Marino','🇸🇲',44,12],['Liechtenstein','🇱🇮',47,9],['Montenegro','🇲🇪',42,19],['North Macedonia','🇲🇰',41,22],['Kosovo','🇽🇰',42,21]
 
   ];
-  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:35+Math.floor(Math.random()*216)};});
+  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:15+Math.floor(Math.random()*4485)};});
   var total=countries.reduce(function(a,c){return a+c.count;},0);document.getElementById('worldTotal').textContent=total.toLocaleString();
   var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement;
   var W=900,H=560,rot=0,tilt=-.08,dragging=false,lastX=0,lastY=0,points=[],hoverIndex=-1,raf=0;
-  function color(n){var t=Math.max(0,Math.min(1,(n-35)/215));var stops=[[246,183,168],[244,119,98],[231,71,60],[169,16,36]];var p=t*3,i=Math.min(2,Math.floor(p)),f=p-i;var a=stops[i],b=stops[i+1];return 'rgb('+a.map(function(v,j){return Math.round(v+(b[j]-v)*f);}).join(',')+')';}
+  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
+  function color(n){var t=Math.max(0,Math.min(1,(n-15)/4485));var stops=[[246,183,168],[244,119,98],[231,71,60],[169,16,36]];var p=t*3,i=Math.min(2,Math.floor(p)),f=p-i;var a=stops[i],b=stops[i+1];return 'rgb('+a.map(function(v,j){return Math.round(v+(b[j]-v)*f);}).join(',')+')';}
   function xyz(lat,lon){var la=lat*Math.PI/180,lo=lon*Math.PI/180;return {x:Math.cos(la)*Math.sin(lo),y:Math.sin(la),z:Math.cos(la)*Math.cos(lo)};}
   // Build a dense spherical point cloud, then retain points over approximate real-world land silhouettes.
   var landPolys=[ [[-168,72],[-130,70],[-105,55],[-80,50],[-52,25],[-82,7],[-108,20],[-125,38],[-150,55]], [[-81,12],[-50,8],[-35,-10],[-48,-35],[-70,-55],[-79,-25]], [[-11,72],[35,70],[65,55],[40,35],[28,5],[10,-35],[-5,-34],[-18,5],[-10,35]], [[30,72],[70,75],[120,60],[160,55],[180,40],[140,10],[105,0],[75,8],[50,30]], [[112,-11],[154,-12],[153,-39],[130,-45],[113,-28]], [[-25,65],[-13,63],[-18,52],[-30,55]], [[43,-13],[51,-15],[49,-26],[43,-24]], [[-180,68],[-150,65],[-140,55],[-165,52]], [[95,20],[125,18],[140,-5],[120,-10],[105,0]] ];
@@ -6466,22 +6465,26 @@ bgfxApply();
   function draw(){if(!page.classList.contains('open')){raf=0;return;}if(!dragging)rot+=.0018;ctx.clearRect(0,0,W,H);var r=Math.min(W*.38,H*.43),cx=W*.49,cy=H*.5;
     var glow=ctx.createRadialGradient(cx-r*.25,cy-r*.35,r*.05,cx,cy,r*1.35);glow.addColorStop(0,'rgba(26,119,183,.18)');glow.addColorStop(.7,'rgba(10,65,112,.08)');glow.addColorStop(1,'rgba(8,24,45,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
     ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='rgba(6,22,42,.22)';ctx.fill();ctx.strokeStyle='rgba(72,170,226,.42)';ctx.lineWidth=1;ctx.stroke();
+    // Geographic vector land silhouettes beneath the particle layer.
+    ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
+    landPolys.forEach(function(poly){var visible=[],allFront=true;poly.forEach(function(pt){var q=project(xyz(pt[1],pt[0]),cx,cy,r);visible.push(q);if(q.z<0)allFront=false;});if(!allFront)return;ctx.beginPath();visible.forEach(function(q,j){if(j===0)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y);});ctx.closePath();ctx.fillStyle='rgba(25,105,158,.10)';ctx.fill();ctx.strokeStyle='rgba(83,174,235,.30)';ctx.lineWidth=1;ctx.stroke();});ctx.restore();
     var projected=points.map(function(p){var q=project(p.v,cx,cy,r);q.p=p;return q;}).sort(function(a,b){return a.z-b.z;});
     projected.forEach(function(q){if(q.z<-.12)return;var c=countries[q.p.country],alpha=.22+((q.z+1)/2)*.78;ctx.beginPath();ctx.arc(q.x,q.y,q.p.size*(.65+q.z*.35),0,Math.PI*2);ctx.fillStyle=q.p.land?color(c.count):'rgba(86,177,230,'+(alpha*.35)+')';ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;});
     // Glowing country anchors are positioned from each country's real geographic latitude/longitude.
-    countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var rr=2.2+Math.min(4,c.count/80);ctx.beginPath();ctx.arc(q.x,q.y,rr+3,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.globalAlpha=.18;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(q.x,q.y,rr,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.fill();if(i===hoverIndex){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}}
+    countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var rr=2.2+Math.min(4,c.count/900);ctx.beginPath();ctx.arc(q.x,q.y,rr+3,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.globalAlpha=.18;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(q.x,q.y,rr,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.fill();if(i===hoverIndex){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}}
     );
     raf=requestAnimationFrame(draw);
   }
-  function renderList(){countries.map(function(c,i){return {c:c,i:i};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;row.innerHTML='<span class="world-flag">'+c.flag+'</span><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';row.addEventListener('mouseenter',function(){selectCountry(i,true);});row.addEventListener('focus',function(){selectCountry(i,true);});row.addEventListener('click',function(){selectCountry(i,true);});list.appendChild(row);});}
-  function selectCountry(i,showTip){hoverIndex=i;list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});if(showTip){var c=countries[i];tip.hidden=false;tip.innerHTML='<strong>'+c.flag+' '+c.name+'</strong><b>'+c.count.toLocaleString()+' online</b><span>Simulated players · geographic coordinates</span>';tip.style.left='12px';tip.style.top='12px';}}
+  function renderList(){countries.map(function(c,i){return {c:c,i:i};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png" loading="lazy"><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';row.addEventListener('mouseenter',function(){selectCountry(i,true);});row.addEventListener('focus',function(){selectCountry(i,true);});row.addEventListener('click',function(){selectCountry(i,true);});list.appendChild(row);});}
+  function positionTip(i){var c=countries[i],rect=canvas.getBoundingClientRect(),r=Math.min(W*.38,H*.43),q=project(xyz(c.lat,c.lon),W*.49,H*.5,r);var stageRect=stage.getBoundingClientRect(),anchorX=rect.left-stageRect.left+q.x,anchorY=rect.top-stageRect.top+q.y;var left=Math.max(8,Math.min(stageRect.width-tip.offsetWidth-8,anchorX+12));var top=Math.max(8,Math.min(stageRect.height-tip.offsetHeight-8,anchorY-tip.offsetHeight/2));tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.toggle('tip-left',left<anchorX-tip.offsetWidth);tip.style.setProperty('--tip-arrow-y',Math.max(12,Math.min(tip.offsetHeight-12,anchorY-top))+'px');}
+  function selectCountry(i,showTip){hoverIndex=i;list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});if(showTip){var c=countries[i];tip.hidden=false;tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';positionTip(i);requestAnimationFrame(function(){positionTip(i);});}}
   function findCountryAt(clientX,clientY){var rect=canvas.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top,r=Math.min(W*.38,H*.43),cx=W*.49,cy=H*.5,best=24,idx=-1;countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var d=Math.hypot(q.x-x,q.y-y);if(d<best){best=d;idx=i;}});return idx;}
   canvas.addEventListener('mousemove',function(e){if(dragging){rot+=(e.clientX-lastX)*.008;tilt=Math.max(-.8,Math.min(.8,tilt+(e.clientY-lastY)*.005));lastX=e.clientX;lastY=e.clientY;return;}var i=findCountryAt(e.clientX,e.clientY);if(i>=0)selectCountry(i,true);else{hoverIndex=-1;tip.hidden=true;}});
   canvas.addEventListener('mousedown',function(e){dragging=true;lastX=e.clientX;lastY=e.clientY;});window.addEventListener('mouseup',function(){dragging=false;});
   canvas.addEventListener('touchstart',function(e){if(e.touches[0]){dragging=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;}},{passive:true});canvas.addEventListener('touchend',function(){dragging=false;});
   function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';resize();if(!raf)raf=requestAnimationFrame(draw);}
   function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';tip.hidden=true;if(raf){cancelAnimationFrame(raf);raf=0;}}
-  renderList();openBtn.addEventListener('click',show);closeBtn.addEventListener('click',hide);page.addEventListener('click',function(e){if(e.target===page)hide();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
+  renderList();openBtn.addEventListener('click',show);document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
 })();
 </script>
 
@@ -6746,7 +6749,7 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 .topbar-search:focus-within svg{stroke:var(--accent-2)}
 .topbar-search input{
   position:relative;z-index:1;
-  width:100%;height:38px;padding:0 72px 0 40px;
+  width:100%;height:38px;padding:0 78px 0 40px;
   border-radius:var(--radius-full);
   background:var(--surface);
   backdrop-filter:blur(20px);
@@ -6764,7 +6767,7 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 }
 /* ═══════ 搜索栏右侧 Ctrl+K 按钮 + 弹窗（主题 / 消息树 / FAQ / 全部游戏）；弹窗挂在 body 上，永远在最顶层 ═══════ */
 .sk-kbd{
-  position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:3;
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:3;
   display:flex;align-items:center;gap:4px;height:24px;padding:0 6px;
   border-radius:var(--radius-full);border:0;
   background:transparent;color:var(--text-3);cursor:pointer;
@@ -6783,7 +6786,7 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 .topbar-search:focus-within .sk-kbd{transform:translateY(calc(-50% - 1px))}
 .topbar-search:focus-within .sk-kbd:active{transform:translateY(calc(-50% - 1px)) scale(.95)}
 /* 世界在线地图入口：与 Ctrl+K 分离，Ctrl+K 自身不再有额外胶囊底 */
-.world-map-btn{flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;align-self:center;margin-left:10px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-2);cursor:pointer;transition:all var(--tr);-webkit-app-region:no-drag;box-shadow:var(--shadow-1)}
+.world-map-btn{flex:0 0 38px;width:38px;height:38px;display:grid;place-items:center;align-self:center;margin-left:0;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text-2);cursor:pointer;transition:all var(--tr);-webkit-app-region:no-drag;box-shadow:var(--shadow-1)}
 .world-map-btn:hover{color:var(--accent-2);border-color:var(--accent);background:var(--accent-soft);transform:translateY(-1px)}
 .world-map-btn svg{position:static!important;transform:none!important;width:19px!important;height:19px!important;stroke:currentColor!important;pointer-events:none}
 .world-map-btn:active{transform:scale(.96)}
@@ -15499,10 +15502,9 @@ __UI_SCRIPT__
 </script>
 
 <div id="worldOnlinePage" class="world-online-page" aria-hidden="true">
-  <header class="world-online-head">
-    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong>WORLD ACTIVITY</strong><small>Global player distribution · simulated data</small></div></div>
-    <div class="world-total-wrap"><span class="world-live-dot"></span><span>ONLINE NOW</span><strong id="worldTotal">—</strong></div>
-    <button id="worldMapClose" class="world-close" type="button" aria-label="Close world map">×</button>
+  <header class="world-online-head" onmousedown="if(event.button===0 && !event.target.closest('button')){window.uiDrag&&window.uiDrag(event)}">
+    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong>WORLD ACTIVITY</strong><small>Global player distribution</small></div></div>
+    <div class="world-total-wrap"><span>ONLINE NOW</span><strong id="worldTotal">—</strong></div>
   </header>
   <div class="world-content">
     <section class="world-map-panel">
@@ -15514,29 +15516,28 @@ __UI_SCRIPT__
       <div class="world-legend"><span>FEWER PLAYERS</span><i class="legend-low"></i><i class="legend-mid"></i><i class="legend-high"></i><i class="legend-hot"></i><span>MORE PLAYERS</span></div>
     </section>
     <aside class="world-side-panel">
-      <div class="world-side-title"><span>REGIONAL ACTIVITY</span><small>SIMULATED</small></div>
+      <div class="world-side-title"><span>REGIONAL ACTIVITY</span></div>
       <div id="worldCountryList" class="world-country-list"></div>
-      <div class="world-disclaimer">Numbers are fictional UI demo values, regenerated each time the app starts. They do not represent real users.</div>
     </aside>
   </div>
-  <footer class="world-foot"><span><i></i> Simulation active</span><span>Vector map · Country-level overview</span></footer>
+  <footer class="world-foot"><span class="world-esc-key"><kbd>ESC</kbd><span>返回</span></span></footer>
 </div>
 <style>
 .world-online-page{position:fixed;inset:0;z-index:2147483200;display:none;flex-direction:column;background:var(--bg,#0a0a0c);color:var(--text,#f4f4f5);font-family:var(--font,Inter,sans-serif);overflow:hidden}
 .world-online-page.open{display:flex;animation:worldPageIn .28s ease-out}
 @keyframes worldPageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.world-online-head{height:76px;flex-shrink:0;display:flex;align-items:center;gap:24px;padding:0 28px;border-bottom:1px solid var(--border);background:var(--surface-solid,#17171b)}
+.world-online-head{height:76px;flex-shrink:0;display:flex;align-items:center;gap:24px;padding:0 28px;border-bottom:1px solid var(--border);background:var(--surface-solid,#17171b);-webkit-app-region:drag;cursor:move}.world-online-head button,.world-online-head a{-webkit-app-region:no-drag}
 .world-brand{display:flex;align-items:center;gap:12px;min-width:250px}.world-brand-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:27px}
 .world-brand strong,.world-brand small{display:block}.world-brand strong{font-size:13px;letter-spacing:1.4px}.world-brand small{font-size:11px;color:var(--text-3);margin-top:3px}
 .world-total-wrap{margin-left:auto;display:flex;align-items:center;gap:9px;color:var(--text-3);font-size:10px;letter-spacing:1.2px}.world-total-wrap strong{font:700 23px var(--font-mono,monospace);letter-spacing:0;color:var(--text);margin-left:5px}
-.world-live-dot,.world-foot i{width:7px;height:7px;border-radius:50%;background:#35d399;box-shadow:0 0 10px #35d399;display:inline-block}
-.world-close{width:36px;height:36px;border:1px solid var(--border);border-radius:50%;background:var(--surface-2);color:var(--text-2);font-size:25px;cursor:pointer}.world-close:hover{color:var(--text);background:var(--surface-3)}
+.world-live-dot{display:none}
+.world-close{display:none!important}
 .world-content{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;padding:24px clamp(14px,3vw,42px);overflow:auto;max-width:1800px;width:100%;margin:0 auto}
 .world-map-panel,.world-side-panel{min-width:0;border:1px solid var(--border);border-radius:22px;background:var(--surface);box-shadow:var(--shadow-1);overflow:hidden}
 .world-map-panel{background:linear-gradient(145deg,var(--surface),var(--surface-2))}
 .world-map-caption{height:48px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:1.1px;color:var(--text-2)}
 .world-map-hint{font-size:11px;font-weight:400;letter-spacing:0;color:var(--text-3)}
-.world-map-stage{position:relative;min-height:380px;height:calc(100% - 85px);display:flex;align-items:center;justify-content:center;padding:10px;background:radial-gradient(ellipse at center,rgba(24,83,132,.16),transparent 66%)}
+.world-map-stage{position:relative;min-height:380px;height:calc(100% - 84px);display:flex;align-items:center;justify-content:center;padding:10px;background:radial-gradient(ellipse at center,rgba(24,83,132,.16),transparent 66%)}
 #worldGlobeCanvas{display:block;width:min(100%,820px);height:100%;min-height:360px;max-height:calc(100vh - 220px);cursor:grab;touch-action:pan-y}
 #worldGlobeCanvas:active{cursor:grabbing}
 #worldVectorMap{width:100%;max-height:100%;min-height:300px;color:var(--text);overflow:visible}
@@ -15545,19 +15546,19 @@ __UI_SCRIPT__
 .world-country-mark:hover,.world-country-mark.active{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 7px currentColor)}
 .world-legend{height:36px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:9px;color:var(--text-3);letter-spacing:.5px}
 .world-legend i{width:25px;height:7px;border-radius:3px}.legend-low{background:#f6b7a8}.legend-mid{background:#f47762}.legend-high{background:#e7473c}.legend-hot{background:#a91024}
-.world-country-tip{position:absolute;z-index:4;min-width:170px;padding:12px 14px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);box-shadow:var(--shadow-2);pointer-events:none}
+.world-country-tip{position:absolute;z-index:4;min-width:170px;padding:12px 14px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);box-shadow:var(--shadow-2);pointer-events:none}.world-country-tip:before{content:"";position:absolute;left:-6px;top:var(--tip-arrow-y,50%);width:10px;height:10px;transform:translateY(-50%) rotate(45deg);background:var(--surface-solid);border-left:1px solid var(--border-2);border-bottom:1px solid var(--border-2)}.world-country-tip.tip-left:before{left:auto;right:-6px;transform:translateY(-50%) rotate(225deg)}.world-tip-title{display:flex;align-items:center;gap:8px}.world-tip-title img{width:24px;height:17px;object-fit:cover;border-radius:3px}.world-tip-title strong{font-size:13px}
 .world-country-tip strong{display:block;font-size:13px}.world-country-tip span{display:block;margin-top:5px;color:var(--text-3);font-size:10px}.world-country-tip b{display:block;margin-top:3px;font:700 19px var(--font-mono,monospace);color:var(--text)}
 .world-side-panel{display:flex;flex-direction:column}.world-side-title{padding:17px 16px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1px;font-weight:700;color:var(--text-2)}.world-side-title small{font-size:9px;color:var(--accent);letter-spacing:.8px}
 .world-country-list{overflow:auto;padding:6px 10px;flex:1}.world-country-row{display:flex;align-items:center;gap:10px;padding:10px 7px;border-bottom:1px solid var(--border);border-radius:8px;cursor:pointer}.world-country-row:hover,.world-country-row.active{background:var(--surface-2)}
-.world-flag{font-size:20px;width:28px;text-align:center}.world-country-name{flex:1;min-width:0;font-size:12px;font-weight:600}.world-country-name small{display:block;font-size:10px;color:var(--text-3);font-weight:400;margin-top:2px}.world-country-count{font:600 12px var(--font-mono,monospace);text-align:right}.world-country-count small{display:block;font:10px var(--font, sans-serif);color:var(--text-3);margin-top:2px}
-.world-disclaimer{padding:12px 14px;font-size:10px;line-height:1.5;color:var(--text-3);border-top:1px solid var(--border)}
-.world-foot{height:34px;flex-shrink:0;padding:0 26px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);color:var(--text-3);font-size:10px}.world-foot span:first-child{display:flex;align-items:center;gap:7px}
+.world-flag{width:26px;height:18px;object-fit:cover;border-radius:3px;flex:0 0 26px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}.world-country-name{flex:1;min-width:0;font-size:12px;font-weight:600}.world-country-name small{display:block;font-size:10px;color:var(--text-3);font-weight:400;margin-top:2px}.world-country-count{font:600 12px var(--font-mono,monospace);text-align:right}.world-country-count small{display:block;font:10px var(--font, sans-serif);color:var(--text-3);margin-top:2px}
+.world-disclaimer{display:none!important}
+.world-foot{height:42px;flex-shrink:0;padding:0 26px;display:flex;align-items:center;justify-content:flex-end;color:var(--text-3);font-size:11px;background:transparent;border:0}.world-esc-key{display:flex;align-items:center;gap:8px}.world-esc-key kbd{padding:4px 8px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface-2);color:var(--text-2);font:600 10px var(--font-mono,monospace);box-shadow:0 2px 0 var(--border)}
 @media(max-width:760px){.world-online-head{height:64px;padding:0 14px;gap:10px}.world-brand{min-width:0}.world-brand small{display:none}.world-total-wrap{gap:5px}.world-total-wrap strong{font-size:17px}.world-content{grid-template-columns:1fr;padding:10px;gap:12px}.world-map-stage{height:auto;min-height:310px}#worldGlobeCanvas{min-height:300px;max-height:50vh}.world-side-panel{max-height:340px}.world-map-hint{display:none}.world-foot{padding:0 14px}}
 </style>
 <script>
 (function(){
-  var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage'),closeBtn=document.getElementById('worldMapClose');
-  if(!openBtn||!page||!closeBtn||page.dataset.globeReady)return; page.dataset.globeReady='1';
+  var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage');
+  if(!openBtn||!page||page.dataset.globeReady)return; page.dataset.globeReady='1';
   var raw=[
     ['United States','🇺🇸',39,-98],['Canada','🇨🇦',56,-106],['Mexico','🇲🇽',23,-102],['Guatemala','🇬🇹',15,-90],['Cuba','🇨🇺',22,-79],['Panama','🇵🇦',9,-80],['Costa Rica','🇨🇷',10,-84],['Jamaica','🇯🇲',18,-77],['Haiti','🇭🇹',19,-72],['Dominican Republic','🇩🇴',19,-70],['Colombia','🇨🇴',4,-72],['Venezuela','🇻🇪',8,-66],['Ecuador','🇪🇨',-2,-77],['Peru','🇵🇪',-10,-76],['Bolivia','🇧🇴',-17,-65],['Chile','🇨🇱',-30,-71],['Argentina','🇦🇷',-38,-64],['Uruguay','🇺🇾',-33,-56],['Paraguay','🇵🇾',-23,-58],['Brazil','🇧🇷',-10,-52],
     ['Iceland','🇮🇸',65,-19],['Ireland','🇮🇪',53,-8],['United Kingdom','🇬🇧',54,-2],['Portugal','🇵🇹',39,-8],['Spain','🇪🇸',40,-4],['France','🇫🇷',46,2],['Belgium','🇧🇪',50,4],['Netherlands','🇳🇱',52,5],['Germany','🇩🇪',51,10],['Switzerland','🇨🇭',47,8],['Italy','🇮🇹',42,12],['Norway','🇳🇴',62,10],['Sweden','🇸🇪',60,18],['Finland','🇫🇮',64,26],['Denmark','🇩🇰',56,10],['Poland','🇵🇱',52,20],['Czechia','🇨🇿',49,15],['Austria','🇦🇹',47,14],['Hungary','🇭🇺',47,19],['Romania','🇷🇴',46,25],['Greece','🇬🇷',39,22],['Ukraine','🇺🇦',49,32],['Türkiye','🇹🇷',39,35],['Russia','🇷🇺',60,90],
@@ -15569,11 +15570,12 @@ __UI_SCRIPT__
     ['Bahamas','🇧🇸',24,-76],['Belize','🇧🇿',17,-88],['Honduras','🇭🇳',15,-86],['El Salvador','🇸🇻',14,-89],['Nicaragua','🇳🇮',13,-85],['Trinidad and Tobago','🇹🇹',11,-61],['Barbados','🇧🇧',13,-59],['Guyana','🇬🇾',5,-59],['Suriname','🇸🇷',4,-56],['Grenada','🇬🇩',12,-61],['Antigua and Barbuda','🇦🇬',17,-62],['Dominica','🇩🇲',15,-61],['Saint Lucia','🇱🇨',14,-61],['Saint Vincent and the Grenadines','🇻🇨',13,-61],['Samoa','🇼🇸',-13,-172],['Tonga','🇹🇴',-21,-175],['Vanuatu','🇻🇺',-16,167],['Solomon Islands','🇸🇧',-9,160],['Kiribati','🇰🇮',1,173],['Tuvalu','🇹🇻',-8,178],['Marshall Islands','🇲🇭',7,171],['Micronesia','🇫🇲',7,158],['Palau','🇵🇼',7,134],['Nauru','🇳🇷',-1,167],['Cook Islands','🇨🇰',-21,-159],['Niue','🇳🇺',-19,-170],['Monaco','🇲🇨',44,7],['San Marino','🇸🇲',44,12],['Liechtenstein','🇱🇮',47,9],['Montenegro','🇲🇪',42,19],['North Macedonia','🇲🇰',41,22],['Kosovo','🇽🇰',42,21]
 
   ];
-  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:35+Math.floor(Math.random()*216)};});
+  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:15+Math.floor(Math.random()*4485)};});
   var total=countries.reduce(function(a,c){return a+c.count;},0);document.getElementById('worldTotal').textContent=total.toLocaleString();
   var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement;
   var W=900,H=560,rot=0,tilt=-.08,dragging=false,lastX=0,lastY=0,points=[],hoverIndex=-1,raf=0;
-  function color(n){var t=Math.max(0,Math.min(1,(n-35)/215));var stops=[[246,183,168],[244,119,98],[231,71,60],[169,16,36]];var p=t*3,i=Math.min(2,Math.floor(p)),f=p-i;var a=stops[i],b=stops[i+1];return 'rgb('+a.map(function(v,j){return Math.round(v+(b[j]-v)*f);}).join(',')+')';}
+  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
+  function color(n){var t=Math.max(0,Math.min(1,(n-15)/4485));var stops=[[246,183,168],[244,119,98],[231,71,60],[169,16,36]];var p=t*3,i=Math.min(2,Math.floor(p)),f=p-i;var a=stops[i],b=stops[i+1];return 'rgb('+a.map(function(v,j){return Math.round(v+(b[j]-v)*f);}).join(',')+')';}
   function xyz(lat,lon){var la=lat*Math.PI/180,lo=lon*Math.PI/180;return {x:Math.cos(la)*Math.sin(lo),y:Math.sin(la),z:Math.cos(la)*Math.cos(lo)};}
   // Build a dense spherical point cloud, then retain points over approximate real-world land silhouettes.
   var landPolys=[ [[-168,72],[-130,70],[-105,55],[-80,50],[-52,25],[-82,7],[-108,20],[-125,38],[-150,55]], [[-81,12],[-50,8],[-35,-10],[-48,-35],[-70,-55],[-79,-25]], [[-11,72],[35,70],[65,55],[40,35],[28,5],[10,-35],[-5,-34],[-18,5],[-10,35]], [[30,72],[70,75],[120,60],[160,55],[180,40],[140,10],[105,0],[75,8],[50,30]], [[112,-11],[154,-12],[153,-39],[130,-45],[113,-28]], [[-25,65],[-13,63],[-18,52],[-30,55]], [[43,-13],[51,-15],[49,-26],[43,-24]], [[-180,68],[-150,65],[-140,55],[-165,52]], [[95,20],[125,18],[140,-5],[120,-10],[105,0]] ];
@@ -15586,22 +15588,26 @@ __UI_SCRIPT__
   function draw(){if(!page.classList.contains('open')){raf=0;return;}if(!dragging)rot+=.0018;ctx.clearRect(0,0,W,H);var r=Math.min(W*.38,H*.43),cx=W*.49,cy=H*.5;
     var glow=ctx.createRadialGradient(cx-r*.25,cy-r*.35,r*.05,cx,cy,r*1.35);glow.addColorStop(0,'rgba(26,119,183,.18)');glow.addColorStop(.7,'rgba(10,65,112,.08)');glow.addColorStop(1,'rgba(8,24,45,0)');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
     ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='rgba(6,22,42,.22)';ctx.fill();ctx.strokeStyle='rgba(72,170,226,.42)';ctx.lineWidth=1;ctx.stroke();
+    // Geographic vector land silhouettes beneath the particle layer.
+    ctx.save();ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.clip();
+    landPolys.forEach(function(poly){var visible=[],allFront=true;poly.forEach(function(pt){var q=project(xyz(pt[1],pt[0]),cx,cy,r);visible.push(q);if(q.z<0)allFront=false;});if(!allFront)return;ctx.beginPath();visible.forEach(function(q,j){if(j===0)ctx.moveTo(q.x,q.y);else ctx.lineTo(q.x,q.y);});ctx.closePath();ctx.fillStyle='rgba(25,105,158,.10)';ctx.fill();ctx.strokeStyle='rgba(83,174,235,.30)';ctx.lineWidth=1;ctx.stroke();});ctx.restore();
     var projected=points.map(function(p){var q=project(p.v,cx,cy,r);q.p=p;return q;}).sort(function(a,b){return a.z-b.z;});
     projected.forEach(function(q){if(q.z<-.12)return;var c=countries[q.p.country],alpha=.22+((q.z+1)/2)*.78;ctx.beginPath();ctx.arc(q.x,q.y,q.p.size*(.65+q.z*.35),0,Math.PI*2);ctx.fillStyle=q.p.land?color(c.count):'rgba(86,177,230,'+(alpha*.35)+')';ctx.globalAlpha=alpha;ctx.fill();ctx.globalAlpha=1;});
     // Glowing country anchors are positioned from each country's real geographic latitude/longitude.
-    countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var rr=2.2+Math.min(4,c.count/80);ctx.beginPath();ctx.arc(q.x,q.y,rr+3,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.globalAlpha=.18;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(q.x,q.y,rr,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.fill();if(i===hoverIndex){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}}
+    countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var rr=2.2+Math.min(4,c.count/900);ctx.beginPath();ctx.arc(q.x,q.y,rr+3,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.globalAlpha=.18;ctx.fill();ctx.globalAlpha=1;ctx.beginPath();ctx.arc(q.x,q.y,rr,0,Math.PI*2);ctx.fillStyle=color(c.count);ctx.fill();if(i===hoverIndex){ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.stroke();}}
     );
     raf=requestAnimationFrame(draw);
   }
-  function renderList(){countries.map(function(c,i){return {c:c,i:i};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;row.innerHTML='<span class="world-flag">'+c.flag+'</span><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';row.addEventListener('mouseenter',function(){selectCountry(i,true);});row.addEventListener('focus',function(){selectCountry(i,true);});row.addEventListener('click',function(){selectCountry(i,true);});list.appendChild(row);});}
-  function selectCountry(i,showTip){hoverIndex=i;list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});if(showTip){var c=countries[i];tip.hidden=false;tip.innerHTML='<strong>'+c.flag+' '+c.name+'</strong><b>'+c.count.toLocaleString()+' online</b><span>Simulated players · geographic coordinates</span>';tip.style.left='12px';tip.style.top='12px';}}
+  function renderList(){countries.map(function(c,i){return {c:c,i:i};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png" loading="lazy"><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';row.addEventListener('mouseenter',function(){selectCountry(i,true);});row.addEventListener('focus',function(){selectCountry(i,true);});row.addEventListener('click',function(){selectCountry(i,true);});list.appendChild(row);});}
+  function positionTip(i){var c=countries[i],rect=canvas.getBoundingClientRect(),r=Math.min(W*.38,H*.43),q=project(xyz(c.lat,c.lon),W*.49,H*.5,r);var stageRect=stage.getBoundingClientRect(),anchorX=rect.left-stageRect.left+q.x,anchorY=rect.top-stageRect.top+q.y;var left=Math.max(8,Math.min(stageRect.width-tip.offsetWidth-8,anchorX+12));var top=Math.max(8,Math.min(stageRect.height-tip.offsetHeight-8,anchorY-tip.offsetHeight/2));tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.toggle('tip-left',left<anchorX-tip.offsetWidth);tip.style.setProperty('--tip-arrow-y',Math.max(12,Math.min(tip.offsetHeight-12,anchorY-top))+'px');}
+  function selectCountry(i,showTip){hoverIndex=i;list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});if(showTip){var c=countries[i];tip.hidden=false;tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';positionTip(i);requestAnimationFrame(function(){positionTip(i);});}}
   function findCountryAt(clientX,clientY){var rect=canvas.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top,r=Math.min(W*.38,H*.43),cx=W*.49,cy=H*.5,best=24,idx=-1;countries.forEach(function(c,i){var q=project(xyz(c.lat,c.lon),cx,cy,r);if(q.z<0)return;var d=Math.hypot(q.x-x,q.y-y);if(d<best){best=d;idx=i;}});return idx;}
   canvas.addEventListener('mousemove',function(e){if(dragging){rot+=(e.clientX-lastX)*.008;tilt=Math.max(-.8,Math.min(.8,tilt+(e.clientY-lastY)*.005));lastX=e.clientX;lastY=e.clientY;return;}var i=findCountryAt(e.clientX,e.clientY);if(i>=0)selectCountry(i,true);else{hoverIndex=-1;tip.hidden=true;}});
   canvas.addEventListener('mousedown',function(e){dragging=true;lastX=e.clientX;lastY=e.clientY;});window.addEventListener('mouseup',function(){dragging=false;});
   canvas.addEventListener('touchstart',function(e){if(e.touches[0]){dragging=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;}},{passive:true});canvas.addEventListener('touchend',function(){dragging=false;});
   function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';resize();if(!raf)raf=requestAnimationFrame(draw);}
   function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';tip.hidden=true;if(raf){cancelAnimationFrame(raf);raf=0;}}
-  renderList();openBtn.addEventListener('click',show);closeBtn.addEventListener('click',hide);page.addEventListener('click',function(e){if(e.target===page)hide();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
+  renderList();openBtn.addEventListener('click',show);document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
 })();
 </script>
 
