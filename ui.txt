@@ -63,6 +63,16 @@
     radial-gradient(46% 42% at 8% 92%,rgba(34,211,238,.16),transparent 70%);
   --lg-sp:cubic-bezier(.32,.72,0,1);
 }
+/* 主题切换动画：切换瞬间临时给全局加过渡，颜色平滑渐变（尊重「减少动态效果」） */
+html.ui-theme-anim,html.ui-theme-anim *,html.ui-theme-anim *::before,html.ui-theme-anim *::after{
+  transition:background-color .45s cubic-bezier(.4,0,.2,1),color .45s cubic-bezier(.4,0,.2,1),
+    border-color .45s cubic-bezier(.4,0,.2,1),fill .45s cubic-bezier(.4,0,.2,1),
+    stroke .45s cubic-bezier(.4,0,.2,1),box-shadow .45s cubic-bezier(.4,0,.2,1),
+    outline-color .45s cubic-bezier(.4,0,.2,1),opacity .3s ease !important;
+}
+@media (prefers-reduced-motion:reduce){
+  html.ui-theme-anim,html.ui-theme-anim *,html.ui-theme-anim *::before,html.ui-theme-anim *::after{transition:none !important}
+}
 #===UI_CSS
 
 :root{
@@ -2545,9 +2555,21 @@ function uiApplyDynamic(spec){
   var hero = document.getElementById('hero');
   if (hero) { hero.setAttribute('data-deco', spec.deco || 'none'); }
 }
+var uiThemeAnimTimer = null;
+function uiThemeAnimate(){
+  var root = document.documentElement;
+  try { if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { return; } } catch (e) {}
+  root.classList.add('ui-theme-anim');
+  clearTimeout(uiThemeAnimTimer);
+  uiThemeAnimTimer = setTimeout(function(){ root.classList.remove('ui-theme-anim'); }, 560);
+}
 function uiApplyTheme(theme, persist){
   uiState.theme = theme;
   var spec = uiActiveSpec(theme);
+  /* 只有主题真的变了才播放动画；首次加载和重复应用同一主题都不播 */
+  var animKey = theme + '|' + spec.base;
+  if (uiState.themeKey && uiState.themeKey !== animKey) { uiThemeAnimate(); }
+  uiState.themeKey = animKey;
   document.documentElement.setAttribute('data-theme', spec.base);
   var custom = uiFindCustom(theme);
   uiThemeNode().textContent = (custom || (theme !== 'light' && theme !== 'dark'))
