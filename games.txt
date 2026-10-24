@@ -110,7 +110,7 @@ cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/57
 cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/578080/01dfa3ae5449218b17d6d04229dfed681fc377db/ss_01dfa3ae5449218b17d6d04229dfed681fc377db.1920x1080.jpg?t=1786493086
 cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/578080/d874034ce52876c300ce9a97aaee57497347b6ab/ss_d874034ce52876c300ce9a97aaee57497347b6ab.1920x1080.jpg?t=1786493086
 process  = TslGame.exe
-runmode  = dll
+runmode  = exe
 download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_pubg.zip
 dev      = KRAFTON
 pub      = KRAFTON
