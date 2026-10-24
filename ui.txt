@@ -6382,24 +6382,24 @@ bgfxApply();
 
 <div id="worldOnlinePage" class="world-online-page" aria-hidden="true">
   <header class="world-online-head" onmousedown="if(event.button===0 && !event.target.closest('button')){window.uiDrag&&window.uiDrag(event)}">
-    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong>WORLD ACTIVITY</strong><small>Global player distribution</small></div></div>
-    <div class="world-total-wrap"><span>ONLINE NOW</span><strong id="worldTotal">—</strong></div>
+    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong data-ui="worldTitle">WORLD ACTIVITY</strong><small data-ui="worldSub">Global player distribution</small></div></div>
+    <div class="world-total-wrap"><span data-ui="worldOnlineNow">ONLINE NOW</span><strong id="worldTotal">—</strong></div>
   </header>
   <div class="world-content">
     <section class="world-map-panel">
-      <div class="world-map-caption"><span>GLOBAL NETWORK</span><span class="world-map-hint">Drag to rotate · hover a marker</span></div>
+      <div class="world-map-caption"><span data-ui="worldNetwork">GLOBAL NETWORK</span><span class="world-map-hint" data-ui="worldHint">Drag to rotate · hover a marker</span></div>
       <div class="world-map-stage">
         <canvas id="worldGlobeCanvas" aria-label="Interactive 3D particle globe showing simulated online players by country" role="img"></canvas>
         <div id="worldCountryTip" class="world-country-tip" hidden></div>
       </div>
-      <div class="world-legend"><span>FEWER PLAYERS</span><i class="legend-low"></i><i class="legend-mid"></i><i class="legend-high"></i><i class="legend-hot"></i><span>MORE PLAYERS</span></div>
+      <div class="world-legend"><span data-ui="worldFewer">FEWER PLAYERS</span><i class="legend-low"></i><i class="legend-mid"></i><i class="legend-high"></i><i class="legend-hot"></i><span data-ui="worldMore">MORE PLAYERS</span></div>
     </section>
     <aside class="world-side-panel">
-      <div class="world-side-title"><span>REGIONAL ACTIVITY</span></div>
+      <div class="world-side-title"><span data-ui="worldRegional">REGIONAL ACTIVITY</span></div>
       <div id="worldCountryList" class="world-country-list"></div>
     </aside>
   </div>
-  <footer class="world-foot"><span class="world-esc-key"><kbd>ESC</kbd><span>返回</span></span></footer>
+  <footer class="world-foot"><button type="button" class="world-esc-key" id="worldBackBtn"><kbd>ESC</kbd><span data-ui="worldBack">Back</span></button></footer>
 </div>
 <style>
 .world-online-page{position:fixed;inset:0;z-index:2147483200;display:none;flex-direction:column;background:var(--bg,#0a0a0c);color:var(--text,#f4f4f5);font-family:var(--font,Inter,sans-serif);overflow:hidden}
@@ -6431,13 +6431,35 @@ bgfxApply();
 .world-country-list{overflow:auto;padding:6px 10px;flex:1}.world-country-row{display:flex;align-items:center;gap:10px;padding:10px 7px;border-bottom:1px solid var(--border);border-radius:8px;cursor:pointer}.world-country-row:hover,.world-country-row.active{background:var(--surface-2)}
 .world-flag{width:26px;height:18px;object-fit:cover;border-radius:3px;flex:0 0 26px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}.world-country-name{flex:1;min-width:0;font-size:12px;font-weight:600}.world-country-name small{display:block;font-size:10px;color:var(--text-3);font-weight:400;margin-top:2px}.world-country-count{font:600 12px var(--font-mono,monospace);text-align:right}.world-country-count small{display:block;font:10px var(--font, sans-serif);color:var(--text-3);margin-top:2px}
 .world-disclaimer{display:none!important}
-.world-foot{height:42px;flex-shrink:0;padding:0 26px;display:flex;align-items:center;justify-content:flex-end;color:var(--text-3);font-size:11px;background:transparent;border:0}.world-esc-key{display:flex;align-items:center;gap:8px}.world-esc-key kbd{padding:4px 8px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface-2);color:var(--text-2);font:600 10px var(--font-mono,monospace);box-shadow:0 2px 0 var(--border)}
-@media(max-width:760px){.world-online-head{height:64px;padding:0 14px;gap:10px}.world-brand{min-width:0}.world-brand small{display:none}.world-total-wrap{gap:5px}.world-total-wrap strong{font-size:17px}.world-content{grid-template-columns:1fr;padding:10px;gap:12px}.world-map-stage{height:auto;min-height:310px}#worldGlobeCanvas{min-height:300px;max-height:50vh}.world-side-panel{max-height:340px}.world-map-hint{display:none}.world-foot{padding:0 14px}}
+.world-foot{height:56px;flex-shrink:0;width:100%;max-width:1800px;margin:0 auto;box-sizing:border-box;padding:0 clamp(14px,3vw,42px) 6px;display:flex;align-items:center;justify-content:flex-start;color:var(--text-3);font-size:11px;background:transparent;border:0}.world-esc-key{display:flex;align-items:center;gap:10px;padding:6px 10px 6px 6px;margin-left:-6px;border:0;border-radius:10px;background:transparent;color:inherit;font:inherit;cursor:pointer;transition:background var(--tr-fast),color var(--tr-fast)}.world-esc-key:hover{background:var(--surface-2);color:var(--text-2)}.world-esc-key kbd{padding:4px 8px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface-2);color:var(--text-2);font:600 10px var(--font-mono,monospace);box-shadow:0 2px 0 var(--border)}
+@media(max-width:760px){.world-online-head{height:64px;padding:0 14px;gap:10px}.world-brand{min-width:0}.world-brand small{display:none}.world-total-wrap{gap:5px}.world-total-wrap strong{font-size:17px}.world-content{grid-template-columns:1fr;padding:10px;gap:12px}.world-map-stage{height:auto;min-height:310px}#worldGlobeCanvas{min-height:300px;max-height:50vh}.world-side-panel{max-height:340px}.world-map-hint{display:none}.world-foot{padding:0 14px 6px}}
+
+.world-tip-title{margin:0}
+.world-you{display:inline-block;margin-left:auto;padding:2px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent-2);font:700 9px var(--font,sans-serif);font-style:normal;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap}
+.world-country-name .world-you{margin-left:7px;vertical-align:1px}
+.world-country-tip b small{display:inline;margin-left:5px;font:600 11px var(--font,sans-serif);color:var(--text-3)}
+.world-country-tip b i{font-style:normal}
+.world-country-name b{font-weight:600}
+.world-country-count i{font-style:normal}
+.world-country-count i.up{animation:worldUp 1s ease-out}.world-country-count i.dn{animation:worldDn 1s ease-out}
+@keyframes worldUp{0%{color:var(--ok,#10b981);text-shadow:0 0 8px var(--ok,#10b981)}100%{color:inherit;text-shadow:none}}
+@keyframes worldDn{0%{color:var(--err,#ef4444);text-shadow:0 0 8px var(--err,#ef4444)}100%{color:inherit;text-shadow:none}}
 </style>
 <script>
 (function(){
   var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage');
   if(!openBtn||!page||page.dataset.globeReady)return; page.dataset.globeReady='1';
+  /* ───────── 多语言：全部写进 UI_T（8 种内置语言），自定义翻译编辑器会自动列出这些键；自定义语言缺失的键回落到英文 ───────── */
+  var WT={"en":{"worldTitle":"WORLD ACTIVITY","worldSub":"Global player distribution","worldOnlineNow":"ONLINE NOW","worldNetwork":"GLOBAL NETWORK","worldHint":"Drag to rotate · hover a marker","worldFewer":"FEWER PLAYERS","worldMore":"MORE PLAYERS","worldRegional":"REGIONAL ACTIVITY","worldBack":"Back","worldPlayers":"players","worldOnline":"online","worldYou":"You","worldYouHere":"Your location","worldRegion":"Geographic region","worldBtnTitle":"World online players","worldAria":"Interactive 3D particle globe showing online players by country","cn_us":"United States","cn_ca":"Canada","cn_mx":"Mexico","cn_gt":"Guatemala","cn_cu":"Cuba","cn_pa":"Panama","cn_cr":"Costa Rica","cn_jm":"Jamaica","cn_ht":"Haiti","cn_do":"Dominican Republic","cn_co":"Colombia","cn_ve":"Venezuela","cn_ec":"Ecuador","cn_pe":"Peru","cn_bo":"Bolivia","cn_cl":"Chile","cn_ar":"Argentina","cn_uy":"Uruguay","cn_py":"Paraguay","cn_br":"Brazil","cn_is":"Iceland","cn_ie":"Ireland","cn_gb":"United Kingdom","cn_pt":"Portugal","cn_es":"Spain","cn_fr":"France","cn_be":"Belgium","cn_nl":"Netherlands","cn_de":"Germany","cn_ch":"Switzerland","cn_it":"Italy","cn_no":"Norway","cn_se":"Sweden","cn_fi":"Finland","cn_dk":"Denmark","cn_pl":"Poland","cn_cz":"Czechia","cn_at":"Austria","cn_hu":"Hungary","cn_ro":"Romania","cn_gr":"Greece","cn_ua":"Ukraine","cn_tr":"Türkiye","cn_ru":"Russia","cn_ma":"Morocco","cn_dz":"Algeria","cn_tn":"Tunisia","cn_ly":"Libya","cn_eg":"Egypt","cn_sn":"Senegal","cn_gh":"Ghana","cn_ng":"Nigeria","cn_cm":"Cameroon","cn_et":"Ethiopia","cn_ke":"Kenya","cn_ug":"Uganda","cn_tz":"Tanzania","cn_cd":"Democratic Republic of the Congo","cn_ao":"Angola","cn_zm":"Zambia","cn_zw":"Zimbabwe","cn_mz":"Mozambique","cn_na":"Namibia","cn_za":"South Africa","cn_mg":"Madagascar","cn_sa":"Saudi Arabia","cn_il":"Israel","cn_jo":"Jordan","cn_iq":"Iraq","cn_ir":"Iran","cn_kz":"Kazakhstan","cn_uz":"Uzbekistan","cn_pk":"Pakistan","cn_in":"India","cn_np":"Nepal","cn_bd":"Bangladesh","cn_lk":"Sri Lanka","cn_mm":"Myanmar","cn_th":"Thailand","cn_vn":"Vietnam","cn_kh":"Cambodia","cn_my":"Malaysia","cn_sg":"Singapore","cn_id":"Indonesia","cn_ph":"Philippines","cn_cn":"China","cn_mn":"Mongolia","cn_kp":"North Korea","cn_kr":"South Korea","cn_jp":"Japan","cn_tw":"Taiwan","cn_af":"Afghanistan","cn_ae":"United Arab Emirates","cn_qa":"Qatar","cn_kw":"Kuwait","cn_om":"Oman","cn_au":"Australia","cn_nz":"New Zealand","cn_pg":"Papua New Guinea","cn_fj":"Fiji","cn_al":"Albania","cn_ba":"Bosnia and Herzegovina","cn_hr":"Croatia","cn_rs":"Serbia","cn_bg":"Bulgaria","cn_sk":"Slovakia","cn_si":"Slovenia","cn_ee":"Estonia","cn_lv":"Latvia","cn_lt":"Lithuania","cn_by":"Belarus","cn_md":"Moldova","cn_lu":"Luxembourg","cn_mt":"Malta","cn_cy":"Cyprus","cn_ad":"Andorra","cn_am":"Armenia","cn_ge":"Georgia","cn_az":"Azerbaijan","cn_kg":"Kyrgyzstan","cn_tj":"Tajikistan","cn_tm":"Turkmenistan","cn_ye":"Yemen","cn_sy":"Syria","cn_lb":"Lebanon","cn_ps":"Palestine","cn_bh":"Bahrain","cn_bn":"Brunei","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Bhutan","cn_mv":"Maldives","cn_mr":"Mauritania","cn_ml":"Mali","cn_bf":"Burkina Faso","cn_ci":"Ivory Coast","cn_lr":"Liberia","cn_sl":"Sierra Leone","cn_gn":"Guinea","cn_gw":"Guinea-Bissau","cn_gm":"Gambia","cn_tg":"Togo","cn_bj":"Benin","cn_ne":"Niger","cn_td":"Chad","cn_sd":"Sudan","cn_ss":"South Sudan","cn_so":"Somalia","cn_er":"Eritrea","cn_dj":"Djibouti","cn_cf":"Central African Republic","cn_cg":"Republic of the Congo","cn_ga":"Gabon","cn_gq":"Equatorial Guinea","cn_rw":"Rwanda","cn_bi":"Burundi","cn_mw":"Malawi","cn_bw":"Botswana","cn_ls":"Lesotho","cn_sz":"Eswatini","cn_mu":"Mauritius","cn_sc":"Seychelles","cn_km":"Comoros","cn_cv":"Cape Verde","cn_st":"Sao Tome and Principe","cn_bs":"Bahamas","cn_bz":"Belize","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nicaragua","cn_tt":"Trinidad and Tobago","cn_bb":"Barbados","cn_gy":"Guyana","cn_sr":"Suriname","cn_gd":"Grenada","cn_ag":"Antigua and Barbuda","cn_dm":"Dominica","cn_lc":"Saint Lucia","cn_vc":"Saint Vincent and the Grenadines","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Solomon Islands","cn_ki":"Kiribati","cn_tv":"Tuvalu","cn_mh":"Marshall Islands","cn_fm":"Micronesia","cn_pw":"Palau","cn_nr":"Nauru","cn_ck":"Cook Islands","cn_nu":"Niue","cn_mc":"Monaco","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Montenegro","cn_mk":"North Macedonia","cn_xk":"Kosovo"},"zh":{"worldTitle":"世界活跃度","worldSub":"全球玩家分布","worldOnlineNow":"当前在线","worldNetwork":"全球网络","worldHint":"拖动旋转 · 悬停标记查看","worldFewer":"人数较少","worldMore":"人数较多","worldRegional":"地区活跃度","worldBack":"返回","worldPlayers":"玩家","worldOnline":"在线","worldYou":"你","worldYouHere":"你的位置","worldRegion":"地理区域","worldBtnTitle":"世界在线玩家","worldAria":"按国家显示在线玩家的可交互 3D 粒子地球","cn_us":"美国","cn_ca":"加拿大","cn_mx":"墨西哥","cn_gt":"危地马拉","cn_cu":"古巴","cn_pa":"巴拿马","cn_cr":"哥斯达黎加","cn_jm":"牙买加","cn_ht":"海地","cn_do":"多米尼加共和国","cn_co":"哥伦比亚","cn_ve":"委内瑞拉","cn_ec":"厄瓜多尔","cn_pe":"秘鲁","cn_bo":"玻利维亚","cn_cl":"智利","cn_ar":"阿根廷","cn_uy":"乌拉圭","cn_py":"巴拉圭","cn_br":"巴西","cn_is":"冰岛","cn_ie":"爱尔兰","cn_gb":"英国","cn_pt":"葡萄牙","cn_es":"西班牙","cn_fr":"法国","cn_be":"比利时","cn_nl":"荷兰","cn_de":"德国","cn_ch":"瑞士","cn_it":"意大利","cn_no":"挪威","cn_se":"瑞典","cn_fi":"芬兰","cn_dk":"丹麦","cn_pl":"波兰","cn_cz":"捷克","cn_at":"奥地利","cn_hu":"匈牙利","cn_ro":"罗马尼亚","cn_gr":"希腊","cn_ua":"乌克兰","cn_tr":"土耳其","cn_ru":"俄罗斯","cn_ma":"摩洛哥","cn_dz":"阿尔及利亚","cn_tn":"突尼斯","cn_ly":"利比亚","cn_eg":"埃及","cn_sn":"塞内加尔","cn_gh":"加纳","cn_ng":"尼日利亚","cn_cm":"喀麦隆","cn_et":"埃塞俄比亚","cn_ke":"肯尼亚","cn_ug":"乌干达","cn_tz":"坦桑尼亚","cn_cd":"刚果（金）","cn_ao":"安哥拉","cn_zm":"赞比亚","cn_zw":"津巴布韦","cn_mz":"莫桑比克","cn_na":"纳米比亚","cn_za":"南非","cn_mg":"马达加斯加","cn_sa":"沙特阿拉伯","cn_il":"以色列","cn_jo":"约旦","cn_iq":"伊拉克","cn_ir":"伊朗","cn_kz":"哈萨克斯坦","cn_uz":"乌兹别克斯坦","cn_pk":"巴基斯坦","cn_in":"印度","cn_np":"尼泊尔","cn_bd":"孟加拉国","cn_lk":"斯里兰卡","cn_mm":"缅甸","cn_th":"泰国","cn_vn":"越南","cn_kh":"柬埔寨","cn_my":"马来西亚","cn_sg":"新加坡","cn_id":"印度尼西亚","cn_ph":"菲律宾","cn_cn":"中国","cn_mn":"蒙古","cn_kp":"朝鲜","cn_kr":"韩国","cn_jp":"日本","cn_tw":"台湾","cn_af":"阿富汗","cn_ae":"阿拉伯联合酋长国","cn_qa":"卡塔尔","cn_kw":"科威特","cn_om":"阿曼","cn_au":"澳大利亚","cn_nz":"新西兰","cn_pg":"巴布亚新几内亚","cn_fj":"斐济","cn_al":"阿尔巴尼亚","cn_ba":"波斯尼亚和黑塞哥维那","cn_hr":"克罗地亚","cn_rs":"塞尔维亚","cn_bg":"保加利亚","cn_sk":"斯洛伐克","cn_si":"斯洛文尼亚","cn_ee":"爱沙尼亚","cn_lv":"拉脱维亚","cn_lt":"立陶宛","cn_by":"白俄罗斯","cn_md":"摩尔多瓦","cn_lu":"卢森堡","cn_mt":"马耳他","cn_cy":"塞浦路斯","cn_ad":"安道尔","cn_am":"亚美尼亚","cn_ge":"格鲁吉亚","cn_az":"阿塞拜疆","cn_kg":"吉尔吉斯斯坦","cn_tj":"塔吉克斯坦","cn_tm":"土库曼斯坦","cn_ye":"也门","cn_sy":"叙利亚","cn_lb":"黎巴嫩","cn_ps":"巴勒斯坦领土","cn_bh":"巴林","cn_bn":"文莱","cn_la":"老挝","cn_tl":"东帝汶","cn_bt":"不丹","cn_mv":"马尔代夫","cn_mr":"毛里塔尼亚","cn_ml":"马里","cn_bf":"布基纳法索","cn_ci":"科特迪瓦","cn_lr":"利比里亚","cn_sl":"塞拉利昂","cn_gn":"几内亚","cn_gw":"几内亚比绍","cn_gm":"冈比亚","cn_tg":"多哥","cn_bj":"贝宁","cn_ne":"尼日尔","cn_td":"乍得","cn_sd":"苏丹","cn_ss":"南苏丹","cn_so":"索马里","cn_er":"厄立特里亚","cn_dj":"吉布提","cn_cf":"中非共和国","cn_cg":"刚果（布）","cn_ga":"加蓬","cn_gq":"赤道几内亚","cn_rw":"卢旺达","cn_bi":"布隆迪","cn_mw":"马拉维","cn_bw":"博茨瓦纳","cn_ls":"莱索托","cn_sz":"斯威士兰","cn_mu":"毛里求斯","cn_sc":"塞舌尔","cn_km":"科摩罗","cn_cv":"佛得角","cn_st":"圣多美和普林西比","cn_bs":"巴哈马","cn_bz":"伯利兹","cn_hn":"洪都拉斯","cn_sv":"萨尔瓦多","cn_ni":"尼加拉瓜","cn_tt":"特立尼达和多巴哥","cn_bb":"巴巴多斯","cn_gy":"圭亚那","cn_sr":"苏里南","cn_gd":"格林纳达","cn_ag":"安提瓜和巴布达","cn_dm":"多米尼克","cn_lc":"圣卢西亚","cn_vc":"圣文森特和格林纳丁斯","cn_ws":"萨摩亚","cn_to":"汤加","cn_vu":"瓦努阿图","cn_sb":"所罗门群岛","cn_ki":"基里巴斯","cn_tv":"图瓦卢","cn_mh":"马绍尔群岛","cn_fm":"密克罗尼西亚","cn_pw":"帕劳","cn_nr":"瑙鲁","cn_ck":"库克群岛","cn_nu":"纽埃","cn_mc":"摩纳哥","cn_sm":"圣马力诺","cn_li":"列支敦士登","cn_me":"黑山","cn_mk":"北马其顿","cn_xk":"科索沃"},"ru":{"worldTitle":"АКТИВНОСТЬ В МИРЕ","worldSub":"Распределение игроков по миру","worldOnlineNow":"СЕЙЧАС ОНЛАЙН","worldNetwork":"ГЛОБАЛЬНАЯ СЕТЬ","worldHint":"Вращайте мышью · наведите на маркер","worldFewer":"МЕНЬШЕ ИГРОКОВ","worldMore":"БОЛЬШЕ ИГРОКОВ","worldRegional":"АКТИВНОСТЬ ПО РЕГИОНАМ","worldBack":"Назад","worldPlayers":"игроков","worldOnline":"онлайн","worldYou":"Вы","worldYouHere":"Ваше местоположение","worldRegion":"Географический регион","worldBtnTitle":"Игроки онлайн в мире","worldAria":"Интерактивный 3D-глобус из частиц с игроками онлайн по странам","cn_us":"Соединенные Штаты","cn_ca":"Канада","cn_mx":"Мексика","cn_gt":"Гватемала","cn_cu":"Куба","cn_pa":"Панама","cn_cr":"Коста-Рика","cn_jm":"Ямайка","cn_ht":"Гаити","cn_do":"Доминиканская Республика","cn_co":"Колумбия","cn_ve":"Венесуэла","cn_ec":"Эквадор","cn_pe":"Перу","cn_bo":"Боливия","cn_cl":"Чили","cn_ar":"Аргентина","cn_uy":"Уругвай","cn_py":"Парагвай","cn_br":"Бразилия","cn_is":"Исландия","cn_ie":"Ирландия","cn_gb":"Великобритания","cn_pt":"Португалия","cn_es":"Испания","cn_fr":"Франция","cn_be":"Бельгия","cn_nl":"Нидерланды","cn_de":"Германия","cn_ch":"Швейцария","cn_it":"Италия","cn_no":"Норвегия","cn_se":"Швеция","cn_fi":"Финляндия","cn_dk":"Дания","cn_pl":"Польша","cn_cz":"Чехия","cn_at":"Австрия","cn_hu":"Венгрия","cn_ro":"Румыния","cn_gr":"Греция","cn_ua":"Украина","cn_tr":"Турция","cn_ru":"Россия","cn_ma":"Марокко","cn_dz":"Алжир","cn_tn":"Тунис","cn_ly":"Ливия","cn_eg":"Египет","cn_sn":"Сенегал","cn_gh":"Гана","cn_ng":"Нигерия","cn_cm":"Камерун","cn_et":"Эфиопия","cn_ke":"Кения","cn_ug":"Уганда","cn_tz":"Танзания","cn_cd":"Конго - Киншаса","cn_ao":"Ангола","cn_zm":"Замбия","cn_zw":"Зимбабве","cn_mz":"Мозамбик","cn_na":"Намибия","cn_za":"Южно-Африканская Республика","cn_mg":"Мадагаскар","cn_sa":"Саудовская Аравия","cn_il":"Израиль","cn_jo":"Иордания","cn_iq":"Ирак","cn_ir":"Иран","cn_kz":"Казахстан","cn_uz":"Узбекистан","cn_pk":"Пакистан","cn_in":"Индия","cn_np":"Непал","cn_bd":"Бангладеш","cn_lk":"Шри-Ланка","cn_mm":"Мьянма (Бирма)","cn_th":"Таиланд","cn_vn":"Вьетнам","cn_kh":"Камбоджа","cn_my":"Малайзия","cn_sg":"Сингапур","cn_id":"Индонезия","cn_ph":"Филиппины","cn_cn":"Китай","cn_mn":"Монголия","cn_kp":"КНДР","cn_kr":"Республика Корея","cn_jp":"Япония","cn_tw":"Тайвань","cn_af":"Афганистан","cn_ae":"ОАЭ","cn_qa":"Катар","cn_kw":"Кувейт","cn_om":"Оман","cn_au":"Австралия","cn_nz":"Новая Зеландия","cn_pg":"Папуа — Новая Гвинея","cn_fj":"Фиджи","cn_al":"Албания","cn_ba":"Босния и Герцеговина","cn_hr":"Хорватия","cn_rs":"Сербия","cn_bg":"Болгария","cn_sk":"Словакия","cn_si":"Словения","cn_ee":"Эстония","cn_lv":"Латвия","cn_lt":"Литва","cn_by":"Беларусь","cn_md":"Молдова","cn_lu":"Люксембург","cn_mt":"Мальта","cn_cy":"Кипр","cn_ad":"Андорра","cn_am":"Армения","cn_ge":"Грузия","cn_az":"Азербайджан","cn_kg":"Киргизия","cn_tj":"Таджикистан","cn_tm":"Туркменистан","cn_ye":"Йемен","cn_sy":"Сирия","cn_lb":"Ливан","cn_ps":"Палестинские территории","cn_bh":"Бахрейн","cn_bn":"Бруней","cn_la":"Лаос","cn_tl":"Восточный Тимор","cn_bt":"Бутан","cn_mv":"Мальдивы","cn_mr":"Мавритания","cn_ml":"Мали","cn_bf":"Буркина-Фасо","cn_ci":"Кот-д’Ивуар","cn_lr":"Либерия","cn_sl":"Сьерра-Леоне","cn_gn":"Гвинея","cn_gw":"Гвинея-Бисау","cn_gm":"Гамбия","cn_tg":"Того","cn_bj":"Бенин","cn_ne":"Нигер","cn_td":"Чад","cn_sd":"Судан","cn_ss":"Южный Судан","cn_so":"Сомали","cn_er":"Эритрея","cn_dj":"Джибути","cn_cf":"Центрально-Африканская Республика","cn_cg":"Конго - Браззавиль","cn_ga":"Габон","cn_gq":"Экваториальная Гвинея","cn_rw":"Руанда","cn_bi":"Бурунди","cn_mw":"Малави","cn_bw":"Ботсвана","cn_ls":"Лесото","cn_sz":"Эсватини","cn_mu":"Маврикий","cn_sc":"Сейшельские о-ва","cn_km":"Коморы","cn_cv":"Кабо-Верде","cn_st":"Сан-Томе и Принсипи","cn_bs":"Багамы","cn_bz":"Белиз","cn_hn":"Гондурас","cn_sv":"Сальвадор","cn_ni":"Никарагуа","cn_tt":"Тринидад и Тобаго","cn_bb":"Барбадос","cn_gy":"Гайана","cn_sr":"Суринам","cn_gd":"Гренада","cn_ag":"Антигуа и Барбуда","cn_dm":"Доминика","cn_lc":"Сент-Люсия","cn_vc":"Сент-Винсент и Гренадины","cn_ws":"Самоа","cn_to":"Тонга","cn_vu":"Вануату","cn_sb":"Соломоновы о-ва","cn_ki":"Кирибати","cn_tv":"Тувалу","cn_mh":"Маршалловы о-ва","cn_fm":"Федеративные Штаты Микронезии","cn_pw":"Палау","cn_nr":"Науру","cn_ck":"о-ва Кука","cn_nu":"Ниуэ","cn_mc":"Монако","cn_sm":"Сан-Марино","cn_li":"Лихтенштейн","cn_me":"Черногория","cn_mk":"Северная Македония","cn_xk":"Косово"},"de":{"worldTitle":"WELTWEITE AKTIVITÄT","worldSub":"Globale Spielerverteilung","worldOnlineNow":"JETZT ONLINE","worldNetwork":"GLOBALES NETZWERK","worldHint":"Zum Drehen ziehen · Marker anfahren","worldFewer":"WENIGER SPIELER","worldMore":"MEHR SPIELER","worldRegional":"REGIONALE AKTIVITÄT","worldBack":"Zurück","worldPlayers":"Spieler","worldOnline":"online","worldYou":"Du","worldYouHere":"Dein Standort","worldRegion":"Geografische Region","worldBtnTitle":"Spieler weltweit online","worldAria":"Interaktiver 3D-Partikelglobus mit Online-Spielern nach Land","cn_us":"Vereinigte Staaten","cn_ca":"Kanada","cn_mx":"Mexiko","cn_gt":"Guatemala","cn_cu":"Kuba","cn_pa":"Panama","cn_cr":"Costa Rica","cn_jm":"Jamaika","cn_ht":"Haiti","cn_do":"Dominikanische Republik","cn_co":"Kolumbien","cn_ve":"Venezuela","cn_ec":"Ecuador","cn_pe":"Peru","cn_bo":"Bolivien","cn_cl":"Chile","cn_ar":"Argentinien","cn_uy":"Uruguay","cn_py":"Paraguay","cn_br":"Brasilien","cn_is":"Island","cn_ie":"Irland","cn_gb":"Vereinigtes Königreich","cn_pt":"Portugal","cn_es":"Spanien","cn_fr":"Frankreich","cn_be":"Belgien","cn_nl":"Niederlande","cn_de":"Deutschland","cn_ch":"Schweiz","cn_it":"Italien","cn_no":"Norwegen","cn_se":"Schweden","cn_fi":"Finnland","cn_dk":"Dänemark","cn_pl":"Polen","cn_cz":"Tschechien","cn_at":"Österreich","cn_hu":"Ungarn","cn_ro":"Rumänien","cn_gr":"Griechenland","cn_ua":"Ukraine","cn_tr":"Türkei","cn_ru":"Russland","cn_ma":"Marokko","cn_dz":"Algerien","cn_tn":"Tunesien","cn_ly":"Libyen","cn_eg":"Ägypten","cn_sn":"Senegal","cn_gh":"Ghana","cn_ng":"Nigeria","cn_cm":"Kamerun","cn_et":"Äthiopien","cn_ke":"Kenia","cn_ug":"Uganda","cn_tz":"Tansania","cn_cd":"Kongo-Kinshasa","cn_ao":"Angola","cn_zm":"Sambia","cn_zw":"Simbabwe","cn_mz":"Mosambik","cn_na":"Namibia","cn_za":"Südafrika","cn_mg":"Madagaskar","cn_sa":"Saudi-Arabien","cn_il":"Israel","cn_jo":"Jordanien","cn_iq":"Irak","cn_ir":"Iran","cn_kz":"Kasachstan","cn_uz":"Usbekistan","cn_pk":"Pakistan","cn_in":"Indien","cn_np":"Nepal","cn_bd":"Bangladesch","cn_lk":"Sri Lanka","cn_mm":"Myanmar","cn_th":"Thailand","cn_vn":"Vietnam","cn_kh":"Kambodscha","cn_my":"Malaysia","cn_sg":"Singapur","cn_id":"Indonesien","cn_ph":"Philippinen","cn_cn":"China","cn_mn":"Mongolei","cn_kp":"Nordkorea","cn_kr":"Südkorea","cn_jp":"Japan","cn_tw":"Taiwan","cn_af":"Afghanistan","cn_ae":"Vereinigte Arabische Emirate","cn_qa":"Katar","cn_kw":"Kuwait","cn_om":"Oman","cn_au":"Australien","cn_nz":"Neuseeland","cn_pg":"Papua-Neuguinea","cn_fj":"Fidschi","cn_al":"Albanien","cn_ba":"Bosnien und Herzegowina","cn_hr":"Kroatien","cn_rs":"Serbien","cn_bg":"Bulgarien","cn_sk":"Slowakei","cn_si":"Slowenien","cn_ee":"Estland","cn_lv":"Lettland","cn_lt":"Litauen","cn_by":"Belarus","cn_md":"Republik Moldau","cn_lu":"Luxemburg","cn_mt":"Malta","cn_cy":"Zypern","cn_ad":"Andorra","cn_am":"Armenien","cn_ge":"Georgien","cn_az":"Aserbaidschan","cn_kg":"Kirgisistan","cn_tj":"Tadschikistan","cn_tm":"Turkmenistan","cn_ye":"Jemen","cn_sy":"Syrien","cn_lb":"Libanon","cn_ps":"Palästinensische Autonomiegebiete","cn_bh":"Bahrain","cn_bn":"Brunei Darussalam","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Bhutan","cn_mv":"Malediven","cn_mr":"Mauretanien","cn_ml":"Mali","cn_bf":"Burkina Faso","cn_ci":"Côte d’Ivoire","cn_lr":"Liberia","cn_sl":"Sierra Leone","cn_gn":"Guinea","cn_gw":"Guinea-Bissau","cn_gm":"Gambia","cn_tg":"Togo","cn_bj":"Benin","cn_ne":"Niger","cn_td":"Tschad","cn_sd":"Sudan","cn_ss":"Südsudan","cn_so":"Somalia","cn_er":"Eritrea","cn_dj":"Dschibuti","cn_cf":"Zentralafrikanische Republik","cn_cg":"Kongo-Brazzaville","cn_ga":"Gabun","cn_gq":"Äquatorialguinea","cn_rw":"Ruanda","cn_bi":"Burundi","cn_mw":"Malawi","cn_bw":"Botsuana","cn_ls":"Lesotho","cn_sz":"Eswatini","cn_mu":"Mauritius","cn_sc":"Seychellen","cn_km":"Komoren","cn_cv":"Cabo Verde","cn_st":"São Tomé und Príncipe","cn_bs":"Bahamas","cn_bz":"Belize","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nicaragua","cn_tt":"Trinidad und Tobago","cn_bb":"Barbados","cn_gy":"Guyana","cn_sr":"Suriname","cn_gd":"Grenada","cn_ag":"Antigua und Barbuda","cn_dm":"Dominica","cn_lc":"St. Lucia","cn_vc":"St. Vincent und die Grenadinen","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Salomonen","cn_ki":"Kiribati","cn_tv":"Tuvalu","cn_mh":"Marshallinseln","cn_fm":"Mikronesien","cn_pw":"Palau","cn_nr":"Nauru","cn_ck":"Cookinseln","cn_nu":"Niue","cn_mc":"Monaco","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Montenegro","cn_mk":"Nordmazedonien","cn_xk":"Kosovo"},"ja":{"worldTitle":"ワールドアクティビティ","worldSub":"世界のプレイヤー分布","worldOnlineNow":"現在オンライン","worldNetwork":"グローバルネットワーク","worldHint":"ドラッグで回転 · マーカーにホバー","worldFewer":"プレイヤー少","worldMore":"プレイヤー多","worldRegional":"地域別アクティビティ","worldBack":"戻る","worldPlayers":"人","worldOnline":"オンライン","worldYou":"あなた","worldYouHere":"現在地","worldRegion":"地理的地域","worldBtnTitle":"世界のオンラインプレイヤー","worldAria":"国別のオンラインプレイヤーを表示するインタラクティブな3D粒子地球儀","cn_us":"アメリカ合衆国","cn_ca":"カナダ","cn_mx":"メキシコ","cn_gt":"グアテマラ","cn_cu":"キューバ","cn_pa":"パナマ","cn_cr":"コスタリカ","cn_jm":"ジャマイカ","cn_ht":"ハイチ","cn_do":"ドミニカ共和国","cn_co":"コロンビア","cn_ve":"ベネズエラ","cn_ec":"エクアドル","cn_pe":"ペルー","cn_bo":"ボリビア","cn_cl":"チリ","cn_ar":"アルゼンチン","cn_uy":"ウルグアイ","cn_py":"パラグアイ","cn_br":"ブラジル","cn_is":"アイスランド","cn_ie":"アイルランド","cn_gb":"イギリス","cn_pt":"ポルトガル","cn_es":"スペイン","cn_fr":"フランス","cn_be":"ベルギー","cn_nl":"オランダ","cn_de":"ドイツ","cn_ch":"スイス","cn_it":"イタリア","cn_no":"ノルウェー","cn_se":"スウェーデン","cn_fi":"フィンランド","cn_dk":"デンマーク","cn_pl":"ポーランド","cn_cz":"チェコ","cn_at":"オーストリア","cn_hu":"ハンガリー","cn_ro":"ルーマニア","cn_gr":"ギリシャ","cn_ua":"ウクライナ","cn_tr":"トルコ","cn_ru":"ロシア","cn_ma":"モロッコ","cn_dz":"アルジェリア","cn_tn":"チュニジア","cn_ly":"リビア","cn_eg":"エジプト","cn_sn":"セネガル","cn_gh":"ガーナ","cn_ng":"ナイジェリア","cn_cm":"カメルーン","cn_et":"エチオピア","cn_ke":"ケニア","cn_ug":"ウガンダ","cn_tz":"タンザニア","cn_cd":"コンゴ民主共和国(キンシャサ)","cn_ao":"アンゴラ","cn_zm":"ザンビア","cn_zw":"ジンバブエ","cn_mz":"モザンビーク","cn_na":"ナミビア","cn_za":"南アフリカ","cn_mg":"マダガスカル","cn_sa":"サウジアラビア","cn_il":"イスラエル","cn_jo":"ヨルダン","cn_iq":"イラク","cn_ir":"イラン","cn_kz":"カザフスタン","cn_uz":"ウズベキスタン","cn_pk":"パキスタン","cn_in":"インド","cn_np":"ネパール","cn_bd":"バングラデシュ","cn_lk":"スリランカ","cn_mm":"ミャンマー (ビルマ)","cn_th":"タイ","cn_vn":"ベトナム","cn_kh":"カンボジア","cn_my":"マレーシア","cn_sg":"シンガポール","cn_id":"インドネシア","cn_ph":"フィリピン","cn_cn":"中国","cn_mn":"モンゴル","cn_kp":"北朝鮮","cn_kr":"韓国","cn_jp":"日本","cn_tw":"台湾","cn_af":"アフガニスタン","cn_ae":"アラブ首長国連邦","cn_qa":"カタール","cn_kw":"クウェート","cn_om":"オマーン","cn_au":"オーストラリア","cn_nz":"ニュージーランド","cn_pg":"パプアニューギニア","cn_fj":"フィジー","cn_al":"アルバニア","cn_ba":"ボスニア・ヘルツェゴビナ","cn_hr":"クロアチア","cn_rs":"セルビア","cn_bg":"ブルガリア","cn_sk":"スロバキア","cn_si":"スロベニア","cn_ee":"エストニア","cn_lv":"ラトビア","cn_lt":"リトアニア","cn_by":"ベラルーシ","cn_md":"モルドバ","cn_lu":"ルクセンブルク","cn_mt":"マルタ","cn_cy":"キプロス","cn_ad":"アンドラ","cn_am":"アルメニア","cn_ge":"ジョージア","cn_az":"アゼルバイジャン","cn_kg":"キルギス","cn_tj":"タジキスタン","cn_tm":"トルクメニスタン","cn_ye":"イエメン","cn_sy":"シリア","cn_lb":"レバノン","cn_ps":"パレスチナ自治区","cn_bh":"バーレーン","cn_bn":"ブルネイ","cn_la":"ラオス","cn_tl":"東ティモール","cn_bt":"ブータン","cn_mv":"モルディブ","cn_mr":"モーリタニア","cn_ml":"マリ","cn_bf":"ブルキナファソ","cn_ci":"コートジボワール","cn_lr":"リベリア","cn_sl":"シエラレオネ","cn_gn":"ギニア","cn_gw":"ギニアビサウ","cn_gm":"ガンビア","cn_tg":"トーゴ","cn_bj":"ベナン","cn_ne":"ニジェール","cn_td":"チャド","cn_sd":"スーダン","cn_ss":"南スーダン","cn_so":"ソマリア","cn_er":"エリトリア","cn_dj":"ジブチ","cn_cf":"中央アフリカ共和国","cn_cg":"コンゴ共和国(ブラザビル)","cn_ga":"ガボン","cn_gq":"赤道ギニア","cn_rw":"ルワンダ","cn_bi":"ブルンジ","cn_mw":"マラウイ","cn_bw":"ボツワナ","cn_ls":"レソト","cn_sz":"エスワティニ","cn_mu":"モーリシャス","cn_sc":"セーシェル","cn_km":"コモロ","cn_cv":"カーボベルデ","cn_st":"サントメ・プリンシペ","cn_bs":"バハマ","cn_bz":"ベリーズ","cn_hn":"ホンジュラス","cn_sv":"エルサルバドル","cn_ni":"ニカラグア","cn_tt":"トリニダード・トバゴ","cn_bb":"バルバドス","cn_gy":"ガイアナ","cn_sr":"スリナム","cn_gd":"グレナダ","cn_ag":"アンティグア・バーブーダ","cn_dm":"ドミニカ国","cn_lc":"セントルシア","cn_vc":"セントビンセント及びグレナディーン諸島","cn_ws":"サモア","cn_to":"トンガ","cn_vu":"バヌアツ","cn_sb":"ソロモン諸島","cn_ki":"キリバス","cn_tv":"ツバル","cn_mh":"マーシャル諸島","cn_fm":"ミクロネシア連邦","cn_pw":"パラオ","cn_nr":"ナウル","cn_ck":"クック諸島","cn_nu":"ニウエ","cn_mc":"モナコ","cn_sm":"サンマリノ","cn_li":"リヒテンシュタイン","cn_me":"モンテネグロ","cn_mk":"北マケドニア","cn_xk":"コソボ"},"es":{"worldTitle":"ACTIVIDAD MUNDIAL","worldSub":"Distribución global de jugadores","worldOnlineNow":"EN LÍNEA AHORA","worldNetwork":"RED GLOBAL","worldHint":"Arrastra para girar · pasa el cursor por un marcador","worldFewer":"MENOS JUGADORES","worldMore":"MÁS JUGADORES","worldRegional":"ACTIVIDAD REGIONAL","worldBack":"Volver","worldPlayers":"jugadores","worldOnline":"en línea","worldYou":"Tú","worldYouHere":"Tu ubicación","worldRegion":"Región geográfica","worldBtnTitle":"Jugadores en línea en el mundo","worldAria":"Globo 3D interactivo de partículas con jugadores en línea por país","cn_us":"Estados Unidos","cn_ca":"Canadá","cn_mx":"México","cn_gt":"Guatemala","cn_cu":"Cuba","cn_pa":"Panamá","cn_cr":"Costa Rica","cn_jm":"Jamaica","cn_ht":"Haití","cn_do":"República Dominicana","cn_co":"Colombia","cn_ve":"Venezuela","cn_ec":"Ecuador","cn_pe":"Perú","cn_bo":"Bolivia","cn_cl":"Chile","cn_ar":"Argentina","cn_uy":"Uruguay","cn_py":"Paraguay","cn_br":"Brasil","cn_is":"Islandia","cn_ie":"Irlanda","cn_gb":"Reino Unido","cn_pt":"Portugal","cn_es":"España","cn_fr":"Francia","cn_be":"Bélgica","cn_nl":"Países Bajos","cn_de":"Alemania","cn_ch":"Suiza","cn_it":"Italia","cn_no":"Noruega","cn_se":"Suecia","cn_fi":"Finlandia","cn_dk":"Dinamarca","cn_pl":"Polonia","cn_cz":"Chequia","cn_at":"Austria","cn_hu":"Hungría","cn_ro":"Rumanía","cn_gr":"Grecia","cn_ua":"Ucrania","cn_tr":"Turquía","cn_ru":"Rusia","cn_ma":"Marruecos","cn_dz":"Argelia","cn_tn":"Túnez","cn_ly":"Libia","cn_eg":"Egipto","cn_sn":"Senegal","cn_gh":"Ghana","cn_ng":"Nigeria","cn_cm":"Camerún","cn_et":"Etiopía","cn_ke":"Kenia","cn_ug":"Uganda","cn_tz":"Tanzania","cn_cd":"República Democrática del Congo","cn_ao":"Angola","cn_zm":"Zambia","cn_zw":"Zimbabue","cn_mz":"Mozambique","cn_na":"Namibia","cn_za":"Sudáfrica","cn_mg":"Madagascar","cn_sa":"Arabia Saudí","cn_il":"Israel","cn_jo":"Jordania","cn_iq":"Irak","cn_ir":"Irán","cn_kz":"Kazajistán","cn_uz":"Uzbekistán","cn_pk":"Pakistán","cn_in":"India","cn_np":"Nepal","cn_bd":"Bangladés","cn_lk":"Sri Lanka","cn_mm":"Myanmar (Birmania)","cn_th":"Tailandia","cn_vn":"Vietnam","cn_kh":"Camboya","cn_my":"Malasia","cn_sg":"Singapur","cn_id":"Indonesia","cn_ph":"Filipinas","cn_cn":"China","cn_mn":"Mongolia","cn_kp":"Corea del Norte","cn_kr":"Corea del Sur","cn_jp":"Japón","cn_tw":"Taiwán","cn_af":"Afganistán","cn_ae":"Emiratos Árabes Unidos","cn_qa":"Catar","cn_kw":"Kuwait","cn_om":"Omán","cn_au":"Australia","cn_nz":"Nueva Zelanda","cn_pg":"Papúa Nueva Guinea","cn_fj":"Fiyi","cn_al":"Albania","cn_ba":"Bosnia y Herzegovina","cn_hr":"Croacia","cn_rs":"Serbia","cn_bg":"Bulgaria","cn_sk":"Eslovaquia","cn_si":"Eslovenia","cn_ee":"Estonia","cn_lv":"Letonia","cn_lt":"Lituania","cn_by":"Bielorrusia","cn_md":"Moldavia","cn_lu":"Luxemburgo","cn_mt":"Malta","cn_cy":"Chipre","cn_ad":"Andorra","cn_am":"Armenia","cn_ge":"Georgia","cn_az":"Azerbaiyán","cn_kg":"Kirguistán","cn_tj":"Tayikistán","cn_tm":"Turkmenistán","cn_ye":"Yemen","cn_sy":"Siria","cn_lb":"Líbano","cn_ps":"Territorios Palestinos","cn_bh":"Baréin","cn_bn":"Brunéi","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Bután","cn_mv":"Maldivas","cn_mr":"Mauritania","cn_ml":"Mali","cn_bf":"Burkina Faso","cn_ci":"Côte d’Ivoire","cn_lr":"Liberia","cn_sl":"Sierra Leona","cn_gn":"Guinea","cn_gw":"Guinea-Bisáu","cn_gm":"Gambia","cn_tg":"Togo","cn_bj":"Benín","cn_ne":"Níger","cn_td":"Chad","cn_sd":"Sudán","cn_ss":"Sudán del Sur","cn_so":"Somalia","cn_er":"Eritrea","cn_dj":"Yibuti","cn_cf":"República Centroafricana","cn_cg":"Congo","cn_ga":"Gabón","cn_gq":"Guinea Ecuatorial","cn_rw":"Ruanda","cn_bi":"Burundi","cn_mw":"Malaui","cn_bw":"Botsuana","cn_ls":"Lesoto","cn_sz":"Esuatini","cn_mu":"Mauricio","cn_sc":"Seychelles","cn_km":"Comoras","cn_cv":"Cabo Verde","cn_st":"Santo Tomé y Príncipe","cn_bs":"Bahamas","cn_bz":"Belice","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nicaragua","cn_tt":"Trinidad y Tobago","cn_bb":"Barbados","cn_gy":"Guyana","cn_sr":"Surinam","cn_gd":"Granada","cn_ag":"Antigua y Barbuda","cn_dm":"Dominica","cn_lc":"Santa Lucía","cn_vc":"San Vicente y las Granadinas","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Islas Salomón","cn_ki":"Kiribati","cn_tv":"Tuvalu","cn_mh":"Islas Marshall","cn_fm":"Micronesia","cn_pw":"Palaos","cn_nr":"Nauru","cn_ck":"Islas Cook","cn_nu":"Niue","cn_mc":"Mónaco","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Montenegro","cn_mk":"Macedonia del Norte","cn_xk":"Kosovo"},"tr":{"worldTitle":"DÜNYA AKTİVİTESİ","worldSub":"Küresel oyuncu dağılımı","worldOnlineNow":"ŞU AN ÇEVRİMİÇİ","worldNetwork":"KÜRESEL AĞ","worldHint":"Döndürmek için sürükle · işaretçinin üzerine gel","worldFewer":"DAHA AZ OYUNCU","worldMore":"DAHA ÇOK OYUNCU","worldRegional":"BÖLGESEL AKTİVİTE","worldBack":"Geri","worldPlayers":"oyuncu","worldOnline":"çevrimiçi","worldYou":"Sen","worldYouHere":"Konumun","worldRegion":"Coğrafi bölge","worldBtnTitle":"Dünya genelinde çevrimiçi oyuncular","worldAria":"Ülkelere göre çevrimiçi oyuncuları gösteren etkileşimli 3D parçacık küre","cn_us":"Amerika Birleşik Devletleri","cn_ca":"Kanada","cn_mx":"Meksika","cn_gt":"Guatemala","cn_cu":"Küba","cn_pa":"Panama","cn_cr":"Kosta Rika","cn_jm":"Jamaika","cn_ht":"Haiti","cn_do":"Dominik Cumhuriyeti","cn_co":"Kolombiya","cn_ve":"Venezuela","cn_ec":"Ekvador","cn_pe":"Peru","cn_bo":"Bolivya","cn_cl":"Şili","cn_ar":"Arjantin","cn_uy":"Uruguay","cn_py":"Paraguay","cn_br":"Brezilya","cn_is":"İzlanda","cn_ie":"İrlanda","cn_gb":"Birleşik Krallık","cn_pt":"Portekiz","cn_es":"İspanya","cn_fr":"Fransa","cn_be":"Belçika","cn_nl":"Hollanda","cn_de":"Almanya","cn_ch":"İsviçre","cn_it":"İtalya","cn_no":"Norveç","cn_se":"İsveç","cn_fi":"Finlandiya","cn_dk":"Danimarka","cn_pl":"Polonya","cn_cz":"Çekya","cn_at":"Avusturya","cn_hu":"Macaristan","cn_ro":"Romanya","cn_gr":"Yunanistan","cn_ua":"Ukrayna","cn_tr":"Türkiye","cn_ru":"Rusya","cn_ma":"Fas","cn_dz":"Cezayir","cn_tn":"Tunus","cn_ly":"Libya","cn_eg":"Mısır","cn_sn":"Senegal","cn_gh":"Gana","cn_ng":"Nijerya","cn_cm":"Kamerun","cn_et":"Etiyopya","cn_ke":"Kenya","cn_ug":"Uganda","cn_tz":"Tanzanya","cn_cd":"Kongo - Kinşasa","cn_ao":"Angola","cn_zm":"Zambiya","cn_zw":"Zimbabve","cn_mz":"Mozambik","cn_na":"Namibya","cn_za":"Güney Afrika","cn_mg":"Madagaskar","cn_sa":"Suudi Arabistan","cn_il":"İsrail","cn_jo":"Ürdün","cn_iq":"Irak","cn_ir":"İran","cn_kz":"Kazakistan","cn_uz":"Özbekistan","cn_pk":"Pakistan","cn_in":"Hindistan","cn_np":"Nepal","cn_bd":"Bangladeş","cn_lk":"Sri Lanka","cn_mm":"Myanmar (Burma)","cn_th":"Tayland","cn_vn":"Vietnam","cn_kh":"Kamboçya","cn_my":"Malezya","cn_sg":"Singapur","cn_id":"Endonezya","cn_ph":"Filipinler","cn_cn":"Çin","cn_mn":"Moğolistan","cn_kp":"Kuzey Kore","cn_kr":"Güney Kore","cn_jp":"Japonya","cn_tw":"Tayvan","cn_af":"Afganistan","cn_ae":"Birleşik Arap Emirlikleri","cn_qa":"Katar","cn_kw":"Kuveyt","cn_om":"Umman","cn_au":"Avustralya","cn_nz":"Yeni Zelanda","cn_pg":"Papua Yeni Gine","cn_fj":"Fiji","cn_al":"Arnavutluk","cn_ba":"Bosna-Hersek","cn_hr":"Hırvatistan","cn_rs":"Sırbistan","cn_bg":"Bulgaristan","cn_sk":"Slovakya","cn_si":"Slovenya","cn_ee":"Estonya","cn_lv":"Letonya","cn_lt":"Litvanya","cn_by":"Belarus","cn_md":"Moldova","cn_lu":"Lüksemburg","cn_mt":"Malta","cn_cy":"Kıbrıs","cn_ad":"Andorra","cn_am":"Ermenistan","cn_ge":"Gürcistan","cn_az":"Azerbaycan","cn_kg":"Kırgızistan","cn_tj":"Tacikistan","cn_tm":"Türkmenistan","cn_ye":"Yemen","cn_sy":"Suriye","cn_lb":"Lübnan","cn_ps":"Filistin Bölgeleri","cn_bh":"Bahreyn","cn_bn":"Brunei","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Butan","cn_mv":"Maldivler","cn_mr":"Moritanya","cn_ml":"Mali","cn_bf":"Burkina Faso","cn_ci":"Côte d’Ivoire","cn_lr":"Liberya","cn_sl":"Sierra Leone","cn_gn":"Gine","cn_gw":"Gine-Bissau","cn_gm":"Gambiya","cn_tg":"Togo","cn_bj":"Benin","cn_ne":"Nijer","cn_td":"Çad","cn_sd":"Sudan","cn_ss":"Güney Sudan","cn_so":"Somali","cn_er":"Eritre","cn_dj":"Cibuti","cn_cf":"Orta Afrika Cumhuriyeti","cn_cg":"Kongo - Brazavil","cn_ga":"Gabon","cn_gq":"Ekvator Ginesi","cn_rw":"Ruanda","cn_bi":"Burundi","cn_mw":"Malavi","cn_bw":"Botsvana","cn_ls":"Lesotho","cn_sz":"Esvatini","cn_mu":"Mauritius","cn_sc":"Seyşeller","cn_km":"Komorlar","cn_cv":"Cabo Verde","cn_st":"Sao Tome ve Principe","cn_bs":"Bahamalar","cn_bz":"Belize","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nikaragua","cn_tt":"Trinidad ve Tobago","cn_bb":"Barbados","cn_gy":"Guyana","cn_sr":"Surinam","cn_gd":"Grenada","cn_ag":"Antigua ve Barbuda","cn_dm":"Dominika","cn_lc":"Saint Lucia","cn_vc":"Saint Vincent ve Grenadinler","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Solomon Adaları","cn_ki":"Kiribati","cn_tv":"Tuvalu","cn_mh":"Marshall Adaları","cn_fm":"Mikronezya","cn_pw":"Palau","cn_nr":"Nauru","cn_ck":"Cook Adaları","cn_nu":"Niue","cn_mc":"Monako","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Karadağ","cn_mk":"Kuzey Makedonya","cn_xk":"Kosova"},"pt":{"worldTitle":"ATIVIDADE MUNDIAL","worldSub":"Distribuição global de jogadores","worldOnlineNow":"ONLINE AGORA","worldNetwork":"REDE GLOBAL","worldHint":"Arraste para girar · passe o mouse sobre um marcador","worldFewer":"MENOS JOGADORES","worldMore":"MAIS JOGADORES","worldRegional":"ATIVIDADE REGIONAL","worldBack":"Voltar","worldPlayers":"jogadores","worldOnline":"online","worldYou":"Você","worldYouHere":"Sua localização","worldRegion":"Região geográfica","worldBtnTitle":"Jogadores online no mundo","worldAria":"Globo 3D interativo de partículas com jogadores online por país","cn_us":"Estados Unidos","cn_ca":"Canadá","cn_mx":"México","cn_gt":"Guatemala","cn_cu":"Cuba","cn_pa":"Panamá","cn_cr":"Costa Rica","cn_jm":"Jamaica","cn_ht":"Haiti","cn_do":"República Dominicana","cn_co":"Colômbia","cn_ve":"Venezuela","cn_ec":"Equador","cn_pe":"Peru","cn_bo":"Bolívia","cn_cl":"Chile","cn_ar":"Argentina","cn_uy":"Uruguai","cn_py":"Paraguai","cn_br":"Brasil","cn_is":"Islândia","cn_ie":"Irlanda","cn_gb":"Reino Unido","cn_pt":"Portugal","cn_es":"Espanha","cn_fr":"França","cn_be":"Bélgica","cn_nl":"Países Baixos","cn_de":"Alemanha","cn_ch":"Suíça","cn_it":"Itália","cn_no":"Noruega","cn_se":"Suécia","cn_fi":"Finlândia","cn_dk":"Dinamarca","cn_pl":"Polônia","cn_cz":"Tchéquia","cn_at":"Áustria","cn_hu":"Hungria","cn_ro":"Romênia","cn_gr":"Grécia","cn_ua":"Ucrânia","cn_tr":"Turquia","cn_ru":"Rússia","cn_ma":"Marrocos","cn_dz":"Argélia","cn_tn":"Tunísia","cn_ly":"Líbia","cn_eg":"Egito","cn_sn":"Senegal","cn_gh":"Gana","cn_ng":"Nigéria","cn_cm":"Camarões","cn_et":"Etiópia","cn_ke":"Quênia","cn_ug":"Uganda","cn_tz":"Tanzânia","cn_cd":"Congo - Kinshasa","cn_ao":"Angola","cn_zm":"Zâmbia","cn_zw":"Zimbábue","cn_mz":"Moçambique","cn_na":"Namíbia","cn_za":"África do Sul","cn_mg":"Madagascar","cn_sa":"Arábia Saudita","cn_il":"Israel","cn_jo":"Jordânia","cn_iq":"Iraque","cn_ir":"Irã","cn_kz":"Cazaquistão","cn_uz":"Uzbequistão","cn_pk":"Paquistão","cn_in":"Índia","cn_np":"Nepal","cn_bd":"Bangladesh","cn_lk":"Sri Lanka","cn_mm":"Mianmar (Birmânia)","cn_th":"Tailândia","cn_vn":"Vietnã","cn_kh":"Camboja","cn_my":"Malásia","cn_sg":"Singapura","cn_id":"Indonésia","cn_ph":"Filipinas","cn_cn":"China","cn_mn":"Mongólia","cn_kp":"Coreia do Norte","cn_kr":"Coreia do Sul","cn_jp":"Japão","cn_tw":"Taiwan","cn_af":"Afeganistão","cn_ae":"Emirados Árabes Unidos","cn_qa":"Catar","cn_kw":"Kuwait","cn_om":"Omã","cn_au":"Austrália","cn_nz":"Nova Zelândia","cn_pg":"Papua-Nova Guiné","cn_fj":"Fiji","cn_al":"Albânia","cn_ba":"Bósnia e Herzegovina","cn_hr":"Croácia","cn_rs":"Sérvia","cn_bg":"Bulgária","cn_sk":"Eslováquia","cn_si":"Eslovênia","cn_ee":"Estônia","cn_lv":"Letônia","cn_lt":"Lituânia","cn_by":"Bielorrússia","cn_md":"Moldávia","cn_lu":"Luxemburgo","cn_mt":"Malta","cn_cy":"Chipre","cn_ad":"Andorra","cn_am":"Armênia","cn_ge":"Geórgia","cn_az":"Azerbaijão","cn_kg":"Quirguistão","cn_tj":"Tadjiquistão","cn_tm":"Turcomenistão","cn_ye":"Iêmen","cn_sy":"Síria","cn_lb":"Líbano","cn_ps":"Territórios palestinos","cn_bh":"Barein","cn_bn":"Brunei","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Butão","cn_mv":"Maldivas","cn_mr":"Mauritânia","cn_ml":"Mali","cn_bf":"Burquina Faso","cn_ci":"Costa do Marfim","cn_lr":"Libéria","cn_sl":"Serra Leoa","cn_gn":"Guiné","cn_gw":"Guiné-Bissau","cn_gm":"Gâmbia","cn_tg":"Togo","cn_bj":"Benin","cn_ne":"Níger","cn_td":"Chade","cn_sd":"Sudão","cn_ss":"Sudão do Sul","cn_so":"Somália","cn_er":"Eritreia","cn_dj":"Djibuti","cn_cf":"República Centro-Africana","cn_cg":"República do Congo","cn_ga":"Gabão","cn_gq":"Guiné Equatorial","cn_rw":"Ruanda","cn_bi":"Burundi","cn_mw":"Malaui","cn_bw":"Botsuana","cn_ls":"Lesoto","cn_sz":"Essuatíni","cn_mu":"Maurício","cn_sc":"Seicheles","cn_km":"Comores","cn_cv":"Cabo Verde","cn_st":"São Tomé e Príncipe","cn_bs":"Bahamas","cn_bz":"Belize","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nicarágua","cn_tt":"Trinidad e Tobago","cn_bb":"Barbados","cn_gy":"Guiana","cn_sr":"Suriname","cn_gd":"Granada","cn_ag":"Antígua e Barbuda","cn_dm":"Dominica","cn_lc":"Santa Lúcia","cn_vc":"São Vicente e Granadinas","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Ilhas Salomão","cn_ki":"Quiribati","cn_tv":"Tuvalu","cn_mh":"Ilhas Marshall","cn_fm":"Micronésia","cn_pw":"Palau","cn_nr":"Nauru","cn_ck":"Ilhas Cook","cn_nu":"Niue","cn_mc":"Mônaco","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Montenegro","cn_mk":"Macedônia do Norte","cn_xk":"Kosovo"}};
+  Object.keys(WT).forEach(function(l){if(!UI_T[l])UI_T[l]={};Object.keys(WT[l]).forEach(function(k){UI_T[l][k]=WT[l][k];});});
+  function T(k){return uiT(k);}
+  function loc(){return (typeof UI_LOCALES!=='undefined'&&UI_LOCALES[uiState.lang])||'en-US';}
+  function fmt(n){try{return n.toLocaleString(loc());}catch(e){return String(n);}}
+  function esc(s){return uiEsc(s);}
+  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
+  function codeToFlag(code){return String.fromCodePoint.apply(null,code.toUpperCase().split('').map(function(ch){return 127397+ch.charCodeAt(0);}));}
+  function regionName(code){try{return new Intl.DisplayNames([loc()],{type:'region'}).of(code.toUpperCase())||'';}catch(e){return '';}}
+  function xyz(lat,lon){var la=lat*Math.PI/180,lo=lon*Math.PI/180;return {x:Math.cos(la)*Math.sin(lo),y:Math.sin(la),z:Math.cos(la)*Math.cos(lo)};}
   /* ───────── 国家数据：[名称, 国旗, 纬度, 经度] ───────── */
   var raw=[
     ['United States','🇺🇸',39,-98],['Canada','🇨🇦',56,-106],['Mexico','🇲🇽',23,-102],['Guatemala','🇬🇹',15,-90],['Cuba','🇨🇺',22,-79],['Panama','🇵🇦',9,-80],['Costa Rica','🇨🇷',10,-84],['Jamaica','🇯🇲',18,-77],['Haiti','🇭🇹',19,-72],['Dominican Republic','🇩🇴',19,-70],['Colombia','🇨🇴',4,-72],['Venezuela','🇻🇪',8,-66],['Ecuador','🇪🇨',-2,-77],['Peru','🇵🇪',-10,-76],['Bolivia','🇧🇴',-17,-65],['Chile','🇨🇱',-30,-71],['Argentina','🇦🇷',-38,-64],['Uruguay','🇺🇾',-33,-56],['Paraguay','🇵🇾',-23,-58],['Brazil','🇧🇷',-10,-52],
@@ -6456,31 +6478,59 @@ bgfxApply();
   (function(){var runs=MASK_RLE.split(','),p=0,v=0,i,n;for(i=0;i<runs.length;i++){n=parseInt(runs[i],36);if(v)mask.fill(1,p,p+n);p+=n;v^=1;}})();
   function landAt(i,j){if(j<0||j>=MH)return 0;i=((i%MW)+MW)%MW;return mask[j*MW+i];}
 
-  /* ───────── 在线人数：全球总数随机 120 ~ 1000，按权重分配到各国，总和严格等于总数 ───────── */
-  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:0,ph:Math.random()*6.283};});
-  var T=120+Math.floor(Math.random()*881);
+  /* ───────── 在线人数模型（全球总数始终在 120 ~ 1000 之间，随时间缓慢起伏）─────────
+     · 目标总数做带回归的随机游走；每个 tick 随机 1~3 人上线/下线，偏向目标
+     · 上线概率随各国「当地时间」变化（晚间活跃、凌晨低谷），再乘每个国家固定的人气权重
+     · 偶尔有一队人同时上线（小爆发）
+     · 你所在国家（IP 定位）人数永远不低于 5 */
+  var T0=120,T1=1000,MIN_ME=5;
+  var DAY=[.55,.4,.28,.2,.15,.15,.18,.25,.32,.4,.45,.5,.55,.6,.62,.65,.7,.78,.88,.96,1,1,.9,.72];
+  function dayF(c,d){var h=(d.getUTCHours()+d.getUTCMinutes()/60+c.lon/15+48)%24;return DAY[Math.floor(h)];}
+  var countries=[],byCode={},me=null,S=0,target=0;
+  function mkCountry(name,flag,lat,lon,dyn){var c={name:name,flag:flag,code:flagCode(flag),lat:lat,lon:lon,count:0,ap:0,dr:3,ph:Math.random()*6.283,flash:0,base:Math.pow(Math.random(),3)+.015,dyn:!!dyn,step:0,rgb:[255,176,128]};c.v=xyz(lat,lon);c.i=countries.length;countries.push(c);byCode[c.code]=c;return c;}
+  raw.forEach(function(a){mkCountry(a[0],a[1],a[2],a[3],false);});
   (function(){
-    var w=countries.map(function(){return Math.pow(Math.random(),3)+.015;}),ws=w.reduce(function(a,b){return a+b;},0),used=0,rem=[];
+    var T=T0+Math.floor(Math.random()*(T1-T0+1)),now=new Date(),w=countries.map(function(c){return c.base*dayF(c,now);}),ws=w.reduce(function(a,b){return a+b;},0),used=0,rem=[];
     countries.forEach(function(c,i){var e=w[i]/ws*T;c.count=Math.floor(e);used+=c.count;rem.push({i:i,f:e-c.count});});
-    rem.sort(function(a,b){return b.f-a.f;});
-    for(var k=0;k<T-used;k++)countries[rem[k].i].count++;
+    rem.sort(function(a,b){return b.f-a.f;});for(var k=0;k<T-used;k++)countries[rem[k].i].count++;
+    S=T;target=T;
   })();
-  var active=countries.filter(function(c){return c.count>0;});
-  var maxCount=active.reduce(function(m,c){return Math.max(m,c.count);},1);
-  document.getElementById('worldTotal').textContent=T.toLocaleString();
+  function gauss(){return (Math.random()+Math.random()+Math.random()-1.5)*1.15;}
+  function pickWeighted(ws){var s=0,i;for(i=0;i<ws.length;i++)s+=ws[i];if(s<=0)return -1;var r=Math.random()*s;for(i=0;i<ws.length;i++){r-=ws[i];if(r<=0)return i;}return ws.length-1;}
+  function pickJoin(d){var i=pickWeighted(countries.map(function(c){return c.base*dayF(c,d)*(1+c.count*.04);}));return i<0?null:countries[i];}
+  function pickLeave(d){var i=pickWeighted(countries.map(function(c){var m=(c===me)?MIN_ME:0;return c.count>m?(c.count-m)*(1.7-dayF(c,d)):0;}));return i<0?null:countries[i];}
+  function addPlayers(c,dlt){
+    if(!c)return 0;var minC=(c===me)?MIN_ME:0,real=Math.max(minC,c.count+dlt)-c.count;
+    if(real>0&&S+real>T1)real=T1-S;if(real<0&&S+real<T0)real=T0-S;
+    if(!real)return 0;c.count+=real;S+=real;if(real>0)c.flash=performance.now();return real;
+  }
+  function tick(){
+    var d=new Date();target+=(550-target)*.012+gauss()*16;target=Math.max(170,Math.min(940,target));
+    var gap=target-S,n=1+Math.floor(Math.random()*3),pj=.5+Math.max(-.38,Math.min(.38,gap/110));
+    for(var k=0;k<n;k++){
+      if(Math.random()<pj)addPlayers(pickJoin(d),1+(Math.random()<.14?1+Math.floor(Math.random()*2):0));
+      else addPlayers(pickLeave(d),-1);
+    }
+    if(Math.random()<.06)addPlayers(pickJoin(d),3+Math.floor(Math.random()*6));
+  }
 
-  /* ───────── 颜色：人数 浅橙红 → 深红 ───────── */
-  var STOPS=[[255,176,128],[255,112,64],[228,52,38],[150,10,30]];
-  function heat(n){var t=Math.sqrt(Math.max(0,Math.min(1,n/maxCount))),p=t*3,i=Math.min(2,Math.floor(p)),f=p-i,a=STOPS[i],b=STOPS[i+1];return [0,1,2].map(function(j){return Math.round(a[j]+(b[j]-a[j])*f);});}
-  active.forEach(function(c){c.rgb=heat(c.count);c.rad=2.6+5.4*Math.sqrt(c.count/maxCount);});
+  /* ───────── 配色：人数 浅橙红 → 深红 ───────── */
+  var STOPS=[[255,176,128],[255,112,64],[228,52,38],[150,10,30]],maxCount=1,haloCache={};
+  function heatT(t){var p=Math.max(0,Math.min(1,t))*3,i=Math.min(2,Math.floor(p)),f=p-i,a=STOPS[i],b=STOPS[i+1];return [0,1,2].map(function(j){return Math.round(a[j]+(b[j]-a[j])*f);});}
   function rgba(c,a){return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')';}
   function glowSprite(c,size,core){var cv=document.createElement('canvas');cv.width=cv.height=size;var g=cv.getContext('2d'),h=size/2,gr=g.createRadialGradient(h,h,0,h,h,h);gr.addColorStop(0,rgba(core||c,1));gr.addColorStop(.2,rgba(c,.8));gr.addColorStop(.5,rgba(c,.24));gr.addColorStop(1,rgba(c,0));g.fillStyle=gr;g.fillRect(0,0,size,size);return cv;}
-  active.forEach(function(c){c.halo=glowSprite(c.rgb,64,[255,236,224]);});
+  function haloFor(step){return haloCache[step]||(haloCache[step]=glowSprite(heatT(step/23),64,[255,236,224]));}
+  var active=[];
+  function recalc(){
+    maxCount=1;active=[];
+    countries.forEach(function(c){if(c.count>0){active.push(c);if(c.count>maxCount)maxCount=c.count;}});
+    countries.forEach(function(c){var t=Math.sqrt(Math.max(0,c.count)/maxCount);c.step=Math.round(t*23);c.rgb=heatT(t);c.radT=2.6+5.4*t;});
+  }
   function parseCol(s,fb){s=(s||'').trim();var m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(s);if(m){var h=m[1];if(h.length===3)h=h.replace(/./g,'$&$&');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}m=/rgba?\(([^)]+)\)/i.exec(s);if(m){var p=m[1].split(/[\s,\/]+/).map(parseFloat);if(p.length>=3&&!isNaN(p[0]))return [p[0],p[1],p[2]];}return fb;}
   function mix(a,b,t){return [0,1,2].map(function(i){return Math.round(a[i]+(b[i]-a[i])*t);});}
   var theme={key:'',acc:[59,130,246],light:false,sprite:null};
   function readTheme(){
-    var cs=getComputedStyle(page),acc=parseCol(cs.getPropertyValue('--accent'),[59,130,246]),light=document.documentElement.getAttribute('data-theme')==='light',key=acc.join(',')+'|'+light;
+    var acc=parseCol(getComputedStyle(page).getPropertyValue('--accent'),[59,130,246]),light=document.documentElement.getAttribute('data-theme')==='light',key=acc.join(',')+'|'+light;
     if(key===theme.key)return;theme.key=key;theme.acc=acc;theme.light=light;
     theme.sprite=glowSprite(acc,32,light?acc:mix(acc,[255,255,255],.6));
   }
@@ -6497,31 +6547,29 @@ bgfxApply();
     PX.push(x);PY.push(y);PZ.push(z);PK.push(kind);PS.push(Math.random()*6.283);
   }
   var PN=PX.length;
-  function xyz(lat,lon){var la=lat*Math.PI/180,lo=lon*Math.PI/180;return {x:Math.cos(la)*Math.sin(lo),y:Math.sin(la),z:Math.cos(la)*Math.cos(lo)};}
-  active.forEach(function(c){c.v=xyz(c.lat,c.lon);});
 
   /* ───────── 状态 ───────── */
-  var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement;
-  var W=900,H=560,rot=-1.2,tilt=.28,vel=0,dragging=false,lastX=0,lastY=0,downX=0,downY=0,moved=0,hoverIndex=-1,raf=0,frame=0,focus=null;
-  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
+  var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement,totalEl=document.getElementById('worldTotal');
+  var W=900,H=560,rot=-1.2,tilt=.28,vel=0,dragging=false,lastX=0,lastY=0,downX=0,downY=0,moved=0,hoverIndex=-1,raf=0,frame=0,focus=null,touched=false,tot=S,langSeen=uiState.lang,timer=0,lastTick=Date.now(),listHover=false,lastSort=0;
   function geom(){var r=Math.min(W,H)*.42;return {r:r,cx:W/2,cy:H/2,sc:Math.max(.7,Math.min(1.45,r/300))};}
   function proj(v,g){var cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(tilt),st=Math.sin(tilt),x=v.x*cr+v.z*sr,z0=v.z*cr-v.x*sr,y=v.y*ct-z0*st,z=v.y*st+z0*ct;return {x:g.cx+x*g.r,y:g.cy-y*g.r,z:z};}
   function resize(){var dpr=Math.min(2,window.devicePixelRatio||1),rect=canvas.getBoundingClientRect();W=Math.max(300,rect.width);H=Math.max(300,rect.height);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
+  function cname(c){var k='cn_'+c.code,tb=UI_T[uiState.lang],v=(tb&&tb[k])||UI_T.en[k];if(v)return v;if(c.dyn){var r=regionName(c.code);if(r)return r;}return c.name;}
 
   /* ───────── 绘制 ───────── */
   function draw(now){
     if(!page.classList.contains('open')){raf=0;return;}
+    if(uiState.lang!==langSeen){langSeen=uiState.lang;relabel();}
     if(frame++%45===0)readTheme();
     var t=now/1000,g=geom(),cx=g.cx,cy=g.cy,R=g.r,sc=g.sc,light=theme.light,acc=theme.acc;
-    /* 旋转：拖动 > 聚焦动画 > 惯性 > 悬停暂停 > 自转 */
     if(!dragging){
       if(focus){var dr=focus.rot-rot,dt=focus.tilt-tilt;rot+=dr*.09;tilt+=dt*.09;vel=0;if(Math.abs(dr)<.002&&Math.abs(dt)<.002)focus=null;}
       else if(Math.abs(vel)>.0003){rot+=vel;vel*=.94;}
       else if(hoverIndex<0)rot+=.0018;
     }
+    if(Math.abs(tot-S)>.01){tot+=(S-tot)*.16;if(Math.abs(tot-S)<.5)tot=S;var s=fmt(Math.round(tot));if(totalEl.textContent!==s)totalEl.textContent=s;}
     ctx.clearRect(0,0,W,H);
     ctx.globalCompositeOperation='source-over';
-    /* 球体底色 + 大气光晕 */
     var base=ctx.createRadialGradient(cx-R*.3,cy-R*.35,R*.1,cx,cy,R);
     base.addColorStop(0,rgba(acc,light?.10:.14));base.addColorStop(1,rgba(acc,light?.02:.03));
     ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.fillStyle=base;ctx.fill();
@@ -6530,7 +6578,6 @@ bgfxApply();
     ctx.fillStyle=atm;ctx.beginPath();ctx.arc(cx,cy,R*1.24,0,6.2832);ctx.fill();
     ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.strokeStyle=rgba(acc,light?.35:.28);ctx.lineWidth=1;ctx.stroke();
     ctx.globalCompositeOperation=light?'source-over':'lighter';
-    /* 粒子 */
     var cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(tilt),st=Math.sin(tilt),spr=theme.sprite;
     for(var i=0;i<PN;i++){
       var X=PX[i],Y=PY[i],Z=PZ[i],x=X*cr+Z*sr,z0=Z*cr-X*sr,yy=Y*ct-z0*st,z=Y*st+z0*ct,k=PK[i],d,a;
@@ -6544,40 +6591,61 @@ bgfxApply();
       ctx.globalAlpha=a;ctx.drawImage(spr,cx+x*R-d/2,cy-yy*R-d/2,d,d);
     }
     ctx.globalAlpha=1;
-    /* 国家在线标记：发光光晕 + 实心核 + 脉冲环 */
     var vis=[];
-    for(var j=0;j<active.length;j++){var c=active[j],q=proj(c.v,g);if(q.z>.02){q.c=c;q.i=countries.indexOf(c);vis.push(q);}}
+    for(var j=0;j<countries.length;j++){
+      var c=countries[j];c.ap+=((c.count>0?1:0)-c.ap)*.12;c.dr+=((c.radT||3)-c.dr)*.12;
+      if(c.ap<.03)continue;var q=proj(c.v,g);if(q.z>.02){q.c=c;vis.push(q);}
+    }
     vis.sort(function(a,b){return a.z-b.z;});
     vis.forEach(function(q){
-      var c=q.c,hov=q.i===hoverIndex,fade=Math.min(1,q.z/.3),rd=c.rad*sc*(hov?1.25:1),pu=.88+.12*Math.sin(t*2.4+c.ph),hs=rd*(hov?9:6.4)*pu;
+      var c=q.c,hov=c.i===hoverIndex,fade=Math.min(1,q.z/.3)*c.ap,rd=c.dr*sc*(hov?1.25:1),pu=.88+.12*Math.sin(t*2.4+c.ph),hs=rd*(hov?9:6.4)*pu;
       ctx.globalCompositeOperation=light?'source-over':'lighter';
-      ctx.globalAlpha=fade*(light?.55:.9);ctx.drawImage(c.halo,q.x-hs/2,q.y-hs/2,hs,hs);
+      ctx.globalAlpha=fade*(light?.55:.9);ctx.drawImage(haloFor(c.step),q.x-hs/2,q.y-hs/2,hs,hs);
       var p=((t*.55+c.ph/6.283)%1);
       ctx.globalAlpha=fade*(1-p)*.55;ctx.beginPath();ctx.arc(q.x,q.y,rd+p*rd*2.8,0,6.2832);ctx.strokeStyle=rgba(c.rgb,1);ctx.lineWidth=1.2;ctx.stroke();
+      var fa=(now-c.flash)/1400;
+      if(fa>=0&&fa<1){ctx.globalAlpha=fade*(1-fa)*.9;ctx.beginPath();ctx.arc(q.x,q.y,rd+fa*rd*4.6,0,6.2832);ctx.strokeStyle='rgba(255,236,224,1)';ctx.lineWidth=1.6;ctx.stroke();}
       ctx.globalCompositeOperation='source-over';
       ctx.globalAlpha=fade;ctx.beginPath();ctx.arc(q.x,q.y,rd*.62,0,6.2832);ctx.fillStyle=rgba(c.rgb,1);ctx.fill();
       ctx.lineWidth=1;ctx.strokeStyle='rgba(255,236,224,'+(hov?.95:.55)+')';ctx.stroke();
-      if(hov){ctx.beginPath();ctx.arc(q.x,q.y,rd+3.5,0,6.2832);ctx.strokeStyle='#fff';ctx.lineWidth=1.6;ctx.stroke();}
+      if(c===me){var mp=(t*.9)%1;ctx.beginPath();ctx.arc(q.x,q.y,rd+5,0,6.2832);ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.4;ctx.stroke();
+        ctx.globalAlpha=fade*(1-mp)*.7;ctx.beginPath();ctx.arc(q.x,q.y,rd+5+mp*rd*3.4,0,6.2832);ctx.strokeStyle=rgba(acc,1);ctx.lineWidth=1.4;ctx.stroke();}
+      if(hov){ctx.globalAlpha=fade;ctx.beginPath();ctx.arc(q.x,q.y,rd+3.5,0,6.2832);ctx.strokeStyle='#fff';ctx.lineWidth=1.6;ctx.stroke();}
     });
     ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-    if(hoverIndex>=0&&!tip.hidden){var hq=proj(countries[hoverIndex].v||xyz(countries[hoverIndex].lat,countries[hoverIndex].lon),g);if(hq.z<=.02){tip.hidden=true;}else positionTip(hoverIndex);}
+    if(hoverIndex>=0&&!tip.hidden){var hq=proj(countries[hoverIndex].v,g);if(hq.z<=.02){tip.hidden=true;}else positionTip(hoverIndex);}
     raf=requestAnimationFrame(draw);
   }
 
   /* ───────── 列表 / 悬浮提示 ───────── */
-  function renderList(){
-    active.map(function(c){return {c:c,i:countries.indexOf(c)};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){
-      var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;
-      row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png" loading="lazy"><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';
-      row.addEventListener('mouseenter',function(){selectCountry(i,true);});
-      row.addEventListener('focus',function(){selectCountry(i,true);});
-      row.addEventListener('click',function(){focusCountry(i);});
-      list.appendChild(row);
-    });
-    list.addEventListener('mouseleave',function(){clearHover();});
+  var rows=[];
+  function buildRow(c){
+    var row=document.createElement('div');row.className='world-country-row';row.dataset.index=c.i;row.tabIndex=0;
+    row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+c.code+'.png" loading="lazy"><span class="world-country-name"><b class="wn"></b><small class="ws"></small></span><span class="world-country-count"><i class="wc"></i><small class="wp"></small></span>';
+    row._n=row.querySelector('.wn');row._s=row.querySelector('.ws');row._c=row.querySelector('.wc');row._p=row.querySelector('.wp');row._last=-1;
+    row.addEventListener('mouseenter',function(){selectCountry(c.i,true);});
+    row.addEventListener('focus',function(){selectCountry(c.i,true);});
+    row.addEventListener('click',function(){touched=true;focusCountry(c.i);});
+    rows[c.i]=row;list.appendChild(row);fillRow(c,true);return row;
   }
+  function youBadge(){return '<em class="world-you">'+esc(T('worldYou'))+'</em>';}
+  function fillRow(c,full){
+    var row=rows[c.i];if(!row)return;
+    if(full){row._n.innerHTML=esc(cname(c))+(c===me?youBadge():'');row._s.textContent=c===me?T('worldYouHere'):T('worldRegion');row._p.textContent=T('worldPlayers');}
+    if(row._last!==c.count){
+      var up=row._last>=0&&c.count>row._last,dn=row._last>=0&&c.count<row._last;row._last=c.count;row._c.textContent=fmt(c.count);
+      row.style.display=c.count>0?'':'none';
+      if(up||dn){row._c.classList.remove('up','dn');void row._c.offsetWidth;row._c.classList.add(up?'up':'dn');}
+    }
+  }
+  function sortRows(force){
+    var nowMs=Date.now();if(!force&&(listHover||nowMs-lastSort<5000))return;lastSort=nowMs;
+    active.slice().sort(function(a,b){return b.count-a.count;}).forEach(function(c){list.appendChild(rows[c.i]);});
+  }
+  function renderList(){countries.forEach(buildRow);sortRows(true);list.addEventListener('mouseenter',function(){listHover=true;});list.addEventListener('mouseleave',function(){listHover=false;clearHover();});}
+  function tipHtml(c){return '<div class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+c.code+'.png"><strong>'+esc(cname(c))+'</strong>'+(c===me?youBadge():'')+'</div><b><i class="wtn">'+esc(fmt(c.count))+'</i><small>'+esc(T('worldOnline'))+'</small></b>';}
   function positionTip(i){
-    var c=countries[i],g=geom(),rect=canvas.getBoundingClientRect(),q=proj(c.v||xyz(c.lat,c.lon),g),stageRect=stage.getBoundingClientRect(),
+    var c=countries[i],g=geom(),rect=canvas.getBoundingClientRect(),q=proj(c.v,g),stageRect=stage.getBoundingClientRect(),
         ax=rect.left-stageRect.left+q.x,ay=rect.top-stageRect.top+q.y,
         left=Math.max(8,Math.min(stageRect.width-tip.offsetWidth-8,ax+16)),top=Math.max(8,Math.min(stageRect.height-tip.offsetHeight-8,ay-tip.offsetHeight/2));
     tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.toggle('tip-left',left<ax-tip.offsetWidth);
@@ -6585,26 +6653,67 @@ bgfxApply();
   }
   function selectCountry(i,showTip){
     hoverIndex=i;
-    list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});
-    if(showTip){var c=countries[i];tip.hidden=false;
-      tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';
+    list.querySelectorAll('.world-country-row.active').forEach(function(n){n.classList.remove('active');});
+    if(rows[i])rows[i].classList.add('active');
+    if(showTip){var c=countries[i];tip.hidden=false;tip.innerHTML=tipHtml(c);
       var q=proj(c.v,geom());if(q.z<=.02){tip.hidden=true;return;}positionTip(i);}
   }
   function clearHover(){hoverIndex=-1;tip.hidden=true;list.querySelectorAll('.world-country-row.active').forEach(function(n){n.classList.remove('active');});}
-  function focusCountry(i){
-    var c=countries[i];selectCountry(i,false);
-    var tr=-c.lon*Math.PI/180,d=((tr-rot+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
-    focus={rot:rot+d,tilt:Math.max(-.8,Math.min(.8,c.lat*Math.PI/180*.85))};
-    tip.hidden=false;tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';
-  }
+  function focusOn(c,ratio){var tr=-c.lon*Math.PI/180,d=((tr-rot+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;focus={rot:rot+d,tilt:Math.max(-.8,Math.min(.8,c.lat*Math.PI/180*(ratio||.85)))};}
+  function focusCountry(i){var c=countries[i];selectCountry(i,false);focusOn(c);tip.hidden=false;tip.innerHTML=tipHtml(c);}
   function findCountryAt(clientX,clientY){
     var rect=canvas.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top,g=geom(),best=1e9,idx=-1;
-    active.forEach(function(c){var q=proj(c.v,g);if(q.z<=.02)return;var lim=Math.max(13,c.rad*g.sc+7),d=Math.hypot(q.x-x,q.y-y);if(d<lim&&d<best){best=d;idx=countries.indexOf(c);}});
+    active.forEach(function(c){var q=proj(c.v,g);if(q.z<=.02)return;var lim=Math.max(13,c.dr*g.sc+7),d=Math.hypot(q.x-x,q.y-y);if(d<lim&&d<best){best=d;idx=c.i;}});
     return idx;
+  }
+  /* 整页文案：data-ui 节点 + 标题/无障碍标签 + 列表 + 提示 */
+  function relabel(){
+    page.querySelectorAll('[data-ui]').forEach(function(n){n.textContent=T(n.getAttribute('data-ui'));});
+    canvas.setAttribute('aria-label',T('worldAria'));openBtn.setAttribute('aria-label',T('worldBtnTitle'));openBtn.title=T('worldBtnTitle');
+    countries.forEach(function(c){fillRow(c,true);});
+    if(hoverIndex>=0&&!tip.hidden)tip.innerHTML=tipHtml(countries[hoverIndex]);
+    totalEl.textContent=fmt(Math.round(tot));
+  }
+  function refreshLive(){
+    recalc();
+    countries.forEach(function(c){fillRow(c,false);});
+    sortRows(false);
+    if(hoverIndex>=0&&!tip.hidden){var n=tip.querySelector('.wtn');if(n)n.textContent=fmt(countries[hoverIndex].count);}
+  }
+
+  /* ───────── 当前 IP → 国家（真实定位）；所在国人数不低于 5 ───────── */
+  var GEO_KEY='starline.worldGeo.v1',geoStarted=false;
+  function fetchJson(url,ms){return new Promise(function(res,rej){var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort();rej(new Error('timeout'));},ms);fetch(url,{cache:'no-store',credentials:'omit',signal:ctl?ctl.signal:undefined}).then(function(r){if(!r.ok)throw new Error('http');return r.json();}).then(function(d){clearTimeout(tm);res(d);},function(e){clearTimeout(tm);rej(e);});});}
+  var GEO_SRC=[
+    {u:'https://ipwho.is/',f:function(d){return d&&d.success!==false&&d.country_code?{code:d.country_code,name:d.country,lat:d.latitude,lon:d.longitude}:null;}},
+    {u:'https://ipapi.co/json/',f:function(d){return d&&!d.error&&d.country_code?{code:d.country_code,name:d.country_name,lat:d.latitude,lon:d.longitude}:null;}},
+    {u:'https://api.country.is/',f:function(d){return d&&d.country?{code:d.country}:null;}}
+  ];
+  function geoCached(){try{var o=JSON.parse(localStorage.getItem(GEO_KEY)||'null');if(o&&o.code&&Date.now()-o.t<3600000)return o;}catch(e){}return null;}
+  function geoLookup(){
+    return GEO_SRC.reduce(function(p,s){return p.then(function(r){if(r)return r;return fetchJson(s.u,5000).then(s.f).catch(function(){return null;});});},Promise.resolve(null)).then(function(r){
+      if(r&&r.code){r.t=Date.now();try{localStorage.setItem(GEO_KEY,JSON.stringify(r));}catch(e){}return r;}
+      var m=/[-_]([A-Za-z]{2})\b/.exec(navigator.language||'');return m?{code:m[1],locale:true}:null;   /* 全部网络源失败时，退回系统区域设置 */
+    });
+  }
+  function setMe(info){
+    if(!info||!info.code)return;var code=String(info.code).toLowerCase(),c=byCode[code];
+    if(!c){if(typeof info.lat!=='number'||typeof info.lon!=='number')return;c=mkCountry(info.name||regionName(code)||code.toUpperCase(),codeToFlag(code),info.lat,info.lon,true);buildRow(c);}
+    var prev=me;if(prev&&prev!==c){fillRow(prev,true);}
+    me=c;
+    if(c.count<MIN_ME){var need=MIN_ME-c.count;c.count+=need;S+=need;c.flash=performance.now();var guard=0;while(S>T1&&guard++<400){var o=pickLeave(new Date());if(!o||o===c)break;addPlayers(o,-1);}}
+    recalc();countries.forEach(function(x){fillRow(x,x===c||x===prev);});sortRows(true);
+    if(!touched&&page.classList.contains('open')){focusOn(c,.6);}
+    else if(!touched){rot=-c.lon*Math.PI/180;tilt=Math.max(-.8,Math.min(.8,c.lat*Math.PI/180*.6));}
+  }
+  function startGeo(){
+    if(geoStarted)return;geoStarted=true;
+    var cached=geoCached();if(cached){setMe(cached);return;}
+    geoLookup().then(setMe).catch(function(){});
   }
 
   /* ───────── 交互：指针拖动旋转 / 悬停 / 点击聚焦 ───────── */
-  canvas.addEventListener('pointerdown',function(e){dragging=true;moved=0;downX=lastX=e.clientX;downY=lastY=e.clientY;vel=0;focus=null;try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
+  canvas.addEventListener('pointerdown',function(e){dragging=true;touched=true;moved=0;downX=lastX=e.clientX;downY=lastY=e.clientY;vel=0;focus=null;try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
   canvas.addEventListener('pointermove',function(e){
     if(dragging){var dx=e.clientX-lastX,dy=e.clientY-lastY;rot+=dx*.0065;vel=dx*.0065;tilt=Math.max(-.9,Math.min(.9,tilt+dy*.005));lastX=e.clientX;lastY=e.clientY;moved=Math.max(moved,Math.hypot(e.clientX-downX,e.clientY-downY));if(moved>4){tip.hidden=true;}return;}
     var i=findCountryAt(e.clientX,e.clientY);
@@ -6616,13 +6725,29 @@ bgfxApply();
   canvas.addEventListener('pointercancel',function(){dragging=false;});
   canvas.addEventListener('pointerleave',function(){if(!dragging)clearHover();});
 
-  function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';readTheme();resize();if(!raf)raf=requestAnimationFrame(draw);}
-  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';clearHover();dragging=false;if(raf){cancelAnimationFrame(raf);raf=0;}}
-  renderList();openBtn.addEventListener('click',show);
+  /* ───────── 开关页面 / 实时更新循环 ───────── */
+  function schedule(){timer=setTimeout(function(){tick();lastTick=Date.now();refreshLive();if(page.classList.contains('open'))schedule();},700+Math.random()*1700);}
+  function show(){
+    page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+    readTheme();resize();relabel();
+    var missed=Math.min(30,Math.floor((Date.now()-lastTick)/1800));for(var k=0;k<missed;k++)tick();lastTick=Date.now();refreshLive();tot=S;totalEl.textContent=fmt(S);
+    startGeo();
+    if(!raf)raf=requestAnimationFrame(draw);if(!timer)schedule();
+  }
+  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';clearHover();dragging=false;if(raf){cancelAnimationFrame(raf);raf=0;}if(timer){clearTimeout(timer);timer=0;}}
+  recalc();renderList();relabel();
+  openBtn.addEventListener('click',show);
+  var backBtn=document.getElementById('worldBackBtn');if(backBtn)backBtn.addEventListener('click',hide);
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});
   window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
+  /* 语言切换 / 保存自定义翻译时刷新（uiSetLang 每次都会调用 ctRefreshLabels） */
+  (function(){
+    var p1=window.ctRefreshLabels;window.ctRefreshLabels=function(){var r;if(typeof p1==='function'){try{r=p1.apply(this,arguments);}catch(e){}}try{relabel();}catch(e){}return r;};
+    if(typeof window.onUiLangChanged==='function'){var p2=window.onUiLangChanged;window.onUiLangChanged=function(){var r;try{r=p2.apply(this,arguments);}catch(e){}try{relabel();}catch(e){}return r;};}
+  })();
 })();
 </script>
+
 
 
 </body>
@@ -6876,7 +7001,7 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
   height:64px;flex-shrink:0;display:flex;align-items:center;gap:14px;
   padding:0 26px;-webkit-app-region:drag;
 }
-.topbar-search{flex:1;max-width:420px;min-width:160px;position:relative;-webkit-app-region:no-drag}
+.topbar-search{flex:1;max-width:435px;min-width:160px;position:relative;-webkit-app-region:no-drag}
 .topbar-search svg{
   position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:2;
   width:16px;height:16px;fill:none;stroke:var(--text-3);stroke-width:2.2;
@@ -9251,7 +9376,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
         <input id="searchInput" type="text" placeholder="Search games..." data-ui-ph="searchGames" autocomplete="off" spellcheck="false">
         <button class="sk-kbd" id="skKbd" type="button" title="FAQ &amp; all games (Ctrl+K)" aria-haspopup="dialog" aria-expanded="false" aria-controls="skPop"><kbd>Ctrl</kbd><kbd>K</kbd></button>
       </div>
-      <button class="world-map-btn" id="worldMapOpen" type="button" title="World online players" aria-label="World online players">
+      <button class="world-map-btn" id="worldMapOpen" type="button" title="World online players" aria-label="World online players" data-ui-title="worldBtnTitle">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.2"/><path d="M2.8 12h18.4M12 2.8c2.5 2.5 3.7 5.6 3.7 9.2s-1.2 6.7-3.7 9.2c-2.5-2.5-3.7-5.6-3.7-9.2S9.5 5.3 12 2.8z"/></svg>
         </button>
       <div class="tb-spacer"></div>
@@ -15640,24 +15765,24 @@ __UI_SCRIPT__
 
 <div id="worldOnlinePage" class="world-online-page" aria-hidden="true">
   <header class="world-online-head" onmousedown="if(event.button===0 && !event.target.closest('button')){window.uiDrag&&window.uiDrag(event)}">
-    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong>WORLD ACTIVITY</strong><small>Global player distribution</small></div></div>
-    <div class="world-total-wrap"><span>ONLINE NOW</span><strong id="worldTotal">—</strong></div>
+    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong data-ui="worldTitle">WORLD ACTIVITY</strong><small data-ui="worldSub">Global player distribution</small></div></div>
+    <div class="world-total-wrap"><span data-ui="worldOnlineNow">ONLINE NOW</span><strong id="worldTotal">—</strong></div>
   </header>
   <div class="world-content">
     <section class="world-map-panel">
-      <div class="world-map-caption"><span>GLOBAL NETWORK</span><span class="world-map-hint">Drag to rotate · hover a marker</span></div>
+      <div class="world-map-caption"><span data-ui="worldNetwork">GLOBAL NETWORK</span><span class="world-map-hint" data-ui="worldHint">Drag to rotate · hover a marker</span></div>
       <div class="world-map-stage">
         <canvas id="worldGlobeCanvas" aria-label="Interactive 3D particle globe showing simulated online players by country" role="img"></canvas>
         <div id="worldCountryTip" class="world-country-tip" hidden></div>
       </div>
-      <div class="world-legend"><span>FEWER PLAYERS</span><i class="legend-low"></i><i class="legend-mid"></i><i class="legend-high"></i><i class="legend-hot"></i><span>MORE PLAYERS</span></div>
+      <div class="world-legend"><span data-ui="worldFewer">FEWER PLAYERS</span><i class="legend-low"></i><i class="legend-mid"></i><i class="legend-high"></i><i class="legend-hot"></i><span data-ui="worldMore">MORE PLAYERS</span></div>
     </section>
     <aside class="world-side-panel">
-      <div class="world-side-title"><span>REGIONAL ACTIVITY</span></div>
+      <div class="world-side-title"><span data-ui="worldRegional">REGIONAL ACTIVITY</span></div>
       <div id="worldCountryList" class="world-country-list"></div>
     </aside>
   </div>
-  <footer class="world-foot"><span class="world-esc-key"><kbd>ESC</kbd><span>返回</span></span></footer>
+  <footer class="world-foot"><button type="button" class="world-esc-key" id="worldBackBtn"><kbd>ESC</kbd><span data-ui="worldBack">Back</span></button></footer>
 </div>
 <style>
 .world-online-page{position:fixed;inset:0;z-index:2147483200;display:none;flex-direction:column;background:var(--bg,#0a0a0c);color:var(--text,#f4f4f5);font-family:var(--font,Inter,sans-serif);overflow:hidden}
@@ -15689,13 +15814,35 @@ __UI_SCRIPT__
 .world-country-list{overflow:auto;padding:6px 10px;flex:1}.world-country-row{display:flex;align-items:center;gap:10px;padding:10px 7px;border-bottom:1px solid var(--border);border-radius:8px;cursor:pointer}.world-country-row:hover,.world-country-row.active{background:var(--surface-2)}
 .world-flag{width:26px;height:18px;object-fit:cover;border-radius:3px;flex:0 0 26px;box-shadow:0 0 0 1px rgba(255,255,255,.12)}.world-country-name{flex:1;min-width:0;font-size:12px;font-weight:600}.world-country-name small{display:block;font-size:10px;color:var(--text-3);font-weight:400;margin-top:2px}.world-country-count{font:600 12px var(--font-mono,monospace);text-align:right}.world-country-count small{display:block;font:10px var(--font, sans-serif);color:var(--text-3);margin-top:2px}
 .world-disclaimer{display:none!important}
-.world-foot{height:42px;flex-shrink:0;padding:0 26px;display:flex;align-items:center;justify-content:flex-end;color:var(--text-3);font-size:11px;background:transparent;border:0}.world-esc-key{display:flex;align-items:center;gap:8px}.world-esc-key kbd{padding:4px 8px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface-2);color:var(--text-2);font:600 10px var(--font-mono,monospace);box-shadow:0 2px 0 var(--border)}
-@media(max-width:760px){.world-online-head{height:64px;padding:0 14px;gap:10px}.world-brand{min-width:0}.world-brand small{display:none}.world-total-wrap{gap:5px}.world-total-wrap strong{font-size:17px}.world-content{grid-template-columns:1fr;padding:10px;gap:12px}.world-map-stage{height:auto;min-height:310px}#worldGlobeCanvas{min-height:300px;max-height:50vh}.world-side-panel{max-height:340px}.world-map-hint{display:none}.world-foot{padding:0 14px}}
+.world-foot{height:56px;flex-shrink:0;width:100%;max-width:1800px;margin:0 auto;box-sizing:border-box;padding:0 clamp(14px,3vw,42px) 6px;display:flex;align-items:center;justify-content:flex-start;color:var(--text-3);font-size:11px;background:transparent;border:0}.world-esc-key{display:flex;align-items:center;gap:10px;padding:6px 10px 6px 6px;margin-left:-6px;border:0;border-radius:10px;background:transparent;color:inherit;font:inherit;cursor:pointer;transition:background var(--tr-fast),color var(--tr-fast)}.world-esc-key:hover{background:var(--surface-2);color:var(--text-2)}.world-esc-key kbd{padding:4px 8px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface-2);color:var(--text-2);font:600 10px var(--font-mono,monospace);box-shadow:0 2px 0 var(--border)}
+@media(max-width:760px){.world-online-head{height:64px;padding:0 14px;gap:10px}.world-brand{min-width:0}.world-brand small{display:none}.world-total-wrap{gap:5px}.world-total-wrap strong{font-size:17px}.world-content{grid-template-columns:1fr;padding:10px;gap:12px}.world-map-stage{height:auto;min-height:310px}#worldGlobeCanvas{min-height:300px;max-height:50vh}.world-side-panel{max-height:340px}.world-map-hint{display:none}.world-foot{padding:0 14px 6px}}
+
+.world-tip-title{margin:0}
+.world-you{display:inline-block;margin-left:auto;padding:2px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent-2);font:700 9px var(--font,sans-serif);font-style:normal;letter-spacing:.6px;text-transform:uppercase;white-space:nowrap}
+.world-country-name .world-you{margin-left:7px;vertical-align:1px}
+.world-country-tip b small{display:inline;margin-left:5px;font:600 11px var(--font,sans-serif);color:var(--text-3)}
+.world-country-tip b i{font-style:normal}
+.world-country-name b{font-weight:600}
+.world-country-count i{font-style:normal}
+.world-country-count i.up{animation:worldUp 1s ease-out}.world-country-count i.dn{animation:worldDn 1s ease-out}
+@keyframes worldUp{0%{color:var(--ok,#10b981);text-shadow:0 0 8px var(--ok,#10b981)}100%{color:inherit;text-shadow:none}}
+@keyframes worldDn{0%{color:var(--err,#ef4444);text-shadow:0 0 8px var(--err,#ef4444)}100%{color:inherit;text-shadow:none}}
 </style>
 <script>
 (function(){
   var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage');
   if(!openBtn||!page||page.dataset.globeReady)return; page.dataset.globeReady='1';
+  /* ───────── 多语言：全部写进 UI_T（8 种内置语言），自定义翻译编辑器会自动列出这些键；自定义语言缺失的键回落到英文 ───────── */
+  var WT={"en":{"worldTitle":"WORLD ACTIVITY","worldSub":"Global player distribution","worldOnlineNow":"ONLINE NOW","worldNetwork":"GLOBAL NETWORK","worldHint":"Drag to rotate · hover a marker","worldFewer":"FEWER PLAYERS","worldMore":"MORE PLAYERS","worldRegional":"REGIONAL ACTIVITY","worldBack":"Back","worldPlayers":"players","worldOnline":"online","worldYou":"You","worldYouHere":"Your location","worldRegion":"Geographic region","worldBtnTitle":"World online players","worldAria":"Interactive 3D particle globe showing online players by country","cn_us":"United States","cn_ca":"Canada","cn_mx":"Mexico","cn_gt":"Guatemala","cn_cu":"Cuba","cn_pa":"Panama","cn_cr":"Costa Rica","cn_jm":"Jamaica","cn_ht":"Haiti","cn_do":"Dominican Republic","cn_co":"Colombia","cn_ve":"Venezuela","cn_ec":"Ecuador","cn_pe":"Peru","cn_bo":"Bolivia","cn_cl":"Chile","cn_ar":"Argentina","cn_uy":"Uruguay","cn_py":"Paraguay","cn_br":"Brazil","cn_is":"Iceland","cn_ie":"Ireland","cn_gb":"United Kingdom","cn_pt":"Portugal","cn_es":"Spain","cn_fr":"France","cn_be":"Belgium","cn_nl":"Netherlands","cn_de":"Germany","cn_ch":"Switzerland","cn_it":"Italy","cn_no":"Norway","cn_se":"Sweden","cn_fi":"Finland","cn_dk":"Denmark","cn_pl":"Poland","cn_cz":"Czechia","cn_at":"Austria","cn_hu":"Hungary","cn_ro":"Romania","cn_gr":"Greece","cn_ua":"Ukraine","cn_tr":"Türkiye","cn_ru":"Russia","cn_ma":"Morocco","cn_dz":"Algeria","cn_tn":"Tunisia","cn_ly":"Libya","cn_eg":"Egypt","cn_sn":"Senegal","cn_gh":"Ghana","cn_ng":"Nigeria","cn_cm":"Cameroon","cn_et":"Ethiopia","cn_ke":"Kenya","cn_ug":"Uganda","cn_tz":"Tanzania","cn_cd":"Democratic Republic of the Congo","cn_ao":"Angola","cn_zm":"Zambia","cn_zw":"Zimbabwe","cn_mz":"Mozambique","cn_na":"Namibia","cn_za":"South Africa","cn_mg":"Madagascar","cn_sa":"Saudi Arabia","cn_il":"Israel","cn_jo":"Jordan","cn_iq":"Iraq","cn_ir":"Iran","cn_kz":"Kazakhstan","cn_uz":"Uzbekistan","cn_pk":"Pakistan","cn_in":"India","cn_np":"Nepal","cn_bd":"Bangladesh","cn_lk":"Sri Lanka","cn_mm":"Myanmar","cn_th":"Thailand","cn_vn":"Vietnam","cn_kh":"Cambodia","cn_my":"Malaysia","cn_sg":"Singapore","cn_id":"Indonesia","cn_ph":"Philippines","cn_cn":"China","cn_mn":"Mongolia","cn_kp":"North Korea","cn_kr":"South Korea","cn_jp":"Japan","cn_tw":"Taiwan","cn_af":"Afghanistan","cn_ae":"United Arab Emirates","cn_qa":"Qatar","cn_kw":"Kuwait","cn_om":"Oman","cn_au":"Australia","cn_nz":"New Zealand","cn_pg":"Papua New Guinea","cn_fj":"Fiji","cn_al":"Albania","cn_ba":"Bosnia and Herzegovina","cn_hr":"Croatia","cn_rs":"Serbia","cn_bg":"Bulgaria","cn_sk":"Slovakia","cn_si":"Slovenia","cn_ee":"Estonia","cn_lv":"Latvia","cn_lt":"Lithuania","cn_by":"Belarus","cn_md":"Moldova","cn_lu":"Luxembourg","cn_mt":"Malta","cn_cy":"Cyprus","cn_ad":"Andorra","cn_am":"Armenia","cn_ge":"Georgia","cn_az":"Azerbaijan","cn_kg":"Kyrgyzstan","cn_tj":"Tajikistan","cn_tm":"Turkmenistan","cn_ye":"Yemen","cn_sy":"Syria","cn_lb":"Lebanon","cn_ps":"Palestine","cn_bh":"Bahrain","cn_bn":"Brunei","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Bhutan","cn_mv":"Maldives","cn_mr":"Mauritania","cn_ml":"Mali","cn_bf":"Burkina Faso","cn_ci":"Ivory Coast","cn_lr":"Liberia","cn_sl":"Sierra Leone","cn_gn":"Guinea","cn_gw":"Guinea-Bissau","cn_gm":"Gambia","cn_tg":"Togo","cn_bj":"Benin","cn_ne":"Niger","cn_td":"Chad","cn_sd":"Sudan","cn_ss":"South Sudan","cn_so":"Somalia","cn_er":"Eritrea","cn_dj":"Djibouti","cn_cf":"Central African Republic","cn_cg":"Republic of the Congo","cn_ga":"Gabon","cn_gq":"Equatorial Guinea","cn_rw":"Rwanda","cn_bi":"Burundi","cn_mw":"Malawi","cn_bw":"Botswana","cn_ls":"Lesotho","cn_sz":"Eswatini","cn_mu":"Mauritius","cn_sc":"Seychelles","cn_km":"Comoros","cn_cv":"Cape Verde","cn_st":"Sao Tome and Principe","cn_bs":"Bahamas","cn_bz":"Belize","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nicaragua","cn_tt":"Trinidad and Tobago","cn_bb":"Barbados","cn_gy":"Guyana","cn_sr":"Suriname","cn_gd":"Grenada","cn_ag":"Antigua and Barbuda","cn_dm":"Dominica","cn_lc":"Saint Lucia","cn_vc":"Saint Vincent and the Grenadines","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Solomon Islands","cn_ki":"Kiribati","cn_tv":"Tuvalu","cn_mh":"Marshall Islands","cn_fm":"Micronesia","cn_pw":"Palau","cn_nr":"Nauru","cn_ck":"Cook Islands","cn_nu":"Niue","cn_mc":"Monaco","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Montenegro","cn_mk":"North Macedonia","cn_xk":"Kosovo"},"zh":{"worldTitle":"世界活跃度","worldSub":"全球玩家分布","worldOnlineNow":"当前在线","worldNetwork":"全球网络","worldHint":"拖动旋转 · 悬停标记查看","worldFewer":"人数较少","worldMore":"人数较多","worldRegional":"地区活跃度","worldBack":"返回","worldPlayers":"玩家","worldOnline":"在线","worldYou":"你","worldYouHere":"你的位置","worldRegion":"地理区域","worldBtnTitle":"世界在线玩家","worldAria":"按国家显示在线玩家的可交互 3D 粒子地球","cn_us":"美国","cn_ca":"加拿大","cn_mx":"墨西哥","cn_gt":"危地马拉","cn_cu":"古巴","cn_pa":"巴拿马","cn_cr":"哥斯达黎加","cn_jm":"牙买加","cn_ht":"海地","cn_do":"多米尼加共和国","cn_co":"哥伦比亚","cn_ve":"委内瑞拉","cn_ec":"厄瓜多尔","cn_pe":"秘鲁","cn_bo":"玻利维亚","cn_cl":"智利","cn_ar":"阿根廷","cn_uy":"乌拉圭","cn_py":"巴拉圭","cn_br":"巴西","cn_is":"冰岛","cn_ie":"爱尔兰","cn_gb":"英国","cn_pt":"葡萄牙","cn_es":"西班牙","cn_fr":"法国","cn_be":"比利时","cn_nl":"荷兰","cn_de":"德国","cn_ch":"瑞士","cn_it":"意大利","cn_no":"挪威","cn_se":"瑞典","cn_fi":"芬兰","cn_dk":"丹麦","cn_pl":"波兰","cn_cz":"捷克","cn_at":"奥地利","cn_hu":"匈牙利","cn_ro":"罗马尼亚","cn_gr":"希腊","cn_ua":"乌克兰","cn_tr":"土耳其","cn_ru":"俄罗斯","cn_ma":"摩洛哥","cn_dz":"阿尔及利亚","cn_tn":"突尼斯","cn_ly":"利比亚","cn_eg":"埃及","cn_sn":"塞内加尔","cn_gh":"加纳","cn_ng":"尼日利亚","cn_cm":"喀麦隆","cn_et":"埃塞俄比亚","cn_ke":"肯尼亚","cn_ug":"乌干达","cn_tz":"坦桑尼亚","cn_cd":"刚果（金）","cn_ao":"安哥拉","cn_zm":"赞比亚","cn_zw":"津巴布韦","cn_mz":"莫桑比克","cn_na":"纳米比亚","cn_za":"南非","cn_mg":"马达加斯加","cn_sa":"沙特阿拉伯","cn_il":"以色列","cn_jo":"约旦","cn_iq":"伊拉克","cn_ir":"伊朗","cn_kz":"哈萨克斯坦","cn_uz":"乌兹别克斯坦","cn_pk":"巴基斯坦","cn_in":"印度","cn_np":"尼泊尔","cn_bd":"孟加拉国","cn_lk":"斯里兰卡","cn_mm":"缅甸","cn_th":"泰国","cn_vn":"越南","cn_kh":"柬埔寨","cn_my":"马来西亚","cn_sg":"新加坡","cn_id":"印度尼西亚","cn_ph":"菲律宾","cn_cn":"中国","cn_mn":"蒙古","cn_kp":"朝鲜","cn_kr":"韩国","cn_jp":"日本","cn_tw":"台湾","cn_af":"阿富汗","cn_ae":"阿拉伯联合酋长国","cn_qa":"卡塔尔","cn_kw":"科威特","cn_om":"阿曼","cn_au":"澳大利亚","cn_nz":"新西兰","cn_pg":"巴布亚新几内亚","cn_fj":"斐济","cn_al":"阿尔巴尼亚","cn_ba":"波斯尼亚和黑塞哥维那","cn_hr":"克罗地亚","cn_rs":"塞尔维亚","cn_bg":"保加利亚","cn_sk":"斯洛伐克","cn_si":"斯洛文尼亚","cn_ee":"爱沙尼亚","cn_lv":"拉脱维亚","cn_lt":"立陶宛","cn_by":"白俄罗斯","cn_md":"摩尔多瓦","cn_lu":"卢森堡","cn_mt":"马耳他","cn_cy":"塞浦路斯","cn_ad":"安道尔","cn_am":"亚美尼亚","cn_ge":"格鲁吉亚","cn_az":"阿塞拜疆","cn_kg":"吉尔吉斯斯坦","cn_tj":"塔吉克斯坦","cn_tm":"土库曼斯坦","cn_ye":"也门","cn_sy":"叙利亚","cn_lb":"黎巴嫩","cn_ps":"巴勒斯坦领土","cn_bh":"巴林","cn_bn":"文莱","cn_la":"老挝","cn_tl":"东帝汶","cn_bt":"不丹","cn_mv":"马尔代夫","cn_mr":"毛里塔尼亚","cn_ml":"马里","cn_bf":"布基纳法索","cn_ci":"科特迪瓦","cn_lr":"利比里亚","cn_sl":"塞拉利昂","cn_gn":"几内亚","cn_gw":"几内亚比绍","cn_gm":"冈比亚","cn_tg":"多哥","cn_bj":"贝宁","cn_ne":"尼日尔","cn_td":"乍得","cn_sd":"苏丹","cn_ss":"南苏丹","cn_so":"索马里","cn_er":"厄立特里亚","cn_dj":"吉布提","cn_cf":"中非共和国","cn_cg":"刚果（布）","cn_ga":"加蓬","cn_gq":"赤道几内亚","cn_rw":"卢旺达","cn_bi":"布隆迪","cn_mw":"马拉维","cn_bw":"博茨瓦纳","cn_ls":"莱索托","cn_sz":"斯威士兰","cn_mu":"毛里求斯","cn_sc":"塞舌尔","cn_km":"科摩罗","cn_cv":"佛得角","cn_st":"圣多美和普林西比","cn_bs":"巴哈马","cn_bz":"伯利兹","cn_hn":"洪都拉斯","cn_sv":"萨尔瓦多","cn_ni":"尼加拉瓜","cn_tt":"特立尼达和多巴哥","cn_bb":"巴巴多斯","cn_gy":"圭亚那","cn_sr":"苏里南","cn_gd":"格林纳达","cn_ag":"安提瓜和巴布达","cn_dm":"多米尼克","cn_lc":"圣卢西亚","cn_vc":"圣文森特和格林纳丁斯","cn_ws":"萨摩亚","cn_to":"汤加","cn_vu":"瓦努阿图","cn_sb":"所罗门群岛","cn_ki":"基里巴斯","cn_tv":"图瓦卢","cn_mh":"马绍尔群岛","cn_fm":"密克罗尼西亚","cn_pw":"帕劳","cn_nr":"瑙鲁","cn_ck":"库克群岛","cn_nu":"纽埃","cn_mc":"摩纳哥","cn_sm":"圣马力诺","cn_li":"列支敦士登","cn_me":"黑山","cn_mk":"北马其顿","cn_xk":"科索沃"},"ru":{"worldTitle":"АКТИВНОСТЬ В МИРЕ","worldSub":"Распределение игроков по миру","worldOnlineNow":"СЕЙЧАС ОНЛАЙН","worldNetwork":"ГЛОБАЛЬНАЯ СЕТЬ","worldHint":"Вращайте мышью · наведите на маркер","worldFewer":"МЕНЬШЕ ИГРОКОВ","worldMore":"БОЛЬШЕ ИГРОКОВ","worldRegional":"АКТИВНОСТЬ ПО РЕГИОНАМ","worldBack":"Назад","worldPlayers":"игроков","worldOnline":"онлайн","worldYou":"Вы","worldYouHere":"Ваше местоположение","worldRegion":"Географический регион","worldBtnTitle":"Игроки онлайн в мире","worldAria":"Интерактивный 3D-глобус из частиц с игроками онлайн по странам","cn_us":"Соединенные Штаты","cn_ca":"Канада","cn_mx":"Мексика","cn_gt":"Гватемала","cn_cu":"Куба","cn_pa":"Панама","cn_cr":"Коста-Рика","cn_jm":"Ямайка","cn_ht":"Гаити","cn_do":"Доминиканская Республика","cn_co":"Колумбия","cn_ve":"Венесуэла","cn_ec":"Эквадор","cn_pe":"Перу","cn_bo":"Боливия","cn_cl":"Чили","cn_ar":"Аргентина","cn_uy":"Уругвай","cn_py":"Парагвай","cn_br":"Бразилия","cn_is":"Исландия","cn_ie":"Ирландия","cn_gb":"Великобритания","cn_pt":"Португалия","cn_es":"Испания","cn_fr":"Франция","cn_be":"Бельгия","cn_nl":"Нидерланды","cn_de":"Германия","cn_ch":"Швейцария","cn_it":"Италия","cn_no":"Норвегия","cn_se":"Швеция","cn_fi":"Финляндия","cn_dk":"Дания","cn_pl":"Польша","cn_cz":"Чехия","cn_at":"Австрия","cn_hu":"Венгрия","cn_ro":"Румыния","cn_gr":"Греция","cn_ua":"Украина","cn_tr":"Турция","cn_ru":"Россия","cn_ma":"Марокко","cn_dz":"Алжир","cn_tn":"Тунис","cn_ly":"Ливия","cn_eg":"Египет","cn_sn":"Сенегал","cn_gh":"Гана","cn_ng":"Нигерия","cn_cm":"Камерун","cn_et":"Эфиопия","cn_ke":"Кения","cn_ug":"Уганда","cn_tz":"Танзания","cn_cd":"Конго - Киншаса","cn_ao":"Ангола","cn_zm":"Замбия","cn_zw":"Зимбабве","cn_mz":"Мозамбик","cn_na":"Намибия","cn_za":"Южно-Африканская Республика","cn_mg":"Мадагаскар","cn_sa":"Саудовская Аравия","cn_il":"Израиль","cn_jo":"Иордания","cn_iq":"Ирак","cn_ir":"Иран","cn_kz":"Казахстан","cn_uz":"Узбекистан","cn_pk":"Пакистан","cn_in":"Индия","cn_np":"Непал","cn_bd":"Бангладеш","cn_lk":"Шри-Ланка","cn_mm":"Мьянма (Бирма)","cn_th":"Таиланд","cn_vn":"Вьетнам","cn_kh":"Камбоджа","cn_my":"Малайзия","cn_sg":"Сингапур","cn_id":"Индонезия","cn_ph":"Филиппины","cn_cn":"Китай","cn_mn":"Монголия","cn_kp":"КНДР","cn_kr":"Республика Корея","cn_jp":"Япония","cn_tw":"Тайвань","cn_af":"Афганистан","cn_ae":"ОАЭ","cn_qa":"Катар","cn_kw":"Кувейт","cn_om":"Оман","cn_au":"Австралия","cn_nz":"Новая Зеландия","cn_pg":"Папуа — Новая Гвинея","cn_fj":"Фиджи","cn_al":"Албания","cn_ba":"Босния и Герцеговина","cn_hr":"Хорватия","cn_rs":"Сербия","cn_bg":"Болгария","cn_sk":"Словакия","cn_si":"Словения","cn_ee":"Эстония","cn_lv":"Латвия","cn_lt":"Литва","cn_by":"Беларусь","cn_md":"Молдова","cn_lu":"Люксембург","cn_mt":"Мальта","cn_cy":"Кипр","cn_ad":"Андорра","cn_am":"Армения","cn_ge":"Грузия","cn_az":"Азербайджан","cn_kg":"Киргизия","cn_tj":"Таджикистан","cn_tm":"Туркменистан","cn_ye":"Йемен","cn_sy":"Сирия","cn_lb":"Ливан","cn_ps":"Палестинские территории","cn_bh":"Бахрейн","cn_bn":"Бруней","cn_la":"Лаос","cn_tl":"Восточный Тимор","cn_bt":"Бутан","cn_mv":"Мальдивы","cn_mr":"Мавритания","cn_ml":"Мали","cn_bf":"Буркина-Фасо","cn_ci":"Кот-д’Ивуар","cn_lr":"Либерия","cn_sl":"Сьерра-Леоне","cn_gn":"Гвинея","cn_gw":"Гвинея-Бисау","cn_gm":"Гамбия","cn_tg":"Того","cn_bj":"Бенин","cn_ne":"Нигер","cn_td":"Чад","cn_sd":"Судан","cn_ss":"Южный Судан","cn_so":"Сомали","cn_er":"Эритрея","cn_dj":"Джибути","cn_cf":"Центрально-Африканская Республика","cn_cg":"Конго - Браззавиль","cn_ga":"Габон","cn_gq":"Экваториальная Гвинея","cn_rw":"Руанда","cn_bi":"Бурунди","cn_mw":"Малави","cn_bw":"Ботсвана","cn_ls":"Лесото","cn_sz":"Эсватини","cn_mu":"Маврикий","cn_sc":"Сейшельские о-ва","cn_km":"Коморы","cn_cv":"Кабо-Верде","cn_st":"Сан-Томе и Принсипи","cn_bs":"Багамы","cn_bz":"Белиз","cn_hn":"Гондурас","cn_sv":"Сальвадор","cn_ni":"Никарагуа","cn_tt":"Тринидад и Тобаго","cn_bb":"Барбадос","cn_gy":"Гайана","cn_sr":"Суринам","cn_gd":"Гренада","cn_ag":"Антигуа и Барбуда","cn_dm":"Доминика","cn_lc":"Сент-Люсия","cn_vc":"Сент-Винсент и Гренадины","cn_ws":"Самоа","cn_to":"Тонга","cn_vu":"Вануату","cn_sb":"Соломоновы о-ва","cn_ki":"Кирибати","cn_tv":"Тувалу","cn_mh":"Маршалловы о-ва","cn_fm":"Федеративные Штаты Микронезии","cn_pw":"Палау","cn_nr":"Науру","cn_ck":"о-ва Кука","cn_nu":"Ниуэ","cn_mc":"Монако","cn_sm":"Сан-Марино","cn_li":"Лихтенштейн","cn_me":"Черногория","cn_mk":"Северная Македония","cn_xk":"Косово"},"de":{"worldTitle":"WELTWEITE AKTIVITÄT","worldSub":"Globale Spielerverteilung","worldOnlineNow":"JETZT ONLINE","worldNetwork":"GLOBALES NETZWERK","worldHint":"Zum Drehen ziehen · Marker anfahren","worldFewer":"WENIGER SPIELER","worldMore":"MEHR SPIELER","worldRegional":"REGIONALE AKTIVITÄT","worldBack":"Zurück","worldPlayers":"Spieler","worldOnline":"online","worldYou":"Du","worldYouHere":"Dein Standort","worldRegion":"Geografische Region","worldBtnTitle":"Spieler weltweit online","worldAria":"Interaktiver 3D-Partikelglobus mit Online-Spielern nach Land","cn_us":"Vereinigte Staaten","cn_ca":"Kanada","cn_mx":"Mexiko","cn_gt":"Guatemala","cn_cu":"Kuba","cn_pa":"Panama","cn_cr":"Costa Rica","cn_jm":"Jamaika","cn_ht":"Haiti","cn_do":"Dominikanische Republik","cn_co":"Kolumbien","cn_ve":"Venezuela","cn_ec":"Ecuador","cn_pe":"Peru","cn_bo":"Bolivien","cn_cl":"Chile","cn_ar":"Argentinien","cn_uy":"Uruguay","cn_py":"Paraguay","cn_br":"Brasilien","cn_is":"Island","cn_ie":"Irland","cn_gb":"Vereinigtes Königreich","cn_pt":"Portugal","cn_es":"Spanien","cn_fr":"Frankreich","cn_be":"Belgien","cn_nl":"Niederlande","cn_de":"Deutschland","cn_ch":"Schweiz","cn_it":"Italien","cn_no":"Norwegen","cn_se":"Schweden","cn_fi":"Finnland","cn_dk":"Dänemark","cn_pl":"Polen","cn_cz":"Tschechien","cn_at":"Österreich","cn_hu":"Ungarn","cn_ro":"Rumänien","cn_gr":"Griechenland","cn_ua":"Ukraine","cn_tr":"Türkei","cn_ru":"Russland","cn_ma":"Marokko","cn_dz":"Algerien","cn_tn":"Tunesien","cn_ly":"Libyen","cn_eg":"Ägypten","cn_sn":"Senegal","cn_gh":"Ghana","cn_ng":"Nigeria","cn_cm":"Kamerun","cn_et":"Äthiopien","cn_ke":"Kenia","cn_ug":"Uganda","cn_tz":"Tansania","cn_cd":"Kongo-Kinshasa","cn_ao":"Angola","cn_zm":"Sambia","cn_zw":"Simbabwe","cn_mz":"Mosambik","cn_na":"Namibia","cn_za":"Südafrika","cn_mg":"Madagaskar","cn_sa":"Saudi-Arabien","cn_il":"Israel","cn_jo":"Jordanien","cn_iq":"Irak","cn_ir":"Iran","cn_kz":"Kasachstan","cn_uz":"Usbekistan","cn_pk":"Pakistan","cn_in":"Indien","cn_np":"Nepal","cn_bd":"Bangladesch","cn_lk":"Sri Lanka","cn_mm":"Myanmar","cn_th":"Thailand","cn_vn":"Vietnam","cn_kh":"Kambodscha","cn_my":"Malaysia","cn_sg":"Singapur","cn_id":"Indonesien","cn_ph":"Philippinen","cn_cn":"China","cn_mn":"Mongolei","cn_kp":"Nordkorea","cn_kr":"Südkorea","cn_jp":"Japan","cn_tw":"Taiwan","cn_af":"Afghanistan","cn_ae":"Vereinigte Arabische Emirate","cn_qa":"Katar","cn_kw":"Kuwait","cn_om":"Oman","cn_au":"Australien","cn_nz":"Neuseeland","cn_pg":"Papua-Neuguinea","cn_fj":"Fidschi","cn_al":"Albanien","cn_ba":"Bosnien und Herzegowina","cn_hr":"Kroatien","cn_rs":"Serbien","cn_bg":"Bulgarien","cn_sk":"Slowakei","cn_si":"Slowenien","cn_ee":"Estland","cn_lv":"Lettland","cn_lt":"Litauen","cn_by":"Belarus","cn_md":"Republik Moldau","cn_lu":"Luxemburg","cn_mt":"Malta","cn_cy":"Zypern","cn_ad":"Andorra","cn_am":"Armenien","cn_ge":"Georgien","cn_az":"Aserbaidschan","cn_kg":"Kirgisistan","cn_tj":"Tadschikistan","cn_tm":"Turkmenistan","cn_ye":"Jemen","cn_sy":"Syrien","cn_lb":"Libanon","cn_ps":"Palästinensische Autonomiegebiete","cn_bh":"Bahrain","cn_bn":"Brunei Darussalam","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Bhutan","cn_mv":"Malediven","cn_mr":"Mauretanien","cn_ml":"Mali","cn_bf":"Burkina Faso","cn_ci":"Côte d’Ivoire","cn_lr":"Liberia","cn_sl":"Sierra Leone","cn_gn":"Guinea","cn_gw":"Guinea-Bissau","cn_gm":"Gambia","cn_tg":"Togo","cn_bj":"Benin","cn_ne":"Niger","cn_td":"Tschad","cn_sd":"Sudan","cn_ss":"Südsudan","cn_so":"Somalia","cn_er":"Eritrea","cn_dj":"Dschibuti","cn_cf":"Zentralafrikanische Republik","cn_cg":"Kongo-Brazzaville","cn_ga":"Gabun","cn_gq":"Äquatorialguinea","cn_rw":"Ruanda","cn_bi":"Burundi","cn_mw":"Malawi","cn_bw":"Botsuana","cn_ls":"Lesotho","cn_sz":"Eswatini","cn_mu":"Mauritius","cn_sc":"Seychellen","cn_km":"Komoren","cn_cv":"Cabo Verde","cn_st":"São Tomé und Príncipe","cn_bs":"Bahamas","cn_bz":"Belize","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nicaragua","cn_tt":"Trinidad und Tobago","cn_bb":"Barbados","cn_gy":"Guyana","cn_sr":"Suriname","cn_gd":"Grenada","cn_ag":"Antigua und Barbuda","cn_dm":"Dominica","cn_lc":"St. Lucia","cn_vc":"St. Vincent und die Grenadinen","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Salomonen","cn_ki":"Kiribati","cn_tv":"Tuvalu","cn_mh":"Marshallinseln","cn_fm":"Mikronesien","cn_pw":"Palau","cn_nr":"Nauru","cn_ck":"Cookinseln","cn_nu":"Niue","cn_mc":"Monaco","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Montenegro","cn_mk":"Nordmazedonien","cn_xk":"Kosovo"},"ja":{"worldTitle":"ワールドアクティビティ","worldSub":"世界のプレイヤー分布","worldOnlineNow":"現在オンライン","worldNetwork":"グローバルネットワーク","worldHint":"ドラッグで回転 · マーカーにホバー","worldFewer":"プレイヤー少","worldMore":"プレイヤー多","worldRegional":"地域別アクティビティ","worldBack":"戻る","worldPlayers":"人","worldOnline":"オンライン","worldYou":"あなた","worldYouHere":"現在地","worldRegion":"地理的地域","worldBtnTitle":"世界のオンラインプレイヤー","worldAria":"国別のオンラインプレイヤーを表示するインタラクティブな3D粒子地球儀","cn_us":"アメリカ合衆国","cn_ca":"カナダ","cn_mx":"メキシコ","cn_gt":"グアテマラ","cn_cu":"キューバ","cn_pa":"パナマ","cn_cr":"コスタリカ","cn_jm":"ジャマイカ","cn_ht":"ハイチ","cn_do":"ドミニカ共和国","cn_co":"コロンビア","cn_ve":"ベネズエラ","cn_ec":"エクアドル","cn_pe":"ペルー","cn_bo":"ボリビア","cn_cl":"チリ","cn_ar":"アルゼンチン","cn_uy":"ウルグアイ","cn_py":"パラグアイ","cn_br":"ブラジル","cn_is":"アイスランド","cn_ie":"アイルランド","cn_gb":"イギリス","cn_pt":"ポルトガル","cn_es":"スペイン","cn_fr":"フランス","cn_be":"ベルギー","cn_nl":"オランダ","cn_de":"ドイツ","cn_ch":"スイス","cn_it":"イタリア","cn_no":"ノルウェー","cn_se":"スウェーデン","cn_fi":"フィンランド","cn_dk":"デンマーク","cn_pl":"ポーランド","cn_cz":"チェコ","cn_at":"オーストリア","cn_hu":"ハンガリー","cn_ro":"ルーマニア","cn_gr":"ギリシャ","cn_ua":"ウクライナ","cn_tr":"トルコ","cn_ru":"ロシア","cn_ma":"モロッコ","cn_dz":"アルジェリア","cn_tn":"チュニジア","cn_ly":"リビア","cn_eg":"エジプト","cn_sn":"セネガル","cn_gh":"ガーナ","cn_ng":"ナイジェリア","cn_cm":"カメルーン","cn_et":"エチオピア","cn_ke":"ケニア","cn_ug":"ウガンダ","cn_tz":"タンザニア","cn_cd":"コンゴ民主共和国(キンシャサ)","cn_ao":"アンゴラ","cn_zm":"ザンビア","cn_zw":"ジンバブエ","cn_mz":"モザンビーク","cn_na":"ナミビア","cn_za":"南アフリカ","cn_mg":"マダガスカル","cn_sa":"サウジアラビア","cn_il":"イスラエル","cn_jo":"ヨルダン","cn_iq":"イラク","cn_ir":"イラン","cn_kz":"カザフスタン","cn_uz":"ウズベキスタン","cn_pk":"パキスタン","cn_in":"インド","cn_np":"ネパール","cn_bd":"バングラデシュ","cn_lk":"スリランカ","cn_mm":"ミャンマー (ビルマ)","cn_th":"タイ","cn_vn":"ベトナム","cn_kh":"カンボジア","cn_my":"マレーシア","cn_sg":"シンガポール","cn_id":"インドネシア","cn_ph":"フィリピン","cn_cn":"中国","cn_mn":"モンゴル","cn_kp":"北朝鮮","cn_kr":"韓国","cn_jp":"日本","cn_tw":"台湾","cn_af":"アフガニスタン","cn_ae":"アラブ首長国連邦","cn_qa":"カタール","cn_kw":"クウェート","cn_om":"オマーン","cn_au":"オーストラリア","cn_nz":"ニュージーランド","cn_pg":"パプアニューギニア","cn_fj":"フィジー","cn_al":"アルバニア","cn_ba":"ボスニア・ヘルツェゴビナ","cn_hr":"クロアチア","cn_rs":"セルビア","cn_bg":"ブルガリア","cn_sk":"スロバキア","cn_si":"スロベニア","cn_ee":"エストニア","cn_lv":"ラトビア","cn_lt":"リトアニア","cn_by":"ベラルーシ","cn_md":"モルドバ","cn_lu":"ルクセンブルク","cn_mt":"マルタ","cn_cy":"キプロス","cn_ad":"アンドラ","cn_am":"アルメニア","cn_ge":"ジョージア","cn_az":"アゼルバイジャン","cn_kg":"キルギス","cn_tj":"タジキスタン","cn_tm":"トルクメニスタン","cn_ye":"イエメン","cn_sy":"シリア","cn_lb":"レバノン","cn_ps":"パレスチナ自治区","cn_bh":"バーレーン","cn_bn":"ブルネイ","cn_la":"ラオス","cn_tl":"東ティモール","cn_bt":"ブータン","cn_mv":"モルディブ","cn_mr":"モーリタニア","cn_ml":"マリ","cn_bf":"ブルキナファソ","cn_ci":"コートジボワール","cn_lr":"リベリア","cn_sl":"シエラレオネ","cn_gn":"ギニア","cn_gw":"ギニアビサウ","cn_gm":"ガンビア","cn_tg":"トーゴ","cn_bj":"ベナン","cn_ne":"ニジェール","cn_td":"チャド","cn_sd":"スーダン","cn_ss":"南スーダン","cn_so":"ソマリア","cn_er":"エリトリア","cn_dj":"ジブチ","cn_cf":"中央アフリカ共和国","cn_cg":"コンゴ共和国(ブラザビル)","cn_ga":"ガボン","cn_gq":"赤道ギニア","cn_rw":"ルワンダ","cn_bi":"ブルンジ","cn_mw":"マラウイ","cn_bw":"ボツワナ","cn_ls":"レソト","cn_sz":"エスワティニ","cn_mu":"モーリシャス","cn_sc":"セーシェル","cn_km":"コモロ","cn_cv":"カーボベルデ","cn_st":"サントメ・プリンシペ","cn_bs":"バハマ","cn_bz":"ベリーズ","cn_hn":"ホンジュラス","cn_sv":"エルサルバドル","cn_ni":"ニカラグア","cn_tt":"トリニダード・トバゴ","cn_bb":"バルバドス","cn_gy":"ガイアナ","cn_sr":"スリナム","cn_gd":"グレナダ","cn_ag":"アンティグア・バーブーダ","cn_dm":"ドミニカ国","cn_lc":"セントルシア","cn_vc":"セントビンセント及びグレナディーン諸島","cn_ws":"サモア","cn_to":"トンガ","cn_vu":"バヌアツ","cn_sb":"ソロモン諸島","cn_ki":"キリバス","cn_tv":"ツバル","cn_mh":"マーシャル諸島","cn_fm":"ミクロネシア連邦","cn_pw":"パラオ","cn_nr":"ナウル","cn_ck":"クック諸島","cn_nu":"ニウエ","cn_mc":"モナコ","cn_sm":"サンマリノ","cn_li":"リヒテンシュタイン","cn_me":"モンテネグロ","cn_mk":"北マケドニア","cn_xk":"コソボ"},"es":{"worldTitle":"ACTIVIDAD MUNDIAL","worldSub":"Distribución global de jugadores","worldOnlineNow":"EN LÍNEA AHORA","worldNetwork":"RED GLOBAL","worldHint":"Arrastra para girar · pasa el cursor por un marcador","worldFewer":"MENOS JUGADORES","worldMore":"MÁS JUGADORES","worldRegional":"ACTIVIDAD REGIONAL","worldBack":"Volver","worldPlayers":"jugadores","worldOnline":"en línea","worldYou":"Tú","worldYouHere":"Tu ubicación","worldRegion":"Región geográfica","worldBtnTitle":"Jugadores en línea en el mundo","worldAria":"Globo 3D interactivo de partículas con jugadores en línea por país","cn_us":"Estados Unidos","cn_ca":"Canadá","cn_mx":"México","cn_gt":"Guatemala","cn_cu":"Cuba","cn_pa":"Panamá","cn_cr":"Costa Rica","cn_jm":"Jamaica","cn_ht":"Haití","cn_do":"República Dominicana","cn_co":"Colombia","cn_ve":"Venezuela","cn_ec":"Ecuador","cn_pe":"Perú","cn_bo":"Bolivia","cn_cl":"Chile","cn_ar":"Argentina","cn_uy":"Uruguay","cn_py":"Paraguay","cn_br":"Brasil","cn_is":"Islandia","cn_ie":"Irlanda","cn_gb":"Reino Unido","cn_pt":"Portugal","cn_es":"España","cn_fr":"Francia","cn_be":"Bélgica","cn_nl":"Países Bajos","cn_de":"Alemania","cn_ch":"Suiza","cn_it":"Italia","cn_no":"Noruega","cn_se":"Suecia","cn_fi":"Finlandia","cn_dk":"Dinamarca","cn_pl":"Polonia","cn_cz":"Chequia","cn_at":"Austria","cn_hu":"Hungría","cn_ro":"Rumanía","cn_gr":"Grecia","cn_ua":"Ucrania","cn_tr":"Turquía","cn_ru":"Rusia","cn_ma":"Marruecos","cn_dz":"Argelia","cn_tn":"Túnez","cn_ly":"Libia","cn_eg":"Egipto","cn_sn":"Senegal","cn_gh":"Ghana","cn_ng":"Nigeria","cn_cm":"Camerún","cn_et":"Etiopía","cn_ke":"Kenia","cn_ug":"Uganda","cn_tz":"Tanzania","cn_cd":"República Democrática del Congo","cn_ao":"Angola","cn_zm":"Zambia","cn_zw":"Zimbabue","cn_mz":"Mozambique","cn_na":"Namibia","cn_za":"Sudáfrica","cn_mg":"Madagascar","cn_sa":"Arabia Saudí","cn_il":"Israel","cn_jo":"Jordania","cn_iq":"Irak","cn_ir":"Irán","cn_kz":"Kazajistán","cn_uz":"Uzbekistán","cn_pk":"Pakistán","cn_in":"India","cn_np":"Nepal","cn_bd":"Bangladés","cn_lk":"Sri Lanka","cn_mm":"Myanmar (Birmania)","cn_th":"Tailandia","cn_vn":"Vietnam","cn_kh":"Camboya","cn_my":"Malasia","cn_sg":"Singapur","cn_id":"Indonesia","cn_ph":"Filipinas","cn_cn":"China","cn_mn":"Mongolia","cn_kp":"Corea del Norte","cn_kr":"Corea del Sur","cn_jp":"Japón","cn_tw":"Taiwán","cn_af":"Afganistán","cn_ae":"Emiratos Árabes Unidos","cn_qa":"Catar","cn_kw":"Kuwait","cn_om":"Omán","cn_au":"Australia","cn_nz":"Nueva Zelanda","cn_pg":"Papúa Nueva Guinea","cn_fj":"Fiyi","cn_al":"Albania","cn_ba":"Bosnia y Herzegovina","cn_hr":"Croacia","cn_rs":"Serbia","cn_bg":"Bulgaria","cn_sk":"Eslovaquia","cn_si":"Eslovenia","cn_ee":"Estonia","cn_lv":"Letonia","cn_lt":"Lituania","cn_by":"Bielorrusia","cn_md":"Moldavia","cn_lu":"Luxemburgo","cn_mt":"Malta","cn_cy":"Chipre","cn_ad":"Andorra","cn_am":"Armenia","cn_ge":"Georgia","cn_az":"Azerbaiyán","cn_kg":"Kirguistán","cn_tj":"Tayikistán","cn_tm":"Turkmenistán","cn_ye":"Yemen","cn_sy":"Siria","cn_lb":"Líbano","cn_ps":"Territorios Palestinos","cn_bh":"Baréin","cn_bn":"Brunéi","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Bután","cn_mv":"Maldivas","cn_mr":"Mauritania","cn_ml":"Mali","cn_bf":"Burkina Faso","cn_ci":"Côte d’Ivoire","cn_lr":"Liberia","cn_sl":"Sierra Leona","cn_gn":"Guinea","cn_gw":"Guinea-Bisáu","cn_gm":"Gambia","cn_tg":"Togo","cn_bj":"Benín","cn_ne":"Níger","cn_td":"Chad","cn_sd":"Sudán","cn_ss":"Sudán del Sur","cn_so":"Somalia","cn_er":"Eritrea","cn_dj":"Yibuti","cn_cf":"República Centroafricana","cn_cg":"Congo","cn_ga":"Gabón","cn_gq":"Guinea Ecuatorial","cn_rw":"Ruanda","cn_bi":"Burundi","cn_mw":"Malaui","cn_bw":"Botsuana","cn_ls":"Lesoto","cn_sz":"Esuatini","cn_mu":"Mauricio","cn_sc":"Seychelles","cn_km":"Comoras","cn_cv":"Cabo Verde","cn_st":"Santo Tomé y Príncipe","cn_bs":"Bahamas","cn_bz":"Belice","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nicaragua","cn_tt":"Trinidad y Tobago","cn_bb":"Barbados","cn_gy":"Guyana","cn_sr":"Surinam","cn_gd":"Granada","cn_ag":"Antigua y Barbuda","cn_dm":"Dominica","cn_lc":"Santa Lucía","cn_vc":"San Vicente y las Granadinas","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Islas Salomón","cn_ki":"Kiribati","cn_tv":"Tuvalu","cn_mh":"Islas Marshall","cn_fm":"Micronesia","cn_pw":"Palaos","cn_nr":"Nauru","cn_ck":"Islas Cook","cn_nu":"Niue","cn_mc":"Mónaco","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Montenegro","cn_mk":"Macedonia del Norte","cn_xk":"Kosovo"},"tr":{"worldTitle":"DÜNYA AKTİVİTESİ","worldSub":"Küresel oyuncu dağılımı","worldOnlineNow":"ŞU AN ÇEVRİMİÇİ","worldNetwork":"KÜRESEL AĞ","worldHint":"Döndürmek için sürükle · işaretçinin üzerine gel","worldFewer":"DAHA AZ OYUNCU","worldMore":"DAHA ÇOK OYUNCU","worldRegional":"BÖLGESEL AKTİVİTE","worldBack":"Geri","worldPlayers":"oyuncu","worldOnline":"çevrimiçi","worldYou":"Sen","worldYouHere":"Konumun","worldRegion":"Coğrafi bölge","worldBtnTitle":"Dünya genelinde çevrimiçi oyuncular","worldAria":"Ülkelere göre çevrimiçi oyuncuları gösteren etkileşimli 3D parçacık küre","cn_us":"Amerika Birleşik Devletleri","cn_ca":"Kanada","cn_mx":"Meksika","cn_gt":"Guatemala","cn_cu":"Küba","cn_pa":"Panama","cn_cr":"Kosta Rika","cn_jm":"Jamaika","cn_ht":"Haiti","cn_do":"Dominik Cumhuriyeti","cn_co":"Kolombiya","cn_ve":"Venezuela","cn_ec":"Ekvador","cn_pe":"Peru","cn_bo":"Bolivya","cn_cl":"Şili","cn_ar":"Arjantin","cn_uy":"Uruguay","cn_py":"Paraguay","cn_br":"Brezilya","cn_is":"İzlanda","cn_ie":"İrlanda","cn_gb":"Birleşik Krallık","cn_pt":"Portekiz","cn_es":"İspanya","cn_fr":"Fransa","cn_be":"Belçika","cn_nl":"Hollanda","cn_de":"Almanya","cn_ch":"İsviçre","cn_it":"İtalya","cn_no":"Norveç","cn_se":"İsveç","cn_fi":"Finlandiya","cn_dk":"Danimarka","cn_pl":"Polonya","cn_cz":"Çekya","cn_at":"Avusturya","cn_hu":"Macaristan","cn_ro":"Romanya","cn_gr":"Yunanistan","cn_ua":"Ukrayna","cn_tr":"Türkiye","cn_ru":"Rusya","cn_ma":"Fas","cn_dz":"Cezayir","cn_tn":"Tunus","cn_ly":"Libya","cn_eg":"Mısır","cn_sn":"Senegal","cn_gh":"Gana","cn_ng":"Nijerya","cn_cm":"Kamerun","cn_et":"Etiyopya","cn_ke":"Kenya","cn_ug":"Uganda","cn_tz":"Tanzanya","cn_cd":"Kongo - Kinşasa","cn_ao":"Angola","cn_zm":"Zambiya","cn_zw":"Zimbabve","cn_mz":"Mozambik","cn_na":"Namibya","cn_za":"Güney Afrika","cn_mg":"Madagaskar","cn_sa":"Suudi Arabistan","cn_il":"İsrail","cn_jo":"Ürdün","cn_iq":"Irak","cn_ir":"İran","cn_kz":"Kazakistan","cn_uz":"Özbekistan","cn_pk":"Pakistan","cn_in":"Hindistan","cn_np":"Nepal","cn_bd":"Bangladeş","cn_lk":"Sri Lanka","cn_mm":"Myanmar (Burma)","cn_th":"Tayland","cn_vn":"Vietnam","cn_kh":"Kamboçya","cn_my":"Malezya","cn_sg":"Singapur","cn_id":"Endonezya","cn_ph":"Filipinler","cn_cn":"Çin","cn_mn":"Moğolistan","cn_kp":"Kuzey Kore","cn_kr":"Güney Kore","cn_jp":"Japonya","cn_tw":"Tayvan","cn_af":"Afganistan","cn_ae":"Birleşik Arap Emirlikleri","cn_qa":"Katar","cn_kw":"Kuveyt","cn_om":"Umman","cn_au":"Avustralya","cn_nz":"Yeni Zelanda","cn_pg":"Papua Yeni Gine","cn_fj":"Fiji","cn_al":"Arnavutluk","cn_ba":"Bosna-Hersek","cn_hr":"Hırvatistan","cn_rs":"Sırbistan","cn_bg":"Bulgaristan","cn_sk":"Slovakya","cn_si":"Slovenya","cn_ee":"Estonya","cn_lv":"Letonya","cn_lt":"Litvanya","cn_by":"Belarus","cn_md":"Moldova","cn_lu":"Lüksemburg","cn_mt":"Malta","cn_cy":"Kıbrıs","cn_ad":"Andorra","cn_am":"Ermenistan","cn_ge":"Gürcistan","cn_az":"Azerbaycan","cn_kg":"Kırgızistan","cn_tj":"Tacikistan","cn_tm":"Türkmenistan","cn_ye":"Yemen","cn_sy":"Suriye","cn_lb":"Lübnan","cn_ps":"Filistin Bölgeleri","cn_bh":"Bahreyn","cn_bn":"Brunei","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Butan","cn_mv":"Maldivler","cn_mr":"Moritanya","cn_ml":"Mali","cn_bf":"Burkina Faso","cn_ci":"Côte d’Ivoire","cn_lr":"Liberya","cn_sl":"Sierra Leone","cn_gn":"Gine","cn_gw":"Gine-Bissau","cn_gm":"Gambiya","cn_tg":"Togo","cn_bj":"Benin","cn_ne":"Nijer","cn_td":"Çad","cn_sd":"Sudan","cn_ss":"Güney Sudan","cn_so":"Somali","cn_er":"Eritre","cn_dj":"Cibuti","cn_cf":"Orta Afrika Cumhuriyeti","cn_cg":"Kongo - Brazavil","cn_ga":"Gabon","cn_gq":"Ekvator Ginesi","cn_rw":"Ruanda","cn_bi":"Burundi","cn_mw":"Malavi","cn_bw":"Botsvana","cn_ls":"Lesotho","cn_sz":"Esvatini","cn_mu":"Mauritius","cn_sc":"Seyşeller","cn_km":"Komorlar","cn_cv":"Cabo Verde","cn_st":"Sao Tome ve Principe","cn_bs":"Bahamalar","cn_bz":"Belize","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nikaragua","cn_tt":"Trinidad ve Tobago","cn_bb":"Barbados","cn_gy":"Guyana","cn_sr":"Surinam","cn_gd":"Grenada","cn_ag":"Antigua ve Barbuda","cn_dm":"Dominika","cn_lc":"Saint Lucia","cn_vc":"Saint Vincent ve Grenadinler","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Solomon Adaları","cn_ki":"Kiribati","cn_tv":"Tuvalu","cn_mh":"Marshall Adaları","cn_fm":"Mikronezya","cn_pw":"Palau","cn_nr":"Nauru","cn_ck":"Cook Adaları","cn_nu":"Niue","cn_mc":"Monako","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Karadağ","cn_mk":"Kuzey Makedonya","cn_xk":"Kosova"},"pt":{"worldTitle":"ATIVIDADE MUNDIAL","worldSub":"Distribuição global de jogadores","worldOnlineNow":"ONLINE AGORA","worldNetwork":"REDE GLOBAL","worldHint":"Arraste para girar · passe o mouse sobre um marcador","worldFewer":"MENOS JOGADORES","worldMore":"MAIS JOGADORES","worldRegional":"ATIVIDADE REGIONAL","worldBack":"Voltar","worldPlayers":"jogadores","worldOnline":"online","worldYou":"Você","worldYouHere":"Sua localização","worldRegion":"Região geográfica","worldBtnTitle":"Jogadores online no mundo","worldAria":"Globo 3D interativo de partículas com jogadores online por país","cn_us":"Estados Unidos","cn_ca":"Canadá","cn_mx":"México","cn_gt":"Guatemala","cn_cu":"Cuba","cn_pa":"Panamá","cn_cr":"Costa Rica","cn_jm":"Jamaica","cn_ht":"Haiti","cn_do":"República Dominicana","cn_co":"Colômbia","cn_ve":"Venezuela","cn_ec":"Equador","cn_pe":"Peru","cn_bo":"Bolívia","cn_cl":"Chile","cn_ar":"Argentina","cn_uy":"Uruguai","cn_py":"Paraguai","cn_br":"Brasil","cn_is":"Islândia","cn_ie":"Irlanda","cn_gb":"Reino Unido","cn_pt":"Portugal","cn_es":"Espanha","cn_fr":"França","cn_be":"Bélgica","cn_nl":"Países Baixos","cn_de":"Alemanha","cn_ch":"Suíça","cn_it":"Itália","cn_no":"Noruega","cn_se":"Suécia","cn_fi":"Finlândia","cn_dk":"Dinamarca","cn_pl":"Polônia","cn_cz":"Tchéquia","cn_at":"Áustria","cn_hu":"Hungria","cn_ro":"Romênia","cn_gr":"Grécia","cn_ua":"Ucrânia","cn_tr":"Turquia","cn_ru":"Rússia","cn_ma":"Marrocos","cn_dz":"Argélia","cn_tn":"Tunísia","cn_ly":"Líbia","cn_eg":"Egito","cn_sn":"Senegal","cn_gh":"Gana","cn_ng":"Nigéria","cn_cm":"Camarões","cn_et":"Etiópia","cn_ke":"Quênia","cn_ug":"Uganda","cn_tz":"Tanzânia","cn_cd":"Congo - Kinshasa","cn_ao":"Angola","cn_zm":"Zâmbia","cn_zw":"Zimbábue","cn_mz":"Moçambique","cn_na":"Namíbia","cn_za":"África do Sul","cn_mg":"Madagascar","cn_sa":"Arábia Saudita","cn_il":"Israel","cn_jo":"Jordânia","cn_iq":"Iraque","cn_ir":"Irã","cn_kz":"Cazaquistão","cn_uz":"Uzbequistão","cn_pk":"Paquistão","cn_in":"Índia","cn_np":"Nepal","cn_bd":"Bangladesh","cn_lk":"Sri Lanka","cn_mm":"Mianmar (Birmânia)","cn_th":"Tailândia","cn_vn":"Vietnã","cn_kh":"Camboja","cn_my":"Malásia","cn_sg":"Singapura","cn_id":"Indonésia","cn_ph":"Filipinas","cn_cn":"China","cn_mn":"Mongólia","cn_kp":"Coreia do Norte","cn_kr":"Coreia do Sul","cn_jp":"Japão","cn_tw":"Taiwan","cn_af":"Afeganistão","cn_ae":"Emirados Árabes Unidos","cn_qa":"Catar","cn_kw":"Kuwait","cn_om":"Omã","cn_au":"Austrália","cn_nz":"Nova Zelândia","cn_pg":"Papua-Nova Guiné","cn_fj":"Fiji","cn_al":"Albânia","cn_ba":"Bósnia e Herzegovina","cn_hr":"Croácia","cn_rs":"Sérvia","cn_bg":"Bulgária","cn_sk":"Eslováquia","cn_si":"Eslovênia","cn_ee":"Estônia","cn_lv":"Letônia","cn_lt":"Lituânia","cn_by":"Bielorrússia","cn_md":"Moldávia","cn_lu":"Luxemburgo","cn_mt":"Malta","cn_cy":"Chipre","cn_ad":"Andorra","cn_am":"Armênia","cn_ge":"Geórgia","cn_az":"Azerbaijão","cn_kg":"Quirguistão","cn_tj":"Tadjiquistão","cn_tm":"Turcomenistão","cn_ye":"Iêmen","cn_sy":"Síria","cn_lb":"Líbano","cn_ps":"Territórios palestinos","cn_bh":"Barein","cn_bn":"Brunei","cn_la":"Laos","cn_tl":"Timor-Leste","cn_bt":"Butão","cn_mv":"Maldivas","cn_mr":"Mauritânia","cn_ml":"Mali","cn_bf":"Burquina Faso","cn_ci":"Costa do Marfim","cn_lr":"Libéria","cn_sl":"Serra Leoa","cn_gn":"Guiné","cn_gw":"Guiné-Bissau","cn_gm":"Gâmbia","cn_tg":"Togo","cn_bj":"Benin","cn_ne":"Níger","cn_td":"Chade","cn_sd":"Sudão","cn_ss":"Sudão do Sul","cn_so":"Somália","cn_er":"Eritreia","cn_dj":"Djibuti","cn_cf":"República Centro-Africana","cn_cg":"República do Congo","cn_ga":"Gabão","cn_gq":"Guiné Equatorial","cn_rw":"Ruanda","cn_bi":"Burundi","cn_mw":"Malaui","cn_bw":"Botsuana","cn_ls":"Lesoto","cn_sz":"Essuatíni","cn_mu":"Maurício","cn_sc":"Seicheles","cn_km":"Comores","cn_cv":"Cabo Verde","cn_st":"São Tomé e Príncipe","cn_bs":"Bahamas","cn_bz":"Belize","cn_hn":"Honduras","cn_sv":"El Salvador","cn_ni":"Nicarágua","cn_tt":"Trinidad e Tobago","cn_bb":"Barbados","cn_gy":"Guiana","cn_sr":"Suriname","cn_gd":"Granada","cn_ag":"Antígua e Barbuda","cn_dm":"Dominica","cn_lc":"Santa Lúcia","cn_vc":"São Vicente e Granadinas","cn_ws":"Samoa","cn_to":"Tonga","cn_vu":"Vanuatu","cn_sb":"Ilhas Salomão","cn_ki":"Quiribati","cn_tv":"Tuvalu","cn_mh":"Ilhas Marshall","cn_fm":"Micronésia","cn_pw":"Palau","cn_nr":"Nauru","cn_ck":"Ilhas Cook","cn_nu":"Niue","cn_mc":"Mônaco","cn_sm":"San Marino","cn_li":"Liechtenstein","cn_me":"Montenegro","cn_mk":"Macedônia do Norte","cn_xk":"Kosovo"}};
+  Object.keys(WT).forEach(function(l){if(!UI_T[l])UI_T[l]={};Object.keys(WT[l]).forEach(function(k){UI_T[l][k]=WT[l][k];});});
+  function T(k){return uiT(k);}
+  function loc(){return (typeof UI_LOCALES!=='undefined'&&UI_LOCALES[uiState.lang])||'en-US';}
+  function fmt(n){try{return n.toLocaleString(loc());}catch(e){return String(n);}}
+  function esc(s){return uiEsc(s);}
+  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
+  function codeToFlag(code){return String.fromCodePoint.apply(null,code.toUpperCase().split('').map(function(ch){return 127397+ch.charCodeAt(0);}));}
+  function regionName(code){try{return new Intl.DisplayNames([loc()],{type:'region'}).of(code.toUpperCase())||'';}catch(e){return '';}}
+  function xyz(lat,lon){var la=lat*Math.PI/180,lo=lon*Math.PI/180;return {x:Math.cos(la)*Math.sin(lo),y:Math.sin(la),z:Math.cos(la)*Math.cos(lo)};}
   /* ───────── 国家数据：[名称, 国旗, 纬度, 经度] ───────── */
   var raw=[
     ['United States','🇺🇸',39,-98],['Canada','🇨🇦',56,-106],['Mexico','🇲🇽',23,-102],['Guatemala','🇬🇹',15,-90],['Cuba','🇨🇺',22,-79],['Panama','🇵🇦',9,-80],['Costa Rica','🇨🇷',10,-84],['Jamaica','🇯🇲',18,-77],['Haiti','🇭🇹',19,-72],['Dominican Republic','🇩🇴',19,-70],['Colombia','🇨🇴',4,-72],['Venezuela','🇻🇪',8,-66],['Ecuador','🇪🇨',-2,-77],['Peru','🇵🇪',-10,-76],['Bolivia','🇧🇴',-17,-65],['Chile','🇨🇱',-30,-71],['Argentina','🇦🇷',-38,-64],['Uruguay','🇺🇾',-33,-56],['Paraguay','🇵🇾',-23,-58],['Brazil','🇧🇷',-10,-52],
@@ -15714,31 +15861,59 @@ __UI_SCRIPT__
   (function(){var runs=MASK_RLE.split(','),p=0,v=0,i,n;for(i=0;i<runs.length;i++){n=parseInt(runs[i],36);if(v)mask.fill(1,p,p+n);p+=n;v^=1;}})();
   function landAt(i,j){if(j<0||j>=MH)return 0;i=((i%MW)+MW)%MW;return mask[j*MW+i];}
 
-  /* ───────── 在线人数：全球总数随机 120 ~ 1000，按权重分配到各国，总和严格等于总数 ───────── */
-  var countries=raw.map(function(a){return {name:a[0],flag:a[1],lat:a[2],lon:a[3],count:0,ph:Math.random()*6.283};});
-  var T=120+Math.floor(Math.random()*881);
+  /* ───────── 在线人数模型（全球总数始终在 120 ~ 1000 之间，随时间缓慢起伏）─────────
+     · 目标总数做带回归的随机游走；每个 tick 随机 1~3 人上线/下线，偏向目标
+     · 上线概率随各国「当地时间」变化（晚间活跃、凌晨低谷），再乘每个国家固定的人气权重
+     · 偶尔有一队人同时上线（小爆发）
+     · 你所在国家（IP 定位）人数永远不低于 5 */
+  var T0=120,T1=1000,MIN_ME=5;
+  var DAY=[.55,.4,.28,.2,.15,.15,.18,.25,.32,.4,.45,.5,.55,.6,.62,.65,.7,.78,.88,.96,1,1,.9,.72];
+  function dayF(c,d){var h=(d.getUTCHours()+d.getUTCMinutes()/60+c.lon/15+48)%24;return DAY[Math.floor(h)];}
+  var countries=[],byCode={},me=null,S=0,target=0;
+  function mkCountry(name,flag,lat,lon,dyn){var c={name:name,flag:flag,code:flagCode(flag),lat:lat,lon:lon,count:0,ap:0,dr:3,ph:Math.random()*6.283,flash:0,base:Math.pow(Math.random(),3)+.015,dyn:!!dyn,step:0,rgb:[255,176,128]};c.v=xyz(lat,lon);c.i=countries.length;countries.push(c);byCode[c.code]=c;return c;}
+  raw.forEach(function(a){mkCountry(a[0],a[1],a[2],a[3],false);});
   (function(){
-    var w=countries.map(function(){return Math.pow(Math.random(),3)+.015;}),ws=w.reduce(function(a,b){return a+b;},0),used=0,rem=[];
+    var T=T0+Math.floor(Math.random()*(T1-T0+1)),now=new Date(),w=countries.map(function(c){return c.base*dayF(c,now);}),ws=w.reduce(function(a,b){return a+b;},0),used=0,rem=[];
     countries.forEach(function(c,i){var e=w[i]/ws*T;c.count=Math.floor(e);used+=c.count;rem.push({i:i,f:e-c.count});});
-    rem.sort(function(a,b){return b.f-a.f;});
-    for(var k=0;k<T-used;k++)countries[rem[k].i].count++;
+    rem.sort(function(a,b){return b.f-a.f;});for(var k=0;k<T-used;k++)countries[rem[k].i].count++;
+    S=T;target=T;
   })();
-  var active=countries.filter(function(c){return c.count>0;});
-  var maxCount=active.reduce(function(m,c){return Math.max(m,c.count);},1);
-  document.getElementById('worldTotal').textContent=T.toLocaleString();
+  function gauss(){return (Math.random()+Math.random()+Math.random()-1.5)*1.15;}
+  function pickWeighted(ws){var s=0,i;for(i=0;i<ws.length;i++)s+=ws[i];if(s<=0)return -1;var r=Math.random()*s;for(i=0;i<ws.length;i++){r-=ws[i];if(r<=0)return i;}return ws.length-1;}
+  function pickJoin(d){var i=pickWeighted(countries.map(function(c){return c.base*dayF(c,d)*(1+c.count*.04);}));return i<0?null:countries[i];}
+  function pickLeave(d){var i=pickWeighted(countries.map(function(c){var m=(c===me)?MIN_ME:0;return c.count>m?(c.count-m)*(1.7-dayF(c,d)):0;}));return i<0?null:countries[i];}
+  function addPlayers(c,dlt){
+    if(!c)return 0;var minC=(c===me)?MIN_ME:0,real=Math.max(minC,c.count+dlt)-c.count;
+    if(real>0&&S+real>T1)real=T1-S;if(real<0&&S+real<T0)real=T0-S;
+    if(!real)return 0;c.count+=real;S+=real;if(real>0)c.flash=performance.now();return real;
+  }
+  function tick(){
+    var d=new Date();target+=(550-target)*.012+gauss()*16;target=Math.max(170,Math.min(940,target));
+    var gap=target-S,n=1+Math.floor(Math.random()*3),pj=.5+Math.max(-.38,Math.min(.38,gap/110));
+    for(var k=0;k<n;k++){
+      if(Math.random()<pj)addPlayers(pickJoin(d),1+(Math.random()<.14?1+Math.floor(Math.random()*2):0));
+      else addPlayers(pickLeave(d),-1);
+    }
+    if(Math.random()<.06)addPlayers(pickJoin(d),3+Math.floor(Math.random()*6));
+  }
 
-  /* ───────── 颜色：人数 浅橙红 → 深红 ───────── */
-  var STOPS=[[255,176,128],[255,112,64],[228,52,38],[150,10,30]];
-  function heat(n){var t=Math.sqrt(Math.max(0,Math.min(1,n/maxCount))),p=t*3,i=Math.min(2,Math.floor(p)),f=p-i,a=STOPS[i],b=STOPS[i+1];return [0,1,2].map(function(j){return Math.round(a[j]+(b[j]-a[j])*f);});}
-  active.forEach(function(c){c.rgb=heat(c.count);c.rad=2.6+5.4*Math.sqrt(c.count/maxCount);});
+  /* ───────── 配色：人数 浅橙红 → 深红 ───────── */
+  var STOPS=[[255,176,128],[255,112,64],[228,52,38],[150,10,30]],maxCount=1,haloCache={};
+  function heatT(t){var p=Math.max(0,Math.min(1,t))*3,i=Math.min(2,Math.floor(p)),f=p-i,a=STOPS[i],b=STOPS[i+1];return [0,1,2].map(function(j){return Math.round(a[j]+(b[j]-a[j])*f);});}
   function rgba(c,a){return 'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')';}
   function glowSprite(c,size,core){var cv=document.createElement('canvas');cv.width=cv.height=size;var g=cv.getContext('2d'),h=size/2,gr=g.createRadialGradient(h,h,0,h,h,h);gr.addColorStop(0,rgba(core||c,1));gr.addColorStop(.2,rgba(c,.8));gr.addColorStop(.5,rgba(c,.24));gr.addColorStop(1,rgba(c,0));g.fillStyle=gr;g.fillRect(0,0,size,size);return cv;}
-  active.forEach(function(c){c.halo=glowSprite(c.rgb,64,[255,236,224]);});
+  function haloFor(step){return haloCache[step]||(haloCache[step]=glowSprite(heatT(step/23),64,[255,236,224]));}
+  var active=[];
+  function recalc(){
+    maxCount=1;active=[];
+    countries.forEach(function(c){if(c.count>0){active.push(c);if(c.count>maxCount)maxCount=c.count;}});
+    countries.forEach(function(c){var t=Math.sqrt(Math.max(0,c.count)/maxCount);c.step=Math.round(t*23);c.rgb=heatT(t);c.radT=2.6+5.4*t;});
+  }
   function parseCol(s,fb){s=(s||'').trim();var m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(s);if(m){var h=m[1];if(h.length===3)h=h.replace(/./g,'$&$&');return [parseInt(h.substr(0,2),16),parseInt(h.substr(2,2),16),parseInt(h.substr(4,2),16)];}m=/rgba?\(([^)]+)\)/i.exec(s);if(m){var p=m[1].split(/[\s,\/]+/).map(parseFloat);if(p.length>=3&&!isNaN(p[0]))return [p[0],p[1],p[2]];}return fb;}
   function mix(a,b,t){return [0,1,2].map(function(i){return Math.round(a[i]+(b[i]-a[i])*t);});}
   var theme={key:'',acc:[59,130,246],light:false,sprite:null};
   function readTheme(){
-    var cs=getComputedStyle(page),acc=parseCol(cs.getPropertyValue('--accent'),[59,130,246]),light=document.documentElement.getAttribute('data-theme')==='light',key=acc.join(',')+'|'+light;
+    var acc=parseCol(getComputedStyle(page).getPropertyValue('--accent'),[59,130,246]),light=document.documentElement.getAttribute('data-theme')==='light',key=acc.join(',')+'|'+light;
     if(key===theme.key)return;theme.key=key;theme.acc=acc;theme.light=light;
     theme.sprite=glowSprite(acc,32,light?acc:mix(acc,[255,255,255],.6));
   }
@@ -15755,31 +15930,29 @@ __UI_SCRIPT__
     PX.push(x);PY.push(y);PZ.push(z);PK.push(kind);PS.push(Math.random()*6.283);
   }
   var PN=PX.length;
-  function xyz(lat,lon){var la=lat*Math.PI/180,lo=lon*Math.PI/180;return {x:Math.cos(la)*Math.sin(lo),y:Math.sin(la),z:Math.cos(la)*Math.cos(lo)};}
-  active.forEach(function(c){c.v=xyz(c.lat,c.lon);});
 
   /* ───────── 状态 ───────── */
-  var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement;
-  var W=900,H=560,rot=-1.2,tilt=.28,vel=0,dragging=false,lastX=0,lastY=0,downX=0,downY=0,moved=0,hoverIndex=-1,raf=0,frame=0,focus=null;
-  function flagCode(emoji){return Array.from(emoji).map(function(ch){return String.fromCharCode(ch.codePointAt(0)-127397);}).join('').toLowerCase();}
+  var canvas=document.getElementById('worldGlobeCanvas'),ctx=canvas.getContext('2d'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip'),stage=canvas.parentElement,totalEl=document.getElementById('worldTotal');
+  var W=900,H=560,rot=-1.2,tilt=.28,vel=0,dragging=false,lastX=0,lastY=0,downX=0,downY=0,moved=0,hoverIndex=-1,raf=0,frame=0,focus=null,touched=false,tot=S,langSeen=uiState.lang,timer=0,lastTick=Date.now(),listHover=false,lastSort=0;
   function geom(){var r=Math.min(W,H)*.42;return {r:r,cx:W/2,cy:H/2,sc:Math.max(.7,Math.min(1.45,r/300))};}
   function proj(v,g){var cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(tilt),st=Math.sin(tilt),x=v.x*cr+v.z*sr,z0=v.z*cr-v.x*sr,y=v.y*ct-z0*st,z=v.y*st+z0*ct;return {x:g.cx+x*g.r,y:g.cy-y*g.r,z:z};}
   function resize(){var dpr=Math.min(2,window.devicePixelRatio||1),rect=canvas.getBoundingClientRect();W=Math.max(300,rect.width);H=Math.max(300,rect.height);canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
+  function cname(c){var k='cn_'+c.code,tb=UI_T[uiState.lang],v=(tb&&tb[k])||UI_T.en[k];if(v)return v;if(c.dyn){var r=regionName(c.code);if(r)return r;}return c.name;}
 
   /* ───────── 绘制 ───────── */
   function draw(now){
     if(!page.classList.contains('open')){raf=0;return;}
+    if(uiState.lang!==langSeen){langSeen=uiState.lang;relabel();}
     if(frame++%45===0)readTheme();
     var t=now/1000,g=geom(),cx=g.cx,cy=g.cy,R=g.r,sc=g.sc,light=theme.light,acc=theme.acc;
-    /* 旋转：拖动 > 聚焦动画 > 惯性 > 悬停暂停 > 自转 */
     if(!dragging){
       if(focus){var dr=focus.rot-rot,dt=focus.tilt-tilt;rot+=dr*.09;tilt+=dt*.09;vel=0;if(Math.abs(dr)<.002&&Math.abs(dt)<.002)focus=null;}
       else if(Math.abs(vel)>.0003){rot+=vel;vel*=.94;}
       else if(hoverIndex<0)rot+=.0018;
     }
+    if(Math.abs(tot-S)>.01){tot+=(S-tot)*.16;if(Math.abs(tot-S)<.5)tot=S;var s=fmt(Math.round(tot));if(totalEl.textContent!==s)totalEl.textContent=s;}
     ctx.clearRect(0,0,W,H);
     ctx.globalCompositeOperation='source-over';
-    /* 球体底色 + 大气光晕 */
     var base=ctx.createRadialGradient(cx-R*.3,cy-R*.35,R*.1,cx,cy,R);
     base.addColorStop(0,rgba(acc,light?.10:.14));base.addColorStop(1,rgba(acc,light?.02:.03));
     ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.fillStyle=base;ctx.fill();
@@ -15788,7 +15961,6 @@ __UI_SCRIPT__
     ctx.fillStyle=atm;ctx.beginPath();ctx.arc(cx,cy,R*1.24,0,6.2832);ctx.fill();
     ctx.beginPath();ctx.arc(cx,cy,R,0,6.2832);ctx.strokeStyle=rgba(acc,light?.35:.28);ctx.lineWidth=1;ctx.stroke();
     ctx.globalCompositeOperation=light?'source-over':'lighter';
-    /* 粒子 */
     var cr=Math.cos(rot),sr=Math.sin(rot),ct=Math.cos(tilt),st=Math.sin(tilt),spr=theme.sprite;
     for(var i=0;i<PN;i++){
       var X=PX[i],Y=PY[i],Z=PZ[i],x=X*cr+Z*sr,z0=Z*cr-X*sr,yy=Y*ct-z0*st,z=Y*st+z0*ct,k=PK[i],d,a;
@@ -15802,40 +15974,61 @@ __UI_SCRIPT__
       ctx.globalAlpha=a;ctx.drawImage(spr,cx+x*R-d/2,cy-yy*R-d/2,d,d);
     }
     ctx.globalAlpha=1;
-    /* 国家在线标记：发光光晕 + 实心核 + 脉冲环 */
     var vis=[];
-    for(var j=0;j<active.length;j++){var c=active[j],q=proj(c.v,g);if(q.z>.02){q.c=c;q.i=countries.indexOf(c);vis.push(q);}}
+    for(var j=0;j<countries.length;j++){
+      var c=countries[j];c.ap+=((c.count>0?1:0)-c.ap)*.12;c.dr+=((c.radT||3)-c.dr)*.12;
+      if(c.ap<.03)continue;var q=proj(c.v,g);if(q.z>.02){q.c=c;vis.push(q);}
+    }
     vis.sort(function(a,b){return a.z-b.z;});
     vis.forEach(function(q){
-      var c=q.c,hov=q.i===hoverIndex,fade=Math.min(1,q.z/.3),rd=c.rad*sc*(hov?1.25:1),pu=.88+.12*Math.sin(t*2.4+c.ph),hs=rd*(hov?9:6.4)*pu;
+      var c=q.c,hov=c.i===hoverIndex,fade=Math.min(1,q.z/.3)*c.ap,rd=c.dr*sc*(hov?1.25:1),pu=.88+.12*Math.sin(t*2.4+c.ph),hs=rd*(hov?9:6.4)*pu;
       ctx.globalCompositeOperation=light?'source-over':'lighter';
-      ctx.globalAlpha=fade*(light?.55:.9);ctx.drawImage(c.halo,q.x-hs/2,q.y-hs/2,hs,hs);
+      ctx.globalAlpha=fade*(light?.55:.9);ctx.drawImage(haloFor(c.step),q.x-hs/2,q.y-hs/2,hs,hs);
       var p=((t*.55+c.ph/6.283)%1);
       ctx.globalAlpha=fade*(1-p)*.55;ctx.beginPath();ctx.arc(q.x,q.y,rd+p*rd*2.8,0,6.2832);ctx.strokeStyle=rgba(c.rgb,1);ctx.lineWidth=1.2;ctx.stroke();
+      var fa=(now-c.flash)/1400;
+      if(fa>=0&&fa<1){ctx.globalAlpha=fade*(1-fa)*.9;ctx.beginPath();ctx.arc(q.x,q.y,rd+fa*rd*4.6,0,6.2832);ctx.strokeStyle='rgba(255,236,224,1)';ctx.lineWidth=1.6;ctx.stroke();}
       ctx.globalCompositeOperation='source-over';
       ctx.globalAlpha=fade;ctx.beginPath();ctx.arc(q.x,q.y,rd*.62,0,6.2832);ctx.fillStyle=rgba(c.rgb,1);ctx.fill();
       ctx.lineWidth=1;ctx.strokeStyle='rgba(255,236,224,'+(hov?.95:.55)+')';ctx.stroke();
-      if(hov){ctx.beginPath();ctx.arc(q.x,q.y,rd+3.5,0,6.2832);ctx.strokeStyle='#fff';ctx.lineWidth=1.6;ctx.stroke();}
+      if(c===me){var mp=(t*.9)%1;ctx.beginPath();ctx.arc(q.x,q.y,rd+5,0,6.2832);ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=1.4;ctx.stroke();
+        ctx.globalAlpha=fade*(1-mp)*.7;ctx.beginPath();ctx.arc(q.x,q.y,rd+5+mp*rd*3.4,0,6.2832);ctx.strokeStyle=rgba(acc,1);ctx.lineWidth=1.4;ctx.stroke();}
+      if(hov){ctx.globalAlpha=fade;ctx.beginPath();ctx.arc(q.x,q.y,rd+3.5,0,6.2832);ctx.strokeStyle='#fff';ctx.lineWidth=1.6;ctx.stroke();}
     });
     ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
-    if(hoverIndex>=0&&!tip.hidden){var hq=proj(countries[hoverIndex].v||xyz(countries[hoverIndex].lat,countries[hoverIndex].lon),g);if(hq.z<=.02){tip.hidden=true;}else positionTip(hoverIndex);}
+    if(hoverIndex>=0&&!tip.hidden){var hq=proj(countries[hoverIndex].v,g);if(hq.z<=.02){tip.hidden=true;}else positionTip(hoverIndex);}
     raf=requestAnimationFrame(draw);
   }
 
   /* ───────── 列表 / 悬浮提示 ───────── */
-  function renderList(){
-    active.map(function(c){return {c:c,i:countries.indexOf(c)};}).sort(function(a,b){return b.c.count-a.c.count;}).forEach(function(o){
-      var c=o.c,i=o.i,row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;
-      row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png" loading="lazy"><span class="world-country-name">'+c.name+'<small>Geographic region</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';
-      row.addEventListener('mouseenter',function(){selectCountry(i,true);});
-      row.addEventListener('focus',function(){selectCountry(i,true);});
-      row.addEventListener('click',function(){focusCountry(i);});
-      list.appendChild(row);
-    });
-    list.addEventListener('mouseleave',function(){clearHover();});
+  var rows=[];
+  function buildRow(c){
+    var row=document.createElement('div');row.className='world-country-row';row.dataset.index=c.i;row.tabIndex=0;
+    row.innerHTML='<img class="world-flag" alt="" src="https://flagcdn.com/w40/'+c.code+'.png" loading="lazy"><span class="world-country-name"><b class="wn"></b><small class="ws"></small></span><span class="world-country-count"><i class="wc"></i><small class="wp"></small></span>';
+    row._n=row.querySelector('.wn');row._s=row.querySelector('.ws');row._c=row.querySelector('.wc');row._p=row.querySelector('.wp');row._last=-1;
+    row.addEventListener('mouseenter',function(){selectCountry(c.i,true);});
+    row.addEventListener('focus',function(){selectCountry(c.i,true);});
+    row.addEventListener('click',function(){touched=true;focusCountry(c.i);});
+    rows[c.i]=row;list.appendChild(row);fillRow(c,true);return row;
   }
+  function youBadge(){return '<em class="world-you">'+esc(T('worldYou'))+'</em>';}
+  function fillRow(c,full){
+    var row=rows[c.i];if(!row)return;
+    if(full){row._n.innerHTML=esc(cname(c))+(c===me?youBadge():'');row._s.textContent=c===me?T('worldYouHere'):T('worldRegion');row._p.textContent=T('worldPlayers');}
+    if(row._last!==c.count){
+      var up=row._last>=0&&c.count>row._last,dn=row._last>=0&&c.count<row._last;row._last=c.count;row._c.textContent=fmt(c.count);
+      row.style.display=c.count>0?'':'none';
+      if(up||dn){row._c.classList.remove('up','dn');void row._c.offsetWidth;row._c.classList.add(up?'up':'dn');}
+    }
+  }
+  function sortRows(force){
+    var nowMs=Date.now();if(!force&&(listHover||nowMs-lastSort<5000))return;lastSort=nowMs;
+    active.slice().sort(function(a,b){return b.count-a.count;}).forEach(function(c){list.appendChild(rows[c.i]);});
+  }
+  function renderList(){countries.forEach(buildRow);sortRows(true);list.addEventListener('mouseenter',function(){listHover=true;});list.addEventListener('mouseleave',function(){listHover=false;clearHover();});}
+  function tipHtml(c){return '<div class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+c.code+'.png"><strong>'+esc(cname(c))+'</strong>'+(c===me?youBadge():'')+'</div><b><i class="wtn">'+esc(fmt(c.count))+'</i><small>'+esc(T('worldOnline'))+'</small></b>';}
   function positionTip(i){
-    var c=countries[i],g=geom(),rect=canvas.getBoundingClientRect(),q=proj(c.v||xyz(c.lat,c.lon),g),stageRect=stage.getBoundingClientRect(),
+    var c=countries[i],g=geom(),rect=canvas.getBoundingClientRect(),q=proj(c.v,g),stageRect=stage.getBoundingClientRect(),
         ax=rect.left-stageRect.left+q.x,ay=rect.top-stageRect.top+q.y,
         left=Math.max(8,Math.min(stageRect.width-tip.offsetWidth-8,ax+16)),top=Math.max(8,Math.min(stageRect.height-tip.offsetHeight-8,ay-tip.offsetHeight/2));
     tip.style.left=left+'px';tip.style.top=top+'px';tip.classList.toggle('tip-left',left<ax-tip.offsetWidth);
@@ -15843,26 +16036,67 @@ __UI_SCRIPT__
   }
   function selectCountry(i,showTip){
     hoverIndex=i;
-    list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===i);});
-    if(showTip){var c=countries[i];tip.hidden=false;
-      tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';
+    list.querySelectorAll('.world-country-row.active').forEach(function(n){n.classList.remove('active');});
+    if(rows[i])rows[i].classList.add('active');
+    if(showTip){var c=countries[i];tip.hidden=false;tip.innerHTML=tipHtml(c);
       var q=proj(c.v,geom());if(q.z<=.02){tip.hidden=true;return;}positionTip(i);}
   }
   function clearHover(){hoverIndex=-1;tip.hidden=true;list.querySelectorAll('.world-country-row.active').forEach(function(n){n.classList.remove('active');});}
-  function focusCountry(i){
-    var c=countries[i];selectCountry(i,false);
-    var tr=-c.lon*Math.PI/180,d=((tr-rot+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
-    focus={rot:rot+d,tilt:Math.max(-.8,Math.min(.8,c.lat*Math.PI/180*.85))};
-    tip.hidden=false;tip.innerHTML='<span class="world-tip-title"><img alt="" src="https://flagcdn.com/w40/'+flagCode(c.flag)+'.png"><strong>'+c.name+'</strong></span><b>'+c.count.toLocaleString()+' online</b>';
-  }
+  function focusOn(c,ratio){var tr=-c.lon*Math.PI/180,d=((tr-rot+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;focus={rot:rot+d,tilt:Math.max(-.8,Math.min(.8,c.lat*Math.PI/180*(ratio||.85)))};}
+  function focusCountry(i){var c=countries[i];selectCountry(i,false);focusOn(c);tip.hidden=false;tip.innerHTML=tipHtml(c);}
   function findCountryAt(clientX,clientY){
     var rect=canvas.getBoundingClientRect(),x=clientX-rect.left,y=clientY-rect.top,g=geom(),best=1e9,idx=-1;
-    active.forEach(function(c){var q=proj(c.v,g);if(q.z<=.02)return;var lim=Math.max(13,c.rad*g.sc+7),d=Math.hypot(q.x-x,q.y-y);if(d<lim&&d<best){best=d;idx=countries.indexOf(c);}});
+    active.forEach(function(c){var q=proj(c.v,g);if(q.z<=.02)return;var lim=Math.max(13,c.dr*g.sc+7),d=Math.hypot(q.x-x,q.y-y);if(d<lim&&d<best){best=d;idx=c.i;}});
     return idx;
+  }
+  /* 整页文案：data-ui 节点 + 标题/无障碍标签 + 列表 + 提示 */
+  function relabel(){
+    page.querySelectorAll('[data-ui]').forEach(function(n){n.textContent=T(n.getAttribute('data-ui'));});
+    canvas.setAttribute('aria-label',T('worldAria'));openBtn.setAttribute('aria-label',T('worldBtnTitle'));openBtn.title=T('worldBtnTitle');
+    countries.forEach(function(c){fillRow(c,true);});
+    if(hoverIndex>=0&&!tip.hidden)tip.innerHTML=tipHtml(countries[hoverIndex]);
+    totalEl.textContent=fmt(Math.round(tot));
+  }
+  function refreshLive(){
+    recalc();
+    countries.forEach(function(c){fillRow(c,false);});
+    sortRows(false);
+    if(hoverIndex>=0&&!tip.hidden){var n=tip.querySelector('.wtn');if(n)n.textContent=fmt(countries[hoverIndex].count);}
+  }
+
+  /* ───────── 当前 IP → 国家（真实定位）；所在国人数不低于 5 ───────── */
+  var GEO_KEY='starline.worldGeo.v1',geoStarted=false;
+  function fetchJson(url,ms){return new Promise(function(res,rej){var ctl=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ctl)ctl.abort();rej(new Error('timeout'));},ms);fetch(url,{cache:'no-store',credentials:'omit',signal:ctl?ctl.signal:undefined}).then(function(r){if(!r.ok)throw new Error('http');return r.json();}).then(function(d){clearTimeout(tm);res(d);},function(e){clearTimeout(tm);rej(e);});});}
+  var GEO_SRC=[
+    {u:'https://ipwho.is/',f:function(d){return d&&d.success!==false&&d.country_code?{code:d.country_code,name:d.country,lat:d.latitude,lon:d.longitude}:null;}},
+    {u:'https://ipapi.co/json/',f:function(d){return d&&!d.error&&d.country_code?{code:d.country_code,name:d.country_name,lat:d.latitude,lon:d.longitude}:null;}},
+    {u:'https://api.country.is/',f:function(d){return d&&d.country?{code:d.country}:null;}}
+  ];
+  function geoCached(){try{var o=JSON.parse(localStorage.getItem(GEO_KEY)||'null');if(o&&o.code&&Date.now()-o.t<3600000)return o;}catch(e){}return null;}
+  function geoLookup(){
+    return GEO_SRC.reduce(function(p,s){return p.then(function(r){if(r)return r;return fetchJson(s.u,5000).then(s.f).catch(function(){return null;});});},Promise.resolve(null)).then(function(r){
+      if(r&&r.code){r.t=Date.now();try{localStorage.setItem(GEO_KEY,JSON.stringify(r));}catch(e){}return r;}
+      var m=/[-_]([A-Za-z]{2})\b/.exec(navigator.language||'');return m?{code:m[1],locale:true}:null;   /* 全部网络源失败时，退回系统区域设置 */
+    });
+  }
+  function setMe(info){
+    if(!info||!info.code)return;var code=String(info.code).toLowerCase(),c=byCode[code];
+    if(!c){if(typeof info.lat!=='number'||typeof info.lon!=='number')return;c=mkCountry(info.name||regionName(code)||code.toUpperCase(),codeToFlag(code),info.lat,info.lon,true);buildRow(c);}
+    var prev=me;if(prev&&prev!==c){fillRow(prev,true);}
+    me=c;
+    if(c.count<MIN_ME){var need=MIN_ME-c.count;c.count+=need;S+=need;c.flash=performance.now();var guard=0;while(S>T1&&guard++<400){var o=pickLeave(new Date());if(!o||o===c)break;addPlayers(o,-1);}}
+    recalc();countries.forEach(function(x){fillRow(x,x===c||x===prev);});sortRows(true);
+    if(!touched&&page.classList.contains('open')){focusOn(c,.6);}
+    else if(!touched){rot=-c.lon*Math.PI/180;tilt=Math.max(-.8,Math.min(.8,c.lat*Math.PI/180*.6));}
+  }
+  function startGeo(){
+    if(geoStarted)return;geoStarted=true;
+    var cached=geoCached();if(cached){setMe(cached);return;}
+    geoLookup().then(setMe).catch(function(){});
   }
 
   /* ───────── 交互：指针拖动旋转 / 悬停 / 点击聚焦 ───────── */
-  canvas.addEventListener('pointerdown',function(e){dragging=true;moved=0;downX=lastX=e.clientX;downY=lastY=e.clientY;vel=0;focus=null;try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
+  canvas.addEventListener('pointerdown',function(e){dragging=true;touched=true;moved=0;downX=lastX=e.clientX;downY=lastY=e.clientY;vel=0;focus=null;try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
   canvas.addEventListener('pointermove',function(e){
     if(dragging){var dx=e.clientX-lastX,dy=e.clientY-lastY;rot+=dx*.0065;vel=dx*.0065;tilt=Math.max(-.9,Math.min(.9,tilt+dy*.005));lastX=e.clientX;lastY=e.clientY;moved=Math.max(moved,Math.hypot(e.clientX-downX,e.clientY-downY));if(moved>4){tip.hidden=true;}return;}
     var i=findCountryAt(e.clientX,e.clientY);
@@ -15874,13 +16108,29 @@ __UI_SCRIPT__
   canvas.addEventListener('pointercancel',function(){dragging=false;});
   canvas.addEventListener('pointerleave',function(){if(!dragging)clearHover();});
 
-  function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';readTheme();resize();if(!raf)raf=requestAnimationFrame(draw);}
-  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';clearHover();dragging=false;if(raf){cancelAnimationFrame(raf);raf=0;}}
-  renderList();openBtn.addEventListener('click',show);
+  /* ───────── 开关页面 / 实时更新循环 ───────── */
+  function schedule(){timer=setTimeout(function(){tick();lastTick=Date.now();refreshLive();if(page.classList.contains('open'))schedule();},700+Math.random()*1700);}
+  function show(){
+    page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';
+    readTheme();resize();relabel();
+    var missed=Math.min(30,Math.floor((Date.now()-lastTick)/1800));for(var k=0;k<missed;k++)tick();lastTick=Date.now();refreshLive();tot=S;totalEl.textContent=fmt(S);
+    startGeo();
+    if(!raf)raf=requestAnimationFrame(draw);if(!timer)schedule();
+  }
+  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';clearHover();dragging=false;if(raf){cancelAnimationFrame(raf);raf=0;}if(timer){clearTimeout(timer);timer=0;}}
+  recalc();renderList();relabel();
+  openBtn.addEventListener('click',show);
+  var backBtn=document.getElementById('worldBackBtn');if(backBtn)backBtn.addEventListener('click',hide);
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});
   window.addEventListener('resize',function(){if(page.classList.contains('open'))resize();});
+  /* 语言切换 / 保存自定义翻译时刷新（uiSetLang 每次都会调用 ctRefreshLabels） */
+  (function(){
+    var p1=window.ctRefreshLabels;window.ctRefreshLabels=function(){var r;if(typeof p1==='function'){try{r=p1.apply(this,arguments);}catch(e){}}try{relabel();}catch(e){}return r;};
+    if(typeof window.onUiLangChanged==='function'){var p2=window.onUiLangChanged;window.onUiLangChanged=function(){var r;try{r=p2.apply(this,arguments);}catch(e){}try{relabel();}catch(e){}return r;};}
+  })();
 })();
 </script>
+
 
 
 </body>
