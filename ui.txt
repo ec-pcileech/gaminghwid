@@ -6339,6 +6339,17 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 .lg-ck{width:13px;height:13px;flex-shrink:0;margin-left:8px;fill:none;stroke:var(--accent-2);stroke-width:2.6;
   stroke-linecap:round;stroke-linejoin:round;opacity:0}
 .lg-item.active .lg-ck{opacity:1}
+/* APP 右下角拖拽改变窗口大小的手柄 */
+#uiResizeGrip{
+  position:fixed;right:0;bottom:0;width:22px;height:22px;z-index:2147483000;
+  display:grid;place-items:end;padding:0 4px 4px 0;box-sizing:border-box;
+  cursor:nwse-resize;color:var(--text-3);opacity:.5;touch-action:none;
+  -webkit-app-region:no-drag;-webkit-user-select:none;user-select:none;
+  transition:opacity var(--tr),color var(--tr);
+}
+#uiResizeGrip:hover,html.ui-resizing #uiResizeGrip{opacity:1;color:var(--accent-2)}
+#uiResizeGrip svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;pointer-events:none}
+html.ui-resizing,html.ui-resizing *{cursor:nwse-resize !important;-webkit-user-select:none;user-select:none}
 .tb-spacer{flex:1}
 .tb-actions{display:flex;gap:8px;align-items:center;-webkit-app-region:no-drag}
 .tb-btn{
@@ -9386,6 +9397,18 @@ __UI_SCRIPT__
     if (h > 0) return h + 'h ' + m + 'm';
     return m + 'm';
   }
+
+  /* 给右下角拖拽手柄用：窗口尺寸换算、下发、复位（RESIZE 的单位与 applyDPI 一致） */
+  window.uiWinGeom = {
+    scale: function(){ return Math.max(0.5, Math.min(2, ((USER && USER.dpi) || 100) / 100)); },
+    min: function(){ return [640, 480]; },
+    max: function(){
+      try { return [window.screen.availWidth - 8, window.screen.availHeight - 8]; }
+      catch (e) { return [4096, 4096]; }
+    },
+    send: function(w, h){ wv('RESIZE:' + w + 'x' + h); },
+    reset: function(){ applyDPI((USER && USER.dpi) || 100); }
+  };
 
   function applyDPI(dpi){
     var scale = (dpi || 100) / 100;
@@ -13372,6 +13395,51 @@ __UI_SCRIPT__
     return r;
   };
   paintBtn();
+})();
+</script>
+<script>
+/* ═══════ 右下角拖拽手柄：拖动即改变 APP 窗口大小（向宿主发 RESIZE:宽x高） ═══════ */
+(function(){
+  if(document.getElementById('uiResizeGrip'))return;
+  var g=document.createElement('div');
+  g.id='uiResizeGrip';g.setAttribute('data-nodrag','');g.setAttribute('role','separator');g.setAttribute('aria-label','Resize');
+  g.innerHTML='<svg viewBox="0 0 12 12"><path d="M11 3L3 11M11 7L7 11"/></svg>';
+  document.body.appendChild(g);
+
+  var drag=null,raf=0,pend=null,last=null,root=document.documentElement;
+
+  function flush(){
+    raf=0;
+    var geom=window.uiWinGeom;if(!drag||!pend||!geom)return;
+    var mn=geom.min(),mx=geom.max();
+    /* 窗口左上角固定：让右下角始终跟在鼠标下面（按下时的偏移保持不变） */
+    var w=Math.round((pend.x+drag.ox)*drag.scale),h=Math.round((pend.y+drag.oy)*drag.scale);
+    w=Math.max(mn[0],Math.min(mx[0],w));h=Math.max(mn[1],Math.min(mx[1],h));
+    if(last&&last.w===w&&last.h===h)return;
+    last={w:w,h:h};geom.send(w,h);
+  }
+  function end(){
+    if(!drag)return;
+    drag=null;pend=null;last=null;root.classList.remove('ui-resizing');
+  }
+
+  g.addEventListener('pointerdown',function(e){
+    if(e.button!==0||!window.uiWinGeom)return;
+    e.preventDefault();e.stopPropagation();
+    drag={ox:window.innerWidth-e.clientX,oy:window.innerHeight-e.clientY,scale:window.uiWinGeom.scale()};
+    try{g.setPointerCapture(e.pointerId);}catch(err){}
+    root.classList.add('ui-resizing');
+  });
+  g.addEventListener('pointermove',function(e){
+    if(!drag)return;
+    pend={x:e.clientX,y:e.clientY};
+    if(!raf)raf=requestAnimationFrame(flush);
+  });
+  g.addEventListener('pointerup',end);
+  g.addEventListener('pointercancel',end);
+  g.addEventListener('lostpointercapture',end);
+  /* 双击手柄：恢复为当前缩放对应的默认窗口大小 */
+  g.addEventListener('dblclick',function(e){e.preventDefault();if(window.uiWinGeom)window.uiWinGeom.reset();});
 })();
 </script>
 </body>
