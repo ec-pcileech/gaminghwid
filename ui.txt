@@ -6377,6 +6377,113 @@ bgfxApply();
 </script>
 
 
+
+<div id="worldOnlinePage" class="world-online-page" aria-hidden="true">
+  <header class="world-online-head">
+    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong>WORLD ACTIVITY</strong><small>Global player distribution · simulated data</small></div></div>
+    <div class="world-total-wrap"><span class="world-live-dot"></span><span>ONLINE NOW</span><strong id="worldTotal">—</strong></div>
+    <button id="worldMapClose" class="world-close" type="button" aria-label="Close world map">×</button>
+  </header>
+  <div class="world-content">
+    <section class="world-map-panel">
+      <div class="world-map-caption"><span>GLOBAL NETWORK</span><span class="world-map-hint">Hover over a country to inspect</span></div>
+      <div class="world-map-stage">
+        <svg id="worldVectorMap" viewBox="0 0 1000 520" role="img" aria-label="Stylized vector world map">
+          <defs><pattern id="worldGrid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="currentColor" stroke-opacity=".08" stroke-width="1"/></pattern></defs>
+          <rect width="1000" height="520" fill="url(#worldGrid)"/>
+          <g class="world-continent">
+            <path d="M80 100 L125 68 185 58 224 82 258 93 279 126 260 151 230 159 215 190 188 210 176 248 151 239 140 208 116 191 103 159 79 140Z"/>
+            <path d="M225 254 L260 264 285 300 277 337 258 378 248 425 228 458 212 419 211 382 194 345 198 309Z"/>
+            <path d="M420 100 L452 82 492 92 510 112 493 132 460 128 444 151 418 138Z"/>
+            <path d="M453 153 L493 143 533 167 548 206 529 247 514 293 489 329 469 303 460 266 442 227 432 188Z"/>
+            <path d="M503 96 L555 67 626 64 683 82 725 75 782 95 833 122 867 152 850 177 806 170 781 194 740 184 706 204 671 188 640 211 604 194 579 166 541 159Z"/>
+            <path d="M620 207 L658 207 689 234 700 274 678 300 650 286 631 255Z"/>
+            <path d="M775 324 L811 306 851 320 867 350 846 376 809 373 785 352Z"/>
+            <path d="M370 84 L392 76 407 91 396 110 378 106Z"/>
+          </g>
+          <g id="worldCountryMarks"></g>
+        </svg>
+        <div id="worldCountryTip" class="world-country-tip" hidden></div>
+      </div>
+      <div class="world-legend"><span>FEWER PLAYERS</span><i class="legend-low"></i><i class="legend-mid"></i><i class="legend-high"></i><i class="legend-hot"></i><span>MORE PLAYERS</span></div>
+    </section>
+    <aside class="world-side-panel">
+      <div class="world-side-title"><span>REGIONAL ACTIVITY</span><small>SIMULATED</small></div>
+      <div id="worldCountryList" class="world-country-list"></div>
+      <div class="world-disclaimer">Numbers are fictional UI demo values, regenerated each time the app starts. They do not represent real users.</div>
+    </aside>
+  </div>
+  <footer class="world-foot"><span><i></i> Simulation active</span><span>Vector map · Country-level overview</span></footer>
+</div>
+<style>
+.world-online-page{position:fixed;inset:0;z-index:2147483200;display:none;flex-direction:column;background:var(--bg,#0a0a0c);color:var(--text,#f4f4f5);font-family:var(--font,Inter,sans-serif);overflow:hidden}
+.world-online-page.open{display:flex;animation:worldPageIn .28s ease-out}
+@keyframes worldPageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.world-online-head{height:76px;flex-shrink:0;display:flex;align-items:center;gap:24px;padding:0 28px;border-bottom:1px solid var(--border);background:var(--surface-solid,#17171b)}
+.world-brand{display:flex;align-items:center;gap:12px;min-width:250px}.world-brand-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:27px}
+.world-brand strong,.world-brand small{display:block}.world-brand strong{font-size:13px;letter-spacing:1.4px}.world-brand small{font-size:11px;color:var(--text-3);margin-top:3px}
+.world-total-wrap{margin-left:auto;display:flex;align-items:center;gap:9px;color:var(--text-3);font-size:10px;letter-spacing:1.2px}.world-total-wrap strong{font:700 23px var(--font-mono,monospace);letter-spacing:0;color:var(--text);margin-left:5px}
+.world-live-dot,.world-foot i{width:7px;height:7px;border-radius:50%;background:#35d399;box-shadow:0 0 10px #35d399;display:inline-block}
+.world-close{width:36px;height:36px;border:1px solid var(--border);border-radius:50%;background:var(--surface-2);color:var(--text-2);font-size:25px;cursor:pointer}.world-close:hover{color:var(--text);background:var(--surface-3)}
+.world-content{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;padding:22px;overflow:auto}
+.world-map-panel,.world-side-panel{min-width:0;border:1px solid var(--border);border-radius:18px;background:var(--surface);box-shadow:var(--shadow-1);overflow:hidden}
+.world-map-caption{height:48px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:1.1px;color:var(--text-2)}
+.world-map-hint{font-size:11px;font-weight:400;letter-spacing:0;color:var(--text-3)}
+.world-map-stage{position:relative;min-height:300px;height:calc(100% - 85px);display:flex;align-items:center;padding:10px}
+#worldVectorMap{width:100%;max-height:100%;min-height:300px;color:var(--text);overflow:visible}
+.world-continent path{fill:var(--surface-3);stroke:var(--text-3);stroke-opacity:.35;stroke-width:1.2;stroke-linejoin:round;transition:fill .2s}
+.world-country-mark{cursor:pointer;stroke:rgba(255,255,255,.7);stroke-width:1.5;transition:r .15s,filter .15s}
+.world-country-mark:hover,.world-country-mark.active{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 7px currentColor)}
+.world-legend{height:36px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:9px;color:var(--text-3);letter-spacing:.5px}
+.world-legend i{width:25px;height:7px;border-radius:3px}.legend-low{background:#f6b7a8}.legend-mid{background:#f47762}.legend-high{background:#e7473c}.legend-hot{background:#a91024}
+.world-country-tip{position:absolute;z-index:4;min-width:170px;padding:12px 14px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);box-shadow:var(--shadow-2);pointer-events:none}
+.world-country-tip strong{display:block;font-size:13px}.world-country-tip span{display:block;margin-top:5px;color:var(--text-3);font-size:10px}.world-country-tip b{display:block;margin-top:3px;font:700 19px var(--font-mono,monospace);color:var(--text)}
+.world-side-panel{display:flex;flex-direction:column}.world-side-title{padding:17px 16px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1px;font-weight:700;color:var(--text-2)}.world-side-title small{font-size:9px;color:var(--accent);letter-spacing:.8px}
+.world-country-list{overflow:auto;padding:6px 10px;flex:1}.world-country-row{display:flex;align-items:center;gap:10px;padding:10px 7px;border-bottom:1px solid var(--border);border-radius:8px;cursor:pointer}.world-country-row:hover,.world-country-row.active{background:var(--surface-2)}
+.world-flag{font-size:20px;width:28px;text-align:center}.world-country-name{flex:1;min-width:0;font-size:12px;font-weight:600}.world-country-name small{display:block;font-size:10px;color:var(--text-3);font-weight:400;margin-top:2px}.world-country-count{font:600 12px var(--font-mono,monospace);text-align:right}.world-country-count small{display:block;font:10px var(--font, sans-serif);color:var(--text-3);margin-top:2px}
+.world-disclaimer{padding:12px 14px;font-size:10px;line-height:1.5;color:var(--text-3);border-top:1px solid var(--border)}
+.world-foot{height:34px;flex-shrink:0;padding:0 26px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);color:var(--text-3);font-size:10px}.world-foot span:first-child{display:flex;align-items:center;gap:7px}
+@media(max-width:760px){.world-online-head{padding:0 14px;gap:10px}.world-brand{min-width:0}.world-brand small{display:none}.world-total-wrap{gap:5px}.world-total-wrap strong{font-size:17px}.world-content{grid-template-columns:1fr;padding:10px}.world-map-stage{height:auto}.world-side-panel{max-height:340px}.world-map-hint{display:none}}
+</style>
+<script>
+(function(){
+  var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage'),closeBtn=document.getElementById('worldMapClose');
+  if(!openBtn||!page||!closeBtn)return;
+  var countries=[
+    {name:'United States',flag:'🇺🇸',x:190,y:158},{name:'Canada',flag:'🇨🇦',x:190,y:105},
+    {name:'Brazil',flag:'🇧🇷',x:250,y:345},{name:'United Kingdom',flag:'🇬🇧',x:454,y:130},
+    {name:'Germany',flag:'🇩🇪',x:482,y:137},{name:'France',flag:'🇫🇷',x:467,y:151},
+    {name:'Russia',flag:'🇷🇺',x:650,y:118},{name:'India',flag:'🇮🇳',x:600,y:225},
+    {name:'China',flag:'🇨🇳',x:690,y:175},{name:'Japan',flag:'🇯🇵',x:780,y:190},
+    {name:'South Korea',flag:'🇰🇷',x:755,y:195},{name:'Vietnam',flag:'🇻🇳',x:690,y:242},
+    {name:'Australia',flag:'🇦🇺',x:820,y:345},{name:'Indonesia',flag:'🇮🇩',x:720,y:300},
+    {name:'Turkey',flag:'🇹🇷',x:520,y:170},{name:'South Africa',flag:'🇿🇦',x:505,y:315}
+  ];
+  /* 每次启动生成一次虚构人数；每个国家至少 35，总和始终大于 350 */
+  countries.forEach(function(c){c.count=35+Math.floor(Math.random()*216);});
+  var total=countries.reduce(function(a,c){return a+c.count;},0);
+  document.getElementById('worldTotal').textContent=total.toLocaleString();
+  function color(n){var t=Math.max(0,Math.min(1,(n-35)/215));var stops=[[246,183,168],[244,119,98],[231,71,60],[169,16,36]];var p=t*3,i=Math.min(2,Math.floor(p)),f=p-i;var a=stops[i],b=stops[i+1];return 'rgb('+a.map(function(v,j){return Math.round(v+(b[j]-v)*f);}).join(',')+')';}
+  var marks=document.getElementById('worldCountryMarks'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip');
+  function selectCountry(index,showTip){
+    var c=countries[index];marks.querySelectorAll('.world-country-mark').forEach(function(n){n.classList.toggle('active',+n.dataset.index===index);});
+    list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===index);});
+    if(showTip){tip.hidden=false;tip.innerHTML='<strong>'+c.flag+' '+c.name+'</strong><b>'+c.count.toLocaleString()+' online</b><span>Current simulated players</span>';var stage=tip.parentElement.getBoundingClientRect();var x=(c.x/1000)*stage.width,y=(c.y/520)*stage.height;tip.style.left=Math.max(8,Math.min(stage.width-185,x+12))+'px';tip.style.top=Math.max(8,Math.min(stage.height-95,y-16))+'px';}
+  }
+  countries.forEach(function(c,i){
+    var circle=document.createElementNS('http://www.w3.org/2000/svg','circle');circle.setAttribute('cx',c.x);circle.setAttribute('cy',c.y);circle.setAttribute('r',Math.max(7,Math.min(15,6+c.count/25)));circle.setAttribute('fill',color(c.count));circle.setAttribute('class','world-country-mark');circle.dataset.index=i;circle.setAttribute('aria-label',c.name+' '+c.count+' online');circle.addEventListener('mouseenter',function(){selectCountry(i,true);});circle.addEventListener('focus',function(){selectCountry(i,true);});circle.addEventListener('click',function(){selectCountry(i,true);});circle.setAttribute('tabindex','0');marks.appendChild(circle);
+    var row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;row.innerHTML='<span class="world-flag">'+c.flag+'</span><span class="world-country-name">'+c.name+'<small>Current online</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';row.addEventListener('mouseenter',function(){selectCountry(i,true);});row.addEventListener('focus',function(){selectCountry(i,true);});row.addEventListener('click',function(){selectCountry(i,true);});list.appendChild(row);
+  });
+  /* 列表按人数排序；国家数组索引保持不变，地图点位与悬浮信息一一对应 */
+  Array.prototype.slice.call(list.children).sort(function(a,b){return +b.querySelector('.world-country-count').textContent.replace(/,/g,'') - +a.querySelector('.world-country-count').textContent.replace(/,/g,'');}).forEach(function(n){list.appendChild(n);});
+  function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';}
+  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';tip.hidden=true;}
+  openBtn.addEventListener('click',show);closeBtn.addEventListener('click',hide);
+  page.addEventListener('click',function(e){if(e.target===page)hide();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});
+})();
+</script>
+
 </body>
 </html>
 #===DASHBOARD
@@ -6638,7 +6745,7 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 .topbar-search:focus-within svg{stroke:var(--accent-2)}
 .topbar-search input{
   position:relative;z-index:1;
-  width:100%;height:38px;padding:0 84px 0 40px;
+  width:100%;height:38px;padding:0 126px 0 40px;
   border-radius:var(--radius-full);
   background:var(--surface);
   backdrop-filter:blur(20px);
@@ -6656,9 +6763,9 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 }
 /* ═══════ 搜索栏右侧 Ctrl+K 按钮 + 弹窗（主题 / 消息树 / FAQ / 全部游戏）；弹窗挂在 body 上，永远在最顶层 ═══════ */
 .sk-kbd{
-  position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:3;
+  position:absolute;right:48px;top:50%;transform:translateY(-50%);z-index:3;
   display:flex;align-items:center;gap:4px;height:24px;padding:0 6px;
-  border-radius:var(--radius-full);border:1px solid var(--border);
+  border-radius:var(--radius-full);border:0;
   background:transparent;color:var(--text-3);cursor:pointer;
   -webkit-app-region:no-drag;
   transition:border-color var(--tr),color var(--tr),transform var(--tr);
@@ -6674,6 +6781,15 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 .sk-kbd:active{transform:translateY(-50%) scale(.95)}
 .topbar-search:focus-within .sk-kbd{transform:translateY(calc(-50% - 1px))}
 .topbar-search:focus-within .sk-kbd:active{transform:translateY(calc(-50% - 1px)) scale(.95)}
+/* 世界在线地图入口：与 Ctrl+K 分离，Ctrl+K 自身不再有额外胶囊底 */
+.world-map-btn{position:absolute;right:7px;top:50%;transform:translateY(-50%);z-index:4;
+  width:30px;height:30px;display:grid;place-items:center;border:1px solid var(--border);
+  border-radius:50%;background:var(--surface-2);color:var(--text-2);cursor:pointer;
+  transition:all var(--tr);-webkit-app-region:no-drag}
+.world-map-btn:hover{color:var(--accent-2);border-color:var(--accent);background:var(--accent-soft);transform:translateY(-50%) scale(1.06)}
+.world-map-btn svg{position:static!important;transform:none!important;width:16px!important;height:16px!important;stroke:currentColor!important;pointer-events:none}
+.world-map-btn:active{transform:translateY(-50%) scale(.96)}
+
 .sk-pop,.sk-det{
   position:fixed;z-index:2147483100;
   border-radius:var(--radius-lg);
@@ -8996,6 +9112,9 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="searchInput" type="text" placeholder="Search games..." data-ui-ph="searchGames" autocomplete="off" spellcheck="false">
         <button class="sk-kbd" id="skKbd" type="button" title="FAQ &amp; all games (Ctrl+K)" aria-haspopup="dialog" aria-expanded="false" aria-controls="skPop"><kbd>Ctrl</kbd><kbd>K</kbd></button>
+        <button class="world-map-btn" id="worldMapOpen" type="button" title="World online players" aria-label="World online players">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.2"/><path d="M2.8 12h18.4M12 2.8c2.5 2.5 3.7 5.6 3.7 9.2s-1.2 6.7-3.7 9.2c-2.5-2.5-3.7-5.6-3.7-9.2S9.5 5.3 12 2.8z"/></svg>
+        </button>
       </div>
       <div class="tb-spacer"></div>
       <div class="tb-actions">
@@ -15380,5 +15499,112 @@ __UI_SCRIPT__
   refreshLabels();renderRecent();updateButton();
 })();
 </script>
+
+<div id="worldOnlinePage" class="world-online-page" aria-hidden="true">
+  <header class="world-online-head">
+    <div class="world-brand"><span class="world-brand-icon">◎</span><div><strong>WORLD ACTIVITY</strong><small>Global player distribution · simulated data</small></div></div>
+    <div class="world-total-wrap"><span class="world-live-dot"></span><span>ONLINE NOW</span><strong id="worldTotal">—</strong></div>
+    <button id="worldMapClose" class="world-close" type="button" aria-label="Close world map">×</button>
+  </header>
+  <div class="world-content">
+    <section class="world-map-panel">
+      <div class="world-map-caption"><span>GLOBAL NETWORK</span><span class="world-map-hint">Hover over a country to inspect</span></div>
+      <div class="world-map-stage">
+        <svg id="worldVectorMap" viewBox="0 0 1000 520" role="img" aria-label="Stylized vector world map">
+          <defs><pattern id="worldGrid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="currentColor" stroke-opacity=".08" stroke-width="1"/></pattern></defs>
+          <rect width="1000" height="520" fill="url(#worldGrid)"/>
+          <g class="world-continent">
+            <path d="M80 100 L125 68 185 58 224 82 258 93 279 126 260 151 230 159 215 190 188 210 176 248 151 239 140 208 116 191 103 159 79 140Z"/>
+            <path d="M225 254 L260 264 285 300 277 337 258 378 248 425 228 458 212 419 211 382 194 345 198 309Z"/>
+            <path d="M420 100 L452 82 492 92 510 112 493 132 460 128 444 151 418 138Z"/>
+            <path d="M453 153 L493 143 533 167 548 206 529 247 514 293 489 329 469 303 460 266 442 227 432 188Z"/>
+            <path d="M503 96 L555 67 626 64 683 82 725 75 782 95 833 122 867 152 850 177 806 170 781 194 740 184 706 204 671 188 640 211 604 194 579 166 541 159Z"/>
+            <path d="M620 207 L658 207 689 234 700 274 678 300 650 286 631 255Z"/>
+            <path d="M775 324 L811 306 851 320 867 350 846 376 809 373 785 352Z"/>
+            <path d="M370 84 L392 76 407 91 396 110 378 106Z"/>
+          </g>
+          <g id="worldCountryMarks"></g>
+        </svg>
+        <div id="worldCountryTip" class="world-country-tip" hidden></div>
+      </div>
+      <div class="world-legend"><span>FEWER PLAYERS</span><i class="legend-low"></i><i class="legend-mid"></i><i class="legend-high"></i><i class="legend-hot"></i><span>MORE PLAYERS</span></div>
+    </section>
+    <aside class="world-side-panel">
+      <div class="world-side-title"><span>REGIONAL ACTIVITY</span><small>SIMULATED</small></div>
+      <div id="worldCountryList" class="world-country-list"></div>
+      <div class="world-disclaimer">Numbers are fictional UI demo values, regenerated each time the app starts. They do not represent real users.</div>
+    </aside>
+  </div>
+  <footer class="world-foot"><span><i></i> Simulation active</span><span>Vector map · Country-level overview</span></footer>
+</div>
+<style>
+.world-online-page{position:fixed;inset:0;z-index:2147483200;display:none;flex-direction:column;background:var(--bg,#0a0a0c);color:var(--text,#f4f4f5);font-family:var(--font,Inter,sans-serif);overflow:hidden}
+.world-online-page.open{display:flex;animation:worldPageIn .28s ease-out}
+@keyframes worldPageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.world-online-head{height:76px;flex-shrink:0;display:flex;align-items:center;gap:24px;padding:0 28px;border-bottom:1px solid var(--border);background:var(--surface-solid,#17171b)}
+.world-brand{display:flex;align-items:center;gap:12px;min-width:250px}.world-brand-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:27px}
+.world-brand strong,.world-brand small{display:block}.world-brand strong{font-size:13px;letter-spacing:1.4px}.world-brand small{font-size:11px;color:var(--text-3);margin-top:3px}
+.world-total-wrap{margin-left:auto;display:flex;align-items:center;gap:9px;color:var(--text-3);font-size:10px;letter-spacing:1.2px}.world-total-wrap strong{font:700 23px var(--font-mono,monospace);letter-spacing:0;color:var(--text);margin-left:5px}
+.world-live-dot,.world-foot i{width:7px;height:7px;border-radius:50%;background:#35d399;box-shadow:0 0 10px #35d399;display:inline-block}
+.world-close{width:36px;height:36px;border:1px solid var(--border);border-radius:50%;background:var(--surface-2);color:var(--text-2);font-size:25px;cursor:pointer}.world-close:hover{color:var(--text);background:var(--surface-3)}
+.world-content{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;padding:22px;overflow:auto}
+.world-map-panel,.world-side-panel{min-width:0;border:1px solid var(--border);border-radius:18px;background:var(--surface);box-shadow:var(--shadow-1);overflow:hidden}
+.world-map-caption{height:48px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;letter-spacing:1.1px;color:var(--text-2)}
+.world-map-hint{font-size:11px;font-weight:400;letter-spacing:0;color:var(--text-3)}
+.world-map-stage{position:relative;min-height:300px;height:calc(100% - 85px);display:flex;align-items:center;padding:10px}
+#worldVectorMap{width:100%;max-height:100%;min-height:300px;color:var(--text);overflow:visible}
+.world-continent path{fill:var(--surface-3);stroke:var(--text-3);stroke-opacity:.35;stroke-width:1.2;stroke-linejoin:round;transition:fill .2s}
+.world-country-mark{cursor:pointer;stroke:rgba(255,255,255,.7);stroke-width:1.5;transition:r .15s,filter .15s}
+.world-country-mark:hover,.world-country-mark.active{stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 7px currentColor)}
+.world-legend{height:36px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:9px;color:var(--text-3);letter-spacing:.5px}
+.world-legend i{width:25px;height:7px;border-radius:3px}.legend-low{background:#f6b7a8}.legend-mid{background:#f47762}.legend-high{background:#e7473c}.legend-hot{background:#a91024}
+.world-country-tip{position:absolute;z-index:4;min-width:170px;padding:12px 14px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);box-shadow:var(--shadow-2);pointer-events:none}
+.world-country-tip strong{display:block;font-size:13px}.world-country-tip span{display:block;margin-top:5px;color:var(--text-3);font-size:10px}.world-country-tip b{display:block;margin-top:3px;font:700 19px var(--font-mono,monospace);color:var(--text)}
+.world-side-panel{display:flex;flex-direction:column}.world-side-title{padding:17px 16px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:1px;font-weight:700;color:var(--text-2)}.world-side-title small{font-size:9px;color:var(--accent);letter-spacing:.8px}
+.world-country-list{overflow:auto;padding:6px 10px;flex:1}.world-country-row{display:flex;align-items:center;gap:10px;padding:10px 7px;border-bottom:1px solid var(--border);border-radius:8px;cursor:pointer}.world-country-row:hover,.world-country-row.active{background:var(--surface-2)}
+.world-flag{font-size:20px;width:28px;text-align:center}.world-country-name{flex:1;min-width:0;font-size:12px;font-weight:600}.world-country-name small{display:block;font-size:10px;color:var(--text-3);font-weight:400;margin-top:2px}.world-country-count{font:600 12px var(--font-mono,monospace);text-align:right}.world-country-count small{display:block;font:10px var(--font, sans-serif);color:var(--text-3);margin-top:2px}
+.world-disclaimer{padding:12px 14px;font-size:10px;line-height:1.5;color:var(--text-3);border-top:1px solid var(--border)}
+.world-foot{height:34px;flex-shrink:0;padding:0 26px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);color:var(--text-3);font-size:10px}.world-foot span:first-child{display:flex;align-items:center;gap:7px}
+@media(max-width:760px){.world-online-head{padding:0 14px;gap:10px}.world-brand{min-width:0}.world-brand small{display:none}.world-total-wrap{gap:5px}.world-total-wrap strong{font-size:17px}.world-content{grid-template-columns:1fr;padding:10px}.world-map-stage{height:auto}.world-side-panel{max-height:340px}.world-map-hint{display:none}}
+</style>
+<script>
+(function(){
+  var openBtn=document.getElementById('worldMapOpen'),page=document.getElementById('worldOnlinePage'),closeBtn=document.getElementById('worldMapClose');
+  if(!openBtn||!page||!closeBtn)return;
+  var countries=[
+    {name:'United States',flag:'🇺🇸',x:190,y:158},{name:'Canada',flag:'🇨🇦',x:190,y:105},
+    {name:'Brazil',flag:'🇧🇷',x:250,y:345},{name:'United Kingdom',flag:'🇬🇧',x:454,y:130},
+    {name:'Germany',flag:'🇩🇪',x:482,y:137},{name:'France',flag:'🇫🇷',x:467,y:151},
+    {name:'Russia',flag:'🇷🇺',x:650,y:118},{name:'India',flag:'🇮🇳',x:600,y:225},
+    {name:'China',flag:'🇨🇳',x:690,y:175},{name:'Japan',flag:'🇯🇵',x:780,y:190},
+    {name:'South Korea',flag:'🇰🇷',x:755,y:195},{name:'Vietnam',flag:'🇻🇳',x:690,y:242},
+    {name:'Australia',flag:'🇦🇺',x:820,y:345},{name:'Indonesia',flag:'🇮🇩',x:720,y:300},
+    {name:'Turkey',flag:'🇹🇷',x:520,y:170},{name:'South Africa',flag:'🇿🇦',x:505,y:315}
+  ];
+  /* 每次启动生成一次虚构人数；每个国家至少 35，总和始终大于 350 */
+  countries.forEach(function(c){c.count=35+Math.floor(Math.random()*216);});
+  var total=countries.reduce(function(a,c){return a+c.count;},0);
+  document.getElementById('worldTotal').textContent=total.toLocaleString();
+  function color(n){var t=Math.max(0,Math.min(1,(n-35)/215));var stops=[[246,183,168],[244,119,98],[231,71,60],[169,16,36]];var p=t*3,i=Math.min(2,Math.floor(p)),f=p-i;var a=stops[i],b=stops[i+1];return 'rgb('+a.map(function(v,j){return Math.round(v+(b[j]-v)*f);}).join(',')+')';}
+  var marks=document.getElementById('worldCountryMarks'),list=document.getElementById('worldCountryList'),tip=document.getElementById('worldCountryTip');
+  function selectCountry(index,showTip){
+    var c=countries[index];marks.querySelectorAll('.world-country-mark').forEach(function(n){n.classList.toggle('active',+n.dataset.index===index);});
+    list.querySelectorAll('.world-country-row').forEach(function(n){n.classList.toggle('active',+n.dataset.index===index);});
+    if(showTip){tip.hidden=false;tip.innerHTML='<strong>'+c.flag+' '+c.name+'</strong><b>'+c.count.toLocaleString()+' online</b><span>Current simulated players</span>';var stage=tip.parentElement.getBoundingClientRect();var x=(c.x/1000)*stage.width,y=(c.y/520)*stage.height;tip.style.left=Math.max(8,Math.min(stage.width-185,x+12))+'px';tip.style.top=Math.max(8,Math.min(stage.height-95,y-16))+'px';}
+  }
+  countries.forEach(function(c,i){
+    var circle=document.createElementNS('http://www.w3.org/2000/svg','circle');circle.setAttribute('cx',c.x);circle.setAttribute('cy',c.y);circle.setAttribute('r',Math.max(7,Math.min(15,6+c.count/25)));circle.setAttribute('fill',color(c.count));circle.setAttribute('class','world-country-mark');circle.dataset.index=i;circle.setAttribute('aria-label',c.name+' '+c.count+' online');circle.addEventListener('mouseenter',function(){selectCountry(i,true);});circle.addEventListener('focus',function(){selectCountry(i,true);});circle.addEventListener('click',function(){selectCountry(i,true);});circle.setAttribute('tabindex','0');marks.appendChild(circle);
+    var row=document.createElement('div');row.className='world-country-row';row.dataset.index=i;row.tabIndex=0;row.innerHTML='<span class="world-flag">'+c.flag+'</span><span class="world-country-name">'+c.name+'<small>Current online</small></span><span class="world-country-count">'+c.count.toLocaleString()+'<small>players</small></span>';row.addEventListener('mouseenter',function(){selectCountry(i,true);});row.addEventListener('focus',function(){selectCountry(i,true);});row.addEventListener('click',function(){selectCountry(i,true);});list.appendChild(row);
+  });
+  /* 列表按人数排序；国家数组索引保持不变，地图点位与悬浮信息一一对应 */
+  Array.prototype.slice.call(list.children).sort(function(a,b){return +b.querySelector('.world-country-count').textContent.replace(/,/g,'') - +a.querySelector('.world-country-count').textContent.replace(/,/g,'');}).forEach(function(n){list.appendChild(n);});
+  function show(){page.classList.add('open');page.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';}
+  function hide(){page.classList.remove('open');page.setAttribute('aria-hidden','true');document.body.style.overflow='';tip.hidden=true;}
+  openBtn.addEventListener('click',show);closeBtn.addEventListener('click',hide);
+  page.addEventListener('click',function(e){if(e.target===page)hide();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&page.classList.contains('open'))hide();});
+})();
+</script>
+
 </body>
 </html>
