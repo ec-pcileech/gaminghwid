@@ -7357,7 +7357,7 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
   height:64px;flex-shrink:0;display:flex;align-items:center;gap:14px;
   padding:0 26px;-webkit-app-region:drag;
 }
-.topbar-search{flex:1;max-width:455px;min-width:160px;position:relative;-webkit-app-region:no-drag}
+.topbar-search{flex:1;max-width:560px;min-width:260px;position:relative;-webkit-app-region:no-drag}
 .topbar-search svg{
   position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:2;
   width:16px;height:16px;fill:none;stroke:var(--text-3);stroke-width:2.2;
@@ -7693,6 +7693,32 @@ html.ui-resizing,html.ui-resizing *{cursor:nwse-resize !important;-webkit-user-s
 }
 .tb-btn:active{transform:translateY(0) scale(.96)}
 .tb-btn.close:hover{color:var(--err);border-color:rgba(239,68,68,.4)}
+/* ═══ 顶栏自适应：右上角图标放不下时只留 国旗 / 菜单 / 关闭，其余收进菜单弹窗 ═══ */
+.tb-more{display:none;position:relative}
+.topbar.tb-compact .tb-more{display:grid}
+.topbar.tb-compact .topbar-search{min-width:160px}
+.tb-more.open{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-2)}
+.tb-more.has-dot::after{content:"";position:absolute;top:-3px;right:-3px;width:9px;height:9px;border-radius:50%;background:var(--err);box-shadow:0 0 0 2px var(--surface-solid,#111)}
+.tb-more-pop{
+  position:fixed;z-index:255;top:0;left:0;padding:12px;
+  border-radius:var(--radius-lg);
+  background:var(--surface-solid,var(--surface));
+  border:1px solid var(--border-2);
+  box-shadow:var(--shadow-3),0 0 0 1px rgba(0,0,0,.02);
+  backdrop-filter:blur(26px) saturate(180%);-webkit-backdrop-filter:blur(26px) saturate(180%);
+  opacity:0;transform:translateY(-6px) scale(.985);pointer-events:none;
+  transition:opacity .18s ease,transform .22s cubic-bezier(.2,.8,.2,1);
+  -webkit-app-region:no-drag
+}
+.tb-more-pop[hidden]{display:none}
+.tb-more-pop.show{opacity:1;transform:none;pointer-events:auto}
+.tb-more-arrow{
+  position:absolute;top:-6px;width:12px;height:12px;margin-left:-6px;
+  background:var(--surface-solid,var(--surface));
+  border-left:1px solid var(--border-2);border-top:1px solid var(--border-2);
+  transform:rotate(45deg);border-top-left-radius:3px;-webkit-app-region:no-drag
+}
+.tb-more-grid{display:grid;grid-template-columns:repeat(4,36px);gap:8px;justify-items:center;align-items:center}
 .tb-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;
   stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tb-avatar{
@@ -9738,6 +9764,9 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
       <div class="tb-spacer"></div>
       <div class="tb-actions">
         <button class="tb-btn tb-lang" id="tbLang" type="button" title="Language" data-ui-title="language" aria-haspopup="listbox" aria-expanded="false" aria-controls="lgPop"></button>
+        <button class="tb-btn tb-more" id="tbMore" type="button" title="Menu" data-ui-title="tbMoreTitle" aria-haspopup="menu" aria-expanded="false" aria-controls="tbMorePop">
+          <svg viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+        </button>
         <button class="tb-btn" onclick="uiToggleTheme()" title="Toggle theme" data-ui-title="toggleTheme">
           <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
@@ -17139,5 +17168,91 @@ button.sl-row:hover{background:var(--accent-soft);color:var(--text)}
 
 
 
+<script>
+/* ── 顶栏自适应：右上角图标被挡住时只显示 国旗 / 菜单 / 关闭，其余图标收进菜单下方的弹窗（带箭头）── */
+(function(){
+  var bar=document.querySelector('.topbar'),acts=bar&&bar.querySelector('.tb-actions'),more=document.getElementById('tbMore'),lang=document.getElementById('tbLang');
+  if(!bar||!acts||!more||!lang)return;
+  var closeBtn=acts.querySelector('.tb-btn.close');if(!closeBtn)return;
+  var codes=["en", "zh", "ru", "de", "ja", "es", "tr", "pt"],TX={"tbMoreTitle": ["Menu", "菜单", "Меню", "Menü", "メニュー", "Menú", "Menü", "Menu"]};
+  Object.keys(TX).forEach(function(k){codes.forEach(function(c,i){if(typeof UI_T!=='undefined'&&UI_T[c]&&TX[k][i])UI_T[c][k]=TX[k][i];});});
+  function T(k){try{return uiT(k);}catch(e){return TX[k][0];}}
+  var pop=document.createElement('div');pop.className='tb-more-pop';pop.id='tbMorePop';pop.hidden=true;pop.setAttribute('role','menu');
+  pop.innerHTML='<i class="tb-more-arrow"></i><div class="tb-more-grid"></div>';
+  document.body.appendChild(pop);
+  var grid=pop.querySelector('.tb-more-grid'),arrow=pop.querySelector('.tb-more-arrow');
+  function labels(){var t=T('tbMoreTitle');more.title=t;pop.setAttribute('aria-label',t);}
+  labels();
+  var ORDER=[],compact=false,busy=false,tk=0,raf=0,lastW=-1;
+  function isItem(n){return n&&n.nodeType===1&&n!==lang&&n!==more&&n!==closeBtn;}
+  /* 记录可收起的按钮及原始顺序（也包括之后被其它脚本动态插入的，例如状态按钮） */
+  function register(box){
+    Array.prototype.slice.call(box.children).forEach(function(n){
+      if(!isItem(n)||ORDER.indexOf(n)>=0)return;
+      var nx=n.nextElementSibling;while(nx&&ORDER.indexOf(nx)<0)nx=nx.nextElementSibling;
+      var k=nx?ORDER.indexOf(nx):-1;if(k>=0)ORDER.splice(k,0,n);else ORDER.push(n);
+    });
+  }
+  function overflowing(){
+    var tb=bar.getBoundingClientRect(),pr=parseFloat(getComputedStyle(bar).paddingRight)||0,ar=acts.getBoundingClientRect();
+    return ar.right>tb.right-pr+0.5||bar.scrollWidth>bar.clientWidth+1;
+  }
+  function paintDot(){
+    var b=document.getElementById('tbInboxBadge'),d=document.getElementById('tbAnnDot');
+    more.classList.toggle('has-dot',compact&&((b&&!b.hidden)||(d&&!d.hidden)));
+  }
+  function place(){
+    var r=more.getBoundingClientRect(),pw=pop.offsetWidth||196,vw=document.documentElement.clientWidth;
+    var x=r.left+r.width/2-pw/2;if(x+pw>vw-10)x=vw-pw-10;if(x<10)x=10;
+    pop.style.left=Math.round(x)+'px';pop.style.top=Math.round(r.bottom+10)+'px';
+    arrow.style.left=Math.round(r.left+r.width/2-x)+'px';
+  }
+  function show(){
+    if(!compact)return;var t=++tk;pop.hidden=false;place();
+    requestAnimationFrame(function(){if(t===tk)pop.classList.add('show');});
+    more.classList.add('open');more.setAttribute('aria-expanded','true');
+  }
+  function hide(now){
+    var t=++tk;pop.classList.remove('show');more.classList.remove('open');more.setAttribute('aria-expanded','false');
+    if(now){pop.hidden=true;return;}
+    setTimeout(function(){if(t===tk)pop.hidden=true;},200);
+  }
+  function fit(){
+    if(busy)return;busy=true;
+    try{
+      register(acts);register(grid);
+      ORDER.forEach(function(n){acts.insertBefore(n,closeBtn);});   /* 先全部放回顶栏再量 */
+      bar.classList.remove('tb-compact');
+      compact=overflowing();
+      if(compact){bar.classList.add('tb-compact');ORDER.forEach(function(n){grid.appendChild(n);});}
+      if(!compact&&!pop.hidden)hide(true);
+      else if(compact&&!pop.hidden)place();
+      paintDot();
+    }finally{busy=false;try{mo.takeRecords();}catch(e){}}   /* 丢掉自己搬动按钮产生的记录，避免循环 */
+  }
+  function schedule(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;fit();});}
+  var mo=new MutationObserver(schedule);mo.observe(acts,{childList:true});mo.observe(grid,{childList:true});
+  var mo2=new MutationObserver(paintDot);
+  ['tbInboxBadge','tbAnnDot'].forEach(function(id){var n=document.getElementById(id);if(n)mo2.observe(n,{attributes:true,attributeFilter:['hidden']});});
+  if(window.ResizeObserver){new ResizeObserver(function(){var w=bar.clientWidth;if(w!==lastW){lastW=w;fit();}}).observe(bar);}
+  window.addEventListener('resize',schedule);window.addEventListener('load',schedule);
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(schedule);
+  more.addEventListener('click',function(e){e.stopPropagation();if(pop.hidden||!pop.classList.contains('show'))show();else hide();});
+  /* 点弹窗里的按钮：公告/状态面板要贴着图标弹出，所以菜单保持打开；其它按钮点完收起菜单 */
+  grid.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.tb-btn,.tb-avatar');
+    if(!b||!grid.contains(b)||b.id==='tbAnn'||b.id==='tbStatus')return;
+    setTimeout(function(){hide();},0);
+  });
+  document.addEventListener('pointerdown',function(e){
+    if(pop.hidden)return;var t=e.target;
+    if(t&&t.closest&&(t.closest('#tbMorePop')||t.closest('#tbMore')||t.closest('#annPop')||t.closest('.sl-pop')))return;
+    hide();
+  },true);
+  document.addEventListener('keydown',function(e){if((e.key==='Escape'||e.key==='Esc')&&!pop.hidden)hide();});
+  window.addEventListener('resize',function(){if(!pop.hidden)place();});
+  fit();setTimeout(fit,300);
+})();
+</script>
 </body>
 </html>
