@@ -92,6 +92,7 @@ html.ui-theme-vt::view-transition-old(ui-drop-ring){display:none}
 #===UI_CSS
 
 :root{
+  --starline-sidebar-width:248px;--starline-content-max:1440px;--starline-radius:14px;--starline-gap:12px;--starline-font-size:13px;
   --ui-border:var(--border);
   --ui-border-strong:var(--border-strong,var(--border-hi,var(--border-2,#3a4152)));
   --ui-surface:var(--surface);
@@ -1603,7 +1604,18 @@ var UI_LANGS = [
   { code:'ja', flag:'jp', native:'日本語',     latin:'Japanese'   },
   { code:'es', flag:'es', native:'Español',   latin:'Spanish'    },
   { code:'tr', flag:'tr', native:'Türkçe',    latin:'Turkish'    },
-  { code:'pt', flag:'br', native:'Português', latin:'Portuguese' }
+  { code:'pt', flag:'br', native:'Português', latin:'Portuguese' },
+  { code:'vi', flag:'vn', native:'Tiếng Việt', latin:'Vietnamese' },
+  { code:'fr', flag:'fr', native:'Français', latin:'French' },
+  { code:'ko', flag:'kr', native:'한국어', latin:'Korean' },
+  { code:'it', flag:'it', native:'Italiano', latin:'Italian' },
+  { code:'id', flag:'id', native:'Bahasa Indonesia', latin:'Indonesian' },
+  { code:'th', flag:'th', native:'ไทย', latin:'Thai' },
+  { code:'ar', flag:'sa', native:'العربية', latin:'Arabic' },
+  { code:'nl', flag:'nl', native:'Nederlands', latin:'Dutch' },
+  { code:'pl', flag:'pl', native:'Polski', latin:'Polish' },
+  { code:'uk', flag:'ua', native:'Українська', latin:'Ukrainian' },
+  { code:'hi', flag:'in', native:'हिन्दी', latin:'Hindi' }
 ];
 
 var UI_FLAGS = {
@@ -1638,6 +1650,18 @@ var UI_FLAGS = {
      '<path d="M12 2L23 9 12 16 1 9z" fill="#fedf00"/>' +
      '<circle cx="12" cy="9" r="4.2" fill="#002776"/>' +
      '<path d="M8.2 8.2a4.2 4.2 0 0 1 7.5 1.6 9 9 0 0 0-7.5-1.6z" fill="#fff"/>'
+  ,vn:'<rect width="24" height="18" fill="#da251d"/><polygon points="12,3 13.8,8.2 19.3,8.2 14.8,11.4 16.5,16.5 12,13.3 7.5,16.5 9.2,11.4 4.7,8.2 10.2,8.2" fill="#ff0"/>'
+  ,fr:'<rect width="8" height="18" fill="#0055a4"/><rect x="8" width="8" height="18" fill="#fff"/><rect x="16" width="8" height="18" fill="#ef4135"/>'
+  ,kr:'<rect width="24" height="18" fill="#fff"/><circle cx="12" cy="9" r="4.5" fill="#cd2e3a"/><path d="M7.5 9a4.5 4.5 0 0 0 9 0" fill="#0047a0"/>'
+  ,it:'<rect width="8" height="18" fill="#009246"/><rect x="8" width="8" height="18" fill="#fff"/><rect x="16" width="8" height="18" fill="#ce2b37"/>'
+  ,id:'<rect width="24" height="9" fill="#ce1126"/><rect y="9" width="24" height="9" fill="#fff"/>'
+  ,th:'<rect width="24" height="18" fill="#a51931"/><rect y="3" width="24" height="12" fill="#fff"/><rect y="5" width="24" height="8" fill="#2d2a4a"/>'
+  ,sa:'<rect width="24" height="18" fill="#006c35"/><path d="M5 12h14" stroke="#fff" stroke-width="1.4"/><rect x="7" y="5" width="10" height="2" fill="#fff"/>'
+  ,nl:'<rect width="24" height="6" fill="#ae1c28"/><rect y="6" width="24" height="6" fill="#fff"/><rect y="12" width="24" height="6" fill="#21468b"/>'
+  ,pl:'<rect width="24" height="9" fill="#fff"/><rect y="9" width="24" height="9" fill="#dc143c"/>'
+  ,ua:'<rect width="24" height="9" fill="#0057b7"/><rect y="9" width="24" height="9" fill="#ffd700"/>'
+  ,in:'<rect width="24" height="6" fill="#ff9933"/><rect y="6" width="24" height="6" fill="#fff"/><rect y="12" width="24" height="6" fill="#138808"/><circle cx="12" cy="9" r="2" fill="none" stroke="#000080" stroke-width=".7"/>'
+
 };
 
 
@@ -2589,9 +2613,23 @@ function uiCloseConfirmSync(){
 }
 /* ask=true：恢复提示；ask=false：不再提示 */
 function uiCloseConfirmSetAsk(ask){
-  try { if (ask) { localStorage.removeItem(UI_CLOSE_SKIP_KEY); } else { localStorage.setItem(UI_CLOSE_SKIP_KEY, '1'); } } catch (e) {}
+  ask = !!ask;
+  try { if (ask) localStorage.removeItem(UI_CLOSE_SKIP_KEY); else localStorage.setItem(UI_CLOSE_SKIP_KEY, '1'); } catch (e) {}
   uiCloseConfirmSync();
+  window.dispatchEvent(new CustomEvent('starline:close-confirm-changed',{detail:{ask:ask}}));
 }
+(function(){
+  function bindClosePrompt(){
+    var t=document.getElementById('closeConfirmToggle');
+    if(!t || t.__starlineClosePromptBound) return;
+    t.__starlineClosePromptBound=true;
+    t.addEventListener('change',function(){uiCloseConfirmSetAsk(t.checked);});
+    uiCloseConfirmSync();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindClosePrompt); else bindClosePrompt();
+  document.addEventListener('click',function(e){if(e.target && (e.target.closest('#profilePage') || e.target.closest('[data-page="profile"]'))) bindClosePrompt();},true);
+  window.addEventListener('starline:profile-open',bindClosePrompt);
+})();
 function uiCloseConfirmOpen(){
   var o = document.getElementById('closeConfirm');
   return !!(o && o.classList.contains('show'));
@@ -8065,9 +8103,6 @@ html.store-detail-open #storeBackTop,html.store-detail-open #storeRecentToggle,h
 .wh-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
 .wh-title{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--text)}
 .wh-sub{font-size:12.5px;color:var(--text-3);margin-top:3px}
-.wh-live{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-3)}
-.wh-live i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:whPulse 2s ease-in-out infinite}
-.wh-live.off i{background:var(--warn);box-shadow:0 0 10px var(--warn);animation:none}
 .wh-mute{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text-2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--tr-fast)}
 .wh-mute:hover{color:var(--text);border-color:var(--accent)}
 .wh-mute svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -10343,7 +10378,6 @@ return plugin;</code></pre>
             <div class="wh-title" data-wh="title">Lucky Wheel</div>
             <div class="wh-sub" data-wh="sub">Enter a wheel key, spin, win a game key.</div>
           </div>
-          <div class="wh-live" id="whLive"><i></i><span id="whLiveTx"></span></div>
           <button class="wh-mute" id="whMute" type="button" onclick="wheelToggleMute()" title="Sound">
             <svg id="whMuteIc" viewBox="0 0 24 24"></svg>
           </button>
@@ -13971,14 +14005,10 @@ __UI_SCRIPT__
     document.querySelectorAll('#wheelPage [data-wh]').forEach(function(e){ e.textContent = wT(e.getAttribute('data-wh')); });
     document.querySelectorAll('#wheelPage [data-wh-ph]').forEach(function(e){ e.placeholder = wT(e.getAttribute('data-wh-ph')); });
     var n = document.getElementById('navWheelTx'); if (n) n.textContent = uiT('navWheel');
-    wheelLive(WH.online); wheelMuteIcon(); var mb = document.getElementById('whMute'); if (mb) mb.title = wT('sound');
+    wheelMuteIcon(); var mb = document.getElementById('whMute'); if (mb) mb.title = wT('sound');
     if (!WH.spinning) { wheelRenderStrip(); } wheelRenderHist();
   }
-  function wheelLive(on){
-    WH.online = on;
-    var b = document.getElementById('whLive'), t = document.getElementById('whLiveTx');
-    if (b) b.classList.toggle('off', !on); if (t) t.textContent = on ? wT('live') : wT('offline');
-  }
+  function wheelLive(on){ WH.online = !!on; /* Status badge intentionally removed from the UI. */ }
   function wheelSay(text, err){ var m = document.getElementById('whMsg'); if (m) { m.textContent = text || ''; m.classList.toggle('err', !!err); } }
 
   /* ── 奖品展示 ── */
@@ -16115,8 +16145,18 @@ __UI_SCRIPT__
     try{if(typeof uiRenderI18n==='function')uiRenderI18n();}catch(e){}
   })();
   function toast(msg,type,ms,opts){if(typeof window.uiToast==='function'){window.uiToast(msg,type,ms,opts);return;}var n=document.createElement('div');n.textContent=msg;n.style.cssText='position:fixed;z-index:2147483647;right:22px;bottom:22px;padding:11px 15px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);color:var(--text);box-shadow:var(--shadow-lg);font:600 12px var(--font);';document.body.appendChild(n);setTimeout(function(){n.remove();},2600);}
-  function read(){try{var a=JSON.parse(localStorage.getItem(STORE)||'[]');return Array.isArray(a)?a.filter(function(x){return x&&typeof x.source==='string'&&x.id;}):[];}catch(e){return [];}}
-  function write(){try{localStorage.setItem(STORE,JSON.stringify(installed));}catch(e){toast(t('pluginStorageError'));}}
+  function read(){
+    var a=[];try{var saved=JSON.parse(localStorage.getItem(STORE)||'[]');if(Array.isArray(saved))a=saved.filter(function(x){return x&&typeof x.source==='string'&&x.id;});}catch(e){}
+    /* The executable directory is the durable source of truth; localStorage remains a compatibility cache. */
+    try{(Array.isArray(UI_CFG.pluginFiles)?UI_CFG.pluginFiles:[]).forEach(function(f){if(!f||!f.id||typeof f.t!=='string')return;var rec=JSON.parse(f.t);if(!rec||rec.id!==f.id||typeof rec.source!=='string')return;var i=a.findIndex(function(x){return x.id===rec.id;});if(i<0)a.push(rec);else a[i]=rec;});}catch(e){}
+    return a;
+  }
+  function write(){
+    try{localStorage.setItem(STORE,JSON.stringify(installed));}catch(e){toast(t('pluginStorageError'));}
+    /* Persist each complete manifest + source as <exe>\plugins\<id>.json through the native host. */
+    installed.forEach(function(rec){try{uiSend('UI_PLUGIN_SAVE:'+rec.id+'\x1f'+JSON.stringify(rec));}catch(e){}});
+  }
+  function deleteDiskPlugin(id){try{uiSend('UI_PLUGIN_DEL:'+String(id));}catch(e){}}
   function createAPI(rec){
     var listeners={},timers=[],panelHandles=[],externalCleanups=[],api,disposed=false,visible=true,messages={},settingsHandles=[],commands=[],statusItems=[],pluginEvents=[];
     var PERMISSIONS=['storage','network','theme','language','navigation','clipboard-read','clipboard-write','download','cross-plugin','ui'];
@@ -16154,6 +16194,8 @@ __UI_SCRIPT__
       addButton:function(label,fn,container){var b=document.createElement('button');b.type='button';b.className='ui-btn';b.textContent=String(label);b.addEventListener('click',function(e){safeCall(fn,[e,api]);});(container||widgetsHost()||document.body).appendChild(b);trackedNode(b);var removed=false;b.element=b;b.disable=function(){b.disabled=true;};b.enable=function(){b.disabled=false;};b.remove=function(){if(removed)return false;removed=true;removeNode(b);return true;};b.setLabel=function(text){if(!removed)b.textContent=String(text);return !removed;};updateStats();return b;},
       createElement:make,
       addStyle:function(cssText){var st=document.createElement('style');st.setAttribute('data-plugin-style',rec.id);st.textContent=String(cssText||'');document.head.appendChild(st);trackedNode(st);return st;},
+      applyGlobalCSS:function(cssText){requirePermission('ui');var st=document.createElement('style');st.setAttribute('data-plugin-global-style',rec.id);st.textContent=String(cssText||'');document.head.appendChild(st);trackedNode(st);return {element:st,remove:function(){return removeNode(st);}};},
+      setLayout:function(options){requirePermission('ui');options=options||{};var root=document.documentElement;var allowed={'--starline-sidebar-width':/^(\d{2,3})(px|rem|vw)$/,'--starline-content-max':/^(\d{3,4})(px|rem|vw)$/,'--starline-radius':/^(\d{1,2})(px|rem)$/,'--starline-gap':/^(\d{1,2})(px|rem)$/,'--starline-font-size':/^(\d{1,2})(px|rem)$/};Object.keys(allowed).forEach(function(k){if(options[k]!=null&&allowed[k].test(String(options[k])))root.style.setProperty(k,String(options[k]));});if(options.css!=null)return api.applyGlobalCSS(options.css);return true;},
       getConfig:function(key,defaultValue){requirePermission('storage');try{var raw=localStorage.getItem(ownKey(key));return raw==null?(defaultValue===undefined?null:defaultValue):JSON.parse(raw);}catch(e){return defaultValue===undefined?null:defaultValue;}},
       setConfig:function(key,value){requirePermission('storage');try{localStorage.setItem(ownKey(key),JSON.stringify(value));return true;}catch(e){return false;}},
       removeConfig:function(key){requirePermission('storage');try{localStorage.removeItem(ownKey(key));return true;}catch(e){return false;}},
@@ -16330,6 +16372,7 @@ __UI_SCRIPT__
       if(!ok)return;
       try{deactivate(rec);}catch(e){}
       installed=installed.filter(function(x){return x.id!==rec.id;});
+      deleteDiskPlugin(rec.id);
       if(selectedPluginId===rec.id)selectedPluginId='';
       write();render();toast(t('pluginUninstalled')+rec.name);
     });
@@ -16436,6 +16479,8 @@ __UI_SCRIPT__
     {cat:'UI',name:'addButton(label, handler, container?)',sig:'api.addButton(label, handler, container?)',desc:'Creates a styled button. Handler receives (event, api).',example:'api.addButton("Notify", () => api.toast("Clicked"));'},
     {cat:'UI',name:'createElement(tag, attrs, children)',sig:'api.createElement(tag, attrs, children)',desc:'Creates a DOM element. Supports text, className, style and on* event attributes; children may be nodes or text.',example:'const label = api.createElement("p", {className:"my-label", text:"Ready"});'},
     {cat:'UI',name:'addStyle(cssText)',sig:'api.addStyle(cssText)',desc:'Adds plugin-scoped CSS to the document. The style is removed when the plugin is deactivated.',example:'api.addStyle(".my-label { font-weight: 700; }");'},
+    {cat:'UI',name:'applyGlobalCSS(cssText)',sig:'api.applyGlobalCSS(cssText)',desc:'Applies plugin-owned CSS to the whole app, including navigation, page layout, cards, dialogs and controls. Requires the ui permission and is removed on deactivation.',example:'api.applyGlobalCSS(":root { --starline-sidebar-width: 280px; --starline-radius: 18px; } .sidebar { width: var(--starline-sidebar-width); }");'},
+    {cat:'UI',name:'setLayout(options)',sig:'api.setLayout({ sidebarWidth, contentMax, radius, css })',desc:'Changes supported app-wide layout tokens and can attach global CSS. Requires the ui permission; use CSS for custom page composition and visual themes.',example:'api.setLayout({"--starline-sidebar-width":"280px", "--starline-content-max":"1500px", "--starline-radius":"18px"});'},
     {cat:'DOM',name:'getElement(selector, root?)',sig:'api.getElement(selector, root?)',desc:'Returns the first matching element or null. Prefer plugin-owned containers.',example:'const el = api.getElement(".my-label");'},
     {cat:'DOM',name:'queryAll(selector, root?)',sig:'api.queryAll(selector, root?)',desc:'Returns an array of matching elements.',example:'const buttons = api.queryAll("button", container);'},
     {cat:'DOM',name:'getText(selector)',sig:'api.getText(selector)',desc:'Reads text content from the first matching element.',example:'const title = api.getText("h1");'},
@@ -16476,7 +16521,7 @@ __UI_SCRIPT__
   function apiLabel(k){return t('pluginApi'+k.charAt(0).toUpperCase()+k.slice(1));}
   function apiEn(k){return (typeof UI_T!=='undefined'&&UI_T.en&&UI_T.en[k])||'';}
   function tx(key,fb){var v=t(key);return (v==null||v===key)?fb:v;}
-  function apiDocsMarkdown(){var out=['# STARLINE Plugin API Reference','API version: 2.1.0','','Plugins receive an `api` object in `activate(api)`, `render(container, api)` and `deactivate(api)`.','',apiEn('pluginApiWarning'),'','## Permission model','','| Permission | APIs / capability |','|---|---|','| `storage` | config APIs and addSettings persistence |','| `network` | request (host proxy required) |','| `theme` | setTheme |','| `language` | setLanguage |','| `navigation` | navigate |','| `clipboard-read` | readText |','| `clipboard-write` | copyText |','| `download` | downloadText |','| `cross-plugin` | onPlugin plus crossPlugin allowlist |','','Missing permissions throw PermissionDenied for protected APIs. readText returns null and onPlugin returns a no-op unsubscribe when denied. New 2.1 plugins should declare explicit permissions.',''];API_CATALOG.forEach(function(a){out.push('## '+a.name,'','- Category: '+a.cat,'- Signature: `'+a.sig+'`','- Description: '+a.desc,'','```js',a.example,'```','');});out.push('## Minimal plugin template','','```js',"const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Example plugin',\n  activate(api) { api.toast('Enabled'); },\n  render(container, api) { container.textContent = 'Hello from plugin'; },\n  deactivate(api) {}\n};\nreturn plugin;",'```','');return out.join('\n');}
+  function apiDocsMarkdown(){var out=['# STARLINE Plugin API Reference','API version: 2.1.0','','Plugins receive an `api` object in `activate(api)`, `render(container, api)` and `deactivate(api)`.','',apiEn('pluginApiWarning'),'','## Permission model','','| Permission | APIs / capability |','|---|---|','| `storage` | config APIs and addSettings persistence |','| `network` | request (host proxy required) |','| `theme` | setTheme |','| `language` | setLanguage |','| `navigation` | navigate |','| `clipboard-read` | readText |','| `clipboard-write` | copyText |','| `download` | downloadText |','| `ui` | applyGlobalCSS, setLayout, addStatusItem |','| `cross-plugin` | onPlugin plus crossPlugin allowlist |','','Missing permissions throw PermissionDenied for protected APIs. readText returns null and onPlugin returns a no-op unsubscribe when denied. New 2.1 plugins should declare explicit permissions.',''];API_CATALOG.forEach(function(a){out.push('## '+a.name,'','- Category: '+a.cat,'- Signature: `'+a.sig+'`','- Description: '+a.desc,'','```js',a.example,'```','');});out.push('## Minimal plugin template','','```js',"const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Example plugin',\n  activate(api) { api.toast('Enabled'); },\n  render(container, api) { container.textContent = 'Hello from plugin'; },\n  deactivate(api) {}\n};\nreturn plugin;",'```','');return out.join('\n');}
   function apiTemplate(){return "const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Describe what your plugin does',\n  activate(api) {\n    api.toast('My Plugin enabled');\n  },\n  render(container, api) {\n    const title = api.createElement('h3', { text: 'My Plugin' });\n    const button = api.createElement('button', { className: 'ui-btn', text: 'Click me' });\n    button.addEventListener('click', () => api.toast('Button clicked'));\n    container.append(title, button);\n  },\n  deactivate(api) {\n    // Clear any plugin-owned resources here. The host also cleans tracked timers/panels.\n  }\n};\nreturn plugin;\n";}
   function apiCopy(text){var value=String(text||'');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(function(){toast(apiLabel('copied'));},function(){toast(apiLabel('copyFailed'));});return;}var ta=document.createElement('textarea');ta.value=value;document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();toast(ok?apiLabel('copied'):apiLabel('copyFailed'));}
   function apiDownload(name,text,mime){var blob=new Blob([text],{type:mime||'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
