@@ -1253,6 +1253,21 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
 .cc-btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
 .cc-btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 8px 22px var(--accent-glow)}
 .cc-btn.primary:hover{filter:brightness(1.08)}
+/* ═══ Lucky Wheel UI module (shared STARLINE glass theme) ═══ */
+.wheel-ui{display:grid;gap:14px;color:var(--ui-text);font-family:var(--font,sans-serif)}
+.wheel-ui .wheel-panel{background:var(--ui-surface);border:1px solid var(--ui-border);border-radius:var(--ui-radius-lg);padding:18px;backdrop-filter:blur(18px) saturate(160%);box-shadow:var(--ui-shadow)}
+.wheel-ui .wheel-key-input{width:100%;min-height:42px;padding:10px 13px;border:1px solid var(--ui-border-strong);border-radius:var(--ui-radius);background:var(--ui-surface-2);color:var(--ui-text);font:inherit;outline:none}
+.wheel-ui .wheel-key-input:focus{border-color:var(--ui-accent);box-shadow:0 0 0 3px var(--ui-accent-soft)}
+.wheel-ui .wheel-spin-button{min-height:44px;padding:10px 20px;border:0;border-radius:var(--radius-full,999px);background:linear-gradient(135deg,var(--ui-accent),var(--ui-accent-hi));color:#fff;font-weight:700;cursor:pointer;transition:transform var(--tr,.2s),filter var(--tr,.2s)}
+.wheel-ui .wheel-spin-button:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.wheel-ui .wheel-spin-button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.wheel-ui .wheel-prize{border:1px solid var(--ui-border);border-radius:var(--ui-radius);background:var(--ui-surface-2);padding:12px;text-align:center;transition:border-color .15s,transform .15s,box-shadow .15s}
+.wheel-ui .wheel-prize.is-scanning{border-color:var(--ui-accent-hi);box-shadow:0 0 22px var(--ui-accent-soft);transform:scale(1.035)}
+.wheel-ui .wheel-prize.is-winner{border-color:var(--ok);box-shadow:0 0 26px rgba(16,185,129,.25);animation:wheelWinnerPulse .7s ease-in-out 2}
+@keyframes wheelWinnerPulse{50%{transform:scale(1.045)}}
+.wheel-ui .wheel-generated-key{font-family:var(--ui-mono);overflow-wrap:anywhere;padding:12px;border:1px dashed var(--ui-accent);border-radius:var(--ui-radius);background:var(--ui-accent-soft);user-select:all}
+@media(prefers-reduced-motion:reduce){.wheel-ui *, .wheel-ui *::before,.wheel-ui *::after{animation:none!important;transition:none!important}}
+
 #===MARKUP
 
 <div class="ui-view" id="uiSettingsView">
@@ -9727,6 +9742,10 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
       <div id="sbQuick"></div>
       <div class="qp-drop-hint" id="qpDropHint" data-ui="qpDropHint">Drop here to add to Quickplay</div>
       <div class="qp-picker" id="qpPicker" hidden></div>
+      </div>
+      <div class="sb-item" id="sbLuckyWheel" role="button" tabindex="0" title="Lucky Wheel" onclick="window.open('https://www.cata1y3t.boats/wheel.php','_blank','noopener')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('https://www.cata1y3t.boats/wheel.php','_blank','noopener')}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M21 12h-6M12 21v-6M3 12h6"/><path d="m5.64 5.64 4.24 4.24m8.48-4.24-4.24 4.24m0 4.24 4.24 4.24m-8.48-4.24-4.24 4.24"/></svg>
+        <span>Lucky Wheel</span>
       </div>
       <div class="sb-section" data-ui="downloads">Subscriptions</div>
       <div id="sbDown"></div>
