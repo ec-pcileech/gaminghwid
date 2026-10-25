@@ -8098,7 +8098,7 @@ html.store-detail-open #storeBackTop,html.store-detail-open #storeRecentToggle,h
 .wh-msg{min-height:18px;margin:9px 26px 0;font-size:12.5px;color:var(--text-3)}
 .wh-msg.err{color:var(--err)}
 
-.wh-cols{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:18px}
+.wh-cols{display:grid;grid-template-columns:1fr;gap:18px;margin-top:18px}
 @media (max-width:860px){.wh-cols{grid-template-columns:1fr}}
 .wh-card{border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-lg);padding:16px 18px}
 .wh-card h3{font-size:12px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--text-3);margin:0 0 12px}
@@ -10362,7 +10362,6 @@ return plugin;</code></pre>
         </div>
 
         <div class="wh-cols">
-          <div class="wh-card"><h3 data-wh="odds">Prizes</h3><div class="wh-odds" id="whOdds"></div></div>
           <div class="wh-card"><h3 data-wh="mine">My rewards</h3><div class="wh-hist" id="whHist"></div></div>
         </div>
       </div>
@@ -13888,37 +13887,22 @@ __UI_SCRIPT__
     setDPI(parseInt(b.getAttribute('data-dpi'), 10));
   });
 
-  /* 侧边栏文案走现有的 data-ui 多语言（没翻译的语言自动回退英文） */
-  (function(){ try { var T = { en: 'Lucky Wheel', zh: '幸运转盘' }; Object.keys(T).forEach(function(c){ if (typeof UI_T !== 'undefined' && UI_T[c]) UI_T[c].navWheel = T[c]; }); } catch (e) {} })();
-
   /* ═══════════ Lucky Wheel（奖品 = 游戏 KEY；每转一次要一张后台生成的转盘券） ═══════════
      数据全部实时来自网站：WHEEL:prizes（页面开着时每 5 秒一次）→ 后台改奖品 / 概率，这里自动跟着变；
      WHEEL:spin:<券> → 服务端按「此刻」的概率抽奖，中 KEY 就当场生成并回传。 */
-  var WH_T = {
-    en: { nav:'Lucky Wheel', title:'Lucky Wheel', sub:'Enter a wheel key, spin, win a game key.', spin:'Spin', spinning:'Spinning…',
-      ticketPh:'WHL-XXXX-XXXX-XXXX', odds:'Prizes', mine:'My rewards', copy:'Copy key', close:'Close', copied:'Key copied',
-      live:'Live', offline:'Offline', noPrize:'No prizes available right now.', noHist:'No spins yet.', none:'Nothing',
-      won:'You won!', lost:'Not this time', yourKey:'Your license key', used:'activated', day:'Day', days:'Days',
-      oddsUpd:'Prizes updated', needTicket:'Enter your wheel key first.', needUpdate:'Wheel needs the latest app version.',
-      e_TICKET_INVALID:'Wheel key not found.', e_TICKET_USED:'This wheel key has already been used.', e_NO_PRIZES:'No prizes available right now.',
-      e_KEY_GEN:'Could not generate a key, try again.', e_SUSPENDED:'Account is suspended or banned.', e_AUTH:'Please sign in again.',
-      e_NET:'Network error, try again.', e_ERR:'Something went wrong, try again.' },
-    zh: { nav:'幸运转盘', title:'幸运转盘', sub:'输入转盘 KEY，转动，赢取游戏 KEY。', spin:'转动', spinning:'转动中…',
-      ticketPh:'WHL-XXXX-XXXX-XXXX', odds:'奖品', mine:'我的奖励', copy:'复制 KEY', close:'关闭', copied:'KEY 已复制',
-      live:'实时', offline:'离线', noPrize:'暂时没有可抽的奖品。', noHist:'还没有转过。', none:'谢谢参与',
-      won:'恭喜中奖！', lost:'这次没中', yourKey:'你的游戏 KEY', used:'已激活', day:'天', days:'天',
-      oddsUpd:'奖品已更新', needTicket:'请先输入转盘 KEY。', needUpdate:'转盘需要更新到最新版客户端。',
-      e_TICKET_INVALID:'转盘 KEY 不存在。', e_TICKET_USED:'这个转盘 KEY 已经用过了。', e_NO_PRIZES:'暂时没有可抽的奖品。',
-      e_KEY_GEN:'KEY 生成失败，请重试。', e_SUSPENDED:'账号已被停用或封禁。', e_AUTH:'请重新登录。',
-      e_NET:'网络错误，请重试。', e_ERR:'出错了，请重试。' }
-  };
-  function wT(k){
-    var l = (typeof uiState !== 'undefined' && uiState && uiState.lang) || 'en';
-    var t = WH_T[l] || WH_T.en;
-    return (t && t[k]) || WH_T.en[k] || k;
-  }
+  /* 文案走全局 UI_T（key 以 wh_ 开头）：切语言、自定义翻译（x- 语言包编辑器）都自动生效；缺的 key 回退英文 */
+  (function(){
+    var codes = ["en", "zh", "ru", "de", "ja", "es", "tr", "pt"], TX = {"navWheel": ["Lucky Wheel", "幸运转盘", "Колесо удачи", "Glücksrad", "ラッキーホイール", "Rueda de la suerte", "Şans Çarkı", "Roda da sorte"], "wh_title": ["Lucky Wheel", "幸运转盘", "Колесо удачи", "Glücksrad", "ラッキーホイール", "Rueda de la suerte", "Şans Çarkı", "Roda da sorte"], "wh_sub": ["Enter a wheel key, spin, win a game key.", "输入转盘 KEY，转动，赢取游戏 KEY。", "Введите ключ колеса, крутите и выигрывайте игровой ключ.", "Wheel-Key eingeben, drehen, Spiel-Key gewinnen.", "ホイールキーを入力して回し、ゲームキーを当てよう。", "Introduce una clave de rueda, gira y gana una clave de juego.", "Çark anahtarını gir, çevir, oyun anahtarı kazan.", "Digite uma chave da roda, gire e ganhe uma chave de jogo."], "wh_spin": ["Spin", "转动", "Крутить", "Drehen", "回す", "Girar", "Çevir", "Girar"], "wh_spinning": ["Spinning…", "转动中…", "Вращение…", "Dreht sich…", "回転中…", "Girando…", "Dönüyor…", "Girando…"], "wh_mine": ["My rewards", "我的奖励", "Мои награды", "Meine Gewinne", "獲得した報酬", "Mis premios", "Ödüllerim", "Meus prêmios"], "wh_copy": ["Copy key", "复制 KEY", "Копировать ключ", "Key kopieren", "キーをコピー", "Copiar clave", "Anahtarı kopyala", "Copiar chave"], "wh_close": ["Close", "关闭", "Закрыть", "Schließen", "閉じる", "Cerrar", "Kapat", "Fechar"], "wh_copied": ["Key copied", "KEY 已复制", "Ключ скопирован", "Key kopiert", "キーをコピーしました", "Clave copiada", "Anahtar kopyalandı", "Chave copiada"], "wh_live": ["Live", "实时", "В реальном времени", "Live", "リアルタイム", "En vivo", "Canlı", "Ao vivo"], "wh_offline": ["Offline", "离线", "Не в сети", "Offline", "オフライン", "Sin conexión", "Çevrimdışı", "Offline"], "wh_noPrize": ["No prizes available right now.", "暂时没有可抽的奖品。", "Сейчас нет доступных призов.", "Derzeit sind keine Preise verfügbar.", "現在、賞品はありません。", "No hay premios disponibles ahora.", "Şu anda ödül yok.", "Nenhum prêmio disponível no momento."], "wh_noHist": ["No spins yet.", "还没有转过。", "Вы ещё не крутили.", "Noch keine Drehungen.", "まだ回していません。", "Aún no has girado.", "Henüz çevirmedin.", "Você ainda não girou."], "wh_none": ["Nothing", "谢谢参与", "Ничего", "Nichts", "はずれ", "Nada", "Boş", "Nada"], "wh_won": ["You won!", "恭喜中奖！", "Вы выиграли!", "Gewonnen!", "当選！", "¡Has ganado!", "Kazandın!", "Você ganhou!"], "wh_lost": ["Not this time", "这次没中", "Не в этот раз", "Diesmal nicht", "残念！", "Esta vez no", "Bu sefer olmadı", "Não foi dessa vez"], "wh_yourKey": ["Your license key", "你的游戏 KEY", "Ваш лицензионный ключ", "Dein Lizenz-Key", "あなたのライセンスキー", "Tu clave de licencia", "Lisans anahtarın", "Sua chave de licença"], "wh_used": ["activated", "已激活", "активирован", "aktiviert", "有効化済み", "activada", "etkinleştirildi", "ativada"], "wh_dayOne": ["{n} Day", "{n} 天", "{n} дн.", "{n} Tag", "{n}日", "{n} día", "{n} gün", "{n} dia"], "wh_dayMany": ["{n} Days", "{n} 天", "{n} дн.", "{n} Tage", "{n}日", "{n} días", "{n} gün", "{n} dias"], "wh_updated": ["Prizes updated", "奖品已更新", "Призы обновлены", "Preise aktualisiert", "賞品が更新されました", "Premios actualizados", "Ödüller güncellendi", "Prêmios atualizados"], "wh_needTicket": ["Enter your wheel key first.", "请先输入转盘 KEY。", "Сначала введите ключ колеса.", "Gib zuerst deinen Wheel-Key ein.", "先にホイールキーを入力してください。", "Primero introduce tu clave de rueda.", "Önce çark anahtarını gir.", "Digite primeiro a chave da roda."], "wh_needUpdate": ["Wheel needs the latest app version.", "转盘需要更新到最新版客户端。", "Для колеса нужна последняя версия приложения.", "Das Glücksrad benötigt die neueste App-Version.", "ホイールには最新バージョンが必要です。", "La rueda requiere la última versión de la app.", "Çark için uygulamanın son sürümü gerekli.", "A roda precisa da versão mais recente do app."], "wh_sound": ["Sound", "音效", "Звук", "Ton", "サウンド", "Sonido", "Ses", "Som"], "wh_e_TICKET_INVALID": ["Wheel key not found.", "转盘 KEY 不存在。", "Ключ колеса не найден.", "Wheel-Key nicht gefunden.", "ホイールキーが見つかりません。", "Clave de rueda no encontrada.", "Çark anahtarı bulunamadı.", "Chave da roda não encontrada."], "wh_e_TICKET_USED": ["This wheel key has already been used.", "这个转盘 KEY 已经用过了。", "Этот ключ колеса уже использован.", "Dieser Wheel-Key wurde bereits verwendet.", "このホイールキーは使用済みです。", "Esta clave de rueda ya fue usada.", "Bu çark anahtarı zaten kullanılmış.", "Esta chave da roda já foi usada."], "wh_e_NO_PRIZES": ["No prizes available right now.", "暂时没有可抽的奖品。", "Сейчас нет доступных призов.", "Derzeit sind keine Preise verfügbar.", "現在、賞品はありません。", "No hay premios disponibles ahora.", "Şu anda ödül yok.", "Nenhum prêmio disponível no momento."], "wh_e_KEY_GEN": ["Could not generate a key, try again.", "KEY 生成失败，请重试。", "Не удалось создать ключ, повторите.", "Key konnte nicht erstellt werden, bitte erneut versuchen.", "キーを生成できませんでした。もう一度お試しください。", "No se pudo generar la clave, inténtalo de nuevo.", "Anahtar oluşturulamadı, tekrar dene.", "Não foi possível gerar a chave, tente novamente."], "wh_e_SUSPENDED": ["Account is suspended or banned.", "账号已被停用或封禁。", "Аккаунт заблокирован.", "Konto gesperrt.", "アカウントが停止されています。", "La cuenta está suspendida o bloqueada.", "Hesap askıya alındı veya yasaklandı.", "A conta está suspensa ou banida."], "wh_e_AUTH": ["Please sign in again.", "请重新登录。", "Войдите снова.", "Bitte erneut anmelden.", "もう一度ログインしてください。", "Inicia sesión de nuevo.", "Lütfen tekrar giriş yap.", "Entre novamente."], "wh_e_NET": ["Network error, try again.", "网络错误，请重试。", "Ошибка сети, повторите.", "Netzwerkfehler, bitte erneut versuchen.", "ネットワークエラー。もう一度お試しください。", "Error de red, inténtalo de nuevo.", "Ağ hatası, tekrar dene.", "Erro de rede, tente novamente."], "wh_e_ERR": ["Something went wrong, try again.", "出错了，请重试。", "Что-то пошло не так, повторите.", "Etwas ist schiefgelaufen, bitte erneut versuchen.", "問題が発生しました。もう一度お試しください。", "Algo salió mal, inténtalo de nuevo.", "Bir şeyler ters gitti, tekrar dene.", "Algo deu errado, tente novamente."]};
+    Object.keys(TX).forEach(function(k){
+      codes.forEach(function(c, i){
+        if (typeof UI_T !== 'undefined' && UI_T[c] && typeof TX[k][i] === 'string' && TX[k][i] !== '') { UI_T[c][k] = TX[k][i]; }
+      });
+    });
+    try { if (typeof uiRenderI18n === 'function') uiRenderI18n(); } catch (e) {}   /* 侧边栏「幸运转盘」立刻按当前语言显示 */
+  })();
+  function wT(k){ var v = uiT('wh_' + k); return v === 'wh_' + k ? k : v; }
   function wEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
-  function wDays(n){ var l = (uiState && uiState.lang) || 'en'; if (l === 'zh') return n + ' 天'; return n + ' ' + (n === 1 ? wT('day') : wT('days')); }
+  function wDays(n){ return wT(n === 1 ? 'dayOne' : 'dayMany').replace('{n}', n); }
 
   var WH = { prizes: [], rev: '', history: [], spinning: false, timer: null, pend: {}, lastKey: '', online: false, loaded: false };
   var WH_ITEM_W = 150, WH_GAP = 10;
@@ -13986,9 +13970,9 @@ __UI_SCRIPT__
   function wheelApplyText(){
     document.querySelectorAll('#wheelPage [data-wh]').forEach(function(e){ e.textContent = wT(e.getAttribute('data-wh')); });
     document.querySelectorAll('#wheelPage [data-wh-ph]').forEach(function(e){ e.placeholder = wT(e.getAttribute('data-wh-ph')); });
-    var n = document.getElementById('navWheelTx'); if (n) n.textContent = wT('nav');
-    wheelLive(WH.online); wheelMuteIcon();
-    if (!WH.spinning) { wheelRenderStrip(); } wheelRenderOdds(); wheelRenderHist();
+    var n = document.getElementById('navWheelTx'); if (n) n.textContent = uiT('navWheel');
+    wheelLive(WH.online); wheelMuteIcon(); var mb = document.getElementById('whMute'); if (mb) mb.title = wT('sound');
+    if (!WH.spinning) { wheelRenderStrip(); } wheelRenderHist();
   }
   function wheelLive(on){
     WH.online = on;
@@ -14020,14 +14004,6 @@ __UI_SCRIPT__
     for (var r = 0; r < reps; r++) for (var i = 0; i < n; i++) html += wItemHtml(P[i]);
     strip.innerHTML = html;
     strip.style.transform = 'translateX(' + (wheelReelCenter() - WH_ITEM_W / 2) + 'px)';
-  }
-  function wheelRenderOdds(){
-    var box = document.getElementById('whOdds'); if (!box) return;
-    if (!WH.prizes.length) { box.innerHTML = '<div class="wh-empty">' + wEsc(wT('noPrize')) + '</div>'; return; }
-    box.innerHTML = WH.prizes.map(function(p){
-      var x = wPrizeParts(p);
-      return '<div class="wh-odd"><span>' + wEsc(x.g) + (x.d ? ' · ' + wEsc(x.d) : '') + '</span></div>';
-    }).join('');
   }
   function wheelRenderHist(){
     var box = document.getElementById('whHist'); if (!box) return;
@@ -14068,17 +14044,18 @@ __UI_SCRIPT__
       if (WH.spinning) return;
       var changed = WH.loaded && d.rev !== WH.rev;
       WH.prizes = d.prizes || []; WH.rev = d.rev || ''; WH.loaded = true;
-      wheelRenderStrip(); wheelRenderOdds();
+      wheelRenderStrip();
       if (changed) {
-        var o = document.getElementById('whOdds'); if (o) { o.classList.remove('wh-flash'); void o.offsetWidth; o.classList.add('wh-flash'); }
-        wSfx('ping'); wheelSay(wT('oddsUpd'), false);
+        wSfx('ping'); wheelSay(wT('updated'), false);
       }
     } else if (act === 'history') {
       if (d.ok) { WH.history = d.history || []; wheelRenderHist(); }
     } else if (act === 'spin') {
       if (!d.ok) {
         wheelSpinEnd(); wSfx('error');
-        wheelSay(wT('e_' + d.code) !== 'e_' + d.code ? wT('e_' + d.code) : (d.msg || wT('e_ERR')), true);
+        var em = wT('e_' + d.code) !== 'e_' + d.code ? wT('e_' + d.code) : (d.msg || wT('e_ERR'));
+        if (d.detail) { em += ' [' + d.detail + ']'; try { console.error('wheel spin error:', d.detail); } catch (e) {} }
+        wheelSay(em, true);
         return;
       }
       wheelAnimate(d);
@@ -14103,7 +14080,6 @@ __UI_SCRIPT__
   function wheelAnimate(d){
     /* 用服务端这一次抽奖的奖品快照来滚，结果和画面一定对得上，即使后台刚好改过奖品 */
     WH.prizes = d.prizes || WH.prizes; WH.rev = d.rev || WH.rev;
-    wheelRenderOdds();
     var P = WH.prizes, n = P.length, win = d.win_index | 0;
     var strip = document.getElementById('whStrip');
     var reps = Math.max(8, Math.ceil(70 / n) + 2), html = '';
@@ -14296,6 +14272,7 @@ __UI_SCRIPT__
 
 
   function onUiLangChanged(){
+    if (typeof wheelApplyText === 'function') { try { wheelApplyText(); } catch (e) {} }   /* Lucky Wheel 页实时跟着语言走 */
     if (CURRENT_GAME && GAMES[CURRENT_GAME]) {
       renderDetailTexts(CURRENT_GAME);
       renderDetailHeroButtons(CURRENT_GAME);
