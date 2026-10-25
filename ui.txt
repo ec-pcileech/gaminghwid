@@ -8060,6 +8060,7 @@ html.store-detail-open #storeBackTop,html.store-detail-open #storeRecentToggle,h
   background:var(--err);border-radius:var(--radius-full);padding:1px 7px}
 /* ── 管理面板（管理员专用） ───────────────────────────────────────── */
 /* ═══════════ Lucky Wheel ═══════════ */
+#wheelPage[hidden]{display:none!important}
 .wh-wrap{padding:24px 4px 40px;max-width:980px;margin:0 auto}
 .wh-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
 .wh-title{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--text)}
@@ -10361,7 +10362,7 @@ return plugin;</code></pre>
         </div>
 
         <div class="wh-cols">
-          <div class="wh-card"><h3 data-wh="odds">Prizes &amp; odds</h3><div class="wh-odds" id="whOdds"></div></div>
+          <div class="wh-card"><h3 data-wh="odds">Prizes</h3><div class="wh-odds" id="whOdds"></div></div>
           <div class="wh-card"><h3 data-wh="mine">My rewards</h3><div class="wh-hist" id="whHist"></div></div>
         </div>
       </div>
@@ -13895,18 +13896,18 @@ __UI_SCRIPT__
      WHEEL:spin:<券> → 服务端按「此刻」的概率抽奖，中 KEY 就当场生成并回传。 */
   var WH_T = {
     en: { nav:'Lucky Wheel', title:'Lucky Wheel', sub:'Enter a wheel key, spin, win a game key.', spin:'Spin', spinning:'Spinning…',
-      ticketPh:'WHL-XXXX-XXXX-XXXX', odds:'Prizes & odds', mine:'My rewards', copy:'Copy key', close:'Close', copied:'Key copied',
-      live:'Live odds', offline:'Offline', noPrize:'No prizes available right now.', noHist:'No spins yet.', none:'Nothing',
+      ticketPh:'WHL-XXXX-XXXX-XXXX', odds:'Prizes', mine:'My rewards', copy:'Copy key', close:'Close', copied:'Key copied',
+      live:'Live', offline:'Offline', noPrize:'No prizes available right now.', noHist:'No spins yet.', none:'Nothing',
       won:'You won!', lost:'Not this time', yourKey:'Your license key', used:'activated', day:'Day', days:'Days',
-      oddsUpd:'Odds updated', needTicket:'Enter your wheel key first.', needUpdate:'Wheel needs the latest app version.',
+      oddsUpd:'Prizes updated', needTicket:'Enter your wheel key first.', needUpdate:'Wheel needs the latest app version.',
       e_TICKET_INVALID:'Wheel key not found.', e_TICKET_USED:'This wheel key has already been used.', e_NO_PRIZES:'No prizes available right now.',
       e_KEY_GEN:'Could not generate a key, try again.', e_SUSPENDED:'Account is suspended or banned.', e_AUTH:'Please sign in again.',
       e_NET:'Network error, try again.', e_ERR:'Something went wrong, try again.' },
     zh: { nav:'幸运转盘', title:'幸运转盘', sub:'输入转盘 KEY，转动，赢取游戏 KEY。', spin:'转动', spinning:'转动中…',
-      ticketPh:'WHL-XXXX-XXXX-XXXX', odds:'奖品与中奖率', mine:'我的奖励', copy:'复制 KEY', close:'关闭', copied:'KEY 已复制',
-      live:'实时概率', offline:'离线', noPrize:'暂时没有可抽的奖品。', noHist:'还没有转过。', none:'谢谢参与',
+      ticketPh:'WHL-XXXX-XXXX-XXXX', odds:'奖品', mine:'我的奖励', copy:'复制 KEY', close:'关闭', copied:'KEY 已复制',
+      live:'实时', offline:'离线', noPrize:'暂时没有可抽的奖品。', noHist:'还没有转过。', none:'谢谢参与',
       won:'恭喜中奖！', lost:'这次没中', yourKey:'你的游戏 KEY', used:'已激活', day:'天', days:'天',
-      oddsUpd:'奖品 / 概率已更新', needTicket:'请先输入转盘 KEY。', needUpdate:'转盘需要更新到最新版客户端。',
+      oddsUpd:'奖品已更新', needTicket:'请先输入转盘 KEY。', needUpdate:'转盘需要更新到最新版客户端。',
       e_TICKET_INVALID:'转盘 KEY 不存在。', e_TICKET_USED:'这个转盘 KEY 已经用过了。', e_NO_PRIZES:'暂时没有可抽的奖品。',
       e_KEY_GEN:'KEY 生成失败，请重试。', e_SUSPENDED:'账号已被停用或封禁。', e_AUTH:'请重新登录。',
       e_NET:'网络错误，请重试。', e_ERR:'出错了，请重试。' }
@@ -14005,7 +14006,7 @@ __UI_SCRIPT__
   function wPct(p){ var v = Number(p.percent) || 0; return (v % 1 === 0 ? v : v.toFixed(2).replace(/0+$/, '')) + '%'; }
   function wItemHtml(p, extra){
     var x = wPrizeParts(p);
-    return '<div class="wh-item ' + x.cls + (extra || '') + '"><span class="p">' + wPct(p) + '</span><span class="g">' + wEsc(x.g) + '</span>' + (x.d ? '<span class="d">' + wEsc(x.d) + '</span>' : '') + '</div>';
+    return '<div class="wh-item ' + x.cls + (extra || '') + '"><span class="g">' + wEsc(x.g) + '</span>' + (x.d ? '<span class="d">' + wEsc(x.d) + '</span>' : '') + '</div>';
   }
   function wheelReelCenter(){ var r = document.getElementById('whReel'); return r ? r.clientWidth / 2 : 400; }
 
@@ -14025,7 +14026,7 @@ __UI_SCRIPT__
     if (!WH.prizes.length) { box.innerHTML = '<div class="wh-empty">' + wEsc(wT('noPrize')) + '</div>'; return; }
     box.innerHTML = WH.prizes.map(function(p){
       var x = wPrizeParts(p);
-      return '<div class="wh-odd"><span>' + wEsc(x.g) + (x.d ? ' · ' + wEsc(x.d) : '') + '</span><span class="pc">' + wPct(p) + '</span><div class="bar"><i style="width:' + (Number(p.percent) || 0) + '%"></i></div></div>';
+      return '<div class="wh-odd"><span>' + wEsc(x.g) + (x.d ? ' · ' + wEsc(x.d) : '') + '</span></div>';
     }).join('');
   }
   function wheelRenderHist(){
@@ -14183,7 +14184,11 @@ __UI_SCRIPT__
     setActiveNav('navWheel');
     wheelApplyText();
     wheelSend('prizes'); wheelSend('history');
-    if (!WH.timer) WH.timer = setInterval(function(){ if (!WH.spinning) wheelSend('prizes'); }, 5000);
+    if (!WH.timer) WH.timer = setInterval(function(){
+      var pg = document.getElementById('wheelPage');
+      if (!pg || pg.hidden) { wheelHide(); return; }          /* 切到别的页面就停止轮询 */
+      if (!WH.spinning) wheelSend('prizes');
+    }, 5000);
   }
   function wheelHide(){
     var pg = document.getElementById('wheelPage');
@@ -16166,7 +16171,7 @@ __UI_SCRIPT__
       getThemeTokens:function(){var s=getComputedStyle(document.documentElement);var tokens={bg:s.getPropertyValue('--surface').trim()||'#111',fg:s.getPropertyValue('--text').trim()||'#fff',border:s.getPropertyValue('--border-2').trim()||'#333',primary:s.getPropertyValue('--primary').trim()||'#6d8cff',radius:s.getPropertyValue('--radius').trim()||'12px',fontFamily:s.getPropertyValue('--font').trim()||'sans-serif'};Object.keys(tokens).forEach(function(k){document.documentElement.style.setProperty('--starline-'+k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();}),tokens[k]);});return tokens;},
       getLanguage:function(){return document.documentElement.getAttribute('lang')||'en';},
       setLanguage:function(code){requirePermission('language');code=String(code||'');if(typeof window.uiSetLang==='function'){window.uiSetLang(code,true);return true;}if(typeof window.setLang==='function'){window.setLang(code);if(typeof window.uiSend==='function')window.uiSend('UI_LANG:'+code);return true;}return false;},
-      getPage:function(){var ids=['storePage','profilePage','pluginsPage','pluginViewPage','adminPage','uiSettingsView','ctView'];for(var i=0;i<ids.length;i++){var e=$(ids[i]);if(e&&!e.hidden)return ids[i].replace(/Page|View/g,'').toLowerCase();}return 'unknown';},
+      getPage:function(){var ids=['storePage','profilePage','pluginsPage','pluginViewPage','adminPage','wheelPage','uiSettingsView','ctView'];for(var i=0;i<ids.length;i++){var e=$(ids[i]);if(e&&!e.hidden)return ids[i].replace(/Page|View/g,'').toLowerCase();}return 'unknown';},
       navigate:function(page){requirePermission('navigation');page=String(page||'').toLowerCase();if(page==='store'&&window.showStore){window.showStore();return true;}if(page==='profile'&&window.showProfile){window.showProfile();return true;}if(page==='plugins'&&window.showPlugins){window.showPlugins();return true;}if(page==='plugin'&&window.pluginOpen){window.pluginOpen(rec.id);return true;}window.dispatchEvent(new CustomEvent('starline:navigate',{detail:{page:page,pluginId:rec.id}}));return false;},
       addPanel:function(spec){spec=spec||{};var host=widgetsHost();if(!host)return null;var el=document.createElement('section');el.className='plugin-card';var title=document.createElement('div');title.className='plugin-card-title';title.textContent=String(spec.title||rec.name);var body=document.createElement('div');body.className='plugin-render';el.append(title,body);host.appendChild(el);trackedNode(el);var h=handleFor(el,body);panelHandles.push(h);if(typeof spec.render==='function')safeCall(spec.render,[body,api]);updateStats();return h;},
       addButton:function(label,fn,container){var b=document.createElement('button');b.type='button';b.className='ui-btn';b.textContent=String(label);b.addEventListener('click',function(e){safeCall(fn,[e,api]);});(container||widgetsHost()||document.body).appendChild(b);trackedNode(b);var removed=false;b.element=b;b.disable=function(){b.disabled=true;};b.enable=function(){b.disabled=false;};b.remove=function(){if(removed)return false;removed=true;removeNode(b);return true;};b.setLabel=function(text){if(!removed)b.textContent=String(text);return !removed;};updateStats();return b;},
@@ -16334,7 +16339,7 @@ __UI_SCRIPT__
     if(!rec.enabled){toast(t('pluginEnableFirst'));return;}
     if(typeof closeDetail==='function')closeDetail();
     selectedPluginId=id;
-    ['storePage','profilePage','adminPage','pluginsPage'].forEach(hidePage);
+    ['storePage','profilePage','adminPage','pluginsPage','wheelPage'].forEach(hidePage);
     var vp=$('pluginViewPage');if(!vp)return;
     vp.hidden=false;try{vp.scrollTop=0;}catch(e){}
     document.querySelectorAll('.sb-item').forEach(function(b){b.classList.remove('active');});
@@ -16433,7 +16438,7 @@ __UI_SCRIPT__
   function importFile(file){if(!file)return;var reader=new FileReader();reader.onload=function(){importSource(file.name,String(reader.result||''));};reader.onerror=function(){toast(t('pluginReadError'));};reader.readAsText(file,'utf-8');}
   window.showPlugins=function(){
     if(typeof closeDetail==='function')closeDetail();
-    ['storePage','profilePage','adminPage','pluginViewPage'].forEach(hidePage);
+    ['storePage','profilePage','adminPage','pluginViewPage','wheelPage'].forEach(hidePage);
     var pp=$('pluginsPage');if(pp)pp.hidden=false;
     document.querySelectorAll('.sb-item').forEach(function(b){b.classList.toggle('active',b.id==='navPlugins');});
     render();
