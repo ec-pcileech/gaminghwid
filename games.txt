@@ -268,7 +268,7 @@ featured = false
 # ───────────────────────────────────────────────────────────────────────────
 #  Grand Theft Auto V
 # ───────────────────────────────────────────────────────────────────────────
-[GTA5]
+[GTAV]
 title    = Grand Theft Auto V
 short    = GTA V
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/271590/header.jpg
