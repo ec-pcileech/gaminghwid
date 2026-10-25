@@ -1253,38 +1253,7 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
 .cc-btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
 .cc-btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 8px 22px var(--accent-glow)}
 .cc-btn.primary:hover{filter:brightness(1.08)}
-/* ═══ Lucky Wheel UI module (shared STARLINE glass theme) ═══ */
-.wheel-ui{display:grid;gap:14px;color:var(--ui-text);font-family:var(--font,sans-serif)}
-.wheel-ui .wheel-panel{background:var(--ui-surface);border:1px solid var(--ui-border);border-radius:var(--ui-radius-lg);padding:18px;backdrop-filter:blur(18px) saturate(160%);box-shadow:var(--ui-shadow)}
-.wheel-ui .wheel-key-input{width:100%;min-height:42px;padding:10px 13px;border:1px solid var(--ui-border-strong);border-radius:var(--ui-radius);background:var(--ui-surface-2);color:var(--ui-text);font:inherit;outline:none}
-.wheel-ui .wheel-key-input:focus{border-color:var(--ui-accent);box-shadow:0 0 0 3px var(--ui-accent-soft)}
-.wheel-ui .wheel-spin-button{min-height:44px;padding:10px 20px;border:0;border-radius:var(--radius-full,999px);background:linear-gradient(135deg,var(--ui-accent),var(--ui-accent-hi));color:#fff;font-weight:700;cursor:pointer;transition:transform var(--tr,.2s),filter var(--tr,.2s)}
-.wheel-ui .wheel-spin-button:hover{filter:brightness(1.08);transform:translateY(-1px)}
-.wheel-ui .wheel-spin-button:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.wheel-ui .wheel-prize{border:1px solid var(--ui-border);border-radius:var(--ui-radius);background:var(--ui-surface-2);padding:12px;text-align:center;transition:border-color .15s,transform .15s,box-shadow .15s}
-.wheel-ui .wheel-prize.is-scanning{border-color:var(--ui-accent-hi);box-shadow:0 0 22px var(--ui-accent-soft);transform:scale(1.035)}
-.wheel-ui .wheel-prize.is-winner{border-color:var(--ok);box-shadow:0 0 26px rgba(16,185,129,.25);animation:wheelWinnerPulse .7s ease-in-out 2}
-@keyframes wheelWinnerPulse{50%{transform:scale(1.045)}}
-.wheel-ui .wheel-generated-key{font-family:var(--ui-mono);overflow-wrap:anywhere;padding:12px;border:1px dashed var(--ui-accent);border-radius:var(--ui-radius);background:var(--ui-accent-soft);user-select:all}
-@media(prefers-reduced-motion:reduce){.wheel-ui *, .wheel-ui *::before,.wheel-ui *::after{animation:none!important;transition:none!important}}
-
-
-.wheel-ui .wheel-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}.wheel-ui .wheel-play{display:flex;flex-direction:column;gap:10px}.wheel-ui .wheel-pill{font-size:.72rem;padding:6px 10px;border-radius:999px;border:1px solid var(--ui-border);color:var(--ui-muted)}.wheel-ui .wheel-disc{position:relative;width:min(300px,78%);aspect-ratio:1;margin:6px auto 16px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#ff4d6d,#ffb14e,#9c7bff,#3ecfc0,#ff4d6d);box-shadow:0 0 0 7px var(--ui-surface-2),0 0 36px var(--ui-accent-soft);transition:transform 3.8s cubic-bezier(.12,.72,.1,1)}.wheel-ui .wheel-disc:before{content:'';position:absolute;inset:10px;border:2px dashed #fff9;border-radius:50%}.wheel-ui .wheel-pointer{position:absolute;z-index:2;top:-8px;left:calc(50% - 12px);border-left:12px solid transparent;border-right:12px solid transparent;border-top:27px solid #fff;filter:drop-shadow(0 3px 5px #0008)}.wheel-ui .wheel-disc-core{z-index:1;width:36%;aspect-ratio:1;border-radius:50%;background:#101525;border:3px solid #fff9;display:grid;place-items:center;color:#fff;font-weight:900}.wheel-ui .wheel-label{font-size:.8rem;color:var(--ui-muted)}.wheel-ui .wheel-prize-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.wheel-ui .wheel-prize{overflow-wrap:anywhere}.wheel-ui .wheel-prize strong{display:block}.wheel-ui .wheel-prize .wheel-odds{font-size:.75rem;color:var(--ui-accent-hi);margin-top:4px}.wheel-ui .wheel-section-title{font-size:1rem;font-weight:800;margin-bottom:12px}.wheel-ui .wheel-section-title small{display:block;font-size:.72rem;color:var(--ui-muted);font-weight:400}.wheel-ui .wheel-result{margin-top:12px;border:1px solid var(--ui-border);background:var(--ui-surface-2);border-radius:var(--ui-radius);padding:14px}.wheel-ui .wheel-copy{margin-top:8px;padding:8px 12px;border-radius:9px;border:1px solid var(--ui-border);background:var(--ui-surface);color:var(--ui-text);cursor:pointer}.wheel-ui .wheel-history-row{padding:10px 0;border-bottom:1px solid var(--ui-border);overflow-wrap:anywhere}.wheel-ui .wheel-empty{font-size:.82rem;color:var(--ui-muted);padding:10px 0}@media(max-width:760px){.wheel-ui .wheel-grid{grid-template-columns:1fr}} 
-
 #===MARKUP
-
-<div class="ui-view" id="uiLuckyWheelView" hidden>
-  <div class="ui-topbar">
-    <button class="ui-icon-btn" type="button" onclick="uiCloseWheel()" title="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6M9 12h12"/></svg></button>
-    <div class="ui-topbar-title">Lucky Wheel</div><div class="ui-drag-grip" onmousedown="uiDrag(event)"></div>
-    <button class="ui-icon-btn ui-close-btn" type="button" onclick="uiCloseWheel()" title="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
-  </div>
-  <div class="ui-scroll"><div class="ui-inner"><section class="ui-card wheel-ui" id="uiWheelRoot">
-    <div class="wheel-panel" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:1.35rem;font-weight:850">🎡 Lucky Wheel</div><div style="color:var(--ui-muted);font-size:.86rem">One ticket · one spin · live odds</div></div><span class="wheel-pill" id="uiWheelLiveStatus">Connecting…</span></div>
-    <div class="wheel-grid"><div class="wheel-panel wheel-play"><div class="wheel-disc" id="uiWheelDisc"><div class="wheel-pointer"></div><div class="wheel-disc-core">SPIN</div></div><label class="wheel-label" for="uiWheelTicket">Wheel ticket</label><input class="wheel-key-input" id="uiWheelTicket" autocomplete="off" placeholder="WHEEL-XXXX-XXXX-XXXX-XXXX"><button class="wheel-spin-button" id="uiWheelSpinBtn" type="button" onclick="uiWheelSpin()">SPIN THE WHEEL</button><div id="uiWheelResult" class="wheel-result" hidden><strong id="uiWheelResultTitle">Result</strong><div id="uiWheelResultText"></div><div id="uiWheelKeyWrap" hidden><div class="wheel-generated-key" id="uiWheelGeneratedKey"></div><button type="button" class="wheel-copy" onclick="uiWheelCopyKey()">Copy KEY</button></div></div></div>
-    <div class="wheel-panel"><div class="wheel-section-title">Prizes & live odds <small>Refreshes every 5 seconds</small></div><div class="wheel-prize-grid" id="uiWheelPrizes"><div class="wheel-empty">Loading prizes…</div></div><div class="wheel-section-title" style="margin-top:22px">My recent wins</div><div id="uiWheelHistory"><div class="wheel-empty">Loading history…</div></div></div></div>
-  </section></div></div>
-</div>
 
 <div class="ui-view" id="uiSettingsView">
   <div class="ui-topbar">
@@ -1625,18 +1594,6 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
 #===SCRIPT
 
 var UI_CFG = __UI_CONFIG_JSON__;
-
-var uiWheelLastKey='';var uiWheelRefreshTimer=null;
-function uiOpenWheel(){var ids=['uiSettingsView','uiChangelogView','uiRenewView'];ids.forEach(function(id){var e=document.getElementById(id);if(e)e.classList.remove('open')});var v=document.getElementById('uiLuckyWheelView');if(!v)return;v.hidden=false;if(typeof uiShow==='function')uiShow(v);else v.classList.add('open');uiLockBackground();uiWheelRefresh();uiWheelHistory();if(uiWheelRefreshTimer)clearInterval(uiWheelRefreshTimer);uiWheelRefreshTimer=setInterval(function(){if(!v.hidden){uiWheelRefresh();}},5000)}
-function uiCloseWheel(){var v=document.getElementById('uiLuckyWheelView');if(v){v.classList.remove('open');v.hidden=true}if(uiWheelRefreshTimer){clearInterval(uiWheelRefreshTimer);uiWheelRefreshTimer=null}uiUnlockBackground();if(typeof onUiViewClosed==='function')onUiViewClosed()}
-function uiWheelApi(action,body){var opts={credentials:'include',cache:'no-store'};if(body){opts.method='POST';opts.headers={'Content-Type':'application/json'};opts.body=JSON.stringify(body)}return fetch('https://www.cata1y3t.boats/api/wheel.php?action='+encodeURIComponent(action),opts).then(function(r){return r.json()})}
-function uiWheelEsc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function uiWheelRefresh(){uiWheelApi('prizes').then(function(d){if(!d.ok)throw Error(d.msg||'Unable to load prizes');var box=document.getElementById('uiWheelPrizes');box.innerHTML=(d.prizes||[]).map(function(p){return '<div class="wheel-prize"><strong>'+uiWheelEsc(p.label||p.name)+'</strong><div class="wheel-odds">'+Number(p.odds||0).toFixed(2)+'% · weight '+Number(p.probability||0)+'</div></div>'}).join('')||'<div class="wheel-empty">No active prizes</div>';document.getElementById('uiWheelLiveStatus').textContent='LIVE · '+new Date().toLocaleTimeString()}).catch(function(){document.getElementById('uiWheelLiveStatus').textContent='Unable to sync'})}
-function uiWheelHistory(){uiWheelApi('history').then(function(d){var el=document.getElementById('uiWheelHistory');el.innerHTML=(d.history||[]).map(function(h){return '<div class="wheel-history-row"><strong>'+uiWheelEsc(h.prize_name)+'</strong><div style="font-size:.75rem;color:var(--ui-muted)">'+uiWheelEsc(h.created_at)+'</div>'+(h.generated_key?'<div class="wheel-generated-key">'+uiWheelEsc(h.generated_key)+'</div>':'')+'</div>'}).join('')||'<div class="wheel-empty">No spins yet</div>'}).catch(function(){})}
-function uiWheelTone(win){try{var C=window.AudioContext||window.webkitAudioContext,c=new C(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='sine';o.frequency.setValueAtTime(win?660:280,c.currentTime);o.frequency.setValueAtTime(win?880:220,c.currentTime+.13);g.gain.setValueAtTime(.07,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.42);o.start();o.stop(c.currentTime+.43)}catch(e){}}
-function uiWheelSpin(){var input=document.getElementById('uiWheelTicket'),ticket=input.value.trim(),btn=document.getElementById('uiWheelSpinBtn');if(!ticket){input.focus();return}btn.disabled=true;btn.textContent='SPINNING…';var disc=document.getElementById('uiWheelDisc');disc.style.transform='rotate('+(1440+Math.random()*720)+'deg)';document.getElementById('uiWheelResult').hidden=true;uiWheelApi('spin',{ticket:ticket}).then(function(d){setTimeout(function(){if(!d.ok){alert(d.msg||'Spin failed');disc.style.transform='';btn.disabled=false;btn.textContent='SPIN THE WHEEL';return}uiWheelLastKey=d.key||'';document.getElementById('uiWheelResultTitle').textContent=d.key?'🎉 Congratulations!':'Spin result';document.getElementById('uiWheelResultText').textContent=d.key?(d.prize.game_prefix+'-'+d.prize.days+'D KEY generated'):(d.message||'No win this time');document.getElementById('uiWheelKeyWrap').hidden=!d.key;document.getElementById('uiWheelGeneratedKey').textContent=d.key||'';document.getElementById('uiWheelResult').hidden=false;input.value='';input.placeholder='Ticket used — enter another';uiWheelTone(!!d.key);uiWheelHistory();uiWheelRefresh();btn.disabled=false;btn.textContent='SPIN THE WHEEL'},3900)}).catch(function(){alert('Network error. Please retry');btn.disabled=false;btn.textContent='SPIN THE WHEEL'})}
-function uiWheelCopyKey(){if(!uiWheelLastKey)return;var done=function(){var b=document.querySelector('#uiWheelKeyWrap .wheel-copy');if(b){b.textContent='Copied!';setTimeout(function(){b.textContent='Copy KEY'},1300)}};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(uiWheelLastKey).then(done).catch(function(){uiWheelCopyFallback(done)});else uiWheelCopyFallback(done)}function uiWheelCopyFallback(done){var t=document.createElement('textarea');t.value=uiWheelLastKey;document.body.appendChild(t);t.select();try{document.execCommand('copy');done()}catch(e){}t.remove()}
-
 
 var UI_LANGS = [
   { code:'en', flag:'us', native:'English',   latin:'English'    },
@@ -3734,7 +3691,6 @@ function uiCloseView(){
 }
 /* 统一的 ESC 处理：先收浮层，再退回上一级 */
 function uiEscBack(){
-  var wv=document.getElementById('uiLuckyWheelView');if(wv&&!wv.hidden){uiCloseWheel();return true;}
   if (typeof uiCloseConfirmOpen === 'function' && uiCloseConfirmOpen()) { uiCloseConfirmHide(); return true; }
   var ctv = document.getElementById('ctView');
   if (ctv && !ctv.hidden && typeof window.ctClose === 'function') { window.ctClose(); return true; }
@@ -8103,6 +8059,77 @@ html.store-detail-open #storeBackTop,html.store-detail-open #storeRecentToggle,h
 .sb-badge{margin-left:auto;font-size:10px;font-weight:700;color:#fff;
   background:var(--err);border-radius:var(--radius-full);padding:1px 7px}
 /* ── 管理面板（管理员专用） ───────────────────────────────────────── */
+/* ═══════════ Lucky Wheel ═══════════ */
+.wh-wrap{padding:24px 4px 40px;max-width:980px;margin:0 auto}
+.wh-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.wh-title{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--text)}
+.wh-sub{font-size:12.5px;color:var(--text-3);margin-top:3px}
+.wh-live{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-3)}
+.wh-live i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok);animation:whPulse 2s ease-in-out infinite}
+.wh-live.off i{background:var(--warn);box-shadow:0 0 10px var(--warn);animation:none}
+.wh-mute{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text-2);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--tr-fast)}
+.wh-mute:hover{color:var(--text);border-color:var(--accent)}
+.wh-mute svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@keyframes whPulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+.wh-stage{position:relative;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-lg);padding:22px 0 18px;overflow:hidden}
+.wh-stage::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 120% at 50% 0%,var(--accent-soft),transparent 70%);pointer-events:none}
+.wh-reel{position:relative;height:150px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 86%,transparent)}
+.wh-strip{position:absolute;left:0;top:0;height:100%;display:flex;gap:10px;will-change:transform}
+.wh-item{flex:0 0 150px;width:150px;height:140px;margin-top:5px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface-2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;position:relative;transition:border-color .25s,box-shadow .25s,transform .25s}
+.wh-item .g{font-size:22px;font-weight:900;letter-spacing:.5px;color:var(--text)}
+.wh-item .d{font-size:13px;font-weight:700;color:var(--accent)}
+.wh-item .p{position:absolute;top:7px;right:9px;font-size:10px;font-family:var(--font-mono);color:var(--text-3)}
+.wh-item.key .g{background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.wh-item.none .g{font-size:15px;color:var(--text-3);font-weight:700}
+.wh-item.win{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent),0 10px 36px var(--accent-glow);transform:translateY(-3px) scale(1.04)}
+.wh-pointer{position:absolute;left:50%;top:0;bottom:0;width:0;pointer-events:none;z-index:2}
+.wh-pointer::before,.wh-pointer::after{content:"";position:absolute;left:-7px;border:7px solid transparent}
+.wh-pointer::before{top:0;border-top-color:var(--accent)}
+.wh-pointer::after{bottom:0;border-bottom-color:var(--accent)}
+.wh-pointer b{position:absolute;left:-1px;top:14px;bottom:14px;width:2px;background:linear-gradient(var(--accent),transparent 30%,transparent 70%,var(--accent));opacity:.55}
+
+.wh-form{display:flex;gap:10px;margin:18px 22px 0}
+.wh-form input{flex:1;min-width:0;height:44px;padding:0 16px;border-radius:var(--radius-full);border:1px solid var(--border);background:var(--surface-2);color:var(--text);font-family:var(--font-mono);font-size:14px;letter-spacing:.08em;text-transform:uppercase;outline:none;transition:border-color var(--tr-fast)}
+.wh-form input:focus{border-color:var(--accent)}
+.wh-form input::placeholder{color:var(--text-3);letter-spacing:.04em}
+.wh-form .btn[disabled]{opacity:.55;pointer-events:none}
+.wh-msg{min-height:18px;margin:9px 26px 0;font-size:12.5px;color:var(--text-3)}
+.wh-msg.err{color:var(--err)}
+
+.wh-cols{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;margin-top:18px}
+@media (max-width:860px){.wh-cols{grid-template-columns:1fr}}
+.wh-card{border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-lg);padding:16px 18px}
+.wh-card h3{font-size:12px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--text-3);margin:0 0 12px}
+.wh-odds{display:flex;flex-direction:column;gap:9px}
+.wh-odd{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center;font-size:13.5px;color:var(--text)}
+.wh-odd .pc{font-family:var(--font-mono);font-size:12.5px;color:var(--text-2)}
+.wh-odd .bar{grid-column:1/-1;height:4px;border-radius:3px;background:var(--surface-3);overflow:hidden}
+.wh-odd .bar i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transition:width .5s}
+.wh-flash{animation:whFlash 1.2s ease}
+@keyframes whFlash{0%{box-shadow:0 0 0 2px var(--accent)}100%{box-shadow:0 0 0 2px transparent}}
+.wh-hist{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto}
+.wh-hrow{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:var(--radius-sm);background:var(--surface-2);font-size:13px;color:var(--text)}
+.wh-hrow .t{flex:1;min-width:0}
+.wh-hrow .k{font-family:var(--font-mono);font-size:11px;color:var(--text-3);word-break:break-all;margin-top:2px}
+.wh-hrow .u{color:var(--ok)}
+.wh-copy{flex:0 0 30px;height:30px;border-radius:50%;border:1px solid var(--border);background:transparent;color:var(--text-2);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.wh-copy:hover{color:var(--accent);border-color:var(--accent)}
+.wh-copy svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.wh-empty{padding:18px;text-align:center;font-size:13px;color:var(--text-3)}
+
+.wh-modal{position:fixed;inset:0;z-index:9000;display:none;align-items:center;justify-content:center;background:var(--overlay);backdrop-filter:blur(8px)}
+.wh-modal.on{display:flex}
+.wh-pop{width:min(420px,92vw);text-align:center;padding:30px 26px 24px;border-radius:var(--radius-xl);border:1px solid var(--border-2);background:var(--surface-solid);box-shadow:var(--shadow-3);animation:whPop .35s cubic-bezier(.2,1.3,.4,1)}
+@keyframes whPop{from{opacity:0;transform:scale(.85) translateY(10px)}to{opacity:1;transform:none}}
+.wh-pop .big{font-size:34px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:4px}
+.wh-pop .big.lose{background:none;color:var(--text-2);font-size:26px}
+.wh-pop .sub{font-size:14px;color:var(--text-2);margin-bottom:16px}
+.wh-pop .key{padding:13px 14px;border-radius:var(--radius);border:1px dashed var(--accent);background:var(--accent-soft);font-family:var(--font-mono);font-size:14px;letter-spacing:.05em;color:var(--text);word-break:break-all;user-select:all;margin-bottom:16px}
+.wh-pop .row{display:flex;gap:10px;justify-content:center}
+.wh-confetti{position:fixed;inset:0;pointer-events:none;z-index:9001;overflow:hidden}
+.wh-confetti i{position:absolute;top:-12px;width:8px;height:14px;border-radius:2px;animation:whFall linear forwards}
+@keyframes whFall{to{transform:translate3d(var(--dx),105vh,0) rotate(var(--rot));opacity:.9}}
 .admin-wrap{padding:24px 4px 40px}
 .admin-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
 .admin-title{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--text)}
@@ -9742,6 +9769,10 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a6 6 0 0 1 12 0v2"/></svg>
         <span data-ui="profile">Profile</span>
       </div>
+      <div class="sb-item" id="navWheel" onclick="showWheel()">
+        <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/><path d="M12 8c-2.2 0-4-1.1-4-2.5S9.3 3 10.6 3C12 3 12 5 12 8zm0 0c2.2 0 4-1.1 4-2.5S14.7 3 13.4 3C12 3 12 5 12 8z"/></svg>
+        <span id="navWheelTx" data-ui="navWheel">Lucky Wheel</span>
+      </div>
       <div class="sb-item" id="navPlugins" onclick="showPlugins()">
         <svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
         <span data-ui="pluginMine">My plugins</span>
@@ -9771,10 +9802,6 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
       <div id="sbQuick"></div>
       <div class="qp-drop-hint" id="qpDropHint" data-ui="qpDropHint">Drop here to add to Quickplay</div>
       <div class="qp-picker" id="qpPicker" hidden></div>
-      </div>
-      <div class="sb-item" id="sbLuckyWheel" role="button" tabindex="0" title="Lucky Wheel" onclick="uiOpenWheel()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();uiOpenWheel()}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v6M21 12h-6M12 21v-6M3 12h6"/><path d="m5.64 5.64 4.24 4.24m8.48-4.24-4.24 4.24m0 4.24 4.24 4.24m-8.48-4.24-4.24 4.24"/></svg>
-        <span>Lucky Wheel</span>
       </div>
       <div class="sb-section" data-ui="downloads">Subscriptions</div>
       <div id="sbDown"></div>
@@ -10304,6 +10331,51 @@ return plugin;</code></pre>
           </button>
         </div>
         <div id="pluginViewHost"></div>
+      </div>
+    </div>
+
+    <!-- Lucky Wheel：奖品 = 游戏 KEY；每次转动要输入后台生成的转盘券 -->
+    <div class="page" id="wheelPage" hidden>
+      <div class="wh-wrap">
+        <div class="wh-head">
+          <div>
+            <div class="wh-title" data-wh="title">Lucky Wheel</div>
+            <div class="wh-sub" data-wh="sub">Enter a wheel key, spin, win a game key.</div>
+          </div>
+          <div class="wh-live" id="whLive"><i></i><span id="whLiveTx"></span></div>
+          <button class="wh-mute" id="whMute" type="button" onclick="wheelToggleMute()" title="Sound">
+            <svg id="whMuteIc" viewBox="0 0 24 24"></svg>
+          </button>
+        </div>
+
+        <div class="wh-stage">
+          <div class="wh-reel" id="whReel">
+            <div class="wh-pointer"><b></b></div>
+            <div class="wh-strip" id="whStrip"></div>
+          </div>
+          <div class="wh-form">
+            <input id="whTicket" type="text" maxlength="40" autocomplete="off" spellcheck="false" data-wh-ph="ticketPh" placeholder="WHL-XXXX-XXXX-XXXX">
+            <button class="btn btn-primary" id="whSpin" type="button" onclick="wheelSpin()"><span data-wh="spin">Spin</span></button>
+          </div>
+          <div class="wh-msg" id="whMsg"></div>
+        </div>
+
+        <div class="wh-cols">
+          <div class="wh-card"><h3 data-wh="odds">Prizes &amp; odds</h3><div class="wh-odds" id="whOdds"></div></div>
+          <div class="wh-card"><h3 data-wh="mine">My rewards</h3><div class="wh-hist" id="whHist"></div></div>
+        </div>
+      </div>
+
+      <div class="wh-modal" id="whModal" onclick="if(event.target===this)wheelCloseModal()">
+        <div class="wh-pop">
+          <div class="big" id="whPopBig"></div>
+          <div class="sub" id="whPopSub"></div>
+          <div class="key" id="whPopKey" hidden></div>
+          <div class="row">
+            <button class="btn btn-primary" id="whPopCopy" type="button" onclick="wheelCopyLast()" hidden><span data-wh="copy">Copy key</span></button>
+            <button class="btn btn-ghost" type="button" onclick="wheelCloseModal()"><span data-wh="close">Close</span></button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -13815,7 +13887,318 @@ __UI_SCRIPT__
     setDPI(parseInt(b.getAttribute('data-dpi'), 10));
   });
 
+  /* 侧边栏文案走现有的 data-ui 多语言（没翻译的语言自动回退英文） */
+  (function(){ try { var T = { en: 'Lucky Wheel', zh: '幸运转盘' }; Object.keys(T).forEach(function(c){ if (typeof UI_T !== 'undefined' && UI_T[c]) UI_T[c].navWheel = T[c]; }); } catch (e) {} })();
+
+  /* ═══════════ Lucky Wheel（奖品 = 游戏 KEY；每转一次要一张后台生成的转盘券） ═══════════
+     数据全部实时来自网站：WHEEL:prizes（页面开着时每 5 秒一次）→ 后台改奖品 / 概率，这里自动跟着变；
+     WHEEL:spin:<券> → 服务端按「此刻」的概率抽奖，中 KEY 就当场生成并回传。 */
+  var WH_T = {
+    en: { nav:'Lucky Wheel', title:'Lucky Wheel', sub:'Enter a wheel key, spin, win a game key.', spin:'Spin', spinning:'Spinning…',
+      ticketPh:'WHL-XXXX-XXXX-XXXX', odds:'Prizes & odds', mine:'My rewards', copy:'Copy key', close:'Close', copied:'Key copied',
+      live:'Live odds', offline:'Offline', noPrize:'No prizes available right now.', noHist:'No spins yet.', none:'Nothing',
+      won:'You won!', lost:'Not this time', yourKey:'Your license key', used:'activated', day:'Day', days:'Days',
+      oddsUpd:'Odds updated', needTicket:'Enter your wheel key first.', needUpdate:'Wheel needs the latest app version.',
+      e_TICKET_INVALID:'Wheel key not found.', e_TICKET_USED:'This wheel key has already been used.', e_NO_PRIZES:'No prizes available right now.',
+      e_KEY_GEN:'Could not generate a key, try again.', e_SUSPENDED:'Account is suspended or banned.', e_AUTH:'Please sign in again.',
+      e_NET:'Network error, try again.', e_ERR:'Something went wrong, try again.' },
+    zh: { nav:'幸运转盘', title:'幸运转盘', sub:'输入转盘 KEY，转动，赢取游戏 KEY。', spin:'转动', spinning:'转动中…',
+      ticketPh:'WHL-XXXX-XXXX-XXXX', odds:'奖品与中奖率', mine:'我的奖励', copy:'复制 KEY', close:'关闭', copied:'KEY 已复制',
+      live:'实时概率', offline:'离线', noPrize:'暂时没有可抽的奖品。', noHist:'还没有转过。', none:'谢谢参与',
+      won:'恭喜中奖！', lost:'这次没中', yourKey:'你的游戏 KEY', used:'已激活', day:'天', days:'天',
+      oddsUpd:'奖品 / 概率已更新', needTicket:'请先输入转盘 KEY。', needUpdate:'转盘需要更新到最新版客户端。',
+      e_TICKET_INVALID:'转盘 KEY 不存在。', e_TICKET_USED:'这个转盘 KEY 已经用过了。', e_NO_PRIZES:'暂时没有可抽的奖品。',
+      e_KEY_GEN:'KEY 生成失败，请重试。', e_SUSPENDED:'账号已被停用或封禁。', e_AUTH:'请重新登录。',
+      e_NET:'网络错误，请重试。', e_ERR:'出错了，请重试。' }
+  };
+  function wT(k){
+    var l = (typeof uiState !== 'undefined' && uiState && uiState.lang) || 'en';
+    var t = WH_T[l] || WH_T.en;
+    return (t && t[k]) || WH_T.en[k] || k;
+  }
+  function wEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function wDays(n){ var l = (uiState && uiState.lang) || 'en'; if (l === 'zh') return n + ' 天'; return n + ' ' + (n === 1 ? wT('day') : wT('days')); }
+
+  var WH = { prizes: [], rev: '', history: [], spinning: false, timer: null, pend: {}, lastKey: '', online: false, loaded: false };
+  var WH_ITEM_W = 150, WH_GAP = 10;
+
+  /* ── 音效（Web Audio 合成，不需要音频文件）：遵守 UI_CFG.sound，另有页面内静音开关 ── */
+  var WS = { ctx: null, master: null, muted: false };
+  try { WS.muted = localStorage.getItem('starline.wheel.mute') === '1'; } catch (e) {}
+  function wsOn(){
+    try { if (typeof UI_CFG !== 'undefined' && UI_CFG && UI_CFG.sound === false) return false; } catch (e) {}
+    return !WS.muted;
+  }
+  function wsCtx(){
+    if (!wsOn()) return null;
+    if (!WS.ctx) {
+      var C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+      WS.ctx = new C(); WS.master = WS.ctx.createGain(); WS.master.gain.value = 0.55; WS.master.connect(WS.ctx.destination);
+    }
+    if (WS.ctx.state === 'suspended') WS.ctx.resume();
+    return WS.ctx;
+  }
+  function wsTone(freq, at, dur, type, vol, slideTo){
+    var c = wsCtx(); if (!c) return;
+    var t0 = c.currentTime + (at || 0), o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t0);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol || 0.2, t0 + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(WS.master); o.start(t0); o.stop(t0 + dur + 0.03);
+  }
+  function wsNoise(at, dur, vol, hp){
+    var c = wsCtx(); if (!c) return;
+    var n = Math.floor(c.sampleRate * dur), b = c.createBuffer(1, n, c.sampleRate), d = b.getChannelData(0);
+    for (var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    var s = c.createBufferSource(); s.buffer = b;
+    var f = c.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hp || 3000;
+    var g = c.createGain(); g.gain.value = vol || 0.1;
+    s.connect(f); f.connect(g); g.connect(WS.master); s.start(c.currentTime + (at || 0));
+  }
+  var wsSfx = {
+    click: function(){ wsTone(520, 0, .07, 'triangle', .14); wsTone(780, .04, .09, 'triangle', .12); },
+    start: function(){ wsTone(180, 0, .55, 'sawtooth', .07, 720); wsNoise(0, .35, .05, 2500); },
+    tick:  function(p){ var f = 900 + 500 * (1 - p); wsTone(f, 0, .045, 'square', .06); wsNoise(0, .02, .05, 5000); },
+    win:   function(){
+      [523.25, 659.25, 783.99, 1046.5].forEach(function(f, i){ wsTone(f, i * .11, .5, 'triangle', .2); wsTone(f * 2, i * .11, .35, 'sine', .06); });
+      [1568, 2093, 2637, 3136].forEach(function(f, i){ wsTone(f, .5 + i * .06, .25, 'sine', .07); });
+      wsNoise(.45, .5, .05, 6000);
+    },
+    lose:  function(){ wsTone(330, 0, .22, 'triangle', .15, 300); wsTone(247, .2, .38, 'triangle', .14, 200); },
+    error: function(){ wsTone(150, 0, .16, 'sawtooth', .12); wsTone(120, .12, .2, 'sawtooth', .11); },
+    copy:  function(){ wsTone(1200, 0, .06, 'sine', .12); wsTone(1700, .05, .09, 'sine', .1); },
+    ping:  function(){ wsTone(880, 0, .12, 'sine', .08); wsTone(1320, .08, .16, 'sine', .07); }
+  };
+  function wSfx(n, a){ try { if (wsOn() && wsSfx[n]) wsSfx[n](a); } catch (e) {} }
+  function wheelMuteIcon(){
+    var ic = document.getElementById('whMuteIc'); if (!ic) return;
+    var off = !wsOn();
+    ic.innerHTML = '<path d="M11 5 6 9H3v6h3l5 4z"/>' + (off ? '<path d="m16 9 5 6M21 9l-5 6"/>' : '<path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/>');
+  }
+  function wheelToggleMute(){
+    WS.muted = !WS.muted; try { localStorage.setItem('starline.wheel.mute', WS.muted ? '1' : '0'); } catch (e) {}
+    wheelMuteIcon(); if (!WS.muted) wSfx('click');
+  }
+
+  /* ── 文案 ── */
+  function wheelApplyText(){
+    document.querySelectorAll('#wheelPage [data-wh]').forEach(function(e){ e.textContent = wT(e.getAttribute('data-wh')); });
+    document.querySelectorAll('#wheelPage [data-wh-ph]').forEach(function(e){ e.placeholder = wT(e.getAttribute('data-wh-ph')); });
+    var n = document.getElementById('navWheelTx'); if (n) n.textContent = wT('nav');
+    wheelLive(WH.online); wheelMuteIcon();
+    if (!WH.spinning) { wheelRenderStrip(); } wheelRenderOdds(); wheelRenderHist();
+  }
+  function wheelLive(on){
+    WH.online = on;
+    var b = document.getElementById('whLive'), t = document.getElementById('whLiveTx');
+    if (b) b.classList.toggle('off', !on); if (t) t.textContent = on ? wT('live') : wT('offline');
+  }
+  function wheelSay(text, err){ var m = document.getElementById('whMsg'); if (m) { m.textContent = text || ''; m.classList.toggle('err', !!err); } }
+
+  /* ── 奖品展示 ── */
+  function wPrizeParts(p){
+    if (p.type === 'key') return { g: p.game, d: wDays(p.days), cls: 'key' };
+    var nm = (p.name === 'Nothing' || !p.name) ? wT('none') : p.name;
+    return { g: nm, d: '', cls: 'none' };
+  }
+  function wPct(p){ var v = Number(p.percent) || 0; return (v % 1 === 0 ? v : v.toFixed(2).replace(/0+$/, '')) + '%'; }
+  function wItemHtml(p, extra){
+    var x = wPrizeParts(p);
+    return '<div class="wh-item ' + x.cls + (extra || '') + '"><span class="p">' + wPct(p) + '</span><span class="g">' + wEsc(x.g) + '</span>' + (x.d ? '<span class="d">' + wEsc(x.d) + '</span>' : '') + '</div>';
+  }
+  function wheelReelCenter(){ var r = document.getElementById('whReel'); return r ? r.clientWidth / 2 : 400; }
+
+  /* 空闲状态：奖品按顺序摆开，第一个对准指针；转起来时再换成长条 */
+  function wheelRenderStrip(){
+    var strip = document.getElementById('whStrip'); if (!strip) return;
+    var P = WH.prizes;
+    strip.style.transition = 'none';
+    if (!P.length) { strip.innerHTML = '<div class="wh-empty" style="width:100%">' + wEsc(wT('noPrize')) + '</div>'; strip.style.transform = 'translateX(0)'; return; }
+    var html = '', n = P.length, reps = Math.max(3, Math.ceil(14 / n));
+    for (var r = 0; r < reps; r++) for (var i = 0; i < n; i++) html += wItemHtml(P[i]);
+    strip.innerHTML = html;
+    strip.style.transform = 'translateX(' + (wheelReelCenter() - WH_ITEM_W / 2) + 'px)';
+  }
+  function wheelRenderOdds(){
+    var box = document.getElementById('whOdds'); if (!box) return;
+    if (!WH.prizes.length) { box.innerHTML = '<div class="wh-empty">' + wEsc(wT('noPrize')) + '</div>'; return; }
+    box.innerHTML = WH.prizes.map(function(p){
+      var x = wPrizeParts(p);
+      return '<div class="wh-odd"><span>' + wEsc(x.g) + (x.d ? ' · ' + wEsc(x.d) : '') + '</span><span class="pc">' + wPct(p) + '</span><div class="bar"><i style="width:' + (Number(p.percent) || 0) + '%"></i></div></div>';
+    }).join('');
+  }
+  function wheelRenderHist(){
+    var box = document.getElementById('whHist'); if (!box) return;
+    if (!WH.history.length) { box.innerHTML = '<div class="wh-empty">' + wEsc(wT('noHist')) + '</div>'; return; }
+    var cp = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+    box.innerHTML = WH.history.map(function(h, i){
+      return '<div class="wh-hrow"><div class="t"><div>' + wEsc(h.key ? (h.game + ' · ' + wDays(h.days)) : (h.name === 'Nothing' ? wT('none') : h.name)) + '</div>' +
+        (h.key ? '<div class="k">' + wEsc(h.key) + (h.redeemed ? ' · <span class="u">' + wEsc(wT('used')) + '</span>' : '') + '</div>' : '') + '</div>' +
+        (h.key ? '<button class="wh-copy" type="button" onclick="wheelCopy(' + i + ')">' + cp + '</button>' : '') + '</div>';
+    }).join('');
+  }
+
+  /* ── 复制 ── */
+  function wheelCopyText(t){
+    function fb(){ var ta = document.createElement('textarea'); ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); } catch (e) {} ta.remove(); }
+    try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t).catch(fb); } else fb(); } catch (e) { fb(); }
+    wSfx('copy'); toast(wT('copied'), 'ok', 1800);
+  }
+  function wheelCopy(i){ var h = WH.history[i]; if (h && h.key) wheelCopyText(h.key); }
+  function wheelCopyLast(){ if (WH.lastKey) wheelCopyText(WH.lastKey); }
+
+  /* ── 与宿主通信 ── */
+  function wheelSend(action, arg){
+    clearTimeout(WH.pend[action]);
+    WH.pend[action] = setTimeout(function(){          /* 旧版客户端没有 WHEEL 桥接：不会有回复 */
+      wheelLive(false);
+      if (action === 'spin') { wheelSpinEnd(); wheelSay(wT('needUpdate'), true); wSfx('error'); }
+    }, 9000);
+    wv('WHEEL:' + action + (arg != null ? ':' + arg : ''));
+  }
+  function wheelOnRaw(act, body){
+    clearTimeout(WH.pend[act]);
+    var d = null; try { d = JSON.parse(body); } catch (e) {}
+    if (!d) { wheelLive(false); if (act === 'spin') { wheelSpinEnd(); wheelSay(wT('e_ERR'), true); wSfx('error'); } return; }
+    if (act === 'prizes') {
+      if (!d.ok) { wheelLive(false); return; }
+      wheelLive(true);
+      if (WH.spinning) return;
+      var changed = WH.loaded && d.rev !== WH.rev;
+      WH.prizes = d.prizes || []; WH.rev = d.rev || ''; WH.loaded = true;
+      wheelRenderStrip(); wheelRenderOdds();
+      if (changed) {
+        var o = document.getElementById('whOdds'); if (o) { o.classList.remove('wh-flash'); void o.offsetWidth; o.classList.add('wh-flash'); }
+        wSfx('ping'); wheelSay(wT('oddsUpd'), false);
+      }
+    } else if (act === 'history') {
+      if (d.ok) { WH.history = d.history || []; wheelRenderHist(); }
+    } else if (act === 'spin') {
+      if (!d.ok) {
+        wheelSpinEnd(); wSfx('error');
+        wheelSay(wT('e_' + d.code) !== 'e_' + d.code ? wT('e_' + d.code) : (d.msg || wT('e_ERR')), true);
+        return;
+      }
+      wheelAnimate(d);
+    }
+  }
+
+  /* ── 转动 ── */
+  function wheelSpinEnd(){
+    WH.spinning = false;
+    var b = document.getElementById('whSpin'); if (b) { b.disabled = false; b.querySelector('span').textContent = wT('spin'); }
+  }
+  function wheelSpin(){
+    if (WH.spinning) return;
+    var inp = document.getElementById('whTicket'), tk = (inp.value || '').replace(/\s+/g, '').toUpperCase();
+    wheelSay('', false);
+    if (!tk) { wheelSay(wT('needTicket'), true); wSfx('error'); inp.focus(); return; }
+    WH.spinning = true; wSfx('click');
+    var b = document.getElementById('whSpin'); b.disabled = true; b.querySelector('span').textContent = wT('spinning');
+    wheelSend('spin', tk);
+  }
+
+  function wheelAnimate(d){
+    /* 用服务端这一次抽奖的奖品快照来滚，结果和画面一定对得上，即使后台刚好改过奖品 */
+    WH.prizes = d.prizes || WH.prizes; WH.rev = d.rev || WH.rev;
+    wheelRenderOdds();
+    var P = WH.prizes, n = P.length, win = d.win_index | 0;
+    var strip = document.getElementById('whStrip');
+    var reps = Math.max(8, Math.ceil(70 / n) + 2), html = '';
+    for (var r = 0; r < reps; r++) for (var i = 0; i < n; i++) html += wItemHtml(P[i]);
+    strip.style.transition = 'none'; strip.innerHTML = html;
+    var base = wheelReelCenter() - WH_ITEM_W / 2;
+    strip.style.transform = 'translateX(' + base + 'px)'; void strip.offsetWidth;
+
+    var targetIdx = (reps - 3) * n + win, unit = WH_ITEM_W + WH_GAP;
+    var jitter = (Math.random() - 0.5) * (WH_ITEM_W * 0.6);                 /* 在中奖格内随机停，更像真的 */
+    var endX = base - targetIdx * unit + jitter, dur = 5600;
+    wSfx('start');
+    strip.style.transition = 'transform ' + dur + 'ms cubic-bezier(.08,.62,.08,1)';
+    strip.style.transform = 'translateX(' + endX + 'px)';
+
+    var center = wheelReelCenter(), lastI = -1, t0 = performance.now(), done = false;
+    function frame(){
+      if (done) return;
+      var m = new DOMMatrix(getComputedStyle(strip).transform), x = m.m41;
+      var idx = Math.floor((center - x) / unit);
+      if (idx !== lastI) { if (lastI !== -1) wSfx('tick', Math.min(1, (performance.now() - t0) / dur)); lastI = idx; }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+
+    var finished = false;
+    function fin(){
+      if (finished) return; finished = true; done = true;
+      strip.removeEventListener('transitionend', onEnd);
+      var el = strip.children[targetIdx]; if (el) el.classList.add('win');
+      WH.history = d.history || WH.history; wheelRenderHist();
+      document.getElementById('whTicket').value = '';
+      setTimeout(function(){ wheelSpinEnd(); wheelResult(d); }, 450);
+    }
+    function onEnd(e){ if (e.target === strip && e.propertyName === 'transform') fin(); }
+    strip.addEventListener('transitionend', onEnd);
+    setTimeout(fin, dur + 400);
+  }
+
+  function wheelResult(d){
+    var p = d.prize || {}, big = document.getElementById('whPopBig'), sub = document.getElementById('whPopSub'),
+        key = document.getElementById('whPopKey'), cp = document.getElementById('whPopCopy');
+    WH.lastKey = d.key || '';
+    if (d.key) {
+      big.className = 'big'; big.textContent = wT('won');
+      sub.textContent = p.game + ' · ' + wDays(p.days) + ' — ' + wT('yourKey');
+      key.textContent = d.key; key.hidden = false; cp.hidden = false;
+      wSfx('win'); wheelConfetti();
+    } else {
+      big.className = 'big lose'; big.textContent = wT('lost');
+      sub.textContent = (p.name === 'Nothing' || !p.name) ? wT('none') : p.name;
+      key.hidden = true; cp.hidden = true; wSfx('lose');
+    }
+    document.getElementById('whModal').classList.add('on');
+  }
+  function wheelCloseModal(){
+    document.getElementById('whModal').classList.remove('on');
+    var st = document.getElementById('whStrip'); if (st && !WH.spinning) wheelRenderStrip();
+  }
+  function wheelConfetti(){
+    var box = document.createElement('div'); box.className = 'wh-confetti';
+    var cols = ['#ff5d73', '#ffb84d', '#4ddc9a', '#4da3ff', '#b57bff', '#ffffff'];
+    for (var i = 0; i < 70; i++) {
+      var s = document.createElement('i');
+      s.style.left = (Math.random() * 100) + '%'; s.style.background = cols[i % cols.length];
+      s.style.animationDuration = (1.6 + Math.random() * 1.6) + 's'; s.style.animationDelay = (Math.random() * .35) + 's';
+      s.style.setProperty('--dx', ((Math.random() - .5) * 240) + 'px'); s.style.setProperty('--rot', (360 + Math.random() * 720) + 'deg');
+      box.appendChild(s);
+    }
+    document.body.appendChild(box); setTimeout(function(){ box.remove(); }, 3800);
+  }
+
+  /* ── 页面进出 + 实时轮询 ── */
+  function showWheel(){
+    closeDetail();
+    document.querySelectorAll('.page').forEach(function(p){ p.hidden = true; });
+    document.getElementById('wheelPage').hidden = false;
+    setActiveNav('navWheel');
+    wheelApplyText();
+    wheelSend('prizes'); wheelSend('history');
+    if (!WH.timer) WH.timer = setInterval(function(){ if (!WH.spinning) wheelSend('prizes'); }, 5000);
+  }
+  function wheelHide(){
+    var pg = document.getElementById('wheelPage');
+    if (pg) pg.hidden = true;
+    if (WH.timer) { clearInterval(WH.timer); WH.timer = null; }
+  }
+  document.addEventListener('keydown', function(e){
+    var pg = document.getElementById('wheelPage'); if (!pg || pg.hidden) return;
+    if (e.key === 'Enter' && e.target && e.target.id === 'whTicket') { e.preventDefault(); wheelSpin(); }
+    if (e.key === 'Escape') wheelCloseModal();
+  });
+  window.addEventListener('focus', function(){ var pg = document.getElementById('wheelPage'); if (pg && !pg.hidden && !WH.spinning) wheelSend('prizes'); });
+
   function setActiveNav(id){
+    if (id !== 'navWheel') wheelHide();
     document.querySelectorAll('.sb-tab.active,.sb-sub-item.active').forEach(function(e){e.classList.remove('active');});
     document.querySelectorAll('.sb-item').forEach(function(b){
       if (b.id === id) b.classList.add('active');
@@ -14220,6 +14603,10 @@ __UI_SCRIPT__
       if (gp[0]) MY_GROUP = gp[0];
       if (gp[1]) MY_ROLE  = gp[1];
       updateProfileGroup();
+    }
+    else if (msg.indexOf('WHEEL_RAW:') === 0) {
+      var wrest = msg.slice(10), wcol = wrest.indexOf(':');
+      wheelOnRaw(wcol >= 0 ? wrest.slice(0, wcol) : wrest, wcol >= 0 ? wrest.slice(wcol + 1) : '');
     }
     else if (msg.indexOf('ADMIN_RAW:') === 0) {
       var arest  = msg.slice(10);
