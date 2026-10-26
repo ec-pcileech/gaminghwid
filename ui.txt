@@ -9740,8 +9740,19 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
 .plugin-dialog{width:min(420px,100%);background:var(--surface-solid);box-shadow:var(--shadow-3)}
 .plugin-dialog h3{margin:0 0 10px;font-size:15px;font-weight:700;letter-spacing:-.2px;overflow-wrap:anywhere}
 .plugin-dialog p{margin:0 0 14px;white-space:pre-wrap;font-size:13px;line-height:1.6;color:var(--text-2);overflow-wrap:anywhere}
-.plugin-ico-row{display:flex;gap:8px;align-items:center;justify-content:flex-end}
-.plugin-ico-btn{width:40px;height:40px;padding:0!important;display:inline-grid!important;place-items:center;border-radius:12px!important}
+.plugins-wrap .admin-head{justify-content:flex-start;gap:18px}
+.plugin-code-box{position:relative}
+.plugin-copy-ico{position:absolute;z-index:2;width:28px;height:28px;padding:0;display:grid;place-items:center;border:0;border-radius:8px;background:rgba(255,255,255,.06);color:var(--text-3);cursor:pointer;transition:background .15s,color .15s}
+.plugin-copy-ico:hover{background:rgba(255,255,255,.16);color:var(--text)}
+.plugin-copy-ico svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.plugin-copy-ico.done{color:var(--ok,#3ecf8e)}
+.plugin-code-box.left .plugin-copy-ico{left:8px;top:7px}
+.plugin-code-box.left .plugin-api-code{padding-left:44px}
+.plugin-code-box.right{margin:0 0 14px}
+.plugin-code-box.right .plugin-copy-ico{right:10px;top:10px}
+.plugin-code-box.right pre{margin:0;padding-right:52px}
+.plugin-ico-row{display:flex;gap:8px;align-items:center;flex:0 0 auto;margin:0}
+.plugin-ico-btn{margin-left:0!important;width:40px;height:40px;padding:0!important;display:inline-grid!important;place-items:center;border-radius:12px!important}
 .plugin-ico-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .plugin-editor-overlay{z-index:2147483600}
 .plugin-editor{width:min(940px,100%);height:min(780px,calc(100vh - 40px));display:flex;flex-direction:column;padding:0!important;overflow:hidden;background:var(--surface-solid);box-shadow:var(--shadow-3)}
@@ -10315,10 +10326,6 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
     <div class="page" id="pluginsPage" hidden>
       <div class="plugins-wrap">
         <div class="admin-head">
-          <div>
-            <div class="admin-title" data-ui="pluginMine">My plugins</div>
-            <div class="admin-sub" data-ui="pluginHeroSub">Import, enable and manage extensions. Plugins can add their own panels and interactions.</div>
-          </div>
           <div class="plugin-ico-row">
             <button class="btn btn-ghost plugin-ico-btn" type="button" onclick="pluginNew()" data-ui-title="pluginNew" title="New plugin" aria-label="New plugin">
               <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
@@ -10333,6 +10340,11 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
               <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>
             </button>
           </div>
+          <div>
+            <div class="admin-title" data-ui="pluginMine">My plugins</div>
+            <div class="admin-sub" data-ui="pluginHeroSub">Import, enable and manage extensions. Plugins can add their own panels and interactions.</div>
+          </div>
+
         </div>
 
         <div class="plugins-stats">
@@ -10358,7 +10370,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
         </section>
         <section class="plugin-guide" id="pluginGuide" hidden>
           <div class="plugin-guide-head"><div><strong data-ui="pluginGuideTitle">Plugin format</strong><p data-ui="pluginGuideSub">Save the JavaScript below as a .js file, then choose Import plugin. Only import code you trust.</p></div><button class="ui-icon-btn" type="button" onclick="pluginShowGuide(false)" data-ui-title="pluginClose" title="Close">×</button></div>
-          <pre><code>const plugin = {
+          <div class="plugin-code-box right"><button type="button" class="plugin-copy-ico" onclick="pluginCopyCode(this)" data-ui-title="pluginApiCopy" title="Copy" aria-label="Copy"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button><pre><code>const plugin = {
   id: 'my-ui-style',
   name: 'My UI Style',
   version: '1.0.0',
@@ -10380,7 +10392,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
   },
   deactivate(api) {}   // everything done through api.ui is undone for you
 };
-return plugin;</code></pre>
+return plugin;</code></pre></div>
           <div class="plugin-guide-note" data-ui="pluginGuideNote">Plugins can execute JavaScript in this UI page. Only import trusted files. Plugin data is stored in this WebView local storage.</div>
         </section>
         <input type="file" id="pluginFileInput" accept=".js,text/javascript,application/javascript" hidden>
@@ -17069,6 +17081,28 @@ __UI_SCRIPT__
   function apiCopy(text){var value=String(text||'');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(function(){toast(apiLabel('copied'));},function(){toast(apiLabel('copyFailed'));});return;}var ta=document.createElement('textarea');ta.value=value;document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();toast(ok?apiLabel('copied'):apiLabel('copyFailed'));}
   function apiDownload(name,text,mime){var blob=new Blob([text],{type:mime||'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
   function apiBtn(label,fn){var b=document.createElement('button');b.type='button';b.className='ui-btn';b.textContent=label;b.addEventListener('click',fn);return b;}
+  /* 代码框 + 复制图标（side: 'left' = 框内最左侧，'right' = 框内右上角） */
+  var ICON_COPY='<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
+  var ICON_DONE='<svg viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></svg>';
+  function copyIcon(getText){
+    var b=document.createElement('button');b.type='button';b.className='plugin-copy-ico';b.innerHTML=ICON_COPY;
+    var tip=apiLabel('copy');b.title=tip;b.setAttribute('aria-label',tip);b.setAttribute('data-ui-title','pluginApiCopy');
+    b.addEventListener('click',function(e){
+      e.stopPropagation();apiCopy(typeof getText==='function'?getText():getText);
+      b.classList.add('done');b.innerHTML=ICON_DONE;
+      window.setTimeout(function(){b.classList.remove('done');b.innerHTML=ICON_COPY;},1200);
+    });
+    return b;
+  }
+  function codeBox(codeEl,text,side){
+    var box=document.createElement('div');box.className='plugin-code-box '+(side||'left');
+    box.appendChild(copyIcon(text));box.appendChild(codeEl);return box;
+  }
+  window.pluginCopyCode=function(btn){
+    var box=btn&&btn.parentNode,c=box&&box.querySelector('code');if(!c)return;
+    apiCopy(c.textContent);btn.classList.add('done');btn.innerHTML=ICON_DONE;
+    window.setTimeout(function(){btn.classList.remove('done');btn.innerHTML=ICON_COPY;},1200);
+  };
   function apiCap(text){var d=document.createElement('div');d.className='plugin-api-lab';d.textContent=text;return d;}
   function renderApiDocs(){
     var panel=$('pluginApiDocs'),tools=$('pluginApiTools'),catalog=$('pluginApiCatalog');if(!panel||!tools||!catalog)return;
@@ -17087,10 +17121,7 @@ __UI_SCRIPT__
       var desc=document.createElement('p');desc.className='plugin-api-desc';desc.textContent=tx('pluginApiD'+i,a.desc);
       var sig=document.createElement('code');sig.className='plugin-api-code';sig.textContent=a.sig;
       var ex=document.createElement('pre');ex.className='plugin-api-code';var exc=document.createElement('code');exc.textContent=a.example;ex.appendChild(exc);
-      var actions=document.createElement('div');actions.className='plugin-api-actions';
-      actions.appendChild(apiBtn(apiLabel('copy'),function(){apiCopy(a.sig);}));
-      actions.appendChild(apiBtn(apiLabel('copyExample'),function(){apiCopy(a.example);}));
-      card.appendChild(name);card.appendChild(desc);card.appendChild(apiCap(apiLabel('signature')));card.appendChild(sig);card.appendChild(apiCap(apiLabel('example')));card.appendChild(ex);card.appendChild(actions);
+      card.appendChild(name);card.appendChild(desc);card.appendChild(apiCap(apiLabel('signature')));card.appendChild(codeBox(sig,a.sig,'left'));card.appendChild(apiCap(apiLabel('example')));card.appendChild(codeBox(ex,a.example,'left'));
       catalog.appendChild(card);
     });
   }
