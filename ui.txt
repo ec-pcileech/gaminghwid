@@ -8092,6 +8092,36 @@ html.store-detail-open #storeBackTop,html.store-detail-open #storeRecentToggle,h
   background:var(--err);border-radius:var(--radius-full);padding:1px 7px}
 /* ── 管理面板（管理员专用） ───────────────────────────────────────── */
 /* ═══════════ Lucky Wheel ═══════════ */
+/* ═══════════ 社区插件 ═══════════ */
+#communityPage[hidden]{display:none!important}
+.sb-comm{margin-left:auto;flex:0 0 auto;width:26px;height:26px;padding:0;border:0;background:none;box-shadow:none;color:var(--text-3);display:inline-grid;place-items:center;cursor:pointer;border-radius:6px;transition:color var(--tr-fast),transform var(--tr-fast)}
+.sb-comm svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sb-comm:hover{color:var(--accent-2);transform:scale(1.15)}
+.sb-comm.on{color:var(--accent-2)}
+.sb-comm:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.cm-status{display:flex;align-items:center;gap:10px;margin:0 2px 14px;min-height:22px;font-size:12.5px;color:var(--text-3)}
+.cm-spin{width:14px;height:14px;flex:0 0 auto;border-radius:50%;border:2px solid var(--border-2);border-top-color:var(--accent);animation:cmSpin .8s linear infinite}
+@keyframes cmSpin{to{transform:rotate(360deg)}}
+.cm-status.err{color:var(--err)}
+.cm-status .btn{height:28px;padding:0 12px;font-size:12px}
+.cm-card .plugin-item-desc{min-height:38px}
+.cm-perms{display:flex;flex-wrap:wrap;gap:6px;min-height:22px}
+.cm-chip{font:600 10.5px var(--font-mono);padding:3px 8px;border-radius:999px;background:var(--surface-2);color:var(--text-2);border:1px solid var(--border)}
+.cm-card .plugin-item-foot .btn svg{width:14px;height:14px;margin-right:6px;vertical-align:-2px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cm-card .plugin-item-foot .btn[disabled]{opacity:.65;pointer-events:none}
+.cm-card .cm-by{font-size:11.5px;color:var(--text-3);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cm-err .plugin-icon{background:rgba(239,68,68,.12);color:var(--err)}
+.cm-in{animation:cmIn .45s cubic-bezier(.2,.9,.3,1)}
+@keyframes cmIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.cm-skel{pointer-events:none}
+.cm-skel .plugin-item-name{color:var(--text-3);font-weight:600}
+.cm-skel .sk{position:relative;overflow:hidden;border-radius:8px;background:var(--surface-3)}
+.cm-skel .sk::after{content:"";position:absolute;inset:0;transform:translateX(-100%);background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);animation:cmShimmer 1.25s ease-in-out infinite}
+@keyframes cmShimmer{to{transform:translateX(100%)}}
+.cm-skel .sk-ico{width:36px;height:36px;border-radius:10px;flex:0 0 auto}
+.cm-skel .sk-line{height:11px;margin:7px 0}
+.cm-skel .sk-btn{width:96px;height:32px;border-radius:var(--radius-full)}
+@media (prefers-reduced-motion:reduce){.cm-skel .sk::after,.cm-in,.cm-spin{animation:none}}
 #wheelPage[hidden]{display:none!important}
 .wh-wrap{padding:24px 4px 40px;max-width:980px;margin:0 auto}
 .wh-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
@@ -9838,6 +9868,9 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
       <div class="sb-item" id="navPlugins" onclick="showPlugins()">
         <svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>
         <span data-ui="pluginMine">My plugins</span>
+        <button class="sb-comm" id="navCommunity" type="button" onclick="event.stopPropagation();showCommunity()" data-ui-title="cm_tip" title="Community plugins" aria-label="Community plugins">
+          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </button>
       </div>
       <div class="sb-sub" id="sbPluginGroup" hidden>
         <button class="sb-tab" id="navPluginTab" type="button" aria-expanded="false" aria-controls="sbPluginList" onclick="pluginTabToggle()">
@@ -10415,6 +10448,29 @@ return plugin;</code></pre></div>
           </button>
         </div>
         <div id="pluginViewHost"></div>
+      </div>
+    </div>
+
+    <!-- 社区插件：读取 GitHub 仓库 plugins 文件夹里的 .js，点击下载到本地 plugins 文件夹 -->
+    <div class="page" id="communityPage" hidden>
+      <div class="plugins-wrap">
+        <div class="admin-head">
+          <div>
+            <div class="admin-title" data-ui="cm_title">Community plugins</div>
+            <div class="admin-sub" data-ui="cm_sub">Plugins shared by the community. Download one to add it to your plugins folder.</div>
+          </div>
+          <div class="plugin-ico-row">
+            <button class="btn btn-ghost plugin-ico-btn" type="button" onclick="communityRefresh(true)" data-ui-title="cm_refresh" title="Refresh" aria-label="Refresh">
+              <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+            </button>
+            <button class="btn btn-ghost plugin-ico-btn" type="button" onclick="communityOpenRepo()" data-ui-title="cm_repo" title="Open on GitHub" aria-label="Open on GitHub">
+              <svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4 10 14"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="plugins-hint" data-ui="cm_warn">Community plugins are third-party code that runs inside this app. Only install plugins you trust.</div>
+        <div class="cm-status" id="cmStatus"></div>
+        <div class="plugin-list" id="cmList"></div>
       </div>
     </div>
 
@@ -14259,7 +14315,257 @@ __UI_SCRIPT__
   });
   window.addEventListener('focus', function(){ var pg = document.getElementById('wheelPage'); if (pg && !pg.hidden && !WH.spinning) wheelSend('prizes'); });
 
+  /* ═══════════ 社区插件（GitHub: ec-pcileech/gaminghwid → plugins/*.js）═══════════
+     · 先立刻出骨架卡（闪光动画），目录一到手就为每个文件建卡
+     · 4 路并发读每个 .js 的元数据；读好的卡排在最前，没读好的继续闪动排在后面
+     · 元数据按「文件名@sha」缓存，没改动的插件下次打开直接显示
+     · 点「下载」= 走「我的插件」同一条导入流程：写入 <APP 目录>\plugins\xxx.js 并登记 */
+  var CM_REPO = 'ec-pcileech/gaminghwid', CM_BRANCH = 'main', CM_DIR = 'plugins';
+  var CM_KEY = 'starline.community.v1', CM_TTL = 10 * 60 * 1000, CM_CONC = 4, CM_PH = 6;
+  var CM = { items: [], status: 'idle', err: '', run: 0, seq: 0, els: {}, raf: 0, shown: false };
+
+  (function(){
+    var codes = ["en", "zh", "ru", "de", "ja", "es", "tr", "pt"], TX = {"cm_tip": ["Community plugins", "社区插件", "Плагины сообщества", "Community-Plugins", "コミュニティプラグイン", "Plugins de la comunidad", "Topluluk eklentileri", "Plugins da comunidade"], "cm_title": ["Community plugins", "社区插件", "Плагины сообщества", "Community-Plugins", "コミュニティプラグイン", "Plugins de la comunidad", "Topluluk eklentileri", "Plugins da comunidade"], "cm_sub": ["Plugins shared by the community. Download one to add it to your plugins folder.", "来自社区分享的插件。点击下载，即可添加到本地 plugins 文件夹。", "Плагины от сообщества. Скачайте плагин, чтобы добавить его в папку plugins.", "Plugins aus der Community. Herunterladen, um sie in deinen plugins-Ordner zu legen.", "コミュニティが共有するプラグイン。ダウンロードすると plugins フォルダに追加されます。", "Plugins compartidos por la comunidad. Descarga uno para añadirlo a tu carpeta plugins.", "Topluluğun paylaştığı eklentiler. İndirerek plugins klasörüne ekle.", "Plugins compartilhados pela comunidade. Baixe um para adicioná-lo à sua pasta plugins."], "cm_refresh": ["Refresh", "刷新", "Обновить", "Aktualisieren", "更新", "Actualizar", "Yenile", "Atualizar"], "cm_repo": ["Open on GitHub", "在 GitHub 上打开", "Открыть на GitHub", "Auf GitHub öffnen", "GitHub で開く", "Abrir en GitHub", "GitHub'da aç", "Abrir no GitHub"], "cm_warn": ["Community plugins are third-party code that runs inside this app. Only install plugins you trust.", "社区插件是第三方代码，会在本程序内运行。请只安装你信任的插件。", "Плагины сообщества — это сторонний код, работающий внутри приложения. Устанавливайте только доверенные.", "Community-Plugins sind Fremdcode, der in dieser App läuft. Installiere nur vertrauenswürdige Plugins.", "コミュニティプラグインは第三者のコードで、このアプリ内で実行されます。信頼できるものだけをインストールしてください。", "Los plugins de la comunidad son código de terceros que se ejecuta dentro de la app. Instala solo los de confianza.", "Topluluk eklentileri üçüncü taraf koddur ve uygulama içinde çalışır. Yalnızca güvendiklerini kur.", "Plugins da comunidade são código de terceiros executado dentro do app. Instale apenas os de confiança."], "cm_download": ["Download", "下载", "Скачать", "Herunterladen", "ダウンロード", "Descargar", "İndir", "Baixar"], "cm_installed": ["Installed", "已安装", "Установлен", "Installiert", "インストール済み", "Instalado", "Yüklü", "Instalado"], "cm_update": ["Update", "更新", "Обновить", "Aktualisieren", "アップデート", "Actualizar", "Güncelle", "Atualizar"], "cm_downloading": ["Downloading…", "下载中…", "Загрузка…", "Lädt herunter…", "ダウンロード中…", "Descargando…", "İndiriliyor…", "Baixando…"], "cm_fetching": ["Connecting to GitHub…", "正在连接 GitHub…", "Подключение к GitHub…", "Verbindung zu GitHub…", "GitHub に接続中…", "Conectando con GitHub…", "GitHub'a bağlanılıyor…", "Conectando ao GitHub…"], "cm_loadingN": ["Loading plugins… {done}/{total}", "正在读取插件… {done}/{total}", "Загрузка плагинов… {done}/{total}", "Plugins werden geladen… {done}/{total}", "プラグインを読み込み中… {done}/{total}", "Cargando plugins… {done}/{total}", "Eklentiler yükleniyor… {done}/{total}", "Carregando plugins… {done}/{total}"], "cm_count": ["{n} plugins", "共 {n} 个插件", "Плагинов: {n}", "{n} Plugins", "{n} 個のプラグイン", "{n} plugins", "{n} eklenti", "{n} plugins"], "cm_empty": ["No community plugins found.", "没有找到社区插件。", "Плагины сообщества не найдены.", "Keine Community-Plugins gefunden.", "コミュニティプラグインが見つかりません。", "No se encontraron plugins de la comunidad.", "Topluluk eklentisi bulunamadı.", "Nenhum plugin da comunidade encontrado."], "cm_err": ["Could not load the community list. Check your connection and try again.", "无法加载社区列表，请检查网络后重试。", "Не удалось загрузить список. Проверьте подключение и повторите.", "Liste konnte nicht geladen werden. Verbindung prüfen und erneut versuchen.", "リストを読み込めませんでした。接続を確認して再試行してください。", "No se pudo cargar la lista. Revisa tu conexión e inténtalo de nuevo.", "Liste yüklenemedi. Bağlantını kontrol edip tekrar dene.", "Não foi possível carregar a lista. Verifique a conexão e tente novamente."], "cm_retry": ["Retry", "重试", "Повторить", "Erneut versuchen", "再試行", "Reintentar", "Tekrar dene", "Tentar de novo"], "cm_fail": ["Download failed", "下载失败", "Не удалось скачать", "Download fehlgeschlagen", "ダウンロードに失敗しました", "Error al descargar", "İndirme başarısız", "Falha no download"], "cm_noDesc": ["No description", "暂无简介", "Нет описания", "Keine Beschreibung", "説明なし", "Sin descripción", "Açıklama yok", "Sem descrição"], "cm_perms": ["Permissions", "权限", "Разрешения", "Berechtigungen", "権限", "Permisos", "İzinler", "Permissões"], "cm_unreadable": ["Could not read this plugin.", "读取这个插件失败。", "Не удалось прочитать плагин.", "Plugin konnte nicht gelesen werden.", "このプラグインを読み込めませんでした。", "No se pudo leer este plugin.", "Bu eklenti okunamadı.", "Não foi possível ler este plugin."], "cm_by": ["by {a}", "作者 {a}", "автор: {a}", "von {a}", "作者: {a}", "por {a}", "yazar: {a}", "por {a}"]};
+    Object.keys(TX).forEach(function(k){
+      codes.forEach(function(c, i){
+        if (typeof UI_T !== 'undefined' && UI_T[c] && typeof TX[k][i] === 'string' && TX[k][i] !== '') { UI_T[c][k] = TX[k][i]; }
+      });
+    });
+    try { if (typeof uiRenderI18n === 'function') uiRenderI18n(); } catch (e) {}
+  })();
+
+  function cmT(k){ var v = uiT('cm_' + k); return v === 'cm_' + k ? k : v; }
+  function cmEsc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function cmStem(name){ return String(name).replace(/\.js$/i, '').replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^[.-]+/, '').replace(/\.{2,}/g, '.').slice(0, 60) || 'plugin'; }
+  function cmSize(n){ n = n | 0; return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : (n >= 1024 ? Math.round(n / 1024) + ' KB' : n + ' B'); }
+
+  function cmFetch(url, ms, asJson){
+    return new Promise(function(res, rej){
+      var ctl = window.AbortController ? new AbortController() : null;
+      var tm = setTimeout(function(){ if (ctl) ctl.abort(); rej(new Error('timeout')); }, ms || 12000);
+      fetch(url, { cache: 'no-store', credentials: 'omit', signal: ctl ? ctl.signal : undefined })
+        .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return asJson ? r.json() : r.text(); })
+        .then(function(v){ clearTimeout(tm); res(v); }, function(e){ clearTimeout(tm); rej(e); });
+    });
+  }
+  function cmFirst(urls, ms, asJson){      /* 依次尝试多个源（raw.githubusercontent → jsDelivr），第一个成功的为准 */
+    var i = 0, last = null;
+    return new Promise(function(res, rej){
+      (function go(){
+        if (i >= urls.length) { rej(last || new Error('failed')); return; }
+        cmFetch(urls[i++], ms, asJson).then(res, function(e){ last = e; go(); });
+      })();
+    });
+  }
+  function cmUrls(name){
+    var p = encodeURIComponent(name);
+    return ['https://raw.githubusercontent.com/' + CM_REPO + '/' + CM_BRANCH + '/' + CM_DIR + '/' + p,
+            'https://cdn.jsdelivr.net/gh/' + CM_REPO + '@' + CM_BRANCH + '/' + CM_DIR + '/' + p];
+  }
+  function cmFetchList(){
+    var api = 'https://api.github.com/repos/' + CM_REPO + '/contents/' + CM_DIR + '?ref=' + CM_BRANCH;
+    return cmFetch(api, 10000, true).then(function(a){
+      if (!Array.isArray(a)) throw new Error('bad list');
+      return a.filter(function(f){ return f && f.type === 'file' && /\.js$/i.test(f.name); })
+              .map(function(f){ return { name: f.name, size: f.size | 0, sha: String(f.sha || f.size) }; });
+    }).catch(function(){                         /* GitHub API 被限流 / 打不开 → 退到 jsDelivr 的文件清单 */
+      var jd = 'https://data.jsdelivr.com/v1/packages/gh/' + CM_REPO + '@' + CM_BRANCH + '?structure=flat';
+      return cmFetch(jd, 10000, true).then(function(d){
+        var pre = '/' + CM_DIR + '/', out = [];
+        (d.files || []).forEach(function(f){
+          var n = String(f.name || ''); if (n.indexOf(pre) !== 0) return;
+          var rest = n.slice(pre.length); if (rest.indexOf('/') >= 0 || !/\.js$/i.test(rest)) return;
+          out.push({ name: rest, size: f.size | 0, sha: String(f.hash || f.size) });
+        });
+        return out;
+      });
+    });
+  }
+
+  /* 只用正则读头部元数据，不执行任何代码 */
+  function cmPick(src, k){
+    var re = new RegExp('(?:^|[\\s,{])' + k + '\\s*:\\s*(?:\'((?:\\\\.|[^\'\\\\\\n])*)\'|"((?:\\\\.|[^"\\\\\\n])*)"|`([^`]*)`)');
+    var m = re.exec(src); if (!m) return '';
+    return String(m[1] != null ? m[1] : (m[2] != null ? m[2] : m[3])).replace(/\\(.)/g, '$1').trim();
+  }
+  function cmMeta(src, file){
+    var head = String(src || '').slice(0, 8000), perms = [], m = /permissions\s*:\s*\[([^\]]*)\]/.exec(head);
+    if (m) { var re = /['"`]([^'"`]+)['"`]/g, x; while ((x = re.exec(m[1]))) { if (perms.length < 12) perms.push(x[1]); } }
+    var stem = String(file).replace(/\.js$/i, '');
+    return { id: cmPick(head, 'id') || stem.toLowerCase(), name: cmPick(head, 'name') || stem, version: cmPick(head, 'version') || '',
+             description: cmPick(head, 'description'), author: cmPick(head, 'author'), permissions: perms };
+  }
+
+  function cmCacheGet(){ try { return JSON.parse(localStorage.getItem(CM_KEY) || 'null') || null; } catch (e) { return null; } }
+  function cmCacheSet(files, metaMap){ try { localStorage.setItem(CM_KEY, JSON.stringify({ t: Date.now(), files: files, meta: metaMap })); } catch (e) {} }
+  function cmMetaMap(){ var o = {}; CM.items.forEach(function(it){ if (it.status === 'ready' && it.meta) o[it.name + '@' + it.sha] = it.meta; }); return o; }
+
+  /* ── 加载 ── */
+  function communityRefresh(force){ communityLoad(!!force); }
+  function communityLoad(force){
+    var run = ++CM.run, cache = cmCacheGet(), fresh = cache && (Date.now() - cache.t < CM_TTL);
+    CM.err = '';
+    function build(files, metaOld, fromNet){
+      CM.items = files.map(function(f){
+        var m = metaOld && metaOld[f.name + '@' + f.sha], it = { name: f.name, size: f.size, sha: f.sha, status: m ? 'ready' : 'loading', meta: m || null, source: '', seq: 0, busy: false };
+        return it;
+      });
+      CM.items.filter(function(it){ return it.status === 'ready'; }).forEach(function(it){ it.seq = ++CM.seq; });   /* 缓存里已有的最先显示 */
+      CM.status = CM.items.length ? 'loading' : 'empty';
+      if (fromNet) cmCacheSet(files, metaOld || {});     /* 刚从网络拿到的列表：记下时间，避免每次打开都重新请求 */
+      cmSchedule(); cmLoadBodies(run);
+    }
+    if (!force && fresh && cache.files) { build(cache.files, cache.meta); return; }
+    if (!CM.items.length || force) { CM.items = []; }
+    CM.status = 'listing'; cmSchedule();
+    cmFetchList().then(function(files){
+      if (run !== CM.run) return;
+      build(files, cache && cache.meta, true);
+    }).catch(function(e){
+      if (run !== CM.run) return;
+      if (cache && cache.files && cache.files.length) { build(cache.files, cache.meta); return; }   /* 网络不通：用上次的列表 */
+      CM.status = 'error'; CM.err = (e && e.message) || ''; cmSchedule();
+    });
+  }
+  function cmLoadBodies(run){
+    var q = CM.items.filter(function(it){ return it.status === 'loading'; }), idx = 0, active = 0, fetched = q.length;
+    function done(){
+      if (run !== CM.run) return;
+      if (!CM.items.some(function(it){ return it.status === 'loading'; })) { CM.status = 'done'; if (fetched) cmCacheSet(CM.items.map(function(i){ return { name: i.name, size: i.size, sha: i.sha }; }), cmMetaMap()); }
+      cmSchedule();
+    }
+    function next(){
+      if (run !== CM.run) return;
+      if (!q.length) { done(); return; }
+      while (active < CM_CONC && idx < q.length) {
+        (function(it){
+          active++;
+          cmFirst(cmUrls(it.name), 12000, false).then(function(src){
+            if (run !== CM.run) return;
+            it.source = src; it.meta = cmMeta(src, it.name); it.status = 'ready'; it.seq = ++CM.seq;
+          }).catch(function(){ if (run === CM.run) it.status = 'error'; })
+            .then(function(){ active--; if (run !== CM.run) return; cmSchedule(); if (idx >= q.length && active === 0) done(); else next(); });
+        })(q[idx++]);
+      }
+    }
+    next();
+  }
+
+  /* ── 渲染（按元素复用，只给「刚读好」的卡播放入场动画）── */
+  function cmSchedule(){ if (CM.raf) return; CM.raf = requestAnimationFrame(function(){ CM.raf = 0; try { cmRender(); } catch (e) {} }); }
+  function cmInstalled(){ try { return typeof window.pluginInstalledList === 'function' ? window.pluginInstalledList() : []; } catch (e) { return []; } }
+  function cmSkelHtml(name){
+    return '<div class="plugin-item-head"><div class="sk sk-ico"></div><div class="plugin-item-info"><div class="plugin-item-name">' + cmEsc(name || '') + '</div><div class="sk sk-line" style="width:46%"></div></div></div>' +
+      '<div><div class="sk sk-line" style="width:92%"></div><div class="sk sk-line" style="width:64%"></div></div>' +
+      '<div class="plugin-item-foot"><span class="spacer"></span><div class="sk sk-btn"></div></div>';
+  }
+  var ICON_DL = '<svg viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></svg>';
+  var ICON_PLG = '<svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg>';
+  function cmCardHtml(it, inst){
+    var m = it.meta || {}, state = 'dl';
+    if (inst) state = (m.version && inst.version && String(inst.version) !== String(m.version)) ? 'up' : 'ok';
+    var btn;
+    if (it.busy) btn = '<button class="btn btn-primary" type="button" disabled><span class="cm-spin" style="display:inline-block;vertical-align:-3px;margin-right:6px;width:12px;height:12px"></span>' + cmEsc(cmT('downloading')) + '</button>';
+    else if (state === 'ok') btn = '<button class="btn btn-ghost" type="button" disabled>' + cmEsc(cmT('installed')) + '</button>';
+    else btn = '<button class="btn btn-primary" type="button" data-act="dl" data-name="' + cmEsc(it.name) + '">' + ICON_DL + cmEsc(state === 'up' ? cmT('update') : cmT('download')) + '</button>';
+    if (it.status === 'error') {
+      return '<div class="plugin-item-head"><div class="plugin-icon">' + ICON_PLG + '</div><div class="plugin-item-info"><div class="plugin-item-name">' + cmEsc(it.name.replace(/\.js$/i, '')) + '</div><div class="plugin-item-meta">' + cmEsc(it.name) + '</div></div></div>' +
+        '<div class="plugin-item-err">' + cmEsc(cmT('unreadable')) + '</div>' +
+        '<div class="plugin-item-foot"><span class="spacer"></span><button class="btn btn-ghost" type="button" data-act="retry" data-name="' + cmEsc(it.name) + '">' + cmEsc(cmT('retry')) + '</button></div>';
+    }
+    var chips = (m.permissions || []).map(function(p){ return '<span class="cm-chip">' + cmEsc(p) + '</span>'; }).join('');
+    return '<div class="plugin-item-head"><div class="plugin-icon">' + ICON_PLG + '</div><div class="plugin-item-info"><div class="plugin-item-name">' + cmEsc(m.name || it.name) + '</div>' +
+      '<div class="plugin-item-meta">' + cmEsc((m.version ? 'v' + m.version + ' · ' : '') + it.name + ' · ' + cmSize(it.size)) + '</div></div></div>' +
+      '<div class="plugin-item-desc">' + cmEsc(m.description || cmT('noDesc')) + '</div>' +
+      '<div class="cm-perms" title="' + cmEsc(cmT('perms')) + '">' + chips + '</div>' +
+      '<div class="plugin-item-foot"><span class="cm-by">' + cmEsc(m.author ? cmT('by').replace('{a}', m.author) : '') + '</span><span class="spacer"></span>' + btn + '</div>';
+  }
+  function cmRender(){
+    var list = document.getElementById('cmList'), st = document.getElementById('cmStatus'); if (!list) return;
+    var want = [];
+    if (CM.status === 'listing' || (CM.status === 'idle')) { for (var i = 0; i < CM_PH; i++) want.push({ key: 'ph' + i, kind: 'ph' }); }
+    else {
+      var rd = CM.items.filter(function(x){ return x.status === 'ready'; }).sort(function(a, b){ return a.seq - b.seq; });
+      var er = CM.items.filter(function(x){ return x.status === 'error'; });
+      var ld = CM.items.filter(function(x){ return x.status === 'loading'; });
+      rd.concat(er, ld).forEach(function(x){ want.push({ key: x.name, kind: x.status, it: x }); });
+    }
+    var inst = cmInstalled(), keep = {};
+    want.forEach(function(w, idx){
+      keep[w.key] = 1;
+      var el = CM.els[w.key], isNew = !el, mi = null;
+      if (w.kind === 'ready' || w.kind === 'error') {
+        var m = w.it.meta || {}, stem = cmStem(w.it.name);
+        for (var k = 0; k < inst.length; k++) { if (inst[k].id === m.id || inst[k].file === stem) { mi = inst[k]; break; } }
+      }
+      var sig = w.kind + '|' + (w.it ? (w.it.busy ? 'b' : '') + (mi ? 'i' + mi.version : '') + '|' + ((w.it.meta && w.it.meta.version) || '') : '') + '|' + (typeof uiState !== 'undefined' ? uiState.lang : '');
+      if (!el) { el = document.createElement('div'); CM.els[w.key] = el; el.setAttribute('data-key', w.key); }
+      if (el._sig !== sig) {
+        var prevKind = el._kind;
+        el._sig = sig; el._kind = w.kind;
+        el.className = 'plugin-item ' + (w.kind === 'ph' || w.kind === 'loading' ? 'cm-skel' : 'cm-card' + (w.kind === 'error' ? ' cm-err' : ''));
+        el.innerHTML = (w.kind === 'ph') ? cmSkelHtml('') : (w.kind === 'loading' ? cmSkelHtml(w.it.name.replace(/\.js$/i, '')) : cmCardHtml(w.it, mi));
+        if (w.kind === 'ready' && prevKind === 'loading') { el.classList.add('cm-in'); setTimeout(function(e){ e.classList.remove('cm-in'); }.bind(null, el), 600); }
+      }
+      if (list.children[idx] !== el) list.insertBefore(el, list.children[idx] || null);
+    });
+    Object.keys(CM.els).forEach(function(k){ if (!keep[k]) { var e = CM.els[k]; if (e.parentNode) e.parentNode.removeChild(e); delete CM.els[k]; } });
+    /* 状态行 */
+    if (!st) return;
+    var total = CM.items.length, ready = CM.items.filter(function(x){ return x.status !== 'loading'; }).length;
+    st.className = 'cm-status';
+    if (CM.status === 'listing' || CM.status === 'idle') st.innerHTML = '<span class="cm-spin"></span><span>' + cmEsc(cmT('fetching')) + '</span>';
+    else if (CM.status === 'loading') st.innerHTML = '<span class="cm-spin"></span><span>' + cmEsc(cmT('loadingN').replace('{done}', ready).replace('{total}', total)) + '</span>';
+    else if (CM.status === 'error') { st.className = 'cm-status err'; st.innerHTML = '<span>' + cmEsc(cmT('err')) + '</span><button class="btn btn-ghost" type="button" data-act="reload">' + cmEsc(cmT('retry')) + '</button>'; }
+    else if (CM.status === 'empty') st.innerHTML = '<span>' + cmEsc(cmT('empty')) + '</span>';
+    else st.innerHTML = '<span>' + cmEsc(cmT('count').replace('{n}', total)) + '</span>';
+  }
+  function communityRerender(){ Object.keys(CM.els).forEach(function(k){ CM.els[k]._sig = ''; }); cmSchedule(); }
+
+  /* ── 下载 = 走「我的插件」导入流程 ── */
+  function cmDownload(name){
+    var it = null; CM.items.forEach(function(x){ if (x.name === name) it = x; });
+    if (!it || it.busy) return;
+    it.busy = true; cmSchedule();
+    (it.source ? Promise.resolve(it.source) : cmFirst(cmUrls(name), 15000, false).then(function(s){ it.source = s; return s; }))
+      .then(function(src){
+        if (typeof window.pluginImportSource !== 'function') throw new Error('plugin module not ready');
+        window.pluginImportSource(it.name, src);
+      })
+      .catch(function(e){ toast(cmT('fail') + (e && e.message ? ': ' + e.message : ''), 'err', 4500); })
+      .then(function(){ it.busy = false; cmSchedule(); });
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target && e.target.closest ? e.target.closest('#communityPage [data-act]') : null; if (!b) return;
+    var act = b.getAttribute('data-act'), name = b.getAttribute('data-name');
+    if (act === 'dl') cmDownload(name);
+    else if (act === 'reload') communityLoad(true);
+    else if (act === 'retry') {
+      CM.items.forEach(function(x){ if (x.name === name && x.status === 'error') { x.status = 'loading'; } });
+      CM.status = 'loading'; cmSchedule(); cmLoadBodies(CM.run);
+    }
+  });
+  document.addEventListener('starline-plugins-changed', function(){ if (CM.shown) cmSchedule(); });
+  function communityOpenRepo(){ wv('OPEN_URL:https://github.com/' + CM_REPO + '/tree/' + CM_BRANCH + '/' + CM_DIR); }
+
+  function showCommunity(){
+    closeDetail();
+    document.querySelectorAll('.page').forEach(function(p){ p.hidden = true; });
+    if (typeof wheelHide === 'function') wheelHide();
+    document.getElementById('communityPage').hidden = false;
+    document.querySelectorAll('.sb-item').forEach(function(b){ b.classList.toggle('active', b.id === 'navPlugins'); });
+    var cb = document.getElementById('navCommunity'); if (cb) cb.classList.add('on');
+    CM.shown = true;
+    if (CM.status === 'idle' || CM.status === 'error') communityLoad(false); else { communityRerender(); }
+  }
+  function communityHide(){
+    CM.shown = false;
+    var pg = document.getElementById('communityPage'); if (pg) pg.hidden = true;
+    var cb = document.getElementById('navCommunity'); if (cb) cb.classList.remove('on');
+  }
+
   function setActiveNav(id){
+    communityHide();
     if (id !== 'navWheel') wheelHide();
     document.querySelectorAll('.sb-tab.active,.sb-sub-item.active').forEach(function(e){e.classList.remove('active');});
     document.querySelectorAll('.sb-item').forEach(function(b){
@@ -14353,7 +14659,8 @@ __UI_SCRIPT__
 
 
   function onUiLangChanged(){
-    if (typeof wheelApplyText === 'function') { try { wheelApplyText(); } catch (e) {} }   /* Lucky Wheel 页实时跟着语言走 */
+    if (typeof wheelApplyText === 'function') { try { wheelApplyText(); } catch (e) {} }
+    if (typeof communityRerender === 'function') { try { communityRerender(); } catch (e) {} }   /* Lucky Wheel 页实时跟着语言走 */
     if (CURRENT_GAME && GAMES[CURRENT_GAME]) {
       renderDetailTexts(CURRENT_GAME);
       renderDetailHeroButtons(CURRENT_GAME);
@@ -16334,7 +16641,7 @@ __UI_SCRIPT__
       getThemeTokens:function(){var s=getComputedStyle(document.documentElement);var tokens={bg:s.getPropertyValue('--surface').trim()||'#111',fg:s.getPropertyValue('--text').trim()||'#fff',border:s.getPropertyValue('--border-2').trim()||'#333',primary:s.getPropertyValue('--primary').trim()||'#6d8cff',radius:s.getPropertyValue('--radius').trim()||'12px',fontFamily:s.getPropertyValue('--font').trim()||'sans-serif'};Object.keys(tokens).forEach(function(k){document.documentElement.style.setProperty('--starline-'+k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();}),tokens[k]);});return tokens;},
       getLanguage:function(){return document.documentElement.getAttribute('lang')||'en';},
       setLanguage:function(code){requirePermission('language');code=String(code||'');if(typeof window.uiSetLang==='function'){window.uiSetLang(code,true);return true;}if(typeof window.setLang==='function'){window.setLang(code);if(typeof window.uiSend==='function')window.uiSend('UI_LANG:'+code);return true;}return false;},
-      getPage:function(){var ids=['storePage','profilePage','pluginsPage','pluginViewPage','adminPage','wheelPage','uiSettingsView','ctView'];for(var i=0;i<ids.length;i++){var e=$(ids[i]);if(e&&!e.hidden)return ids[i].replace(/Page|View/g,'').toLowerCase();}return 'unknown';},
+      getPage:function(){var ids=['storePage','profilePage','pluginsPage','pluginViewPage','adminPage','wheelPage','communityPage','uiSettingsView','ctView'];for(var i=0;i<ids.length;i++){var e=$(ids[i]);if(e&&!e.hidden)return ids[i].replace(/Page|View/g,'').toLowerCase();}return 'unknown';},
       navigate:function(page){requirePermission('navigation');page=String(page||'').toLowerCase();if(page==='store'&&window.showStore){window.showStore();return true;}if(page==='profile'&&window.showProfile){window.showProfile();return true;}if(page==='plugins'&&window.showPlugins){window.showPlugins();return true;}if(page==='plugin'&&window.pluginOpen){window.pluginOpen(rec.id);return true;}window.dispatchEvent(new CustomEvent('starline:navigate',{detail:{page:page,pluginId:rec.id}}));return false;},
       addPanel:function(spec){spec=spec||{};var host=widgetsHost();if(!host)return null;var el=document.createElement('section');el.className='plugin-card';var title=document.createElement('div');title.className='plugin-card-title';title.textContent=String(spec.title||rec.name);var body=document.createElement('div');body.className='plugin-render';el.append(title,body);host.appendChild(el);trackedNode(el);var h=handleFor(el,body);panelHandles.push(h);if(typeof spec.render==='function')safeCall(spec.render,[body,api]);updateStats();return h;},
       addButton:function(label,fn,container){var b=document.createElement('button');b.type='button';b.className='ui-btn';b.textContent=String(label);b.addEventListener('click',function(e){safeCall(fn,[e,api]);});(container||widgetsHost()||document.body).appendChild(b);trackedNode(b);var removed=false;b.element=b;b.disable=function(){b.disabled=true;};b.enable=function(){b.disabled=false;};b.remove=function(){if(removed)return false;removed=true;removeNode(b);return true;};b.setLabel=function(text){if(!removed)b.textContent=String(text);return !removed;};updateStats();return b;},
@@ -16697,7 +17004,7 @@ __UI_SCRIPT__
     if(!rec.enabled){toast(t('pluginEnableFirst'));return;}
     if(typeof closeDetail==='function')closeDetail();
     selectedPluginId=id;
-    ['storePage','profilePage','adminPage','pluginsPage','wheelPage'].forEach(hidePage);
+    ['storePage','profilePage','adminPage','pluginsPage','wheelPage','communityPage'].forEach(hidePage);if(window.communityHide)communityHide();
     var vp=$('pluginViewPage');if(!vp)return;
     vp.hidden=false;try{vp.scrollTop=0;}catch(e){}
     document.querySelectorAll('.sb-item').forEach(function(b){b.classList.remove('active');});
@@ -16980,6 +17287,7 @@ __UI_SCRIPT__
         hostSend('UI_PLUGINFILE:'+rec.file+'.js\x1f'+source);
       }
       installed.push(rec);write();render();
+      try{document.dispatchEvent(new Event('starline-plugins-changed'));}catch(e3){}
       toast(t('pluginImported')+rec.name,'ok',6000,{action:{label:t('pluginEnableNow'),run:function(){
         if(rec.enabled||!byId(rec.id))return;
         enableRec(rec);
@@ -16987,10 +17295,12 @@ __UI_SCRIPT__
     }
     if(old){dialogBox('confirm',t('pluginExists'),{title:rec.name},'').then(function(ok){if(ok)commit();});}else{commit();}
   }
+  window.pluginImportSource=importSource;   /* 社区插件下载后走同一条导入流程 */
+  window.pluginInstalledList=function(){return installed.map(function(x){return {id:x.id,version:x.version,file:x.file||''};});};
   function importFile(file){if(!file)return;var reader=new FileReader();reader.onload=function(){importSource(file.name,String(reader.result||''));};reader.onerror=function(){toast(t('pluginReadError'));};reader.readAsText(file,'utf-8');}
   window.showPlugins=function(){
     if(typeof closeDetail==='function')closeDetail();
-    ['storePage','profilePage','adminPage','pluginViewPage','wheelPage'].forEach(hidePage);
+    ['storePage','profilePage','adminPage','pluginViewPage','wheelPage','communityPage'].forEach(hidePage);if(window.communityHide)communityHide();
     var pp=$('pluginsPage');if(pp)pp.hidden=false;
     document.querySelectorAll('.sb-item').forEach(function(b){b.classList.toggle('active',b.id==='navPlugins');});
     render();
