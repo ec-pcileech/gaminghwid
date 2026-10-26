@@ -9740,6 +9740,27 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
 .plugin-dialog{width:min(420px,100%);background:var(--surface-solid);box-shadow:var(--shadow-3)}
 .plugin-dialog h3{margin:0 0 10px;font-size:15px;font-weight:700;letter-spacing:-.2px;overflow-wrap:anywhere}
 .plugin-dialog p{margin:0 0 14px;white-space:pre-wrap;font-size:13px;line-height:1.6;color:var(--text-2);overflow-wrap:anywhere}
+.plugin-ico-row{display:flex;gap:8px;align-items:center;justify-content:flex-end}
+.plugin-ico-btn{width:40px;height:40px;padding:0!important;display:inline-grid!important;place-items:center;border-radius:12px!important}
+.plugin-ico-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.plugin-editor-overlay{z-index:2147483600}
+.plugin-editor{width:min(940px,100%);height:min(780px,calc(100vh - 40px));display:flex;flex-direction:column;padding:0!important;overflow:hidden;background:var(--surface-solid);box-shadow:var(--shadow-3)}
+.pe-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.pe-head h3{margin:0!important;font-size:15px}
+.pe-file{font:12px 'Cascadia Mono',Consolas,monospace;color:var(--text-3)}
+.pe-name{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2)}
+.pe-name input{width:190px}
+.pe-name em{font-style:normal;color:var(--text-3)}
+.pe-x{margin-left:auto;width:34px;height:34px;padding:0!important;display:inline-grid!important;place-items:center;border-radius:10px!important}
+.pe-x svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.pe-wrap{flex:1;min-height:0;display:flex;background:rgba(0,0,0,.28);font:13px/1.6 'Cascadia Mono',Consolas,'JetBrains Mono',monospace}
+.pe-gut{margin:0;padding:12px 10px 12px 14px;min-width:46px;text-align:right;color:var(--text-3);overflow:hidden;user-select:none;border-right:1px solid var(--border);white-space:pre;font:inherit}
+.pe-ta{flex:1;min-width:0;border:0;outline:none;resize:none;padding:12px 16px;background:transparent;color:var(--text);font:inherit;tab-size:2;white-space:pre;overflow:auto}
+.pe-foot{display:flex;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--border)}
+.pe-status{font-size:12px;color:var(--text-3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.pe-status.ok{color:var(--ok,#3ecf8e)}
+.pe-status.err{color:#ff6b6b}
+.pe-live{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-2);flex:0 0 auto}
 .plugin-dialog .ui-input{width:100%;box-sizing:border-box;margin-bottom:14px}
 .plugin-dialog-row{display:flex;justify-content:flex-end;gap:8px}
 
@@ -10298,18 +10319,18 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
             <div class="admin-title" data-ui="pluginMine">My plugins</div>
             <div class="admin-sub" data-ui="pluginHeroSub">Import, enable and manage extensions. Plugins can add their own panels and interactions.</div>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
-            <button class="btn btn-ghost" type="button" onclick="pluginOpenFolder()">
+          <div class="plugin-ico-row">
+            <button class="btn btn-ghost plugin-ico-btn" type="button" onclick="pluginNew()" data-ui-title="pluginNew" title="New plugin" aria-label="New plugin">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            <button class="btn btn-ghost plugin-ico-btn" type="button" onclick="pluginOpenFolder()" data-ui-title="pluginOpenFolder" title="Open plugins folder" aria-label="Open plugins folder">
               <svg viewBox="0 0 24 24"><path d="M4 5h6l2 2h8v12H4z"/></svg>
-              <span data-ui="pluginOpenFolder">Open plugins folder</span>
             </button>
-            <button class="btn btn-ghost" type="button" onclick="pluginReload()">
+            <button class="btn btn-ghost plugin-ico-btn" type="button" onclick="pluginReload()" data-ui-title="pluginReload" title="Reload plugins" aria-label="Reload plugins">
               <svg viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
-              <span data-ui="pluginReload">Reload plugins</span>
             </button>
-            <button class="btn btn-primary" type="button" onclick="document.getElementById('pluginFileInput').click()">
+            <button class="btn btn-ghost plugin-ico-btn" type="button" onclick="document.getElementById('pluginFileInput').click()" data-ui-title="pluginImport" title="Import plugin" aria-label="Import plugin">
               <svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>
-              <span data-ui="pluginImport">Import plugin</span>
             </button>
           </div>
         </div>
@@ -16696,6 +16717,181 @@ __UI_SCRIPT__
       write();render();toast(t('pluginUninstalled')+rec.name);
     });
   }
+  /* ═════════ 插件代码编辑器：居中弹窗，实时校验 / 实时应用；「创建新插件」也用它 ═════════ */
+  if(typeof uiAddT==='function')uiAddT({
+    pluginNew:["New plugin","创建新插件","Новый плагин","Neues Plugin","新しいプラグイン","Nuevo plugin","Yeni eklenti","Novo plugin"],
+    pluginEdit:["Edit","编辑","Изменить","Bearbeiten","編集","Editar","Düzenle","Editar"],
+    pluginEditTitle:["Edit plugin","编辑插件","Редактирование плагина","Plugin bearbeiten","プラグインを編集","Editar plugin","Eklentiyi düzenle","Editar plugin"],
+    pluginNewTitle:["Create plugin","创建插件","Создать плагин","Plugin erstellen","プラグインを作成","Crear plugin","Eklenti oluştur","Criar plugin"],
+    pluginFileName:["File name","文件名","Имя файла","Dateiname","ファイル名","Nombre de archivo","Dosya adı","Nome do arquivo"],
+    pluginLive:["Live apply","实时应用","Применять сразу","Live anwenden","リアルタイム適用","Aplicar al instante","Canlı uygula","Aplicar ao vivo"],
+    pluginSave:["Save","保存","Сохранить","Speichern","保存","Guardar","Kaydet","Salvar"],
+    pluginCreate:["Create","创建","Создать","Erstellen","作成","Crear","Oluştur","Criar"],
+    pluginClose:["Close","关闭","Закрыть","Schließen","閉じる","Cerrar","Kapat","Fechar"],
+    pluginSyntaxOk:["Syntax OK","语法正确","Синтаксис в порядке","Syntax OK","構文は正常です","Sintaxis correcta","Sözdizimi doğru","Sintaxe OK"],
+    pluginSyntaxErr:["Syntax error: {e}","语法错误：{e}","Синтаксическая ошибка: {e}","Syntaxfehler: {e}","構文エラー：{e}","Error de sintaxis: {e}","Sözdizimi hatası: {e}","Erro de sintaxe: {e}"],
+    pluginSavedAt:["Saved {t}","已保存 {t}","Сохранено {t}","Gespeichert {t}","保存しました {t}","Guardado {t}","Kaydedildi {t}","Salvo {t}"],
+    pluginAppliedAt:["Applied {t}","已应用 {t}","Применено {t}","Angewendet {t}","適用しました {t}","Aplicado {t}","Uygulandı {t}","Aplicado {t}"],
+    pluginDiscard:["Discard unsaved changes?","放弃未保存的修改？","Отменить несохранённые изменения?","Ungespeicherte Änderungen verwerfen?","未保存の変更を破棄しますか？","¿Descartar los cambios sin guardar?","Kaydedilmemiş değişiklikler silinsin mi?","Descartar alterações não salvas?"],
+    pluginExists:["A plugin with this id or file name already exists","已存在相同 ID 或文件名的插件","Плагин с таким id или именем файла уже есть","Ein Plugin mit dieser ID oder diesem Dateinamen existiert bereits","同じ ID またはファイル名のプラグインが既にあります","Ya existe un plugin con ese id o nombre de archivo","Bu kimlik veya dosya adıyla bir eklenti zaten var","Já existe um plugin com este id ou nome de arquivo"],
+    pluginEditorHint:["Tab = indent · Ctrl+S = save · Esc = close","Tab 缩进 · Ctrl+S 保存 · Esc 关闭","Tab — отступ · Ctrl+S — сохранить · Esc — закрыть","Tab = Einrücken · Strg+S = Speichern · Esc = Schließen","Tab: インデント · Ctrl+S: 保存 · Esc: 閉じる","Tab = sangría · Ctrl+S = guardar · Esc = cerrar","Tab = girinti · Ctrl+S = kaydet · Esc = kapat","Tab = recuo · Ctrl+S = salvar · Esc = fechar"],
+    pluginAskConsent:["Saved. Enable the plugin again to grant its new permissions.","已保存。权限发生变化，请重新启用插件并确认权限。","Сохранено. Включите плагин снова, чтобы подтвердить новые права.","Gespeichert. Aktiviere das Plugin erneut, um neue Rechte zu bestätigen.","保存しました。新しい権限を許可するには、プラグインを再度有効にしてください。","Guardado. Vuelve a activar el plugin para conceder los nuevos permisos.","Kaydedildi. Yeni izinleri onaylamak için eklentiyi yeniden etkinleştirin.","Salvo. Ative o plugin novamente para conceder as novas permissões."]
+  });
+  var PLUGIN_TEMPLATE=[
+    "const plugin = {",
+    "  id: 'my-plugin',",
+    "  name: 'My Plugin',",
+    "  version: '1.0.0',",
+    "  description: 'What this plugin does',",
+    "  permissions: ['ui'],",
+    "",
+    "  activate(api) {",
+    "    api.toast('Hello from my plugin');",
+    "  },",
+    "",
+    "  // optional panel shown when you open the plugin from My plugins",
+    "  render(container, api) {",
+    "    container.textContent = 'Hello!';",
+    "  }",
+    "};",
+    "return plugin;",
+    ""].join('\n');
+  function syntaxError(src){try{new Function('api',src);return '';}catch(e){return e.message;}}
+  /* 执行一遍（不启用）读出 id / 名称 / 权限等元数据，写进 rec；失败抛错 */
+  function fillMeta(rec){
+    var temp=instantiate(rec),p=temp.plugin;
+    rec.id=String(p.id||String(rec.file||rec.name).toLowerCase().replace(/[^a-z0-9._-]+/g,'-')).slice(0,64);
+    rec.name=String(p.name||rec.name).slice(0,80);rec.version=String(p.version||'1.0.0').slice(0,32);rec.description=String(p.description||'').slice(0,400);
+    rec.permissions=Array.isArray(p.permissions)?p.permissions.map(String):[];rec.crossPlugin=Array.isArray(p.crossPlugin)?p.crossPlugin.map(String):[];rec.minApiVersion=String(p.minApiVersion||'2.0.0').slice(0,32);
+    try{temp.api.destroy();}catch(e2){}
+    if(!/^[a-z0-9._-]{1,64}$/i.test(rec.id))throw new Error(t('pluginBadId'));
+  }
+  function persistFile(rec,cssMode){
+    if(!HOST_MODE)return;
+    if(!rec.file)rec.file=safeFileStem(rec.id);
+    rec.fromFolder=true;
+    hostSend('UI_PLUGINFILE:'+rec.file+(cssMode?'.css':'.js')+'\x1f'+(cssMode?rec.css:rec.source));
+  }
+  /* 保存对现有插件的修改：校验 → 停用旧实例 → 写文件 → 重新启用（如果原来是启用的） */
+  function applyEdit(rec,src,cssMode){
+    var wasEnabled=rec.enabled,oldId=rec.id,backup={id:rec.id,name:rec.name,version:rec.version,description:rec.description,permissions:rec.permissions,crossPlugin:rec.crossPlugin,minApiVersion:rec.minApiVersion,source:rec.source,css:rec.css};
+    if(!cssMode){
+      var tmp={id:rec.id,name:rec.name,source:src,css:rec.css,file:rec.file,enabled:false};
+      try{fillMeta(tmp);}catch(e){return {ok:false,error:e.message};}
+      var clash=byId(tmp.id);if(clash&&clash!==rec)return {ok:false,error:t('pluginExists')};
+      if(wasEnabled){try{deactivate(rec);}catch(e){}}
+      rec.source=src;
+      ['id','name','version','description','permissions','crossPlugin','minApiVersion'].forEach(function(k){rec[k]=tmp[k];});
+      if(rec.id!==oldId){
+        ['enabled','granted','config'].forEach(function(k){if(PSTATE[k]&&PSTATE[k][oldId]!==undefined){PSTATE[k][rec.id]=PSTATE[k][oldId];delete PSTATE[k][oldId];}});
+        if(selectedPluginId===oldId)selectedPluginId=rec.id;
+      }
+    }else{
+      if(wasEnabled){try{deactivate(rec);}catch(e){}}
+      rec.css=src;
+    }
+    persistFile(rec,cssMode);
+    var needConsent=false;
+    if(wasEnabled){
+      if(!HOST_MODE||consentOk(rec)){rec.enabled=true;rec.lastError='';activate(rec);}
+      else{rec.enabled=false;needConsent=true;}
+    }
+    write();saveState();render(true);
+    return {ok:true,error:rec.lastError||'',needConsent:needConsent};
+  }
+  function createPlugin(fileName,src){
+    var stem=safeFileStem(String(fileName||'').replace(/\.js$/i,''));
+    if(!String(fileName||'').trim())return {ok:false,error:t('pluginFileName')};
+    var rec={id:'',name:stem,version:'1.0.0',description:'',source:src,css:'',file:stem,enabled:false};
+    try{fillMeta(rec);}catch(e){return {ok:false,error:e.message};}
+    if(byId(rec.id)||(HOST_MODE&&installed.some(function(x){return x.file===stem;})))return {ok:false,error:t('pluginExists')};
+    rec.fromFolder=HOST_MODE;
+    installed.push(rec);persistFile(rec,false);write();render();
+    return {ok:true,rec:rec};
+  }
+  function openEditor(rec){
+    var isNew=!rec,cssMode=!!(rec&&rec.cssOnly);
+    var prev=$('starlinePluginEditor');if(prev)prev.remove();
+    var orig=isNew?PLUGIN_TEMPLATE:(cssMode?(rec.css||''):(rec.source||''));
+    var ov=document.createElement('div');ov.id='starlinePluginEditor';ov.className='plugin-dialog-overlay plugin-editor-overlay';
+    ov.innerHTML=
+      '<section class="plugin-card plugin-editor" role="dialog" aria-modal="true">'+
+        '<div class="pe-head"><h3></h3>'+
+          (isNew?'<label class="pe-name"><span></span><input class="ui-input" data-pe="fname" spellcheck="false" maxlength="60" value="my-plugin"><em>.js</em></label>':'<span class="pe-file"></span>')+
+          '<button type="button" class="btn btn-ghost pe-x" data-pe="x" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>'+
+        '<div class="pe-wrap"><pre class="pe-gut" aria-hidden="true"></pre><textarea class="pe-ta" data-pe="ta" spellcheck="false" wrap="off" autocomplete="off" autocapitalize="off"></textarea></div>'+
+        '<div class="pe-foot"><span class="pe-status" data-pe="status"></span>'+
+          (isNew?'':'<label class="pe-live"><span data-pe="livelbl"></span><span class="bg-switch"><input type="checkbox" data-pe="live" checked><span></span></span></label>')+
+          '<button type="button" class="ui-btn" data-pe="close"></button><button type="button" class="ui-btn ui-btn-primary" data-pe="save"></button></div>'+
+      '</section>';
+    var q=function(k){return ov.querySelector('[data-pe="'+k+'"]');};
+    var ta=q('ta'),gut=ov.querySelector('.pe-gut'),status=q('status'),liveBox=q('live');
+    ov.querySelector('h3').textContent=isNew?t('pluginNewTitle'):(t('pluginEditTitle')+' · '+rec.name);
+    var fl=ov.querySelector('.pe-file');if(fl)fl.textContent=(rec.file?rec.file:rec.id)+(cssMode?'.css':'.js');
+    var nl=ov.querySelector('.pe-name span');if(nl)nl.textContent=t('pluginFileName');
+    var ll=q('livelbl');if(ll)ll.textContent=t('pluginLive');
+    q('close').textContent=t('pluginClose');q('save').textContent=t(isNew?'pluginCreate':'pluginSave');
+    ta.value=orig;ta.title=t('pluginEditorHint');
+    var liveTimer=0,checkTimer=0,errNow='';
+    function setStatus(msg,cls){status.textContent=msg;status.className='pe-status'+(cls?' '+cls:'');}
+    function gutter(){var n=ta.value.split('\n').length,s='';for(var i=1;i<=n;i++)s+=i+'\n';gut.textContent=s;gut.scrollTop=ta.scrollTop;}
+    function check(){
+      if(cssMode){errNow='';setStatus(t('pluginEditorHint'));return;}
+      errNow=syntaxError(ta.value);
+      setStatus(errNow?fmt('pluginSyntaxErr',{e:errNow}):t('pluginSyntaxOk'),errNow?'err':'ok');
+    }
+    function stamp(){var d=new Date(),p=function(n){return (n<10?'0':'')+n;};return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());}
+    function save(auto){
+      if(!cssMode&&syntaxError(ta.value)){check();return false;}
+      if(isNew){
+        var r=createPlugin(q('fname').value,ta.value);
+        if(!r.ok){setStatus(r.error,'err');return false;}
+        toast(t('pluginImported')+r.rec.name);close(true);return true;
+      }
+      var res=applyEdit(rec,ta.value,cssMode);
+      if(!res.ok){setStatus(res.error,'err');return false;}
+      orig=ta.value;
+      if(res.needConsent){setStatus(t('pluginAskConsent'),'err');}
+      else if(res.error){setStatus(res.error,'err');}
+      else setStatus(fmt(auto?'pluginAppliedAt':'pluginSavedAt',{t:stamp()}),'ok');
+      return true;
+    }
+    function close(force){
+      window.clearTimeout(liveTimer);window.clearTimeout(checkTimer);
+      function bye(){document.removeEventListener('keydown',onKey,true);ov.remove();}
+      if(force===true||ta.value===orig){bye();return;}
+      dialogBox('confirm',t('pluginDiscard'),{title:t('pluginClose'),okText:t('pluginClose')},'').then(function(ok){if(ok)bye();});
+    }
+    function onKey(e){
+      if(!document.body.contains(ov))return;
+      if($('starlinePluginDialog'))return;                 // 「放弃修改？」确认框在最上层时，交给它
+      if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}
+      else if((e.ctrlKey||e.metaKey)&&(e.key==='s'||e.key==='S')){e.preventDefault();e.stopPropagation();save(false);}
+    }
+    document.addEventListener('keydown',onKey,true);
+    ta.addEventListener('keydown',function(e){
+      if(e.key==='Tab'){
+        e.preventDefault();var s=ta.selectionStart,en=ta.selectionEnd;
+        ta.setRangeText('  ',s,en,'end');ta.dispatchEvent(new Event('input'));
+      }
+      e.stopPropagation();                                  // 输入时不触发程序的单键快捷键
+    });
+    ta.addEventListener('scroll',function(){gut.scrollTop=ta.scrollTop;});
+    ta.addEventListener('input',function(){
+      gutter();window.clearTimeout(checkTimer);checkTimer=window.setTimeout(check,200);
+      window.clearTimeout(liveTimer);
+      if(!isNew&&liveBox&&liveBox.checked){
+        liveTimer=window.setTimeout(function(){if(!syntaxError(ta.value)||cssMode)save(true);},900);
+      }
+    });
+    q('x').addEventListener('click',function(){close();});
+    q('close').addEventListener('click',function(){close();});
+    q('save').addEventListener('click',function(){save(false);});
+    ov.addEventListener('mousedown',function(e){if(e.target===ov)close();});
+    document.body.appendChild(ov);
+    gutter();check();ta.focus();ta.setSelectionRange(0,0);
+  }
+  window.pluginNew=function(){openEditor(null);};
   function renderManage(){
     var list=$('pluginList');if(!list)return;
     list.innerHTML='';
@@ -16713,6 +16909,7 @@ __UI_SCRIPT__
         '<div class="plugin-item-desc">'+esc(rec.description||t('pluginNoDesc'))+'</div>'+
         (rec.lastError?'<div class="plugin-item-err">'+esc(rec.lastError)+'</div>':'')+
         '<div class="plugin-item-foot"><span class="plugin-item-state'+(rec.enabled?' on':'')+'"><i></i>'+esc(t(rec.enabled?'pluginOn':'pluginOff'))+'</span><span class="spacer"></span>'+
+        '<button type="button" class="btn btn-ghost" data-act="edit">'+esc(t('pluginEdit'))+'</button>'+
         '<button type="button" class="btn btn-ghost" data-act="open"'+(rec.enabled?'':' disabled')+'>'+esc(t('pluginView'))+'</button>'+
         '<button type="button" class="btn btn-ghost plugin-danger" data-act="remove">'+esc(t('pluginUninstall'))+'</button></div>';
       card.querySelector('[data-act="toggle"]').addEventListener('change',function(e){
@@ -16724,6 +16921,7 @@ __UI_SCRIPT__
         }
         write();render();
       });
+      card.querySelector('[data-act="edit"]').addEventListener('click',function(){openEditor(rec);});
       card.querySelector('[data-act="open"]').addEventListener('click',function(){openPlugin(rec.id);});
       card.querySelector('[data-act="remove"]').addEventListener('click',function(){uninstall(rec);});
       list.appendChild(card);
