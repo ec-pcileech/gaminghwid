@@ -9694,8 +9694,8 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
 
 /* ── 插件面板页（Profile ▸ 插件 ▸ 具体插件）── */
 .plugin-view-head{align-items:center}
-.plugin-view-head .plugin-icon{width:48px;height:48px;border-radius:14px}
-.plugin-view-head .plugin-icon svg{width:22px;height:22px}
+.plugin-view-head .plugin-icon{width:40px;height:40px;flex:0 0 40px;aspect-ratio:1/1;border-radius:12px}
+.plugin-view-head .plugin-icon svg{width:18px;height:18px}
 .plugin-view-title{min-width:0;flex:1}
 .plugin-view-title .admin-title{overflow-wrap:anywhere}
 .plugin-view-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:3px;font:500 11px var(--font-mono);color:var(--text-3)}
@@ -9740,7 +9740,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
 .plugin-dialog{width:min(420px,100%);background:var(--surface-solid);box-shadow:var(--shadow-3)}
 .plugin-dialog h3{margin:0 0 10px;font-size:15px;font-weight:700;letter-spacing:-.2px;overflow-wrap:anywhere}
 .plugin-dialog p{margin:0 0 14px;white-space:pre-wrap;font-size:13px;line-height:1.6;color:var(--text-2);overflow-wrap:anywhere}
-.plugins-wrap .admin-head>div:not(.plugin-ico-row){flex:1;min-width:0}
+.plugins-wrap .admin-head>div:not(.plugin-ico-row):not(.plugin-icon){flex:1;min-width:0}
 .plugin-code-box{position:relative}
 .plugin-copy-ico{position:absolute;z-index:2;width:28px;height:28px;padding:0;display:grid;place-items:center;border:0;border-radius:8px;background:rgba(255,255,255,.06);color:var(--text-3);cursor:pointer;transition:background .15s,color .15s}
 .plugin-copy-ico:hover{background:rgba(255,255,255,.16);color:var(--text)}
