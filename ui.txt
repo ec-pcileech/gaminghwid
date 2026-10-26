@@ -16487,6 +16487,45 @@ __UI_SCRIPT__
   var HOST_MODE=false,PSTATE={enabled:{},granted:{},config:{}},stateTimer=0,firstLoad=true,pendingManual=false,safeBoot=false;
   try{HOST_MODE=!!(typeof UI_CFG!=='undefined'&&UI_CFG&&UI_CFG.pluginsHost===true);}catch(e){}
   function hostSend(m){try{if(typeof uiSend==='function')uiSend(m);else if(window.chrome&&window.chrome.webview)window.chrome.webview.postMessage(m);}catch(e){}}
+  /* ═══ 系统音频频谱（宿主 WASAPI loopback）═══
+     宿主每 ~33ms 推一帧：UI_AUDIO:<32 个频段 + 总电平，各 2 位十六进制>。只有数字，没有原始音频。
+     订阅者 = 开着 api.audio.start() 的插件；第一个订阅时通知宿主开始抓，最后一个退订 / 插件停用时停止。 */
+  var AUD={subs:[],status:'idle',frame:null,beatAt:0,avgBass:0,timer:0,err:''};
+  function audNotify(){AUD.subs.slice().forEach(function(s){if(s.onStatus){try{s.onStatus(AUD.status,AUD.err);}catch(e){}}});}
+  function audSetStatus(st,er){if(AUD.status===st&&AUD.err===(er||''))return;AUD.status=st;AUD.err=er||'';audNotify();}
+  function audioHostMsg(m){
+    if(m.indexOf('UI_AUDIO:ERR:')===0){audSetStatus('error',m.slice(13));return;}
+    var hex=m.slice(9);if(hex.length<66||!AUD.subs.length)return;
+    var bands=new Uint8Array(32),i,b=0,mi=0,tr=0;
+    for(i=0;i<32;i++)bands[i]=parseInt(hex.substr(i*2,2),16)||0;
+    var level=(parseInt(hex.substr(64,2),16)||0)/255;
+    for(i=0;i<6;i++)b+=bands[i];b/=6*255;
+    for(i=6;i<19;i++)mi+=bands[i];mi/=13*255;
+    for(i=19;i<32;i++)tr+=bands[i];tr/=13*255;
+    var now=performance.now(),beat=false;
+    AUD.avgBass+=(b-AUD.avgBass)*0.08;
+    if(b>0.22&&b>AUD.avgBass*1.35&&now-AUD.beatAt>180){beat=true;AUD.beatAt=now;}
+    var f={bands:bands,level:level,bass:b,mid:mi,treble:tr,beat:beat,t:now};
+    AUD.frame=f;audSetStatus('live','');
+    AUD.subs.slice().forEach(function(s){try{s.fn(f);}catch(e){}});
+  }
+  function audSubscribe(fn,onStatus){
+    var sub={fn:fn,onStatus:onStatus,dead:false};
+    AUD.subs.push(sub);
+    if(AUD.subs.length===1){
+      if(!HOST_MODE){audSetStatus('unsupported','');}
+      else{
+        audSetStatus('waiting','');hostSend('UI_AUDIOSTART');
+        clearTimeout(AUD.timer);AUD.timer=setTimeout(function(){if(AUD.status==='waiting')audSetStatus('unsupported','');},2500);   /* 老版本宿主不会回帧 */
+      }
+    }else if(onStatus){try{onStatus(AUD.status,AUD.err);}catch(e){}}
+    return function stop(){
+      if(sub.dead)return;sub.dead=true;
+      AUD.subs=AUD.subs.filter(function(x){return x!==sub;});
+      if(!AUD.subs.length){clearTimeout(AUD.timer);AUD.status='idle';AUD.frame=null;if(HOST_MODE)hostSend('UI_AUDIOSTOP');}
+    };
+  }
+  if(HOST_MODE)hostSend('UI_AUDIOSTOP');   /* 页面刷新后复位：宿主上一轮可能还在抓 */
   /* 本机字体：向宿主要（GDI 枚举，不弹权限）；老宿主 / 超时返回 null，由插件自己回退 */
   var fontWaiters=[];
   function requestFonts(){
@@ -16512,7 +16551,7 @@ __UI_SCRIPT__
     if(now)go();else stateTimer=window.setTimeout(go,300);
   }
   function safeFileStem(s){s=String(s||'').replace(/[^A-Za-z0-9._-]+/g,'-').replace(/^[.-]+/,'').replace(/\.{2,}/g,'.').slice(0,60);return s||'plugin';}
-  var SENSITIVE=['appearance','dom','network','clipboard-read','cross-plugin'];
+  var SENSITIVE=['appearance','dom','network','clipboard-read','cross-plugin','audio'];
   function sensitivePerms(rec){return (rec.permissions||[]).filter(function(p){return SENSITIVE.indexOf(p)>=0;});}
   function consentOk(rec){var g=PSTATE.granted[rec.id]||[];return sensitivePerms(rec).every(function(p){return g.indexOf(p)>=0;});}
   /* 从 plugins 文件夹里的 <名字>.js（+ 可选同名 <名字>.css）建立插件记录；只有 .css 的也算一个样式插件 */
@@ -16578,6 +16617,7 @@ __UI_SCRIPT__
   window.pluginOpenFolder=function(){hostSend('UI_PLUGINSOPEN');};
   try{window.chrome.webview.addEventListener('message',function(ev){
     var m=ev&&ev.data;if(typeof m!=='string')return;
+    if(m.charCodeAt(3)===65&&m.indexOf('UI_AUDIO:')===0){audioHostMsg(m);return;}
     if(m.indexOf('UI_FONTS:')===0){var list=null;try{list=JSON.parse(m.slice(9));}catch(e){}var w=fontWaiters.splice(0);w.forEach(function(f){f(Array.isArray(list)?list:null);});return;}
     if(m.indexOf('UI_PLUGINS:')!==0)return;
     var manual=pendingManual;pendingManual=false;
@@ -16608,7 +16648,7 @@ __UI_SCRIPT__
   function toast(msg,type,ms,opts){if(typeof window.uiToast==='function'){window.uiToast(msg,type,ms,opts);return;}var n=document.createElement('div');n.textContent=msg;n.style.cssText='position:fixed;z-index:2147483647;right:22px;bottom:22px;padding:11px 15px;border:1px solid var(--border-2);border-radius:12px;background:var(--surface-solid);color:var(--text);box-shadow:var(--shadow-lg);font:600 12px var(--font);';document.body.appendChild(n);setTimeout(function(){n.remove();},2600);}
   function createAPI(rec){
     var listeners={},timers=[],panelHandles=[],externalCleanups=[],api,disposed=false,visible=true,messages={},settingsHandles=[],commands=[],statusItems=[],pluginEvents=[];
-    var PERMISSIONS=['storage','network','theme','language','navigation','clipboard-read','clipboard-write','download','cross-plugin','ui','appearance','dom'];
+    var PERMISSIONS=['storage','network','theme','language','navigation','clipboard-read','clipboard-write','download','cross-plugin','ui','appearance','dom','audio'];
     var granted=Array.isArray(rec.permissions)?rec.permissions.filter(function(x){return PERMISSIONS.indexOf(x)>=0;}):[];if(!Array.isArray(rec.permissions)&&String(rec.minApiVersion||'2.0.0')<'2.1.0')granted=['storage','theme','language','download','clipboard-write','navigation'];
     var crossAllow=Array.isArray(rec.crossPlugin)?rec.crossPlugin.map(String):[];
     function ownKey(key){return 'starline.plugin.'+rec.id+'.'+String(key);}
@@ -16681,6 +16721,22 @@ __UI_SCRIPT__
       getLocaleInfo:function(){return {language:api.getLanguage(),pluginName:rec.name};},
       destroy:function(){if(disposed)return false;disposed=true;Object.keys(listeners).forEach(function(k){listeners[k]=[];});externalCleanups.slice().forEach(function(fn){try{fn();}catch(e){}});timers.forEach(function(id){window.clearTimeout(id);window.clearInterval(id);});timers=[];panelHandles.forEach(function(h){try{h.remove();}catch(e){}});commands.forEach(function(c){if(typeof window.starlineUnregisterCommand==='function')window.starlineUnregisterCommand(c.id);});statusItems.slice().forEach(function(h){h.remove();});return true;}
     };
+    /* ════════ api.audio —— 系统正在播放的声音的频谱（需要 'audio' 权限；宿主需为新版本）════════
+       api.audio.start(frame => {...}, {onStatus}) → 返回停止函数；frame = {bands:Uint8Array(32, 0..255, 低→高), level, bass, mid, treble (0..1), beat:boolean, t}
+       status: 'waiting' | 'live' | 'unsupported'（宿主太旧 / 非 App 环境）| 'error'（没有播放设备）| 'idle'
+       只会拿到 32 个频段数值，拿不到音频内容。插件停用 / 卸载时自动停止。 */
+    api.audio={
+      start:function(fn,opts){
+        requirePermission('audio');
+        if(typeof fn!=='function')throw err('StarlineAPIError','api.audio.start needs a function');
+        var stop=audSubscribe(function(f){if(!disposed&&!document.hidden)fn(f);},opts&&typeof opts.onStatus==='function'?function(st,er){safeCall(opts.onStatus,[st,er]);}:null);
+        externalCleanups.push(stop);
+        return stop;
+      },
+      status:function(){return AUD.status;},
+      getFrame:function(){requirePermission('audio');return AUD.frame;}
+    };
+
     /* ════════ api.ui —— 整体界面定制：布局 / 主题 / 样式 / DOM / 导航 / 页面 ════════
        权限：'appearance'（主题、CSS、布局、CSS 变量） 'dom'（隐藏 / 移动 / 插入 / 重排元素） 'ui'（导航项、页面、顶栏按钮）
        本插件做过的所有改动，在插件停用 / 卸载 / api.destroy() / api.ui.reset() 时自动按相反顺序还原。 */
@@ -17346,6 +17402,7 @@ __UI_SCRIPT__
     {cat:'Lifecycle',name:'onVisible(fn) / onHidden(fn)',sig:'api.onVisible(fn); api.onHidden(fn)',desc:'Subscribes to visibility events and returns unsubscribe functions.',example:'const off = api.onHidden(() => pausePolling());'},
     {cat:'Logging',name:'log(...args) / warn(...args) / error(...args)',sig:'api.log(...args); api.warn(...args); api.error(...args)',desc:'Adds a plugin id prefix; error also emits starline:plugin-error.',example:'api.log("Loaded"); api.warn("Using fallback");'},
     {cat:'Settings',name:'addSettings(spec)',sig:'api.addSettings({title, fields:[{key,type,label,default,options}]})',desc:'Builds a plugin settings panel; changes persist to plugin config and emit starline:plugin-settings-changed.',example:'api.addSettings({title:"Settings",fields:[{key:"enabled",type:"switch",label:"Enabled",default:true}]});'},
+    {cat:'Audio',name:'audio.start(fn, opts)',sig:'const stop = api.audio.start(frame => {...}, {onStatus})',desc:'Requires audio permission. Streams the spectrum of the sound currently playing on this PC (~30 fps): frame.bands = Uint8Array(32, low to high), frame.level / bass / mid / treble 0..1, frame.beat. Only numbers are exposed, never the audio itself. Needs a host with audio support; onStatus reports waiting / live / unsupported / error. Stops automatically when the plugin is disabled.',example:'const stop = api.audio.start(f => { document.title = Math.round(f.bass * 100); }, { onStatus: s => api.log(s) });'},
     {cat:'Events',name:'onPlugin(targetId, event, handler)',sig:'api.onPlugin(pluginId, event, handler)',desc:'Requires cross-plugin permission and target id in crossPlugin allowlist; otherwise warns and returns a no-op unsubscribe.',example:'const off = api.onPlugin("other-plugin", "ready", payload => api.log(payload));'},
     {cat:'Utilities',name:'readText()',sig:'await api.readText()',desc:'Requires clipboard-read; failure or denied access returns null. Invoke from a user gesture.',example:'button.onclick = async () => { const text = await api.readText(); if (text != null) api.toast("Read clipboard"); };'},
     {cat:'Utilities',name:'pickFile(options)',sig:'await api.pickFile({accept, multiple, maxSize})',desc:'Opens the native file picker; cancellation or oversized files return null.',example:'const files = await api.pickFile({accept:".json,.txt", multiple:false, maxSize:5*1024*1024});'},
@@ -17383,7 +17440,7 @@ __UI_SCRIPT__
   function apiLabel(k){return t('pluginApi'+k.charAt(0).toUpperCase()+k.slice(1));}
   function apiEn(k){return (typeof UI_T!=='undefined'&&UI_T.en&&UI_T.en[k])||'';}
   function tx(key,fb){var v=t(key);return (v==null||v===key)?fb:v;}
-  function apiDocsMarkdown(){var out=['# STARLINE Plugin API Reference','API version: 2.2.0','','Plugins receive an `api` object in `activate(api)`, `render(container, api)` and `deactivate(api)`.','',apiEn('pluginApiWarning'),'','## Permission model','','| Permission | APIs / capability |','|---|---|','| `storage` | config APIs and addSettings persistence |','| `network` | request (host proxy required) |','| `theme` | setTheme |','| `language` | setLanguage |','| `navigation` | navigate |','| `clipboard-read` | readText |','| `clipboard-write` | copyText |','| `download` | downloadText |','| `cross-plugin` | onPlugin plus crossPlugin allowlist |','| `ui` | addCommand, setBadge, addStatusItem, ui.addNavItem / addPage / addTopbarButton |','| `appearance` | ui.applyTheme / setCssVars / injectCSS / setFont / registerLayout / setLayout |','| `dom` | ui.hide / move / reorder / insert / setStyle / setAttr / toggleClass / setText / onElement |','','Missing permissions throw PermissionDenied for protected APIs. readText returns null and onPlugin returns a no-op unsubscribe when denied. New 2.1 plugins should declare explicit permissions.',''];API_CATALOG.forEach(function(a){out.push('## '+a.name,'','- Category: '+a.cat,'- Signature: `'+a.sig+'`','- Description: '+a.desc,'','```js',a.example,'```','');});out.push('## Minimal plugin template','','```js',"const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Example plugin',\n  activate(api) { api.toast('Enabled'); },\n  render(container, api) { container.textContent = 'Hello from plugin'; },\n  deactivate(api) {}\n};\nreturn plugin;",'```','');return out.join('\n');}
+  function apiDocsMarkdown(){var out=['# STARLINE Plugin API Reference','API version: 2.2.0','','Plugins receive an `api` object in `activate(api)`, `render(container, api)` and `deactivate(api)`.','',apiEn('pluginApiWarning'),'','## Permission model','','| Permission | APIs / capability |','|---|---|','| `storage` | config APIs and addSettings persistence |','| `network` | request (host proxy required) |','| `theme` | setTheme |','| `language` | setLanguage |','| `navigation` | navigate |','| `clipboard-read` | readText |','| `clipboard-write` | copyText |','| `download` | downloadText |','| `cross-plugin` | onPlugin plus crossPlugin allowlist |','| `ui` | addCommand, setBadge, addStatusItem, ui.addNavItem / addPage / addTopbarButton |','| `appearance` | ui.applyTheme / setCssVars / injectCSS / setFont / registerLayout / setLayout |','| `dom` | ui.hide / move / reorder / insert / setStyle / setAttr / toggleClass / setText / onElement |','| `audio` | audio.start / getFrame (system audio spectrum, 32 bands; sensitive, asks for consent) |','','Missing permissions throw PermissionDenied for protected APIs. readText returns null and onPlugin returns a no-op unsubscribe when denied. New 2.1 plugins should declare explicit permissions.',''];API_CATALOG.forEach(function(a){out.push('## '+a.name,'','- Category: '+a.cat,'- Signature: `'+a.sig+'`','- Description: '+a.desc,'','```js',a.example,'```','');});out.push('## Minimal plugin template','','```js',"const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Example plugin',\n  activate(api) { api.toast('Enabled'); },\n  render(container, api) { container.textContent = 'Hello from plugin'; },\n  deactivate(api) {}\n};\nreturn plugin;",'```','');return out.join('\n');}
   function apiTemplate(){return "const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Describe what your plugin does',\n  activate(api) {\n    api.toast('My Plugin enabled');\n  },\n  render(container, api) {\n    const title = api.createElement('h3', { text: 'My Plugin' });\n    const button = api.createElement('button', { className: 'ui-btn', text: 'Click me' });\n    button.addEventListener('click', () => api.toast('Button clicked'));\n    container.append(title, button);\n  },\n  deactivate(api) {\n    // Clear any plugin-owned resources here. The host also cleans tracked timers/panels.\n  }\n};\nreturn plugin;\n";}
   function apiCopy(text){var value=String(text||'');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(function(){toast(apiLabel('copied'));},function(){toast(apiLabel('copyFailed'));});return;}var ta=document.createElement('textarea');ta.value=value;document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();toast(ok?apiLabel('copied'):apiLabel('copyFailed'));}
   function apiDownload(name,text,mime){var blob=new Blob([text],{type:mime||'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
