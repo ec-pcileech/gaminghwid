@@ -16150,6 +16150,18 @@ __UI_SCRIPT__
   var HOST_MODE=false,PSTATE={enabled:{},granted:{},config:{}},stateTimer=0,firstLoad=true,pendingManual=false,safeBoot=false;
   try{HOST_MODE=!!(typeof UI_CFG!=='undefined'&&UI_CFG&&UI_CFG.pluginsHost===true);}catch(e){}
   function hostSend(m){try{if(typeof uiSend==='function')uiSend(m);else if(window.chrome&&window.chrome.webview)window.chrome.webview.postMessage(m);}catch(e){}}
+  /* 本机字体：向宿主要（GDI 枚举，不弹权限）；老宿主 / 超时返回 null，由插件自己回退 */
+  var fontWaiters=[];
+  function requestFonts(){
+    return new Promise(function(res){
+      var done=false;
+      function fin(v){if(!done){done=true;res(v);}}
+      fontWaiters.push(fin);
+      if(!HOST_MODE){fin(null);return;}
+      hostSend('UI_FONTSLIST');
+      window.setTimeout(function(){fin(null);},4000);
+    });
+  }
   function parseState(text){
     try{var o=JSON.parse(text||'{}');if(o&&typeof o==='object'){
       PSTATE.enabled=(o.enabled&&typeof o.enabled==='object')?o.enabled:{};
@@ -16228,7 +16240,9 @@ __UI_SCRIPT__
   window.pluginReload=function(){pendingManual=true;hostSend('UI_PLUGINSRESCAN');};
   window.pluginOpenFolder=function(){hostSend('UI_PLUGINSOPEN');};
   try{window.chrome.webview.addEventListener('message',function(ev){
-    var m=ev&&ev.data;if(typeof m!=='string'||m.indexOf('UI_PLUGINS:')!==0)return;
+    var m=ev&&ev.data;if(typeof m!=='string')return;
+    if(m.indexOf('UI_FONTS:')===0){var list=null;try{list=JSON.parse(m.slice(9));}catch(e){}var w=fontWaiters.splice(0);w.forEach(function(f){f(Array.isArray(list)?list:null);});return;}
+    if(m.indexOf('UI_PLUGINS:')!==0)return;
     var manual=pendingManual;pendingManual=false;
     try{applyFiles(JSON.parse(m.slice(11)),manual);}catch(e){}
   });}catch(e){}
@@ -16522,6 +16536,7 @@ __UI_SCRIPT__
       return ui;
     })();
     api.openPluginsFolder=function(){hostSend('UI_PLUGINSOPEN');return HOST_MODE;};
+    api.listFonts=function(){requirePermission('appearance');return requestFonts();};
     api.getPluginInfo=function(){return {id:rec.id,file:rec.file||null,folder:HOST_MODE?'plugins':null,folderMode:HOST_MODE};};
     var onLang=function(){api.emit('languagechange',{language:api.getLanguage()});};window.addEventListener('starline:languagechange',onLang);externalCleanups.push(function(){window.removeEventListener('starline:languagechange',onLang);});
     function computeVisible(){return !document.hidden&&api.getPage()==='plugin'&&selectedPluginId===rec.id;}
@@ -16842,7 +16857,8 @@ __UI_SCRIPT__
       {cat:'DOM',name:'ui.onElement(selector, callback) / ui.onPage(callback)',sig:'api.ui.onElement(selector, el => …); api.ui.onPage(page => …)',desc:'Requires dom for onElement. Calls back for existing and future matches (the UI re-renders often), or whenever the visible page changes. Returns an unsubscribe function.',zh:'onElement 需要 dom 权限。对现有和以后出现的匹配元素回调（界面经常重新渲染），onPage 在可见页面变化时回调。返回取消订阅函数。',example:'api.ui.onElement(\'.card\', el => el.style.borderRadius = \'4px\');\napi.ui.onPage(p => api.log(\'page\', p));'},
       {cat:'UI',name:'ui.addNavItem(spec) / ui.addPage(spec)',sig:'api.ui.addNavItem({ label, icon, page?, onClick?, after?, before? }); api.ui.addPage({ id, render(el, api) })',desc:'Requires ui. Adds a sidebar entry and/or a full page inside the app shell. Pages close themselves when another app page opens.',zh:'需要 ui 权限。在侧栏添加入口，或在程序外壳里添加整页内容。打开程序其他页面时，插件页面会自动关闭。',example:'const page = api.ui.addPage({ id: \'home\', render: el => el.textContent = \'Hello\' });\napi.ui.addNavItem({ label: \'My page\', icon: \'<circle cx="12" cy="12" r="8"/>\', page });'},
       {cat:'UI',name:'ui.addTopbarButton(spec) / ui.reset()',sig:'api.ui.addTopbarButton({ title, icon, onClick, before? }); api.ui.reset()',desc:'Requires ui for the button. reset() undoes every UI change this plugin made.',zh:'按钮需要 ui 权限。reset() 撤销本插件做过的全部界面改动。',example:'api.ui.addTopbarButton({ title: \'Hi\', icon: \'<path d="M5 12h14"/>\', onClick: () => api.toast(\'Hi\') });'},
-      {cat:'Plugin folder',name:'openPluginsFolder() / getPluginInfo()',sig:'api.openPluginsFolder(); api.getPluginInfo()',desc:'Plugins live in the "plugins" folder next to the app. Opens that folder in Explorer; getPluginInfo() returns this plugin\'s file name. Settings saved with setConfig() are kept in plugins/plugins.json.',zh:'插件放在程序目录旁的 plugins 文件夹里。openPluginsFolder() 在资源管理器中打开它；getPluginInfo() 返回本插件的文件名。setConfig() 保存的设置存放在 plugins/plugins.json。',example:'api.openPluginsFolder();\nconsole.log(api.getPluginInfo());'}
+      {cat:'Plugin folder',name:'openPluginsFolder() / getPluginInfo()',sig:'api.openPluginsFolder(); api.getPluginInfo()',desc:'Plugins live in the "plugins" folder next to the app. Opens that folder in Explorer; getPluginInfo() returns this plugin\'s file name. Settings saved with setConfig() are kept in plugins/plugins.json.',zh:'插件放在程序目录旁的 plugins 文件夹里。openPluginsFolder() 在资源管理器中打开它；getPluginInfo() 返回本插件的文件名。setConfig() 保存的设置存放在 plugins/plugins.json。',example:'api.openPluginsFolder();\nconsole.log(api.getPluginInfo());'},
+      {cat:'Plugin folder',name:'listFonts()',sig:'await api.listFonts() -> string[] | null',desc:'Requires appearance. Asks the host for every installed font family (no permission prompt). Resolves to null on older hosts or after 4 seconds.',zh:'需要 appearance 权限。向宿主请求本机已安装的全部字体族（不会弹权限）。旧版宿主或 4 秒无响应时返回 null。',example:'const fonts = await api.listFonts();\nif (fonts) console.log(fonts.length);'}
     ];
     var base=API_CATALOG.length;
     N.forEach(function(a,i){API_CATALOG.push({cat:a.cat,name:a.name,sig:a.sig,desc:a.desc,example:a.example});if(typeof UI_T!=='undefined'){if(UI_T.en)UI_T.en['pluginApiD'+(base+i)]=a.desc;if(UI_T.zh)UI_T.zh['pluginApiD'+(base+i)]=a.zh;}});
