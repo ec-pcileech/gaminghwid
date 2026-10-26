@@ -105,6 +105,61 @@ priceLife= 74.99
 discount = 10
 
 # ───────────────────────────────────────────────────────────────────────────
+#  Counter-Strike: Source
+# ───────────────────────────────────────────────────────────────────────────
+[CSS]
+title    = Counter-Strike: Source
+short    = CSS
+icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/240/header.jpg?t=1745368575
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/240/0000000027.1920x1080.jpg?t=1745368575
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/240/0000000028.1920x1080.jpg?t=1745368575
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/240/0000000029.1920x1080.jpg?t=1745368575
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/240/0000000030.1920x1080.jpg?t=1745368575
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/240/0000000031.1920x1080.jpg?t=1745368575
+process  = hl.exe
+runmode  = dll
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_css.zip
+dev      = Valve
+pub      = Valve
+rel      = 2 Nov, 2004
+genres   = FPS, Shooter, Action
+features = Anti-Cheat, Multiplayer, Cloud Save
+featured = true
+price7   = 4.99        
+price15  = 8.99      
+price30  = 19.99       
+price90  = 59.99     
+priceLife= 109.99 
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Battlefield 4™
+# ───────────────────────────────────────────────────────────────────────────
+[BF4]
+title    = Battlefield 4™
+short    = BF4
+icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1238860/header.jpg?t=1777391884
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/256787502/movie480.mp4
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1238860/ss_8cd5ec2e4bf1986bc01265db93f184e38e3b1236.1920x1080.jpg?t=1777391884
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1238860/ss_03f32767fd67f15723ffcd68c92e425265a0ca3d.1920x1080.jpg?t=1777391884
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1238860/ss_05303c6c14d6bffddb7e7ada02e071880def9ac2.1920x1080.jpg?t=1777391884
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1238860/ss_fb5219a8fde71d6e29b95c35a95fe4f9769c2004.1920x1080.jpg?t=1777391884
+process  = bf4.exe
+runmode  = dll
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_bf4.zip
+dev      = DICE
+pub      = Electronic Arts
+rel      = 29 Oct, 2013
+genres   = FPS, Shooter, Action
+features = Anti-Cheat, Multiplayer, Cloud Save
+featured = true
+price7   = 8.99        
+price15  = 13.99      
+price30  = 30.99       
+price90  = 69.99     
+priceLife= 119.99 
+
+# ───────────────────────────────────────────────────────────────────────────
 #  PUBG
 # ───────────────────────────────────────────────────────────────────────────
 [PUBG]
