@@ -218,6 +218,34 @@ price30  = 12.99
 price90  = 30.99
 priceLife= 49.99
 
+# ───────────────────────────────────────────────────────────────────────────
+#  Left 4 Dead 2
+# ───────────────────────────────────────────────────────────────────────────
+[L4D2]
+title    = Left 4 Dead 2
+short    = L4D2
+icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/550/header.jpg?t=1772742214
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/5952/movie480.mp4
+cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/550/ss_2eae29fbdfe8e5e8999b96d8bb28c5db70507968.1920x1080.jpg?t=1772742214
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/550/ss_29b3b4f2a3994c889f6fc12e0781d9d4726ef33f.1920x1080.jpg?t=1772742214
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/550/ss_9488e329bb42d792a059fb44cb7135d25b6262f5.1920x1080.jpg?t=1772742214
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/550/ss_6ec4ee04d4924b099e25ce79f3d6571c3b623b3b.1920x1080.jpg?t=1772742214
+cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/550/ss_6ec4ee04d4924b099e25ce79f3d6571c3b623b3b.1920x1080.jpg?t=1772742214
+process  = left4dead2.exe
+runmode  = dll
+download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_l4d2.zip
+dev      = Valve
+pub      = Valve
+rel      = 17 Nov, 2009
+genres   = FPS, Shooter, Action
+features = Multiplayer, Cloud Save
+featured = true
+price7   = 6.99        
+price15  = 13.99    
+price30  = 19.99
+price90  = 30.99
+priceLife= 69.99
+
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Apex Legends
