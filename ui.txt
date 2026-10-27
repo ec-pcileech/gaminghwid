@@ -2829,8 +2829,9 @@ function uiFestivalPaintTexts(){
 }
 /* 设置页：节日期间把「外观 / 自定义主题 / 已保存主题」整体置灰锁定，并在最上面放一条说明 */
 function uiFestivalPaintLock(){
-  var on = !!uiFestival(), first = null;
+  var fx = uiFestival(), on = !!fx, first = null;
   document.body.classList.toggle('ui-fest-on', on);
+  if (fx) { document.body.setAttribute('data-fest', fx.id); } else { document.body.removeAttribute('data-fest'); }
   ['uiThemeSeg', 'uiPresetRow', 'uiThemeList'].forEach(function(id){
     var n = document.getElementById(id), c = n && n.closest ? n.closest('.ui-card') : null;
     if (c) { c.classList.toggle('ui-fest-locked', on); if (!first) { first = c; } }
@@ -9055,6 +9056,86 @@ body.dragging .qp-drop-hint{display:block}
 }
 .card-cta svg{width:12px;height:12px;fill:none;stroke:currentColor;
   stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+/* ═══ 节日卡片皮肤：body[data-fest] 由 uiFestivalPaintLock 设置 ═══════════
+   万圣节：蛛网 + 橙紫烛光边框 + 南瓜按钮；圣诞：彩灯串 + 雪堆 + 红绿糖果边 + 礼物按钮 */
+@keyframes festGlow{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
+@keyframes festTwinkle{0%,100%{opacity:1}45%{opacity:.55}60%{opacity:1}80%{opacity:.7}}
+@keyframes festWiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg) scale(1.15)}75%{transform:rotate(14deg) scale(1.15)}}
+@keyframes festFlicker{0%,100%{box-shadow:0 8px 26px rgba(249,115,22,.26),0 0 0 1px rgba(168,85,247,.32)}
+  30%{box-shadow:0 10px 34px rgba(249,115,22,.42),0 0 0 1px rgba(168,85,247,.45)}
+  55%{box-shadow:0 8px 24px rgba(249,115,22,.22),0 0 0 1px rgba(168,85,247,.28)}
+  80%{box-shadow:0 10px 32px rgba(249,115,22,.38),0 0 0 1px rgba(168,85,247,.4)}}
+
+/* —— 万圣节 —— */
+body[data-fest="halloween"] .card{
+  background:radial-gradient(120% 70% at 50% 108%,rgba(249,115,22,.16),transparent 62%),
+    linear-gradient(180deg,rgba(168,85,247,.14),transparent 45%),var(--surface);
+  border-color:rgba(249,115,22,.34);
+  box-shadow:0 4px 18px rgba(124,58,237,.16);
+}
+body[data-fest="halloween"] .card::before{   /* 右上角蛛网 */
+  content:'';position:absolute;top:0;right:0;width:76px;height:76px;z-index:1;pointer-events:none;opacity:.85;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60' fill='none' stroke='white' stroke-opacity='.62' stroke-width='1'%3E%3Cpath d='M60 0L0 0M60 0L8 26M60 0L30 52M60 0L60 60M60 0L2 58'/%3E%3Cpath d='M46 0Q48 12 60 14M32 0Q36 24 60 28M18 0Q24 36 60 42M4 0Q12 48 60 56'/%3E%3C/svg%3E") no-repeat top right/100% 100%;
+}
+body[data-fest="halloween"] .card::after{    /* 底部紫橙流光条 */
+  content:'';position:absolute;left:0;right:0;bottom:0;height:3px;z-index:3;pointer-events:none;
+  background:linear-gradient(90deg,#7c3aed,#f97316,#fde047,#f97316,#7c3aed);background-size:200% 100%;
+  animation:festGlow 5s ease-in-out infinite;
+}
+body[data-fest="halloween"] .card-img::after{
+  background:linear-gradient(to top,rgba(36,10,56,.82) 0%,rgba(88,28,135,.22) 45%,transparent 70%),
+    radial-gradient(90% 60% at 50% 110%,rgba(249,115,22,.35),transparent 70%);
+}
+body[data-fest="halloween"] .card:hover{
+  border-color:#fb923c;transform:translateY(-4px) rotate(-.4deg);
+  animation:festFlicker 2.4s ease-in-out infinite;
+}
+body[data-fest="halloween"] .card:hover .card-title{text-shadow:0 0 14px rgba(249,115,22,.65)}
+body[data-fest="halloween"] .card-badge:not(.owned){background:rgba(38,12,58,.82);border-color:rgba(249,115,22,.55)}
+body[data-fest="halloween"] .card-price .new:not(.free){background:linear-gradient(135deg,#fb923c,#fde047);
+  -webkit-background-clip:text;background-clip:text}
+body[data-fest="halloween"] .card-price .disc{background:linear-gradient(135deg,#f97316,#a855f7)}
+body[data-fest="halloween"] .card-cta:not(.owned){background:linear-gradient(135deg,#f97316,#9333ea);box-shadow:0 4px 16px rgba(249,115,22,.45)}
+body[data-fest="halloween"] .card-cta:not(.owned) svg{display:none}
+body[data-fest="halloween"] .card-cta:not(.owned)::before{content:'\1F383';display:inline-block;font-size:13px;line-height:1}
+body[data-fest="halloween"] .card:hover .card-cta:not(.owned)::before{animation:festWiggle .7s ease-in-out infinite}
+
+/* —— 圣诞节 —— */
+body[data-fest="christmas"] .card{
+  border:1px solid transparent;
+  background:linear-gradient(180deg,rgba(255,255,255,.05),transparent 40%),linear-gradient(var(--surface-solid),var(--surface-solid)) padding-box,
+    linear-gradient(135deg,#e11d48,#16a34a 50%,#e11d48) border-box;
+  box-shadow:0 4px 18px rgba(225,29,72,.14);
+}
+body[data-fest="christmas"] .grid:not(.list) .card::before{   /* 顶部彩灯串（会闪烁） */
+  content:'';position:absolute;top:0;left:0;right:0;height:16px;z-index:1;pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='16' viewBox='0 0 96 16'%3E%3Cpath d='M0 3Q12 11 24 3Q36 11 48 3Q60 11 72 3Q84 11 96 3' fill='none' stroke='%23374151' stroke-width='1.2'/%3E%3Cellipse cx='12' cy='9' rx='2.6' ry='3.4' fill='%23f43f5e'/%3E%3Cellipse cx='36' cy='9' rx='2.6' ry='3.4' fill='%23facc15'/%3E%3Cellipse cx='60' cy='9' rx='2.6' ry='3.4' fill='%2334d399'/%3E%3Cellipse cx='84' cy='9' rx='2.6' ry='3.4' fill='%2338bdf8'/%3E%3C/svg%3E") repeat-x top left/96px 16px;
+  animation:festTwinkle 2.2s ease-in-out infinite;
+}
+body[data-fest="christmas"] .card::after{    /* 底部糖果条 */
+  content:'';position:absolute;left:0;right:0;bottom:0;height:4px;z-index:3;pointer-events:none;
+  background:repeating-linear-gradient(45deg,#e11d48 0 8px,#fff 8px 16px);
+}
+body[data-fest="christmas"] .card-img::after{   /* 图片底部雪堆 */
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='12' viewBox='0 0 40 12'%3E%3Cpath d='M0 12V7Q5 1 10 6Q15 11 20 5Q25 0 30 6Q35 11 40 7V12Z' fill='white' fill-opacity='.93'/%3E%3C/svg%3E") repeat-x bottom left/40px 12px,
+    linear-gradient(to top,rgba(6,40,24,.62) 0%,transparent 58%);
+}
+body[data-fest="christmas"] .card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 10px 30px rgba(225,29,72,.3),0 0 22px rgba(22,163,74,.28);
+}
+body[data-fest="christmas"] .card:hover .card-title{text-shadow:0 0 14px rgba(244,63,94,.55)}
+body[data-fest="christmas"] .card-badge:not(.owned){background:rgba(127,16,40,.85);border-color:rgba(255,255,255,.32)}
+body[data-fest="christmas"] .card-price .new:not(.free){background:linear-gradient(135deg,#fb7185,#fde68a);
+  -webkit-background-clip:text;background-clip:text}
+body[data-fest="christmas"] .card-price .disc{background:linear-gradient(135deg,#e11d48,#16a34a)}
+body[data-fest="christmas"] .card-cta:not(.owned){background:linear-gradient(135deg,#e11d48,#15803d);box-shadow:0 4px 16px rgba(225,29,72,.42)}
+body[data-fest="christmas"] .card-cta:not(.owned) svg{display:none}
+body[data-fest="christmas"] .card-cta:not(.owned)::before{content:'\1F381';display:inline-block;font-size:13px;line-height:1}
+body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:festWiggle .7s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){
+  body[data-fest] .card,body[data-fest] .card::before,body[data-fest] .card::after,body[data-fest] .card-cta::before{animation:none!important}
+}
 .empty{
   grid-column:1/-1;
   padding:60px 20px;text-align:center;
