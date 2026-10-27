@@ -2608,6 +2608,10 @@ uiAddT({
   ccToastOn:  ["Close prompt turned on","已开启关闭提示","Подтверждение закрытия включено","Hinweis beim Schließen aktiviert","終了時の確認をオンにしました","Aviso al cerrar activado","Kapatma uyarısı açıldı","Aviso ao fechar ativado"],
   ccToastOff: ["Close prompt turned off","已关闭关闭提示","Подтверждение закрытия выключено","Hinweis beim Schließen deaktiviert","終了時の確認をオフにしました","Aviso al cerrar desactivado","Kapatma uyarısı kapatıldı","Aviso ao fechar desativado"]
 });
+/* 游戏公告块的标题（games.txt 的 Announcement1/2/…） */
+uiAddT({
+  announcement: ["Announcement","公告","Объявление","Ankündigung","お知らせ","Anuncio","Duyuru","Aviso"]
+});
 /* 插件文件夹 / 权限确认 / 安全模式 的界面文案 */
 uiAddT({"pluginOpenFolder": ["Open plugins folder", "打开插件文件夹", "Открыть папку плагинов", "Plugin-Ordner öffnen", "プラグインフォルダを開く", "Abrir carpeta de plugins", "Eklenti klasörünü aç", "Abrir pasta de plugins"], "pluginReload": ["Reload plugins", "重新加载插件", "Перезагрузить плагины", "Plugins neu laden", "プラグインを再読み込み", "Recargar plugins", "Eklentileri yeniden yükle", "Recarregar plugins"], "pluginReloaded": ["Plugins reloaded", "插件已重新加载", "Плагины перезагружены", "Plugins neu geladen", "プラグインを再読み込みしました", "Plugins recargados", "Eklentiler yeniden yüklendi", "Plugins recarregados"], "pluginLocalDir": ["Loaded from the plugins folder next to the app", "从程序目录下的 plugins 文件夹加载", "Загружено из папки plugins рядом с приложением", "Aus dem Ordner „plugins“ neben der App geladen", "アプリと同じ場所の plugins フォルダーから読み込み", "Cargado desde la carpeta plugins junto a la app", "Uygulamanın yanındaki plugins klasöründen yüklendi", "Carregado da pasta plugins ao lado do app"], "pluginPermConfirm": ["“{name}” wants permission to: {perms}. It can change the app's look, layout or behaviour. Enable it?", "“{name}” 请求权限：{perms}。它可以修改程序的外观、布局或行为，确定启用吗？", "«{name}» запрашивает права: {perms}. Плагин может менять внешний вид, макет или поведение приложения. Включить?", "„{name}“ möchte folgende Rechte: {perms}. Das Plugin kann Aussehen, Layout oder Verhalten der App ändern. Aktivieren?", "「{name}」は次の権限を要求しています：{perms}。アプリの外観・レイアウト・動作を変更できます。有効にしますか？", "«{name}» solicita permisos: {perms}. Puede cambiar el aspecto, el diseño o el comportamiento de la app. ¿Activarlo?", "“{name}” şu izinleri istiyor: {perms}. Uygulamanın görünümünü, düzenini veya davranışını değiştirebilir. Etkinleştirilsin mi?", "“{name}” solicita as permissões: {perms}. Ele pode alterar a aparência, o layout ou o comportamento do app. Ativar?"], "pluginSafeMode": ["Plugins disabled (safe mode)", "插件已全部停用（安全模式）", "Плагины отключены (безопасный режим)", "Plugins deaktiviert (abgesicherter Modus)", "プラグインをすべて無効にしました（セーフモード）", "Plugins desactivados (modo seguro)", "Eklentiler devre dışı (güvenli mod)", "Plugins desativados (modo seguro)"], "pluginGuideSub": ["Save the code below as a .js file in the plugins folder (or use Import plugin), then press Reload plugins. Hold Shift at startup, or press Ctrl+Shift+Alt+P, to disable all plugins.", "把下面的代码保存为 .js 文件放进 plugins 文件夹（或点「导入插件」），再点「重新加载插件」。启动时按住 Shift，或按 Ctrl+Shift+Alt+P，可停用全部插件。", "Сохраните код ниже как .js в папке plugins (или нажмите «Импорт плагина»), затем «Перезагрузить плагины». Shift при запуске или Ctrl+Shift+Alt+P отключает все плагины.", "Speichere den Code unten als .js im Ordner „plugins“ (oder „Plugin importieren“) und klicke auf „Plugins neu laden“. Shift beim Start oder Strg+Umschalt+Alt+P deaktiviert alle Plugins.", "下のコードを .js として plugins フォルダーに保存し（またはインポート）、「プラグインを再読み込み」を押します。起動時に Shift、または Ctrl+Shift+Alt+P で全プラグインを無効化できます。", "Guarda el código como .js en la carpeta plugins (o usa Importar plugin) y pulsa Recargar plugins. Mantén Shift al iniciar o pulsa Ctrl+Shift+Alt+P para desactivar todos.", "Aşağıdaki kodu plugins klasörüne .js olarak kaydedin (veya Eklenti içe aktar) ve Eklentileri yeniden yükle’ye basın. Başlangıçta Shift veya Ctrl+Shift+Alt+P tüm eklentileri devre dışı bırakır.", "Salve o código abaixo como .js na pasta plugins (ou use Importar plugin) e clique em Recarregar plugins. Shift ao iniciar ou Ctrl+Shift+Alt+P desativa todos os plugins."], "pluginGuideNote": ["Plugins run JavaScript inside this UI and can change its look and layout. Only use plugins you trust. Plugin files are in the plugins folder next to the app; their settings are saved in plugins/plugins.json.", "插件会在此界面中运行 JavaScript，并能修改界面外观和布局，请只使用你信任的插件。插件文件位于程序目录旁的 plugins 文件夹，插件设置保存在 plugins/plugins.json。", "Плагины выполняют JavaScript в этом интерфейсе и могут менять его вид и макет. Используйте только доверенные плагины. Файлы лежат в папке plugins рядом с приложением, настройки — в plugins/plugins.json.", "Plugins führen JavaScript in dieser Oberfläche aus und können Aussehen und Layout ändern. Nutze nur vertrauenswürdige Plugins. Die Dateien liegen im Ordner „plugins“ neben der App, Einstellungen in plugins/plugins.json.", "プラグインはこの UI 内で JavaScript を実行し、見た目やレイアウトを変更できます。信頼できるものだけを使用してください。ファイルはアプリと同じ場所の plugins フォルダー、設定は plugins/plugins.json に保存されます。", "Los plugins ejecutan JavaScript en esta interfaz y pueden cambiar su aspecto y diseño. Usa solo plugins de confianza. Los archivos están en la carpeta plugins junto a la app y los ajustes en plugins/plugins.json.", "Eklentiler bu arayüzde JavaScript çalıştırır ve görünümü ile düzeni değiştirebilir. Yalnızca güvendiğiniz eklentileri kullanın. Dosyalar uygulamanın yanındaki plugins klasöründedir, ayarlar plugins/plugins.json içinde saklanır.", "Os plugins executam JavaScript nesta interface e podem alterar aparência e layout. Use apenas plugins confiáveis. Os arquivos ficam na pasta plugins ao lado do app e as configurações em plugins/plugins.json."]});
 
@@ -9495,6 +9499,52 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
   stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 /* games.txt 只给了一张 cover 时：没有可翻的图，箭头藏起来 */
 .detail-hero.single .detail-ctrl{display:none}
+/* ── 游戏公告：games.txt 的 Announcement1/2/…，显示在图集（图片/视频轮播）上方 ──
+   颜色全部取主题变量（--surface / --border / --text / --accent…），浅色 / 深色 / 自定义主题都会自动跟随 */
+.detail-ann{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.detail-ann[hidden]{display:none}
+.ann-item{
+  position:relative;display:flex;align-items:flex-start;gap:14px;
+  padding:14px 20px 14px 22px;overflow:hidden;
+  border-radius:var(--radius-lg);
+  background:var(--surface);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  box-shadow:var(--shadow-1);
+  animation:annIn .45s cubic-bezier(.4,0,.2,1) both;
+}
+/* 左侧强调条 + 轻微强调色渐变底，和 .section h2 的竖条同一语言 */
+.ann-item::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--accent),var(--accent-3));
+  box-shadow:0 0 10px var(--accent-glow);
+}
+.ann-item::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,var(--accent-soft),transparent 60%);
+}
+.ann-ico,.ann-body{position:relative;z-index:1}
+.ann-ico{
+  width:34px;height:34px;flex-shrink:0;border-radius:var(--radius-sm);
+  display:grid;place-items:center;
+  color:var(--accent);background:var(--accent-soft);
+  border:1px solid var(--accent-glow);
+}
+.ann-ico svg{width:18px;height:18px;fill:none;stroke:currentColor;
+  stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
+.ann-body{flex:1;min-width:0}
+.ann-tag{
+  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
+  color:var(--accent);margin-bottom:3px;
+}
+.ann-text{
+  font-size:13.5px;line-height:1.65;color:var(--text);
+  white-space:pre-wrap;overflow-wrap:anywhere;
+}
+@keyframes annIn{
+  from{opacity:0;transform:translateY(-6px)}
+  to{opacity:1;transform:none}
+}
 .section{margin-bottom:36px}
 .section h2{
   font-size:18px;font-weight:800;letter-spacing:-.4px;
@@ -10530,6 +10580,8 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
         </div>
       </div>
       <div class="detail-scroll">
+        <!-- 游戏公告：games.txt 的 Announcement1/2/…，没有就隐藏；位于图集上方 -->
+        <div class="detail-ann" id="detailAnn" hidden></div>
         <div class="detail-hero">
           <!-- 图集槽位由 JS 按 games.txt 的 cover 数量生成 -->
           <div class="detail-slides" id="detailSlides"></div>
@@ -11219,6 +11271,7 @@ __UI_SCRIPT__
     renderGenreBtn();
     renderGenrePop();
     if (CURRENT_GAME && !GAMES[CURRENT_GAME]) closeDetail();
+    else if (CURRENT_GAME) renderDetailAnn(CURRENT_GAME);   /* 后台更新 games.txt 后，公告也实时刷新 */
     if (typeof PANE !== 'undefined' && PANE.code && !GAMES[PANE.code]) paneHide();
     toast(uiT('gamesUpdated'), 'ok', 2600);
     return true;
@@ -13483,6 +13536,70 @@ __UI_SCRIPT__
     }
     return r;
   }
+  /* ── 游戏公告：games.txt 里的 Announcement1 / Announcement2 / …（写几条显示几条）──
+     · 显示在详情页图集（图片/视频轮播）上方，一条都没有就整块隐藏
+     · key 不区分大小写，按数字从小到大排；也认宿主传来的 announcements / ann 数组
+     · 值两边的引号（“ ” " ' 「 」）会自动去掉；值里写 \n 表示换行 */
+  function annClean(v){
+    var s = String(v == null ? '' : v).replace(/\\n/g, '\n').trim();
+    var Q = '"\'\u201C\u201D\u2018\u2019\u201E\u201F\u300C\u300D\u300E\u300F';
+    if (s && Q.indexOf(s.charAt(0)) >= 0) {
+      s = s.slice(1);
+      if (s && Q.indexOf(s.charAt(s.length - 1)) >= 0) s = s.slice(0, -1);
+    }
+    return s.trim();
+  }
+  function detailAnnouncements(meta){
+    meta = meta || {};
+    var raw = [], numbered = [], k, m, i;
+    var arr = Array.isArray(meta.announcements) ? meta.announcements
+            : (Array.isArray(meta.ann) ? meta.ann : null);
+    if (arr) { for (i = 0; i < arr.length; i++) raw.push(arr[i]); }
+    for (k in meta) {
+      if (!Object.prototype.hasOwnProperty.call(meta, k)) continue;
+      m = /^(?:announcement|ann)[\s_\-]*(\d*)$/i.exec(k);
+      if (!m || typeof meta[k] === 'object') continue;
+      numbered.push({ n: m[1] === '' ? 0 : parseInt(m[1], 10), v: meta[k] });
+    }
+    numbered.sort(function(a, b){ return a.n - b.n; });
+    for (i = 0; i < numbered.length; i++) raw.push(numbered[i].v);
+    var out = [];
+    for (i = 0; i < raw.length; i++) {
+      var t = annClean(raw[i]);
+      if (t && out.indexOf(t) < 0) out.push(t);
+    }
+    return out;
+  }
+  var ANN_ICON = '<svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/>'
+               + '<path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  function renderDetailAnn(g){
+    var box = document.getElementById('detailAnn');
+    if (!box) return;
+    var list = detailAnnouncements(GAMES[g]);
+    if (!list.length) {
+      box.hidden = true;
+      box.innerHTML = '';
+      box.removeAttribute('data-sig');
+      return;
+    }
+    var label = uiT('announcement');
+    var sig = g + '\u0001' + label + '\u0001' + list.join('\u0001');
+    if (!box.hidden && box.getAttribute('data-sig') === sig) return;   /* 没变就不重建，避免重复播动画 */
+    var html = '';
+    for (var i = 0; i < list.length; i++) {
+      html += '<div class="ann-item">'
+            +   '<div class="ann-ico">' + ANN_ICON + '</div>'
+            +   '<div class="ann-body">'
+            +     '<div class="ann-tag">' + uiEsc(label + (list.length > 1 ? ' ' + (i + 1) : '')) + '</div>'
+            +     '<div class="ann-text">' + uiEsc(list[i]) + '</div>'
+            +   '</div>'
+            + '</div>';
+    }
+    box.innerHTML = html;
+    box.setAttribute('data-sig', sig);
+    box.hidden = false;
+  }
+
   function renderDetailTexts(g){
     var meta = GAMES[g];
     if (!meta) return;
@@ -13495,6 +13612,7 @@ __UI_SCRIPT__
     var featHtml = '';
     (meta.feat || []).forEach(function(x){ featHtml += '<span class="tag">' + uiEsc(tagT(x)) + '</span>'; });
     document.getElementById('dFeat').innerHTML = featHtml;
+    renderDetailAnn(g);      /* 游戏公告（图集上方）：打开详情页 / 切语言时一起刷新 */
   }
 
 
