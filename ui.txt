@@ -1,5 +1,5 @@
 #STARLINE-UI 1
-#VERSION 2026-10-25
+#VERSION 2026-10-27
 #===THEME_CSS
 
 :root{
@@ -557,13 +557,15 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
   content:'';position:absolute;inset:0;z-index:2;pointer-events:none;display:var(--hero-deco);
 }
 /* 万圣节：紫橙氛围角饰 */
-.hero[data-deco="halloween"]::before{
+.hero[data-deco="halloween"]::before,
+.hero[data-deco="pumpkin"]::before{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext x='12' y='19' font-size='19' text-anchor='middle'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext x='12' y='19' font-size='19' text-anchor='middle'%3E%F0%9F%91%BB%3C/text%3E%3C/svg%3E"),radial-gradient(360px 220px at 0% 0%,rgba(168,85,247,.40),transparent 62%),radial-gradient(340px 220px at 100% 0%,rgba(249,115,22,.34),transparent 62%);
   background-repeat:no-repeat;background-position:14px 12px,calc(100% - 14px) 12px,0 0,100% 0;
   background-size:44px 44px,44px 44px,auto,auto;
 }
 /* 圣诞节：松枝内描边 + 雪花 */
-.hero[data-deco="christmas"]::before{
+.hero[data-deco="christmas"]::before,
+.hero[data-deco="snow"]::before{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext x='12' y='19' font-size='18' text-anchor='middle'%3E%E2%9D%84%3C/text%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext x='12' y='19' font-size='18' text-anchor='middle'%3E%F0%9F%8E%84%3C/text%3E%3C/svg%3E"),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ctext x='12' y='19' font-size='18' text-anchor='middle'%3E%E2%9D%84%3C/text%3E%3C/svg%3E"),radial-gradient(300px 160px at 0% 0%,rgba(74,222,128,.30),transparent 60%),radial-gradient(300px 160px at 100% 0%,rgba(225,29,72,.30),transparent 60%),radial-gradient(220px 130px at 50% 0%,rgba(255,255,255,.16),transparent 70%);
   background-repeat:no-repeat;background-position:18px 14px,50% 10px,calc(100% - 18px) 14px,0 0,100% 0,0 0;
   background-size:36px 36px,36px 36px,36px 36px,auto,auto,auto;
@@ -610,6 +612,26 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
   background-repeat:no-repeat;background-position:calc(100% - 16px) 12px,16px 12px,100% 0,0 100%;
   background-size:44px 44px,40px 40px,auto,auto;
 }
+/* ═══ 节日活动：促销条 / Renew 提示 / 主题锁定 ═══════════════════ */
+.fest-strip{display:flex;align-items:center;gap:12px;margin:14px 0 6px;padding:11px 16px;
+  border-radius:var(--radius-lg,18px);border:1px solid var(--accent-soft);
+  background:linear-gradient(100deg,var(--accent-soft),transparent 72%),var(--surface);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:var(--shadow-1)}
+.fest-strip[hidden],.renew-fest[hidden]{display:none}
+.fest-ico{font-size:24px;line-height:1;flex-shrink:0}
+.fest-main{flex:1;min-width:0}
+.fest-title{font-size:13.5px;font-weight:800;color:var(--text)}
+.fest-sub{font-size:12px;color:var(--text-2);margin-top:2px}
+.fest-badge{flex-shrink:0;font:900 15px/1 var(--font-mono,monospace);padding:7px 13px;border-radius:999px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 6px 18px var(--accent-glow)}
+.renew-fest{display:flex;align-items:center;gap:10px;margin-top:14px;padding:9px 12px;border-radius:var(--ui-radius);
+  border:1px solid var(--ui-accent-soft);background:var(--ui-accent-soft);font-size:12px;color:var(--ui-text)}
+.renew-fest b{font-weight:800}
+.renew-fest .fest-ico{font-size:18px}
+.renew-fest span.sub{color:var(--ui-text-dim)}
+.ui-fest-note{margin:0 0 12px;padding:10px 14px;border-radius:var(--ui-radius);font-size:12.5px;font-weight:600;
+  color:var(--ui-text);background:var(--ui-accent-soft);border:1px solid var(--ui-border-strong)}
+.ui-fest-locked{opacity:.42;pointer-events:none;filter:saturate(.6);user-select:none}
 /* 节日时 banner 不裁剪角饰的柔光 */
 .hero[data-deco]{isolation:isolate}
 .ui-row-label{font-size:12.5px}
@@ -1471,6 +1493,7 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
           </span>
         </span>
       </div>
+      <div class="renew-fest" id="renewFest" hidden></div>
       <div class="renew-plans" id="renewPlans">
         <button class="renew-plan" type="button" data-plan="7D" onclick="uiRenewPickPlan('7D')">
           <div class="renew-plan-name" data-ui="plan7Name">7 Days</div>
@@ -2701,19 +2724,139 @@ function uiPaintPrices(){
    /* Renew 页那三个价格槽位不在这里刷：它们跟着“当前点击的游戏”走
      由 uiRenewPaintPrices() 负责（游戏没写价才回退到这里的全局价）。 */
   var slots = [
-    ['lP30Price',    uiMoney(uiPrice('d30'))],
-    ['lP90Price',    uiMoney(uiPrice('d90'))],
-    ['lPltPrice',    uiMoney(uiPrice('life'))],
-    ['lP30PPrice',   uiMoney(uiPrice('d30') + uiPrice('pauseAdd'))],
-    ['lP90PPrice',   uiMoney(uiPrice('d90') + uiPrice('pauseAdd'))],
+    ['lP30Price',    uiMoney(uiPromoPrice(uiPrice('d30'), '30D'))],
+    ['lP90Price',    uiMoney(uiPromoPrice(uiPrice('d90'), '90D'))],
+    ['lPltPrice',    uiMoney(uiPromoPrice(uiPrice('life'), 'LIFETIME'))],
+    ['lP30PPrice',   uiMoney(uiPromoPrice(uiPrice('d30'), '30D') + uiPrice('pauseAdd'))],
+    ['lP90PPrice',   uiMoney(uiPromoPrice(uiPrice('d90'), '90D') + uiPrice('pauseAdd'))],
     ['lPauseAdd',    '+' + uiMoney(uiPrice('pauseAdd'))]
   ];
   for (var i = 0; i < slots.length; i++) {
     var el = document.getElementById(slots[i][0]);
     if (el) { el.textContent = slots[i][1]; }
   }
+  uiFestivalPaintTexts();
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════
+   节日活动（万圣节 / 圣诞节）
+   · 每年自动生效：节日前 7 天 00:00 → 节日当天 23:59（用户本机日期）
+   · 生效期间：强制使用节日主题（用户不能改），不会写入宿主的 UI_THEME，
+     所以活动结束后自动回到用户自己选的主题
+   · 生效期间：只有 15D / 30D / 90D / LIFETIME 套餐显示 25% 折扣（7D 不参与）
+   · 与 games.txt 的 discount 不叠加，取两者中较大的一个
+   · 宿主可选传入 UI_CFG.serverNow（毫秒时间戳）代替本机时钟
+   ※ 这里只是显示层。真正的收费价格必须由服务器按同一规则计算。
+   ═══════════════════════════════════════════════════════════════════ */
+var UI_FESTIVALS = [
+  { id:'halloween', theme:'preset:d-halloween', icon:'\uD83C\uDF83', titleKey:'festHalloween',
+    from:[10,24], to:[10,31], off:25, plans:['15D','30D','90D','LIFETIME'] },
+  { id:'christmas', theme:'preset:d-christmas', icon:'\uD83C\uDF84', titleKey:'festChristmas',
+    from:[12,18], to:[12,25], off:25, plans:['15D','30D','90D','LIFETIME'] }
+];
+var uiFestKey = '', uiFestTimer = 0, uiFestPerf0 = (window.performance && performance.now) ? performance.now() : 0;
+function uiNowMs(){
+  var sn = (typeof UI_CFG !== 'undefined' && UI_CFG) ? UI_CFG.serverNow : null;
+  if (typeof sn === 'number' && isFinite(sn)) {
+    return sn + ((window.performance && performance.now) ? performance.now() - uiFestPerf0 : 0);
+  }
+  return Date.now();
+}
+function uiFestivalAt(ms){
+  var d = new Date(ms), md = (d.getMonth() + 1) * 100 + d.getDate();
+  for (var i = 0; i < UI_FESTIVALS.length; i++) {
+    var f = UI_FESTIVALS[i];
+    if (md >= f.from[0] * 100 + f.from[1] && md <= f.to[0] * 100 + f.to[1]) { return f; }
+  }
+  return null;
+}
+function uiFestival(){ return uiFestivalAt(uiNowMs()); }
+/* 当前套餐的节日折扣百分比（没有活动 / 套餐不参与 = 0） */
+function uiPromoOff(plan){
+  var f = uiFestival();
+  if (!f || !plan) { return 0; }
+  return f.plans.indexOf(String(plan).toUpperCase()) >= 0 ? f.off : 0;
+}
+function uiPromoPrice(amount, plan){
+  var off = uiPromoOff(plan);
+  return off ? Math.round(amount * (100 - off)) / 100 : amount;
+}
+/* 实际显示的主题：节日期间 = 节日主题，否则 = 用户主题 */
+function uiEffectiveTheme(){ var f = uiFestival(); return f ? f.theme : uiState.theme; }
+function uiFestivalEndText(f){
+  var d = new Date(uiNowMs()), end = new Date(d.getFullYear(), f.to[0] - 1, f.to[1]);
+  try { return end.toLocaleDateString(UI_LOCALES[uiState.lang] || 'en-US', { month:'short', day:'numeric' }); }
+  catch (e) { return (f.to[0]) + '/' + f.to[1]; }
+}
+uiAddT({
+  festHalloween: ["Halloween Sale","万圣节特惠","Распродажа к Хэллоуину","Halloween-Aktion","ハロウィンセール","Oferta de Halloween","Cadılar Bayramı İndirimi","Promoção de Halloween"],
+  festChristmas: ["Christmas Sale","圣诞特惠","Рождественская распродажа","Weihnachtsaktion","クリスマスセール","Oferta de Navidad","Yılbaşı İndirimi","Promoção de Natal"],
+  festStripSub:  ["{off}% off 15 / 30 / 90-day and Lifetime plans","15 / 30 / 90 天与永久套餐 {off}% 折扣","Скидка {off}% на тарифы 15 / 30 / 90 дней и «Навсегда»","{off}% Rabatt auf 15-, 30-, 90-Tage- und Lifetime-Tarife","15 / 30 / 90日プランとライフタイムが{off}%オフ","{off}% de descuento en planes de 15 / 30 / 90 días y de por vida","15 / 30 / 90 günlük ve Ömür boyu planlarda %{off} indirim","{off}% de desconto nos planos de 15 / 30 / 90 dias e vitalício"],
+  festNote7:     ["7-day plan not included","7 天套餐不参与","Тариф на 7 дней не участвует","7-Tage-Tarif nicht enthalten","7日プランは対象外","El plan de 7 días no está incluido","7 günlük plan hariç","Plano de 7 dias não incluído"],
+  festEnds:      ["Ends {date}","{date} 结束","До {date}","Endet am {date}","{date}まで","Termina el {date}","Bitiş: {date}","Termina em {date}"],
+  festLocked:    ["A festival theme is active and can't be changed until the event ends ({date}). Your own theme comes back afterwards.","节日主题进行中，活动结束（{date}）前无法更改主题，结束后自动恢复你的主题。","Включена праздничная тема: менять тему нельзя до конца акции ({date}). Затем вернётся ваша тема.","Das Festtags-Design ist aktiv und bis zum Ende der Aktion ({date}) nicht änderbar. Danach kehrt dein eigenes Design zurück.","イベント用テーマが適用中のため、終了（{date}）までテーマは変更できません。終了後は元のテーマに戻ります。","El tema festivo está activo y no se puede cambiar hasta que termine la promoción ({date}). Después volverá tu tema.","Bayram teması etkin; kampanya bitene kadar ({date}) tema değiştirilemez. Sonrasında kendi temanız geri gelir.","O tema festivo está ativo e não pode ser alterado até o fim da promoção ({date}). Depois, seu tema volta."]
+});
+function uiFestivalBlocked(){
+  var f = uiFestival();
+  if (!f) { return; }
+  try { if (typeof toast === 'function') { toast(uiT('festLocked').replace('{date}', uiFestivalEndText(f)), 'info', 3800); } } catch (e) {}
+}
+/* 顶部促销条 / Renew 页提示 / 设置页提示文字（随语言刷新） */
+function uiFestivalPaintTexts(){
+  var f = uiFestival();
+  var strip = document.getElementById('festStrip'), rn = document.getElementById('renewFest');
+  var title = f ? uiT(f.titleKey) : '', end = f ? uiT('festEnds').replace('{date}', uiFestivalEndText(f)) : '';
+  var sub = f ? uiT('festStripSub').replace('{off}', f.off) : '', n7 = f ? uiT('festNote7') : '';
+  if (strip) {
+    strip.hidden = !f;
+    if (f) {
+      strip.setAttribute('data-fest', f.id);
+      strip.innerHTML = '<span class="fest-ico">' + f.icon + '</span><div class="fest-main"><div class="fest-title">' +
+        uiEsc(title) + ' \u00B7 ' + uiEsc(end) + '</div><div class="fest-sub">' + uiEsc(sub) + ' \u00B7 ' + uiEsc(n7) +
+        '</div></div><span class="fest-badge">-' + f.off + '%</span>';
+    } else { strip.innerHTML = ''; }
+  }
+  if (rn) {
+    rn.hidden = !f;
+    if (f) {
+      rn.innerHTML = '<span class="fest-ico">' + f.icon + '</span><div><b>' + uiEsc(title) + ' -' + f.off + '%</b> \u00B7 ' +
+        '<span class="sub">' + uiEsc(sub) + ' \u00B7 ' + uiEsc(n7) + '</span></div>';
+    } else { rn.innerHTML = ''; }
+  }
+  var note = document.getElementById('uiFestNote');
+  if (note) { note.hidden = !f; if (f) { note.textContent = f.icon + ' ' + uiT('festLocked').replace('{date}', uiFestivalEndText(f)); } }
+}
+/* 设置页：节日期间把「外观 / 自定义主题 / 已保存主题」整体置灰锁定，并在最上面放一条说明 */
+function uiFestivalPaintLock(){
+  var on = !!uiFestival(), first = null;
+  document.body.classList.toggle('ui-fest-on', on);
+  ['uiThemeSeg', 'uiPresetRow', 'uiThemeList'].forEach(function(id){
+    var n = document.getElementById(id), c = n && n.closest ? n.closest('.ui-card') : null;
+    if (c) { c.classList.toggle('ui-fest-locked', on); if (!first) { first = c; } }
+  });
+  var note = document.getElementById('uiFestNote');
+  if (!note && first && first.parentNode) {
+    note = document.createElement('div'); note.id = 'uiFestNote'; note.className = 'ui-fest-note'; note.hidden = true;
+    first.parentNode.insertBefore(note, first);
+  }
+  uiFestivalPaintTexts();
+}
+/* 跨过活动边界（例如 10/31 → 11/1 零点）时自动切换主题和价格，不需要重启 */
+function uiFestivalTick(){
+  var f = uiFestival(), key = f ? f.id : '';
+  if (key === uiFestKey) { return; }
+  uiApplyTheme(uiState.theme, false);     /* 里面会更新 uiFestKey / 主题 / 锁定 / 文字 */
+  uiPaintPrices();
+  try { if (typeof uiRenewPaintPrices === 'function') { uiRenewPaintPrices(); } } catch (e) {}
+  try { if (typeof renderHero === 'function') { renderHero(); } } catch (e) {}
+  try { if (typeof renderGrid === 'function') { renderGrid(); } } catch (e) {}
+}
+function uiFestivalStart(){
+  if (uiFestTimer) { return; }
+  uiFestTimer = setInterval(uiFestivalTick, 30000);
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) { uiFestivalTick(); } });
+}
 
 /* ── 预设主题：light/dark 两组合并成一份，渲染成一个网格 ── */
 function uiPresetList(base){ return UI_PRESETS[base] || UI_PRESETS.light; }
@@ -2941,15 +3084,20 @@ function uiThemeReveal(paint){
   });
 }
 function uiApplyTheme(theme, persist){
-  uiState.theme = theme;
-  var spec = uiActiveSpec(theme);
+  var fest = uiFestival();
+  /* 节日期间：用户 / 插件手动换主题一律拒绝（persist !== false 才是手动操作） */
+  if (fest && persist !== false) { uiFestivalBlocked(); return; }
+  uiState.theme = theme;                 /* 永远是用户自己选的主题，节日结束后用它恢复 */
+  uiFestKey = fest ? fest.id : '';
+  var shown = fest ? fest.theme : theme; /* 实际渲染的主题 */
+  var spec = uiActiveSpec(shown);
   /* 只有主题真的变了才播放动画；首次加载和重复应用同一主题都不播 */
-  var animKey = theme + '|' + spec.base;
+  var animKey = shown + '|' + spec.base;
   var animate = !!(uiState.themeKey && uiState.themeKey !== animKey);
   uiState.themeKey = animKey;
   var tok = ++uiThemeTok;
-  var custom = uiFindCustom(theme);
-  var css = (custom || (theme !== 'light' && theme !== 'dark'))
+  var custom = uiFindCustom(shown);
+  var css = (custom || (shown !== 'light' && shown !== 'dark'))
     ? uiThemeRule(uiSpecTokens(spec)) : '';
   function paint(){
     if (tok !== uiThemeTok) { return; }          /* 已被更新的一次切换取代 */
@@ -2959,12 +3107,14 @@ function uiApplyTheme(theme, persist){
     uiPaintThemeSeg();
     uiRenderPresets();      /* 让预设卡片的高亮跟着当前主题走 */
     uiRenderThemeGrid();
+    uiFestivalPaintLock();
   }
   if (animate) { uiThemeReveal(paint); } else { paint(); }
   if (persist !== false) { uiSend('UI_THEME:' + theme); }
 }
 /* 编辑器实时预览（换色、换特效都立刻可见）*/
 function uiPreviewTheme(){
+  if (uiFestival()) { return; }
   var spec = {
     base: uiState.editorBase, colors: uiState.editorColors,
     fx: uiState.editorFx, deco: uiState.editorDeco, layout: uiState.editorLayout
@@ -2976,14 +3126,14 @@ function uiPreviewTheme(){
 function uiPaintThemeSeg(){
   var seg = document.getElementById('uiThemeSeg');
   if (!seg) { return; }
-  var active = uiState.theme;
+  var active = uiEffectiveTheme();
   if (active !== 'system' && active !== 'light' && active !== 'dark') { active = uiBaseOf(active); }
   for (var i = 0; i < seg.children.length; i++) {
     var btn = seg.children[i];
     btn.classList.toggle('active', btn.getAttribute('data-theme-value') === active);
   }
 }
-function uiSetTheme(name){ uiSyncEditorBase(name); uiApplyTheme(name); }
+function uiSetTheme(name){ if (uiFestival()) { uiFestivalBlocked(); return; } uiSyncEditorBase(name); uiApplyTheme(name); }
 /* 把编辑器状态对齐到某个主题（预设或已保存）*/
 /* 把编辑器状态对齐到某个主题。name 可能是：
    'light' / 'dark' / 'system' / 'preset:<id>' / '<已保存主题名>' / 裸预设 id */
@@ -3030,6 +3180,7 @@ function uiSyncEditorBase(name){
 }
 /* 点击预设：直接应用（不再需要再点 Apply）*/
 function uiPickPreset(id){
+  if (uiFestival()) { uiFestivalBlocked(); return; }
   var def = uiPresetDef(id);
   uiState.editorPreset = id;
   uiState.editorBase = def.base;
@@ -3225,7 +3376,7 @@ function uiRenderPresets(){
   var html = '';
   for (var i = 0; i < all.length; i++) {
     var d = all[i];
-    var active = (uiState.theme === ('preset:' + d.id));
+    var active = (uiEffectiveTheme() === ('preset:' + d.id));
     html += '<button type="button" class="ui-swatch' + (active ? ' active' : '') + '"' +
       ' data-tip="' + uiEsc(uiSwatchTip(d.base, d.fx, d.deco)) + '"' +
       ' onclick="uiPickPreset(\'' + uiEsc(d.id) + '\')">' +
@@ -3259,7 +3410,7 @@ function uiRenderThemeGrid(){
     if (!theme) { continue; }
     var spec = uiNormalizeCustom(theme);
     var tokens = uiSpecTokens(spec);
-    var active = (uiState.theme === theme.name);
+    var active = (uiEffectiveTheme() === theme.name);
     html += '<div class="ui-swatch' + (active ? ' active' : '') + '" role="button" tabindex="0"' +
       ' data-tip="' + uiEsc(uiSwatchTip(spec.base, spec.fx, spec.deco)) + '"' +
       ' onclick="uiApplyTheme(uiCustomAt(' + i + ').name)">' +
@@ -3869,6 +4020,7 @@ function uiRenewPlanPrice(plan){
   /* games.txt 的 discount：整款游戏所有方案统一打折（百分比，默认 0） */
   var off = m ? Math.round(Number(m.discount)) : 0;
   if (!(isFinite(off) && off > 0 && off < 100)) off = 0;
+  off = Math.max(off, uiPromoOff(plan));   /* 节日折扣：只对 15D/30D/90D/LIFETIME，不与游戏折扣叠加 */
   var now = off ? Math.round(base * (100 - off)) / 100 : base;
   return { free: false, text: uiMoney(now), old: off ? uiMoney(base) : '', off: off };
 }
@@ -4112,6 +4264,7 @@ function uiInit(){
   if (typeof uiInitPopups === 'function') { uiInitPopups(); }
   uiSyncEditorBase(uiState.theme);      /* 里面会渲染配色网格与风格下拉 */
   uiApplyTheme(uiState.theme, false);   /* 里面会渲染预设/已存主题网格并应用特效装饰 */
+  uiFestivalStart();                    /* 节日检测：跨过活动边界时自动切换 */
   uiSyncEditorInputs();
   uiApplyLangUi();
   uiPaintPrices();
@@ -9979,6 +10132,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
       </div>
 
 
+      <div class="fest-strip" id="festStrip" hidden></div>
       <div class="sec-head">
         <div class="sec-title" data-ui="allGames">All Games</div>
         <span class="sec-count" id="gameCount">0</span>
@@ -11327,27 +11481,27 @@ __UI_SCRIPT__
     var m = GAMES[g] || {};
     return !!m['free' + plan];
   }
-  function priceOf(g){
+  /* 最便宜的那一档（顺序 7 → 15 → 30 → 90 → 永久）：{plan, price}；plan=null 表示用的是默认价 */
+  function priceTierOf(g){
     var m = GAMES[g] || {};
-    if (m.free7)  return 0;
-    if (priceNum(m.price7))  return priceNum(m.price7);
-    if (m.free15) return 0;
-    if (priceNum(m.price15)) return priceNum(m.price15);
-    if (m.free30) return 0;
-    if (priceNum(m.price30)) return priceNum(m.price30);
-    if (m.free90) return 0;
-    if (priceNum(m.price90)) return priceNum(m.price90);
-    if (m.freeLife) return 0;
-    if (priceNum(m.priceLife)) return priceNum(m.priceLife);
-    return PRICE_DEFAULT;
+    var T = [['7D','free7','price7'],['15D','free15','price15'],['30D','free30','price30'],
+             ['90D','free90','price90'],['LIFETIME','freeLife','priceLife']];
+    for (var i = 0; i < T.length; i++) {
+      if (m[T[i][1]]) return { plan: T[i][0], price: 0 };
+      if (priceNum(m[T[i][2]])) return { plan: T[i][0], price: priceNum(m[T[i][2]]) };
+    }
+    return { plan: null, price: PRICE_DEFAULT };
   }
+  function priceOf(g){ return priceTierOf(g).price; }
   function priceFor(g){ return priceOf(g); }
   function isFreeGame(g){ return priceOf(g) <= 0; }
   /* games.txt 的 discount（百分比，默认 0 = 不打折；有效 1~99）。免费游戏不显示折扣。 */
   function discOf(g){
     if (isFreeGame(g)) return 0;
     var d = Math.round(Number((GAMES[g] || {}).discount));
-    return (isFinite(d) && d > 0 && d < 100) ? d : 0;
+    d = (isFinite(d) && d > 0 && d < 100) ? d : 0;
+    /* 节日折扣按「卡片上显示的那一档」判断：最便宜档是 7D 时不打折 */
+    return Math.max(d, uiPromoOff(priceTierOf(g).plan));
   }
   /* 折后价（保留两位小数，按分四舍五入） */
   function salePriceOf(g){
@@ -16673,7 +16827,7 @@ __UI_SCRIPT__
       getAppInfo:function(){return {name:'STARLINE',apiVersion:'2.2.0',pluginId:rec.id,pluginName:rec.name,pluginVersion:rec.version||'1.0.0',language:api.getLanguage(),theme:api.getTheme()};},
       getHostInfo:function(){return {platform:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)?'mobile':'desktop',isMobile:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent),safeArea:{top:0,right:0,bottom:0,left:0},dpr:window.devicePixelRatio||1,hostVersion:window.STARLINE_HOST_VERSION||'unknown',apiVersion:'2.2.0',features:{pluginsFolder:HOST_MODE,uiApi:true,request:typeof window.starlineHostRequest==='function',asyncDialogs:true,pluginCommands:typeof window.starlineRegisterCommand==='function',safeArea:false}};},
       getTheme:function(){return document.documentElement.getAttribute('data-theme')||'system';},
-      setTheme:function(theme){requirePermission('theme');var v=String(theme||'');if(!/^(light|dark|system)$/.test(v))return false;if(typeof window.uiApplyTheme==='function')window.uiApplyTheme(v,true);else document.documentElement.setAttribute('data-theme',v==='system'?'dark':v);window.dispatchEvent(new CustomEvent('starline:themechange',{detail:{theme:v,pluginId:rec.id}}));return true;},
+      setTheme:function(theme){requirePermission('theme');if(typeof uiFestival==='function'&&uiFestival())return false;var v=String(theme||'');if(!/^(light|dark|system)$/.test(v))return false;if(typeof window.uiApplyTheme==='function')window.uiApplyTheme(v,true);else document.documentElement.setAttribute('data-theme',v==='system'?'dark':v);window.dispatchEvent(new CustomEvent('starline:themechange',{detail:{theme:v,pluginId:rec.id}}));return true;},
       getThemeTokens:function(){var s=getComputedStyle(document.documentElement);var tokens={bg:s.getPropertyValue('--surface').trim()||'#111',fg:s.getPropertyValue('--text').trim()||'#fff',border:s.getPropertyValue('--border-2').trim()||'#333',primary:s.getPropertyValue('--primary').trim()||'#6d8cff',radius:s.getPropertyValue('--radius').trim()||'12px',fontFamily:s.getPropertyValue('--font').trim()||'sans-serif'};Object.keys(tokens).forEach(function(k){document.documentElement.style.setProperty('--starline-'+k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();}),tokens[k]);});return tokens;},
       getLanguage:function(){return document.documentElement.getAttribute('lang')||'en';},
       setLanguage:function(code){requirePermission('language');code=String(code||'');if(typeof window.uiSetLang==='function'){window.uiSetLang(code,true);return true;}if(typeof window.setLang==='function'){window.setLang(code);if(typeof window.uiSend==='function')window.uiSend('UI_LANG:'+code);return true;}return false;},
@@ -16809,6 +16963,7 @@ __UI_SCRIPT__
         getThemeColorKeys:function(){try{var p=uiPresetList('dark')[0],k=[];for(var x in p){if(x!=='id'&&x!=='name')k.push(x);}return k;}catch(e){return [];}},
         applyTheme:function(spec){
           need('appearance');spec=spec||{};
+          if(typeof uiFestival==='function'&&uiFestival())return null;   /* 节日期间主题被强制锁定 */
           if(typeof uiNormalizeCustom!=='function'||typeof uiSpecTokens!=='function'||typeof uiThemeRule!=='function'||typeof uiThemeNode!=='function')throw err('Unsupported','Theme engine is not available in this UI build');
           var base=spec.base==='light'?'light':'dark',list=uiPresetList(base);
           var norm=uiNormalizeCustom({name:'plugin:'+rec.id,base:base,preset:list[0].id,colors:spec.colors||null,
