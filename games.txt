@@ -43,6 +43,8 @@
 #                   · 别名：price30 = price_30 = d30
 #                          price90 = price_90 = d90
 #                          priceLife = price_life = pricelt = life = price
+#       Announcement1 = 公告,Announcement的数量取决与Announcement【1】后面数字
+#       status   = 游戏状态，共三种状态：available / updating / outdated 
 #
 #   · 新增游戏：复制一节，改代号和字段即可，无需重新编译
 # ═══════════════════════════════════════════════════════════════════════════
@@ -300,7 +302,7 @@ price15  = 13.99
 price30  = 19.99
 price90  = 30.99
 priceLife= 69.99
-
+Announcement1 = The latest version has been released
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Apex Legends
