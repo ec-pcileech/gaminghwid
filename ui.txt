@@ -1,5 +1,5 @@
 #STARLINE-UI 1
-#VERSION 2026-10-27
+#VERSION 2026-10-28
 #===THEME_CSS
 
 :root{
@@ -17122,15 +17122,15 @@ __UI_SCRIPT__
     function asyncDialog(kind,message,opts){return dialogBox(kind,message,opts,rec.name);}
     function widgetsHost(){var h=ensureHost(rec.id);return h?h.widgets:document.createElement('div');}
     api={
-      appName:'STARLINE',apiVersion:'2.3.0',pluginId:rec.id,pluginName:rec.name,
+      appName:'STARLINE',apiVersion:'2.4.0',pluginId:rec.id,pluginName:rec.name,
       hasPermission:function(name){return granted.indexOf(String(name))>=0;},
       getPermissions:function(){return granted.slice();},
       toast:function(message){toast(String(message==null?'':message));return true;},
       log:function(){if(window.STARLINE_PLUGIN_LOG_LEVEL!=='silent'&&window.console&&console.log)console.log.apply(console,['['+rec.id+']'].concat([].slice.call(arguments)));},
       warn:function(){if(window.console&&console.warn)console.warn.apply(console,['['+rec.id+']'].concat([].slice.call(arguments)));},
       error:function(){if(window.console&&console.error)console.error.apply(console,['['+rec.id+']'].concat([].slice.call(arguments)));window.dispatchEvent(new CustomEvent('starline:plugin-error',{detail:{pluginId:rec.id,args:[].slice.call(arguments)}}));},
-      getAppInfo:function(){return {name:'STARLINE',apiVersion:'2.3.0',pluginId:rec.id,pluginName:rec.name,pluginVersion:rec.version||'1.0.0',language:api.getLanguage(),theme:api.getTheme()};},
-      getHostInfo:function(){return {platform:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)?'mobile':'desktop',isMobile:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent),safeArea:{top:0,right:0,bottom:0,left:0},dpr:window.devicePixelRatio||1,hostVersion:window.STARLINE_HOST_VERSION||'unknown',apiVersion:'2.3.0',features:{pluginsFolder:HOST_MODE,uiApi:true,studio:!!window.SLStudio,request:typeof window.starlineHostRequest==='function',asyncDialogs:true,pluginCommands:typeof window.starlineRegisterCommand==='function',safeArea:false}};},
+      getAppInfo:function(){return {name:'STARLINE',apiVersion:'2.4.0',pluginId:rec.id,pluginName:rec.name,pluginVersion:rec.version||'1.0.0',language:api.getLanguage(),theme:api.getTheme()};},
+      getHostInfo:function(){return {platform:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)?'mobile':'desktop',isMobile:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent),safeArea:{top:0,right:0,bottom:0,left:0},dpr:window.devicePixelRatio||1,hostVersion:window.STARLINE_HOST_VERSION||'unknown',apiVersion:'2.4.0',features:{pluginsFolder:HOST_MODE,uiApi:true,studio:!!window.SLStudio,request:typeof window.starlineHostRequest==='function',asyncDialogs:true,pluginCommands:typeof window.starlineRegisterCommand==='function',safeArea:false}};},
       getTheme:function(){return document.documentElement.getAttribute('data-theme')||'system';},
       setTheme:function(theme){requirePermission('theme');if(typeof uiFestival==='function'&&uiFestival())return false;var v=String(theme||'');if(!/^(light|dark|system)$/.test(v))return false;if(typeof window.uiApplyTheme==='function')window.uiApplyTheme(v,true);else document.documentElement.setAttribute('data-theme',v==='system'?'dark':v);window.dispatchEvent(new CustomEvent('starline:themechange',{detail:{theme:v,pluginId:rec.id}}));return true;},
       getThemeTokens:function(){var s=getComputedStyle(document.documentElement);var tokens={bg:s.getPropertyValue('--surface').trim()||'#111',fg:s.getPropertyValue('--text').trim()||'#fff',border:s.getPropertyValue('--border-2').trim()||'#333',primary:s.getPropertyValue('--primary').trim()||'#6d8cff',radius:s.getPropertyValue('--radius').trim()||'12px',fontFamily:s.getPropertyValue('--font').trim()||'sans-serif'};Object.keys(tokens).forEach(function(k){document.documentElement.style.setProperty('--starline-'+k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();}),tokens[k]);});return tokens;},
@@ -17175,7 +17175,7 @@ __UI_SCRIPT__
       addCommand:function(id,spec){requirePermission('ui');spec=spec||{};id=String(id||'');if(id.indexOf(rec.id+'.')!==0)throw err('INVALID_COMMAND_ID','Command id must start with '+rec.id+'.');var cmd={id:id,title:String(spec.title||id),run:spec.run};commands.push(cmd);if(typeof window.starlineRegisterCommand==='function')window.starlineRegisterCommand({id:id,title:cmd.title,pluginId:rec.id,run:function(){return safeCall(cmd.run,[api]);}});else window.dispatchEvent(new CustomEvent('starline:command-register',{detail:{id:id,title:cmd.title,pluginId:rec.id}}));return {remove:function(){commands=commands.filter(function(x){return x!==cmd;});if(typeof window.starlineUnregisterCommand==='function')window.starlineUnregisterCommand(id);window.dispatchEvent(new CustomEvent('starline:command-unregister',{detail:{id:id,pluginId:rec.id}}));}};},
       setBadge:function(text){requirePermission('ui');var b=$('sbPluginBadge');if(b){b.textContent=String(text==null?'':text).slice(0,8);b.hidden=!String(text||'');}return !!b;},
       addStatusItem:function(spec){requirePermission('ui');spec=spec||{};if(statusItems.length>=3){api.warn('Maximum 3 status items per plugin.');return null;}var host=widgetsHost()||document.body;var b=document.createElement('button');b.className='ui-btn';b.type='button';b.textContent=String(spec.text||'');b.addEventListener('click',function(e){safeCall(spec.onClick,[e,api]);});host.appendChild(b);trackedNode(b);var removed=false,h={element:b,remove:function(){if(removed)return false;removed=true;statusItems=statusItems.filter(function(x){return x!==h;});removeNode(b);return true;},setText:function(v){if(!removed)b.textContent=String(v);}};statusItems.push(h);return h;},
-      requireApiVersion:function(range){var m=String(range||'').match(/^\s*(>=|>|=|<=|<)?\s*(\d+)\.(\d+)\.(\d+)/);if(!m)return false;var a=[2,3,0],b=[+m[2],+m[3],+m[4]],cmp=0;for(var i=0;i<3;i++){if(a[i]!==b[i]){cmp=a[i]>b[i]?1:-1;break;}}switch(m[1]||'='){case '>=':return cmp>=0;case '>':return cmp>0;case '<=':return cmp<=0;case '<':return cmp<0;default:return cmp===0;}},
+      requireApiVersion:function(range){var m=String(range||'').match(/^\s*(>=|>|=|<=|<)?\s*(\d+)\.(\d+)\.(\d+)/);if(!m)return false;var a=[2,4,0],b=[+m[2],+m[3],+m[4]],cmp=0;for(var i=0;i<3;i++){if(a[i]!==b[i]){cmp=a[i]>b[i]?1:-1;break;}}switch(m[1]||'='){case '>=':return cmp>=0;case '>':return cmp>0;case '<=':return cmp<=0;case '<':return cmp<0;default:return cmp===0;}},
       getStorageInfo:function(){if(HOST_MODE){return {configChars:JSON.stringify(PSTATE.config[rec.id]||{}).length,store:'plugins/plugins.json'};}var used=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);used+=String(k||'').length+String(localStorage.getItem(k)||'').length;}}catch(e){}return {localStorageApproxChars:used,pluginConfigPrefix:'starline.plugin.'+rec.id+'.'};},
       getLocaleInfo:function(){return {language:api.getLanguage(),pluginName:rec.name};},
       destroy:function(){if(disposed)return false;disposed=true;Object.keys(listeners).forEach(function(k){listeners[k]=[];});externalCleanups.slice().forEach(function(fn){try{fn();}catch(e){}});timers.forEach(function(id){window.clearTimeout(id);window.clearInterval(id);});timers=[];panelHandles.forEach(function(h){try{h.remove();}catch(e){}});commands.forEach(function(c){if(typeof window.starlineUnregisterCommand==='function')window.starlineUnregisterCommand(c.id);});statusItems.slice().forEach(function(h){h.remove();});return true;}
@@ -17204,8 +17204,17 @@ __UI_SCRIPT__
       function cu(fn){undo.push(fn);return fn;}
       function need(p){requirePermission(p);}
       function badSel(s){return typeof s!=='string'||!s||s.length>300||/[{}<>]/.test(s);}
-      function q1(s,r){if(s&&s.nodeType===1)return s;if(badSel(s))return null;try{return (r||document).querySelector(s);}catch(e){return null;}}
-      function qa(s,r){if(s&&s.nodeType===1)return [s];if(badSel(s))return [];try{return Array.prototype.slice.call((r||document).querySelectorAll(s));}catch(e){return [];}}
+      /* 2.4：@名称 选择器别名，如 api.ui.rule('@cardTitle', …)；api.ui.parts() 列出全部，api.ui.definePart() 可自定义 */
+      var PARTS={
+        app:'.app',sidebar:'.sidebar',brand:'.sb-brand',nav:'.sb-nav',navItem:'.sb-item',footer:'.sb-foot',
+        main:'.main',topbar:'.topbar',actions:'.tb-actions',search:'.topbar-search',avatar:'#tbAvatar',closeButton:'.tb-actions .tb-btn.close',worldBtn:'#worldMapOpen',
+        hero:'#hero',heroNav:'#heroNav',festStrip:'#festStrip',filters:'#secFilter',viewSwitch:'#storeViewSwitch',genreButton:'#genreBtn',
+        gridWrap:'#gridWrap',grid:'#grid',card:'#grid .card',cardImage:'#grid .card .card-img',cardTitle:'#grid .card .card-title',cardButton:'#grid .card .card-cta',gamePane:'#gamePane',
+        detail:'#detail',detailScroll:'.detail-scroll',detailHero:'.detail-hero',detailButtons:'#detailHeroBtns',profile:'#profilePage',plugins:'#pluginsPage'
+      };
+      function ex(s){return (typeof s==='string'&&s.indexOf('@')>=0)?s.replace(/@([A-Za-z][A-Za-z0-9]*)/g,function(m,n){return Object.prototype.hasOwnProperty.call(PARTS,n)?PARTS[n]:m;}):s;}
+      function q1(s,r){if(s&&s.nodeType===1)return s;s=ex(s);if(badSel(s))return null;try{return (r||document).querySelector(s);}catch(e){return null;}}
+      function qa(s,r){if(s&&s.nodeType===1)return [s];s=ex(s);if(badSel(s))return [];try{return Array.prototype.slice.call((r||document).querySelectorAll(s));}catch(e){return [];}}
       function place(el,dest,pos){
         if(!el||!dest||el===dest||el.contains(dest))return false;
         pos=String(pos||'append');
@@ -17217,6 +17226,7 @@ __UI_SCRIPT__
       }
       function cleanSvg(s){return String(s==null?'':s).replace(/<script[\s\S]*?<\/script>/gi,'').replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi,'').replace(/javascript:/gi,'');}
       function cssRule(selector,decl,tag){
+        selector=ex(selector);
         if(badSel(selector))throw err('BadSelector','Invalid selector');
         try{document.querySelector(selector);}catch(e){throw err('BadSelector','Invalid selector: '+selector);}
         var st=document.createElement('style');st.setAttribute('data-plugin-style',rec.id);st.setAttribute('data-plugin-ui',tag||'rule');
@@ -17336,7 +17346,7 @@ __UI_SCRIPT__
           return handleFor(node,node);
         },
         onElement:function(selector,cb){
-          need('dom');if(typeof cb!=='function'||badSel(selector))return function(){};var seen=typeof WeakSet==='function'?new WeakSet():null,off=false;
+          need('dom');selector=ex(selector);if(typeof cb!=='function'||badSel(selector))return function(){};var seen=typeof WeakSet==='function'?new WeakSet():null,off=false;
           function scan(){if(off)return;qa(selector).forEach(function(el){if(seen){if(seen.has(el))return;seen.add(el);}safeCall(cb,[el,api]);});}
           scan();var mo=new MutationObserver(scan);mo.observe(document.body,{childList:true,subtree:true});
           var stop=function(){off=true;mo.disconnect();};cu(stop);return stop;
@@ -17383,6 +17393,103 @@ __UI_SCRIPT__
           if(ref&&ref.parentNode){ref.parentNode.insertBefore(el,mode==='after'?ref.nextSibling:ref);}else nav.appendChild(el);
           trackedNode(el);cu(function(){removeNode(el);});var h=handleFor(el,el);h.setLabel=function(s){label.textContent=String(s==null?'':s);};return h;
         },
+        /* ════ 2.4 新增：原先只有 UI Studio 才有，现在内置 ════ */
+        parts:function(){var o={};Object.keys(PARTS).forEach(function(k){o[k]=PARTS[k];});return o;},
+        part:function(name){name=String(name==null?'':name).replace(/^@/,'');return Object.prototype.hasOwnProperty.call(PARTS,name)?PARTS[name]:null;},
+        definePart:function(name,selector){
+          need('dom');name=String(name||'');
+          if(!/^[A-Za-z][A-Za-z0-9]{0,31}$/.test(name))throw err('BadPartName','Part name must match [A-Za-z][A-Za-z0-9]{0,31}');
+          selector=String(selector||'');if(badSel(selector))throw err('BadSelector','Invalid selector');
+          var had=Object.prototype.hasOwnProperty.call(PARTS,name),old=PARTS[name];PARTS[name]=selector;
+          cu(function(){if(had)PARTS[name]=old;else delete PARTS[name];});return name;
+        },
+        /* pin：和 move 一样把元素放到目标里，但界面重新渲染、元素被重建 / 被挪走后会自动放回去 */
+        pin:function(selector,target,opts){
+          need('dom');opts=opts||{};
+          var pos=String(opts.position||'append'),el=q1(selector),dest0=q1(target);
+          if(!el||!dest0)return null;
+          var parent0=el.parentNode,next0=el.nextSibling,stopped=false,pending=false,fixes=0,winStart=0,mo=null;
+          function dest(){var d=(typeof target==='string')?q1(target):target;return d&&d.nodeType===1?d:null;}
+          function node(){if(el&&el.isConnected)return el;if(typeof selector==='string'){var n=q1(selector);if(n)el=n;}return el;}
+          function inPlace(e,d){if(pos==='before'||pos==='after')return !!d.parentNode&&e.parentNode===d.parentNode;return e.parentNode===d;}
+          function apply(){
+            if(stopped)return false;
+            var e=node(),d=dest();if(!e||!d||!e.isConnected||!d.isConnected||e===d)return false;
+            if(inPlace(e,d))return true;
+            var now=Date.now();if(now-winStart>2000){winStart=now;fixes=0;}
+            if(++fixes>30){stop(false);api.warn('ui.pin: another script keeps moving '+String(selector)+'; giving up.');return false;}
+            return place(e,d,pos);
+          }
+          function schedule(){if(pending||stopped)return;pending=true;(window.requestAnimationFrame||window.setTimeout)(function(){pending=false;apply();});}
+          function stop(restore){
+            if(stopped)return;stopped=true;if(mo){mo.disconnect();mo=null;}
+            if(restore){try{if(parent0&&el&&el.parentNode!==parent0)parent0.insertBefore(el,next0&&next0.parentNode===parent0?next0:null);}catch(e){}}
+          }
+          if(!place(el,dest0,pos))return null;
+          if(typeof MutationObserver==='function'&&document.body){mo=new MutationObserver(schedule);mo.observe(document.body,{childList:true,subtree:true});}
+          cu(function(){stop(true);});
+          return {apply:apply,remove:function(){stop(true);return true;}};
+        },
+        /* rule：持久的 CSS 规则（对以后新建的元素同样生效）。styles 可以是 {borderRadius:12} 或一段 CSS 文本；默认加 !important */
+        rule:function(selector,styles,opts){
+          need('appearance');opts=opts||{};
+          var sel=ex(selector);if(badSel(sel))throw err('BadSelector','Invalid selector');
+          var imp=opts.important!==false;
+          var media=opts.media&&/^[\w\s():,.\-\/]+$/.test(String(opts.media))?String(opts.media):'';
+          var UNITLESS=/^(opacity|z-index|flex|flex-grow|flex-shrink|order|line-height|font-weight|zoom|scale|aspect-ratio)$/;
+          function decl(st){
+            if(typeof st==='string')return st.replace(/[{}<>]/g,'').slice(0,20000);
+            var out=[];
+            Object.keys(st||{}).forEach(function(k){
+              var prop=String(k).replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();});
+              if(!/^-{0,2}[a-z][a-z0-9-]*$/.test(prop))return;
+              var v=st[k];if(v==null)return;
+              if(typeof v==='number'&&v!==0&&!UNITLESS.test(prop))v=v+'px';
+              v=String(v).replace(/[{};<>]/g,'');
+              out.push(prop+':'+v+(imp&&!/!important/.test(v)?'!important':''));
+            });
+            return out.join(';');
+          }
+          function css(st){var b=sel+'{'+decl(st)+'}';return media?'@media '+media+'{'+b+'}':b;}
+          var h=ui.injectCSS(css(styles),{tag:'rule'});
+          return {element:h.element,update:function(st){return h.update(css(st));},remove:function(){return h.remove();}};
+        },
+        /* hook：包住 app 的某个全局函数（renderGrid、openDetail、closeDetail…），可在它之前 / 之后运行，或整个替换。需要 render 权限 */
+        hook:function(name,spec){
+          need('render');name=String(name||'');
+          if(!/^[A-Za-z_$][\w$]{0,63}$/.test(name))throw err('BadHookName','Invalid function name');
+          if(typeof window[name]!=='function')return null;
+          spec=(typeof spec==='function')?{after:spec}:(spec&&typeof spec==='object'?spec:{});
+          var REG=window.__slHooks||(window.__slHooks={}),rec=REG[name];
+          if(!rec||window[name]!==rec.wrapper){
+            rec={orig:window[name],list:[],wrapper:null};
+            rec.wrapper=function(){
+              var self=this,args=[].slice.call(arguments),list=rec.list.slice(),stop=false;
+              list.forEach(function(h){if(stop||!h.spec.before)return;try{if(h.spec.before.call(null,args,h.api)===false)stop=true;}catch(e){h.api.error(e);}});
+              if(stop)return undefined;
+              var arounds=list.filter(function(h){return typeof h.spec.around==='function';});
+              function run(i){
+                if(i<0)return function(a){return rec.orig.apply(self,a);};
+                var h=arounds[i],inner=run(i-1);
+                return function(a){return h.spec.around.call(null,function(na){return inner(Array.isArray(na)?na:a);},a,h.api);};
+              }
+              var res=run(arounds.length-1)(args);
+              list.forEach(function(h){if(!h.spec.after)return;try{h.spec.after.call(null,res,args,h.api);}catch(e){h.api.error(e);}});
+              return res;
+            };
+            REG[name]=rec;window[name]=rec.wrapper;
+          }
+          var entry={spec:spec,api:api};rec.list.push(entry);
+          var removed=false;
+          function remove(){
+            if(removed)return true;removed=true;
+            rec.list=rec.list.filter(function(h){return h!==entry;});
+            if(!rec.list.length){if(window[name]===rec.wrapper)window[name]=rec.orig;if(REG[name]===rec)delete REG[name];}
+            return true;
+          }
+          cu(remove);
+          return {remove:remove};
+        },
         reset:function(){while(undo.length){var f=undo.pop();try{f();}catch(e){}}return true;}
       };
       externalCleanups.push(function(){ui.reset();});
@@ -17410,7 +17517,7 @@ __UI_SCRIPT__
     plugin.id=String(plugin.id||rec.id);plugin.name=String(plugin.name||rec.name||plugin.id);plugin.version=String(plugin.version||rec.version||'1.0.0');plugin.description=String(plugin.description||rec.description||'');
     return {plugin:plugin,api:api};
   }
-  function activate(rec){if(!rec.enabled)return;try{var r=instantiate(rec);if(!r.api.requireApiVersion('>='+String(rec.minApiVersion||'2.0.0')))throw new Error('Incompatible API version. Requires '+String(rec.minApiVersion||'2.0.0')+', host provides 2.3.0.');runtime[rec.id]=r;if(typeof r.plugin.activate==='function')r.plugin.activate(r.api);}catch(e){rec.lastError=e.message;rec.enabled=false;write();toast(t('pluginEnableFailed')+' '+rec.name);}}
+  function activate(rec){if(!rec.enabled)return;try{var r=instantiate(rec);if(!r.api.requireApiVersion('>='+String(rec.minApiVersion||'2.0.0')))throw new Error('Incompatible API version. Requires '+String(rec.minApiVersion||'2.0.0')+', host provides 2.4.0.');runtime[rec.id]=r;if(typeof r.plugin.activate==='function')r.plugin.activate(r.api);}catch(e){rec.lastError=e.message;rec.enabled=false;write();toast(t('pluginEnableFailed')+' '+rec.name);}}
   function deactivate(rec){var r=runtime[rec.id];if(r){try{if(typeof r.plugin.deactivate==='function')r.plugin.deactivate(r.api);if(r.api&&typeof r.api.destroy==='function')r.api.destroy();}catch(e){}delete runtime[rec.id];}var nodes=pluginNodes[rec.id]||[];nodes.forEach(function(n){try{if(n&&n.remove)n.remove();}catch(e){}});delete pluginNodes[rec.id];removeHost(rec.id);updateStats();}
   function updateStats(){
     var n=0;Object.keys(hosts).forEach(function(k){if(hosts[k]&&hosts[k].widgets)n+=hosts[k].widgets.children.length;});panelCount=n;
@@ -17895,7 +18002,11 @@ __UI_SCRIPT__
       {cat:'UI',name:'ui.addNavItem(spec) / ui.addPage(spec)',sig:'api.ui.addNavItem({ label, icon, page?, onClick?, after?, before? }); api.ui.addPage({ id, render(el, api) })',desc:'Requires ui. Adds a sidebar entry and/or a full page inside the app shell. Pages close themselves when another app page opens.',zh:'需要 ui 权限。在侧栏添加入口，或在程序外壳里添加整页内容。打开程序其他页面时，插件页面会自动关闭。',example:'const page = api.ui.addPage({ id: \'home\', render: el => el.textContent = \'Hello\' });\napi.ui.addNavItem({ label: \'My page\', icon: \'<circle cx="12" cy="12" r="8"/>\', page });'},
       {cat:'UI',name:'ui.addTopbarButton(spec) / ui.reset()',sig:'api.ui.addTopbarButton({ title, icon, onClick, before? }); api.ui.reset()',desc:'Requires ui for the button. reset() undoes every UI change this plugin made.',zh:'按钮需要 ui 权限。reset() 撤销本插件做过的全部界面改动。',example:'api.ui.addTopbarButton({ title: \'Hi\', icon: \'<path d="M5 12h14"/>\', onClick: () => api.toast(\'Hi\') });'},
       {cat:'Plugin folder',name:'openPluginsFolder() / getPluginInfo()',sig:'api.openPluginsFolder(); api.getPluginInfo()',desc:'Plugins live in the "plugins" folder next to the app. Opens that folder in Explorer; getPluginInfo() returns this plugin\'s file name. Settings saved with setConfig() are kept in plugins/plugins.json.',zh:'插件放在程序目录旁的 plugins 文件夹里。openPluginsFolder() 在资源管理器中打开它；getPluginInfo() 返回本插件的文件名。setConfig() 保存的设置存放在 plugins/plugins.json。',example:'api.openPluginsFolder();\nconsole.log(api.getPluginInfo());'},
-      {cat:'Plugin folder',name:'listFonts()',sig:'await api.listFonts() -> string[] | null',desc:'Requires appearance. Asks the host for every installed font family (no permission prompt). Resolves to null on older hosts or after 4 seconds.',zh:'需要 appearance 权限。向宿主请求本机已安装的全部字体族（不会弹权限）。旧版宿主或 4 秒无响应时返回 null。',example:'const fonts = await api.listFonts();\nif (fonts) console.log(fonts.length);'}
+      {cat:'Plugin folder',name:'listFonts()',sig:'await api.listFonts() -> string[] | null',desc:'Requires appearance. Asks the host for every installed font family (no permission prompt). Resolves to null on older hosts or after 4 seconds.',zh:'需要 appearance 权限。向宿主请求本机已安装的全部字体族（不会弹权限）。旧版宿主或 4 秒无响应时返回 null。',example:'const fonts = await api.listFonts();\nif (fonts) console.log(fonts.length);'},
+      {cat:'Layout',name:'ui.parts() / ui.part(name) / ui.definePart(name, selector)  ·  "@name" selectors',sig:'api.ui.parts() -> { name: selector }; api.ui.part("card"); api.ui.definePart("myBox", ".my-box"); any api.ui selector may start with @name, e.g. "@card:hover"',desc:'Stable names for the main regions of the app (sidebar, topbar, hero, grid, card, cardTitle, cardButton, detail, detailButtons, …). Use "@name" wherever api.ui accepts a selector so plugins do not depend on raw class names. definePart (needs dom) adds your own alias; it is removed when the plugin stops.',zh:'给程序主要区域起的稳定名字（sidebar / topbar / hero / grid / card / cardTitle / cardButton / detail / detailButtons …）。api.ui 里任何接受选择器的地方都可以写 "@名称"，这样插件不依赖具体 class。definePart（需要 dom 权限）可添加自己的别名，插件停用时自动移除。',example:'console.table(api.ui.parts());\napi.ui.rule(\'@cardTitle\', { fontSize: 15 });'},
+      {cat:'DOM',name:'ui.pin(selector, target, { position })',sig:'api.ui.pin(sel, target, { position:\'append\'|\'prepend\'|\'before\'|\'after\' }) -> { apply(), remove() }',desc:'Requires dom. Like ui.move, but persistent: whenever the UI re-renders and the element is recreated or taken out of the target, it is put back. Gives up (with a warning) if another script keeps fighting over the element. remove() puts the element back where it was.',zh:'需要 dom 权限。和 ui.move 类似，但是持久的：界面重新渲染、元素被重建或被挪出目标后，会自动放回去。如果有别的脚本一直在抢这个元素，会自动放弃并给出警告。remove() 把元素放回原位。',example:'api.ui.pin(\'.tb-actions > .tb-btn.close\', \'.sidebar\', { position: \'append\' });'},
+      {cat:'Theme',name:'ui.rule(selector, styles, options?)',sig:'api.ui.rule(selector, { prop: value } | "css text", { important?: true, media? }) -> { update(styles), remove() }',desc:'Requires appearance. A persistent CSS rule: unlike setStyle it also applies to elements created later (cards, panels and lists are rebuilt often). Declarations are !important by default; numbers become px (except unitless properties such as opacity or z-index).',zh:'需要 appearance 权限。持久的 CSS 规则：和 setStyle 不同，它对以后新建的元素同样生效（卡片、面板、列表经常被重建）。声明默认带 !important；数字自动加 px（opacity、z-index 等无单位属性除外）。',example:'const r = api.ui.rule(\'@card\', { borderRadius: 22 });\n// r.update({ borderRadius: 4 });'},
+      {cat:'DOM',name:'ui.hook(name, { before, around, after })',sig:'api.ui.hook("renderGrid", { before(args), around(next, args), after(result, args) }) -> { remove() }',desc:'Requires render. Wraps one of the app\'s global functions (renderGrid, openDetail, closeDetail, renderDetailHeroButtons, …) so you can run code before it, after it, or replace it. before() may return false to cancel the call; around(next, args) decides whether and how to call the original. Several plugins can hook the same function; removal is order-independent. Returns null when the function does not exist.',zh:'需要 render 权限。包住程序的某个全局函数（renderGrid / openDetail / closeDetail / renderDetailHeroButtons …），可在它之前、之后运行代码，或整个替换。before() 返回 false 可取消这次调用；around(next, args) 决定是否、怎样调用原函数。多个插件可以钩同一个函数，移除顺序无关。函数不存在时返回 null。',example:'api.ui.hook(\'renderDetailHeroButtons\', { after() { api.log(\'buttons redrawn\'); } });'},
     ];
     var base=API_CATALOG.length;
     N.forEach(function(a,i){API_CATALOG.push({cat:a.cat,name:a.name,sig:a.sig,desc:a.desc,example:a.example});if(typeof UI_T!=='undefined'){if(UI_T.en)UI_T.en['pluginApiD'+(base+i)]=a.desc;if(UI_T.zh)UI_T.zh['pluginApiD'+(base+i)]=a.zh;}});
@@ -17907,7 +18018,7 @@ __UI_SCRIPT__
   function apiLabel(k){return t('pluginApi'+k.charAt(0).toUpperCase()+k.slice(1));}
   function apiEn(k){return (typeof UI_T!=='undefined'&&UI_T.en&&UI_T.en[k])||'';}
   function tx(key,fb){var v=t(key);return (v==null||v===key)?fb:v;}
-  function apiDocsMarkdown(){var out=['# STARLINE Plugin API Reference','API version: 2.3.0','','Plugins receive an `api` object in `activate(api)`, `render(container, api)` and `deactivate(api)`.','',apiEn('pluginApiWarning'),'','## Permission model','','| Permission | APIs / capability |','|---|---|','| `storage` | config APIs and addSettings persistence |','| `network` | request (host proxy required) |','| `theme` | setTheme |','| `language` | setLanguage |','| `navigation` | navigate |','| `clipboard-read` | readText |','| `clipboard-write` | copyText |','| `download` | downloadText |','| `cross-plugin` | onPlugin plus crossPlugin allowlist |','| `ui` | addCommand, setBadge, addStatusItem, ui.addNavItem / addPage / addTopbarButton |','| `appearance` | ui.applyTheme / setCssVars / injectCSS / setFont / registerLayout / setLayout |','| `dom` | ui.hide / move / reorder / insert / setStyle / setAttr / toggleClass / setText / onElement |','| `audio` | audio.start / getFrame (system audio spectrum, 32 bands; sensitive, asks for consent) |','| `layout` | ui.layout.* / ui.edit.* (needs plugins/starline-ui-studio.js) |','| `render` | ui.card / ui.banner / ui.hook / ui.takeover (needs plugins/starline-ui-studio.js) |','| `data` | api.data.* / api.actions.* / data-sl-action (needs plugins/starline-ui-studio.js) |','','Missing permissions throw PermissionDenied for protected APIs. readText returns null and onPlugin returns a no-op unsubscribe when denied. New 2.1 plugins should declare explicit permissions.',''];API_CATALOG.forEach(function(a){out.push('## '+a.name,'','- Category: '+a.cat,'- Signature: `'+a.sig+'`','- Description: '+a.desc,'','```js',a.example,'```','');});out.push('## Minimal plugin template','','```js',"const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Example plugin',\n  activate(api) { api.toast('Enabled'); },\n  render(container, api) { container.textContent = 'Hello from plugin'; },\n  deactivate(api) {}\n};\nreturn plugin;",'```','');return out.join('\n');}
+  function apiDocsMarkdown(){var out=['# STARLINE Plugin API Reference','API version: 2.4.0','','Plugins receive an `api` object in `activate(api)`, `render(container, api)` and `deactivate(api)`.','',apiEn('pluginApiWarning'),'','## Permission model','','| Permission | APIs / capability |','|---|---|','| `storage` | config APIs and addSettings persistence |','| `network` | request (host proxy required) |','| `theme` | setTheme |','| `language` | setLanguage |','| `navigation` | navigate |','| `clipboard-read` | readText |','| `clipboard-write` | copyText |','| `download` | downloadText |','| `cross-plugin` | onPlugin plus crossPlugin allowlist |','| `ui` | addCommand, setBadge, addStatusItem, ui.addNavItem / addPage / addTopbarButton |','| `appearance` | ui.applyTheme / setCssVars / injectCSS / rule / setFont / registerLayout / setLayout |','| `dom` | ui.hide / move / pin / reorder / insert / setStyle / setAttr / toggleClass / setText / onElement / definePart |','| `audio` | audio.start / getFrame (system audio spectrum, 32 bands; sensitive, asks for consent) |','| `layout` | ui.layout.* / ui.edit.* (needs plugins/starline-ui-studio.js) |','| `render` | ui.hook (built in since 2.4); ui.card / ui.banner / ui.takeover (need plugins/starline-ui-studio.js) |','| `data` | api.data.* / api.actions.* / data-sl-action (needs plugins/starline-ui-studio.js) |','','Missing permissions throw PermissionDenied for protected APIs. readText returns null and onPlugin returns a no-op unsubscribe when denied. New 2.1 plugins should declare explicit permissions.',''];API_CATALOG.forEach(function(a){out.push('## '+a.name,'','- Category: '+a.cat,'- Signature: `'+a.sig+'`','- Description: '+a.desc,'','```js',a.example,'```','');});out.push('## Minimal plugin template','','```js',"const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Example plugin',\n  activate(api) { api.toast('Enabled'); },\n  render(container, api) { container.textContent = 'Hello from plugin'; },\n  deactivate(api) {}\n};\nreturn plugin;",'```','');return out.join('\n');}
   function apiTemplate(){return "const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Describe what your plugin does',\n  activate(api) {\n    api.toast('My Plugin enabled');\n  },\n  render(container, api) {\n    const title = api.createElement('h3', { text: 'My Plugin' });\n    const button = api.createElement('button', { className: 'ui-btn', text: 'Click me' });\n    button.addEventListener('click', () => api.toast('Button clicked'));\n    container.append(title, button);\n  },\n  deactivate(api) {\n    // Clear any plugin-owned resources here. The host also cleans tracked timers/panels.\n  }\n};\nreturn plugin;\n";}
   function apiCopy(text){var value=String(text||'');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(function(){toast(apiLabel('copied'));},function(){toast(apiLabel('copyFailed'));});return;}var ta=document.createElement('textarea');ta.value=value;document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();toast(ok?apiLabel('copied'):apiLabel('copyFailed'));}
   function apiDownload(name,text,mime){var blob=new Blob([text],{type:mime||'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
