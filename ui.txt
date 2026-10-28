@@ -15350,6 +15350,17 @@ __UI_SCRIPT__
       var gOrder = (nl >= 0) ? gBody.slice(nl + 1) : '';
       if (typeof applyGamesUpdate === 'function') applyGamesUpdate(gJson, gOrder);
     }
+    else if (msg.indexOf('GAMEANN:') === 0) {
+      /* 宿主后台拉到新的 games.txt，且只有公告变了：GAMEANN:{"CS2":["…"],…}
+         只就地换公告：不重绘列表、不弹提示、不打断正在播放的图集/视频 */
+      try {
+        var annMap = JSON.parse(msg.slice(8));
+        for (var annK in annMap) {
+          if (Object.prototype.hasOwnProperty.call(annMap, annK) && GAMES[annK]) GAMES[annK].announcements = annMap[annK];
+        }
+        if (CURRENT_GAME) renderDetailAnn(CURRENT_GAME);
+      } catch (e) {}
+    }
     else if (msg.indexOf('INJECT_ERR:') === 0) {
       var parts = msg.split(':');
       var reason = '';
