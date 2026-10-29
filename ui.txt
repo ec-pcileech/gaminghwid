@@ -1701,6 +1701,7 @@ var UI_T = {
     updatesSub:'Everything that changed in each release',
     games:'Games', selectGame:'Select Game', selectGameSub:'Choose a title to inject STARLINE into.',
     subscribed:'Subscribed', unsubscribed:'Not subscribed', inject:'Inject', expiresIn:'Expires in',
+    injectMethod:'Injection method', injectMethodLL:'LoadLibrary — standard DLL injection', injectMethodMM:'Manual Map — stealthier, no LoadLibrary call',
     license:'License', active:'ACTIVE', pausable:'Pausable', pauseTime:'Pause time', resumeTime:'Resume time', paused:'Paused', pauseBlocked:'Pause is unavailable while the game is running',
     injectOk:'Injected successfully.', injectFail:'Inject failed: ', unknownError:'Unknown error',
     errNotFound:'Game process not found — start the game first',
@@ -1761,6 +1762,7 @@ var UI_T = {
     updatesSub:'每个版本的更新内容',
     games:'游戏', selectGame:'选择游戏', selectGameSub:'选择一个要注入 STARLINE 的游戏。',
     subscribed:'已订阅', unsubscribed:'未订阅', inject:'注入', expiresIn:'剩余时间',
+    injectMethod:'注入方式', injectMethodLL:'LoadLibrary — 标准 DLL 注入', injectMethodMM:'手动映射 — 更隐蔽，不调用 LoadLibrary',
     license:'授权', active:'已激活', pausable:'可暂停', pauseTime:'暂停时长', resumeTime:'继续计时', paused:'已暂停', pauseBlocked:'游戏运行中无法暂停时长',
     injectOk:'注入成功。', injectFail:'注入失败：', unknownError:'未知错误',
     errNotFound:'未找到游戏进程 — 请先启动游戏',
@@ -1821,6 +1823,7 @@ var UI_T = {
     updatesSub:'Что изменилось в каждой версии',
     games:'Игры', selectGame:'Выбор игры', selectGameSub:'Выберите игру для инъекции STARLINE.',
     subscribed:'Активна', unsubscribed:'Не активна', inject:'Инъекция', expiresIn:'Осталось',
+    injectMethod:'Способ инъекции', injectMethodLL:'LoadLibrary — стандартная инъекция DLL', injectMethodMM:'Manual Map — скрытнее, без вызова LoadLibrary',
     license:'Лицензия', active:'АКТИВНА', pausable:'С паузой', pauseTime:'Пауза', resumeTime:'Продолжить', paused:'На паузе', pauseBlocked:'Пауза недоступна, пока игра запущена',
     injectOk:'Инъекция выполнена.', injectFail:'Ошибка инъекции: ', unknownError:'Неизвестная ошибка',
     errNotFound:'Процесс игры не найден — сначала запустите игру',
@@ -1884,6 +1887,7 @@ var UI_T = {
 
     games:'Spiele', selectGame:'Spiel wählen', selectGameSub:'Wähle ein Spiel für die STARLINE-Injektion.',
     subscribed:'Abonniert', unsubscribed:'Nicht abonniert', inject:'Injizieren', expiresIn:'Läuft ab in',
+    injectMethod:'Injektionsmethode', injectMethodLL:'LoadLibrary — Standard-DLL-Injektion', injectMethodMM:'Manual Map — unauffälliger, ohne LoadLibrary-Aufruf',
     license:'Lizenz', active:'AKTIV', pausable:'Pausierbar', pauseTime:'Pausieren', resumeTime:'Fortsetzen', paused:'Pausiert', pauseBlocked:'Pausieren ist nicht möglich, solange das Spiel läuft',
     injectOk:'Erfolgreich injiziert.', injectFail:'Injektion fehlgeschlagen: ', unknownError:'Unbekannter Fehler',
     errNotFound:'Spielprozess nicht gefunden — starte zuerst das Spiel',
@@ -1944,6 +1948,7 @@ var UI_T = {
     updatesSub:'各バージョンの変更内容',
     games:'ゲーム', selectGame:'ゲームを選択', selectGameSub:'STARLINE を注入するゲームを選択します。',
     subscribed:'購読済み', unsubscribed:'未購読', inject:'注入', expiresIn:'残り時間',
+    injectMethod:'注入方式', injectMethodLL:'LoadLibrary — 標準的な DLL インジェクション', injectMethodMM:'Manual Map — より隠密、LoadLibrary を呼び出さない',
     license:'ライセンス', active:'有効', pausable:'一時停止可', pauseTime:'時間を停止', resumeTime:'再開', paused:'停止中', pauseBlocked:'ゲーム起動中は時間を停止できません',
     injectOk:'注入に成功しました。', injectFail:'注入に失敗: ', unknownError:'不明なエラー',
     errNotFound:'ゲームのプロセスが見つかりません — 先に起動してください',
@@ -2004,6 +2009,7 @@ var UI_T = {
     updatesSub:'Todo lo que cambió en cada versión',
     games:'Juegos', selectGame:'Elegir juego', selectGameSub:'Elige un juego para inyectar STARLINE.',
     subscribed:'Suscrito', unsubscribed:'Sin suscripción', inject:'Inyectar', expiresIn:'Caduca en',
+    injectMethod:'Método de inyección', injectMethodLL:'LoadLibrary — inyección de DLL estándar', injectMethodMM:'Manual Map — más sigiloso, sin llamar a LoadLibrary',
     license:'Licencia', active:'ACTIVA', pausable:'Pausable', pauseTime:'Pausar tiempo', resumeTime:'Reanudar', paused:'En pausa', pauseBlocked:'No se puede pausar mientras el juego está en ejecución',
     injectOk:'Inyectado correctamente.', injectFail:'Fallo al inyectar: ', unknownError:'Error desconocido',
     errNotFound:'No se encontró el proceso — inicia el juego primero',
@@ -2066,6 +2072,7 @@ var UI_T = {
     updatesSub:'Her sürümde neler değişti',
     games:'Oyunlar', selectGame:'Oyun seç', selectGameSub:'STARLINE enjekte etmek için bir oyun seçin.',
     subscribed:'Abone', unsubscribed:'Abone değil', inject:'Enjekte et', expiresIn:'Kalan süre',
+    injectMethod:'Enjeksiyon yöntemi', injectMethodLL:'LoadLibrary — standart DLL enjeksiyonu', injectMethodMM:'Manual Map — daha gizli, LoadLibrary çağrısı yok',
     license:'Lisans', active:'AKTİF', pausable:'Duraklatılabilir', pauseTime:'Süreyi duraklat', resumeTime:'Devam et', paused:'Duraklatıldı', pauseBlocked:'Oyun çalışırken süre duraklatılamaz',
     injectOk:'Başarıyla enjekte edildi.', injectFail:'Enjeksiyon başarısız: ', unknownError:'Bilinmeyen hata',
     errNotFound:'Oyun süreci bulunamadı — önce oyunu başlatın',
@@ -2127,6 +2134,7 @@ var UI_T = {
     updatesSub:'O que mudou em cada versão',
     games:'Jogos', selectGame:'Escolher jogo', selectGameSub:'Escolha um jogo para injetar o STARLINE.',
     subscribed:'Assinado', unsubscribed:'Sem assinatura', inject:'Injetar', expiresIn:'Expira em',
+    injectMethod:'Método de injeção', injectMethodLL:'LoadLibrary — injeção de DLL padrão', injectMethodMM:'Manual Map — mais discreto, sem chamar LoadLibrary',
     license:'Licença', active:'ATIVA', pausable:'Pausável', pauseTime:'Pausar tempo', resumeTime:'Retomar', paused:'Pausado', pauseBlocked:'Não é possível pausar enquanto o jogo está em execução',
     injectOk:'Injetado com sucesso.', injectFail:'Falha na injeção: ', unknownError:'Erro desconhecido',
     errNotFound:'Processo do jogo não encontrado — inicie o jogo primeiro',
@@ -2596,9 +2604,6 @@ function uiT(key){
 /* ── 多语言小工具：uiAddT({ key:[en,zh,ru,de,ja,es,tr,pt] })，一次写入 8 种内置语言。
    key 会自动出现在「自定义翻译」编辑器里（它按英文键列出所有条目） ── */
 var UI_BUILTIN_CODES = ["en", "zh", "ru", "de", "ja", "es", "tr", "pt"];
-uiAddT({
-  injectMethodLabel: ["Injection method", "注入方式", "Метод инъекции", "Injektionsmethode", "注入方式", "Método de inyección", "Enjeksiyon yöntemi", "Método de injeção"],
-});
 function uiAddT(dict){
   Object.keys(dict).forEach(function(k){
     var arr = dict[k];
@@ -4496,19 +4501,6 @@ function decoInit(){
     t.style.top = Math.round(y) + 'px';
     t.classList.add('show');
   }
-  /* Give otherwise-unlabelled buttons a compact tooltip based on their accessible/visible label. */
-  function prepareButtonTips(){
-    document.querySelectorAll('button:not([title]):not([data-tip])').forEach(function(btn){
-      var label = btn.getAttribute('aria-label') || (btn.innerText || '').replace(/\s+/g,' ').trim();
-      if (!label) {
-        var svg = btn.querySelector('svg[aria-label]');
-        if (svg) label = svg.getAttribute('aria-label');
-      }
-      if (label) btn.setAttribute('data-tip', label);
-    });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepareButtonTips);
-  else prepareButtonTips();
   document.addEventListener('mouseover', function(e){
     var el = e.target && e.target.closest ? e.target.closest('[title],[data-tip]') : null;
     if (el === cur) { return; }
@@ -9631,22 +9623,14 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
 .sub-meta{font-size:12px;color:var(--text-3);margin-top:4px}
 .sub-actions{display:flex;gap:10px;flex-shrink:0}
 .inject-panel{
-  background:linear-gradient(115deg,rgba(28,13,35,.96),rgba(20,10,27,.94));
+  background:var(--surface);
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(105,57,126,.48);
-  border-radius:18px;
-  padding:22px 20px;display:flex;align-items:center;gap:20px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
-  transition:border-color var(--tr),box-shadow var(--tr),transform var(--tr);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  padding:22px;display:flex;align-items:center;gap:20px;
+  transition:all var(--tr);
 }
-.inject-panel:hover{border-color:rgba(139,75,157,.68);box-shadow:0 12px 32px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.03)}
-.inject-panel .inject-method-control{border-color:rgba(105,57,126,.55);background:rgba(14,7,20,.72)}
-.inject-panel .inject-method-mark{background:linear-gradient(135deg,#ff8b2c,#c65be7);color:#fff}
-.inject-panel .progress{background:rgba(119,71,139,.25)}
-.inject-panel .progress-fill{background:linear-gradient(90deg,#ff8b2c,#c65be7);box-shadow:0 0 12px rgba(255,139,44,.24)}
-.inject-panel .btn-primary{background:linear-gradient(135deg,#ff9a35,#ff7b22);border-color:transparent;color:#fff;box-shadow:0 5px 18px rgba(255,126,34,.22)}
-.inject-panel .btn-primary:hover{filter:brightness(1.07);box-shadow:0 7px 22px rgba(255,126,34,.3)}
 .inject-panel.active{
   border-color:var(--accent);
   box-shadow:0 0 0 4px var(--accent-soft),var(--shadow-2);
@@ -9659,17 +9643,6 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
 .inject-info{flex:1;min-width:0}
 .inject-title{font-size:17px;font-weight:700;margin-bottom:4px}
 .inject-status{font-size:12.5px;color:var(--text-2);margin-bottom:10px}
-.inject-method{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 15px}
-.inject-method label{font-size:11px;color:var(--text-3);font-weight:700;letter-spacing:.08em;text-transform:uppercase}
-.inject-method-control{position:relative;display:flex;align-items:center;gap:9px;min-width:190px;max-width:100%;padding:0 34px 0 11px;border:1px solid var(--border-2);border-radius:10px;background:linear-gradient(180deg,var(--surface-2),var(--surface));box-shadow:inset 0 1px 0 rgba(255,255,255,.035);transition:border-color var(--tr),box-shadow var(--tr),background var(--tr)}
-.inject-method-control:hover{border-color:color-mix(in srgb,var(--accent) 55%,var(--border-2))}
-.inject-method-control:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-.inject-method-mark{display:grid;place-items:center;width:27px;height:27px;flex-shrink:0;border-radius:7px;background:var(--accent-soft);color:var(--accent-2,var(--accent))}
-.inject-method-mark svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.inject-method select{appearance:none;-webkit-appearance:none;width:100%;min-width:0;padding:10px 0;border:0;background:transparent;color:var(--text);font:600 12px var(--font,inherit);outline:none;cursor:pointer}
-.inject-method select option{background:var(--surface-solid,#17171b);color:var(--text)}
-.inject-method-chevron{position:absolute;right:11px;width:14px;height:14px;fill:none;stroke:var(--text-3);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
-@media(max-width:720px){.inject-panel{flex-wrap:wrap}.inject-method{width:100%;align-items:flex-start;flex-direction:column;gap:7px}.inject-method-control{width:100%;box-sizing:border-box}.inject-actions{margin-left:auto}}
 .progress{
   height:6px;border-radius:3px;
   background:var(--surface-3);overflow:hidden;
@@ -9692,6 +9665,12 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
   animation:shim 1.4s linear infinite;
 }
 .inject-actions{display:flex;gap:10px;margin-left:auto;flex-shrink:0}
+.inject-method{display:flex;gap:4px;flex-shrink:0;padding:4px;border-radius:var(--radius);background:var(--surface-2);border:1px solid var(--border)}
+.inject-method-btn{width:38px;height:38px;display:grid;place-items:center;border-radius:calc(var(--radius) - 2px);border:0;background:transparent;color:var(--text-3);cursor:pointer;transition:background var(--tr-fast),color var(--tr-fast),box-shadow var(--tr-fast)}
+.inject-method-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.inject-method-btn:hover{color:var(--text);background:var(--surface-3)}
+.inject-method-btn.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 4px 14px var(--accent-glow)}
+@media(max-width:720px){.inject-method{order:-1}}
 .profile-wrap{padding:24px 0}
 .profile-hero{
   position:relative;height:180px;
@@ -10692,7 +10671,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
                 <span id="subPauseIco" class="btn-ico"></span>
                 <span id="subPauseTxt">Pause time</span>
               </button>
-              <button class="btn btn-ghost" title="Renew your subscription" onclick="renewGame(event,CURRENT_GAME)">
+              <button class="btn btn-ghost" onclick="renewGame(event,CURRENT_GAME)">
                 <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                 <span data-ui="renew">Renew</span>
               </button>
@@ -10708,22 +10687,19 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
             <div class="inject-info">
               <div class="inject-title" id="injectTitle">-</div>
               <div class="inject-status" id="injectStatus">Ready to launch</div>
-              <div class="inject-method">
-                <label for="injectMethod" data-ui="injectMethodLabel">Injection method</label>
-                <div class="inject-method-control">
-                  <span class="inject-method-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v4m0 10v4M3 12h4m10 0h4"/><circle cx="12" cy="12" r="5"/></svg></span>
-                  <select id="injectMethod" onchange="saveInjectionMethod(this.value)">
-                    <option value="loadlibrary">LoadLibrary</option>
-                    <option value="manualmap">Manual Map</option>
-                  </select>
-                  <svg class="inject-method-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"/></svg>
-                </div>
-              </div>
               <div class="progress"><div class="progress-fill" id="injectProg"></div></div>
             </div>
+            <div class="inject-method" id="injectMethod" role="group" data-ui-title="injectMethod" title="Injection method">
+              <button type="button" class="inject-method-btn active" data-method="loadlibrary" data-ui-title="injectMethodLL" title="LoadLibrary — standard DLL injection" aria-label="LoadLibrary">
+                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+              </button>
+              <button type="button" class="inject-method-btn" data-method="manualmap" data-ui-title="injectMethodMM" title="Manual Map — stealthier, no LoadLibrary call" aria-label="Manual Map">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+              </button>
+            </div>
             <div class="inject-actions">
-              <button class="btn btn-ghost" id="injectCancel" title="Cancel the current launch" hidden onclick="cancelInject()" data-ui="cancel">Cancel</button>
-              <button class="btn btn-primary" id="injectStart" title="Start the selected game" onclick="doInject()">
+              <button class="btn btn-ghost" id="injectCancel" hidden onclick="cancelInject()" data-ui="cancel">Cancel</button>
+              <button class="btn btn-primary" id="injectStart" onclick="doInject()">
                 <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 <span data-ui="launch">Launch</span>
               </button>
@@ -13564,6 +13540,23 @@ __UI_SCRIPT__
     }
   }
 
+  /* ── 注入方式选择：LoadLibrary / Manual Map，纯 UI（不涉及实际注入逻辑），
+     选中状态存在 INJECT_METHOD，供以后 doInject() 读取并传给宿主 ── */
+  var INJECT_METHOD = 'loadlibrary';
+  (function initInjectMethod(){
+    var box = document.getElementById('injectMethod');
+    if (!box) return;
+    var btns = box.querySelectorAll('.inject-method-btn');
+    Array.prototype.forEach.call(btns, function(btn){
+      btn.addEventListener('click', function(){
+        if (btn.classList.contains('active')) return;
+        Array.prototype.forEach.call(btns, function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        INJECT_METHOD = btn.getAttribute('data-method') || 'loadlibrary';
+      });
+    });
+  })();
+
   function tagT(x){
     var k = 't' + String(x).replace(/[^A-Za-z]/g, '');
     var v = uiT(k);
@@ -14208,27 +14201,6 @@ __UI_SCRIPT__
 
 
   var injectTimer = null;
-  /* Injection method selector is currently a persisted UI preference only. */
-  var INJECT_METHOD_KEY = 'starline.injectMethod';
-  function saveInjectionMethod(value){
-    value = value === 'manualmap' ? 'manualmap' : 'loadlibrary';
-    try { localStorage.setItem(INJECT_METHOD_KEY, value); } catch (e) {}
-    var select = document.getElementById('injectMethod');
-    if (select && select.value !== value) select.value = value;
-  }
-  (function initInjectionMethod(){
-    var value = 'loadlibrary';
-    try {
-      var saved = localStorage.getItem(INJECT_METHOD_KEY);
-      if (saved === 'manualmap' || saved === 'loadlibrary') value = saved;
-    } catch (e) {}
-    var apply = function(){
-      var select = document.getElementById('injectMethod');
-      if (select) select.value = value;
-    };
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
-    else apply();
-  })();
   var injectPct = 0;         /* 详情页进度条当前值 */
   var injectRealPct = -1;    /* 宿主上报的真实下载百分比；-1 = 还没收到 */
   var injectGame = '';
