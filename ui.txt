@@ -2596,6 +2596,10 @@ function uiT(key){
 /* ── 多语言小工具：uiAddT({ key:[en,zh,ru,de,ja,es,tr,pt] })，一次写入 8 种内置语言。
    key 会自动出现在「自定义翻译」编辑器里（它按英文键列出所有条目） ── */
 var UI_BUILTIN_CODES = ["en", "zh", "ru", "de", "ja", "es", "tr", "pt"];
+uiAddT({
+  injectMethodLabel: ["Injection method", "注入方式", "Метод инъекции", "Injektionsmethode", "注入方式", "Método de inyección", "Enjeksiyon yöntemi", "Método de injeção"],
+  injectMethodHelp: ["Saved as a UI preference; it does not change the injection backend.", "仅保存界面选择；不会改变实际注入后端。", "Сохраняется только выбор интерфейса; способ внедрения не меняется.", "Wird nur als UI-Einstellung gespeichert; die Injektionsroutine wird nicht geändert.", "UI設定として保存されます。実際の注入処理は変更されません。", "Se guarda como preferencia visual; no cambia el método de inyección real.", "Yalnızca arayüz tercihi olarak kaydedilir; gerçek enjeksiyon yöntemini değiştirmez.", "Salvo como preferência da interface; não altera o mecanismo de injeção."]
+});
 function uiAddT(dict){
   Object.keys(dict).forEach(function(k){
     var arr = dict[k];
@@ -9635,6 +9639,12 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
 .inject-info{flex:1;min-width:0}
 .inject-title{font-size:17px;font-weight:700;margin-bottom:4px}
 .inject-status{font-size:12.5px;color:var(--text-2);margin-bottom:10px}
+.inject-method{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:10px 0 12px}
+.inject-method label{font-size:12px;color:var(--text-2);font-weight:600}
+.inject-method select{min-width:150px;max-width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text);font:inherit;font-size:12px;outline:none}
+.inject-method select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.inject-method-note{font-size:11px;color:var(--text-3);margin-top:4px}
+@media(max-width:720px){.inject-panel{flex-wrap:wrap}.inject-method{width:100%}.inject-actions{margin-left:auto}}
 .progress{
   height:6px;border-radius:3px;
   background:var(--surface-3);overflow:hidden;
@@ -10673,6 +10683,14 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
             <div class="inject-info">
               <div class="inject-title" id="injectTitle">-</div>
               <div class="inject-status" id="injectStatus">Ready to launch</div>
+              <div class="inject-method">
+                <label for="injectMethod" data-ui="injectMethodLabel">Injection method</label>
+                <select id="injectMethod" onchange="saveInjectionMethod(this.value)" aria-describedby="injectMethodNote">
+                  <option value="loadlibrary">LoadLibrary</option>
+                  <option value="manualmap">Manual Map</option>
+                </select>
+              </div>
+              <div class="inject-method-note" id="injectMethodNote" data-ui="injectMethodHelp">Saved as a UI preference; it does not change the injection backend.</div>
               <div class="progress"><div class="progress-fill" id="injectProg"></div></div>
             </div>
             <div class="inject-actions">
@@ -14162,6 +14180,27 @@ __UI_SCRIPT__
 
 
   var injectTimer = null;
+  /* Injection method selector is currently a persisted UI preference only. */
+  var INJECT_METHOD_KEY = 'starline.injectMethod';
+  function saveInjectionMethod(value){
+    value = value === 'manualmap' ? 'manualmap' : 'loadlibrary';
+    try { localStorage.setItem(INJECT_METHOD_KEY, value); } catch (e) {}
+    var select = document.getElementById('injectMethod');
+    if (select && select.value !== value) select.value = value;
+  }
+  (function initInjectionMethod(){
+    var value = 'loadlibrary';
+    try {
+      var saved = localStorage.getItem(INJECT_METHOD_KEY);
+      if (saved === 'manualmap' || saved === 'loadlibrary') value = saved;
+    } catch (e) {}
+    var apply = function(){
+      var select = document.getElementById('injectMethod');
+      if (select) select.value = value;
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
+    else apply();
+  })();
   var injectPct = 0;         /* 详情页进度条当前值 */
   var injectRealPct = -1;    /* 宿主上报的真实下载百分比；-1 = 还没收到 */
   var injectGame = '';
