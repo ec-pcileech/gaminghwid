@@ -4496,6 +4496,19 @@ function decoInit(){
     t.style.top = Math.round(y) + 'px';
     t.classList.add('show');
   }
+  /* Give otherwise-unlabelled buttons a compact tooltip based on their accessible/visible label. */
+  function prepareButtonTips(){
+    document.querySelectorAll('button:not([title]):not([data-tip])').forEach(function(btn){
+      var label = btn.getAttribute('aria-label') || (btn.innerText || '').replace(/\s+/g,' ').trim();
+      if (!label) {
+        var svg = btn.querySelector('svg[aria-label]');
+        if (svg) label = svg.getAttribute('aria-label');
+      }
+      if (label) btn.setAttribute('data-tip', label);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepareButtonTips);
+  else prepareButtonTips();
   document.addEventListener('mouseover', function(e){
     var el = e.target && e.target.closest ? e.target.closest('[title],[data-tip]') : null;
     if (el === cur) { return; }
@@ -9618,14 +9631,22 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
 .sub-meta{font-size:12px;color:var(--text-3);margin-top:4px}
 .sub-actions{display:flex;gap:10px;flex-shrink:0}
 .inject-panel{
-  background:var(--surface);
+  background:linear-gradient(115deg,rgba(28,13,35,.96),rgba(20,10,27,.94));
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--border);
-  border-radius:var(--radius-lg);
-  padding:22px;display:flex;align-items:center;gap:20px;
-  transition:all var(--tr);
+  border:1px solid rgba(105,57,126,.48);
+  border-radius:18px;
+  padding:22px 20px;display:flex;align-items:center;gap:20px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+  transition:border-color var(--tr),box-shadow var(--tr),transform var(--tr);
 }
+.inject-panel:hover{border-color:rgba(139,75,157,.68);box-shadow:0 12px 32px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.03)}
+.inject-panel .inject-method-control{border-color:rgba(105,57,126,.55);background:rgba(14,7,20,.72)}
+.inject-panel .inject-method-mark{background:linear-gradient(135deg,#ff8b2c,#c65be7);color:#fff}
+.inject-panel .progress{background:rgba(119,71,139,.25)}
+.inject-panel .progress-fill{background:linear-gradient(90deg,#ff8b2c,#c65be7);box-shadow:0 0 12px rgba(255,139,44,.24)}
+.inject-panel .btn-primary{background:linear-gradient(135deg,#ff9a35,#ff7b22);border-color:transparent;color:#fff;box-shadow:0 5px 18px rgba(255,126,34,.22)}
+.inject-panel .btn-primary:hover{filter:brightness(1.07);box-shadow:0 7px 22px rgba(255,126,34,.3)}
 .inject-panel.active{
   border-color:var(--accent);
   box-shadow:0 0 0 4px var(--accent-soft),var(--shadow-2);
@@ -10671,7 +10692,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
                 <span id="subPauseIco" class="btn-ico"></span>
                 <span id="subPauseTxt">Pause time</span>
               </button>
-              <button class="btn btn-ghost" onclick="renewGame(event,CURRENT_GAME)">
+              <button class="btn btn-ghost" title="Renew your subscription" onclick="renewGame(event,CURRENT_GAME)">
                 <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
                 <span data-ui="renew">Renew</span>
               </button>
@@ -10701,8 +10722,8 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
               <div class="progress"><div class="progress-fill" id="injectProg"></div></div>
             </div>
             <div class="inject-actions">
-              <button class="btn btn-ghost" id="injectCancel" hidden onclick="cancelInject()" data-ui="cancel">Cancel</button>
-              <button class="btn btn-primary" id="injectStart" onclick="doInject()">
+              <button class="btn btn-ghost" id="injectCancel" title="Cancel the current launch" hidden onclick="cancelInject()" data-ui="cancel">Cancel</button>
+              <button class="btn btn-primary" id="injectStart" title="Start the selected game" onclick="doInject()">
                 <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                 <span data-ui="launch">Launch</span>
               </button>
