@@ -14323,8 +14323,8 @@ __UI_SCRIPT__
     }, 110);
 
 
-    /* 发送 LAUNCH 消息给宿主：宿主负责下载 / 解压 / 运行或注入 */
-    wv('LAUNCH:' + CURRENT_GAME);
+    /* 发送 LAUNCH 消息给宿主：格式 LAUNCH:<game>:<method>，宿主负责下载/解压/运行或注入 */
+    wv('LAUNCH:' + CURRENT_GAME + ':' + INJECT_METHOD);
   }
 
   /* 宿主上报真实进度：详情页面板与侧栏任务卡一起更新 */
