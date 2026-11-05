@@ -234,7 +234,7 @@ cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/39
 cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3932890/7ce6dcc9543c8d698efe8f89bf61a385a1d07ddd/ss_7ce6dcc9543c8d698efe8f89bf61a385a1d07ddd.1920x1080.jpg?t=1785782094
 process  = EscapeFromTarkov.exe
 runmode  = dll
-download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_tarkov.zip
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_tarkov.zip
 dev      = Battlestate Games
 pub      = Battlestate Games
 rel      = 2017
