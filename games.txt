@@ -220,11 +220,40 @@ Announcement1 = This product is being updated. If you bought it, you can exchang
 
 
 # ───────────────────────────────────────────────────────────────────────────
-#  Escape from Tarkov
+#  Escape from Tarkov PVE
 # ───────────────────────────────────────────────────────────────────────────
 [TARKOV]
-title    = Escape from Tarkov
-short    = Tarkov
+title    = Escape from Tarkov PVE
+short    = Tarkov PVE
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/4dd12ea3b00a4f8b67bfd629f3b9abbf8d5cab05/header_alt_assets_2.jpg?t=1785782094
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/extras/b2aabc35727bbcf60226cd2cacea7ea3.webm?t=1785782094
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/extras/c03b85bd48cf39c8cae3666515d2f760.webm?t=1785782094
+cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3932890/a3008a8ce41cd39293b77e5988ab6d3465c01ce2/ss_a3008a8ce41cd39293b77e5988ab6d3465c01ce2.1920x1080.jpg?t=1785782094
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3932890/10f05f9abd2d53c29613c2ac34aa868d64dbb525/ss_10f05f9abd2d53c29613c2ac34aa868d64dbb525.1920x1080.jpg?t=1785782094
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3932890/328f9a1b535506a529910ea822387fb5722556a4/ss_328f9a1b535506a529910ea822387fb5722556a4.1920x1080.jpg?t=1785782094
+cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3932890/7ce6dcc9543c8d698efe8f89bf61a385a1d07ddd/ss_7ce6dcc9543c8d698efe8f89bf61a385a1d07ddd.1920x1080.jpg?t=1785782094
+process  = EscapeFromTarkov.exe
+runmode  = zip
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_tarkov.zip
+dev      = Battlestate Games
+pub      = Battlestate Games
+rel      = 2017
+genres   = Survival, Shooter, Hardcore
+features = Multiplayer, Realistic
+featured = true
+price7   = 8.99        
+price15  = 15.99    
+price30  = 34.99
+price90  = 79.99
+priceLife= 129.99
+
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Escape from Tarkov PVP
+# ───────────────────────────────────────────────────────────────────────────
+[TARKOV]
+title    = Escape from Tarkov PVP
+short    = Tarkov PVP
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/4dd12ea3b00a4f8b67bfd629f3b9abbf8d5cab05/header_alt_assets_2.jpg?t=1785782094
 cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/extras/b2aabc35727bbcf60226cd2cacea7ea3.webm?t=1785782094
 cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/3932890/extras/c03b85bd48cf39c8cae3666515d2f760.webm?t=1785782094
@@ -246,7 +275,6 @@ price15  = 15.99
 price30  = 34.99
 price90  = 79.99
 priceLife= 129.99
-
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Counter-Strike 1.6
