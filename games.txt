@@ -5,8 +5,14 @@
 #  ── APP 更新信息（客户端启动时读取，不显示给用户）──────────────────────
 #  APP_VERSION  最新 APP 版本号；和客户端当前版本不一致就弹更新窗口
 #  APP_DOWNLOAD 新版本 exe 直链；只保存在客户端内存，界面拿不到这个地址
+#  APP_STATUS   APP 状态：available（正常，默认） / maintenance（维护中）
+#               · maintenance 时登录界面不再显示，改为显示「The server is under maintenance」维护页
+#                 （左上角 STARLINE，右上角只有一个「关闭 APP」按钮，无法登录 / 注册）
+#               · 改回 available 后，客户端约 1 分钟内自动恢复登录界面，无需重启
+#               · 也认：maintenance / maintain / maintaining / 维护中 / 维护 / 维修中
 #  ────────────────────────────────────────────────────────────────────────
-#APP_VERSION 3.1.6
+#APP_VERSION 3.1.7
+#APP_STATUS maintenance
 #APP_DOWNLOAD https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/STARLINE.exe
 #
 #  格式说明
