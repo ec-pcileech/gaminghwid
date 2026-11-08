@@ -1,5 +1,5 @@
 #STARLINE-UI 1
-#VERSION 2026-10-28
+#VERSION 2026-11-08
 #===THEME_CSS
 
 :root{
@@ -6082,6 +6082,81 @@ __UI_CSS__
 
 </head>
 <body>
+<script>
+/* STARLINE skin loader —— 插件用 api.ui.setSkin() 把外观存进 localStorage，登录页 / 主界面在插件加载之前就先套上，避免闪一下默认样式 */
+(function(){
+  if(window.SLSkin)return;
+  var KEY='starline.skin.v1',PAGE='login',DBN='starline-plugin-blobs',ROOT=document.documentElement,urls={};
+  function read(){try{var o=JSON.parse(localStorage.getItem(KEY)||'{}');return (o&&typeof o==='object')?o:{};}catch(e){return {};}}
+  function write(o){try{localStorage.setItem(KEY,JSON.stringify(o));return true;}catch(e){return false;}}
+  function num(v,d,a,b){v=parseFloat(v);if(!isFinite(v))v=d;return Math.min(b,Math.max(a,v));}
+  function clean(s){return String(s==null?'':s).replace(/<\/?style[^>]*>/gi,'').replace(/@import[^;]*;?/gi,'').slice(0,300000);}
+  function okSrc(u){return /^(https?:\/\/|data:image\/|data:video\/|blob:|idb:)/i.test(String(u||''));}
+  function idbGet(pid,key,cb){
+    try{
+      var rq=indexedDB.open(DBN,1);
+      rq.onupgradeneeded=function(){var d=rq.result;if(!d.objectStoreNames.contains('blobs')){var os=d.createObjectStore('blobs',{keyPath:'k'});os.createIndex('plugin','plugin',{unique:false});}};
+      rq.onsuccess=function(){try{var g=rq.result.transaction('blobs','readonly').objectStore('blobs').get(pid+'\u0000'+key);g.onsuccess=function(){cb(g.result&&g.result.blob||null);rq.result.close();};g.onerror=function(){cb(null);};}catch(e){cb(null);}};
+      rq.onerror=function(){cb(null);};
+    }catch(e){cb(null);}
+  }
+  function resolve(pid,src,cb){
+    if(/^idb:/i.test(src)){
+      var key=src.slice(4),k=pid+'\u0000'+key;
+      idbGet(pid,key,function(b){if(!b){cb('');return;}if(urls[k]){try{URL.revokeObjectURL(urls[k]);}catch(e){}}urls[k]=URL.createObjectURL(b);cb(urls[k]);});
+    }else cb(src);
+  }
+  function releaseUrls(pid){Object.keys(urls).forEach(function(k){if(k.indexOf(pid+'\u0000')===0){try{URL.revokeObjectURL(urls[k]);}catch(e){}delete urls[k];}});}
+  function layer(pid){return document.getElementById('slSkinBg-'+pid);}
+  function applyBg(pid,bg){
+    var el=layer(pid);
+    if(!bg||!bg.src||!okSrc(bg.src)){if(el){el.remove();}releaseUrls(pid);return;}
+    var host=document.body||ROOT,sig=bg.kind+'|'+bg.src;
+    if(!el){
+      el=document.createElement('div');el.id='slSkinBg-'+pid;el.className='sl-skin-bg';el.setAttribute('aria-hidden','true');
+      el.style.cssText='position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none';
+      el.innerHTML='<div class="sl-skin-media" style="position:absolute;inset:-6%"></div><div class="sl-skin-dim" style="position:absolute;inset:0"></div>';
+      host.insertBefore(el,host.firstChild);
+    }
+    var media=el.firstChild,dim=el.lastChild;
+    media.style.filter='blur('+num(bg.blur,0,0,80)+'px) saturate('+num(bg.saturate,1,.2,3)+') brightness('+num(bg.brightness,1,.3,2)+')';
+    dim.style.background='rgba('+(/^\d{1,3},\d{1,3},\d{1,3}$/.test(bg.dimColor||'')?bg.dimColor:'0,0,0')+','+num(bg.dim,.3,0,.95)+')';
+    if(el.getAttribute('data-sig')===sig)return;
+    el.setAttribute('data-sig',sig);media.innerHTML='';
+    resolve(pid,bg.src,function(url){
+      if(!url||el.getAttribute('data-sig')!==sig)return;
+      var m;
+      if(bg.kind==='video'){m=document.createElement('video');m.muted=true;m.loop=true;m.autoplay=true;m.setAttribute('playsinline','');m.setAttribute('muted','');}
+      else{m=document.createElement('img');m.alt='';m.draggable=false;}
+      m.style.cssText='width:100%;height:100%;object-fit:'+(bg.fit==='contain'?'contain':'cover')+';display:block';
+      m.src=url;media.appendChild(m);
+      if(m.play){var pr=m.play();if(pr&&pr.catch)pr.catch(function(){});}
+    });
+  }
+  /* s = { cls, css, bg, theme } —— 只对当前页面生效 */
+  function apply(pid,s){
+    s=s||{};
+    var st=document.getElementById('slSkinCss-'+pid);
+    if(!st){st=document.createElement('style');st.id='slSkinCss-'+pid;(document.head||ROOT).appendChild(st);}
+    var css=clean(s.css);if(st.textContent!==css)st.textContent=css;
+    var cls=/^[A-Za-z][\w-]{0,31}$/.test(String(s.cls||''))?String(s.cls):'';
+    if(st.getAttribute('data-cls')&&st.getAttribute('data-cls')!==cls)ROOT.classList.remove(st.getAttribute('data-cls'));
+    st.setAttribute('data-cls',cls);if(cls)ROOT.classList.add(cls);
+    if(s.theme==='light'||s.theme==='dark')ROOT.setAttribute('data-theme',s.theme);
+    applyBg(pid,s.bg);
+  }
+  function remove(pid,keepStore){
+    var st=document.getElementById('slSkinCss-'+pid);
+    if(st){var c=st.getAttribute('data-cls');if(c)ROOT.classList.remove(c);st.remove();}
+    var el=layer(pid);if(el)el.remove();
+    releaseUrls(pid);
+    if(!keepStore){var all=read();if(all[pid]){delete all[pid];write(all);}}
+  }
+  window.SLSkin={PAGE:PAGE,read:read,write:write,apply:apply,remove:remove,sanitize:clean,okSrc:okSrc};
+  var all=read();
+  Object.keys(all).forEach(function(pid){var e=all[pid],k=e&&e[PAGE];if(k&&typeof k==='object'){try{apply(pid,{cls:e.cls,theme:e.theme,css:k.css,bg:k.bg});}catch(x){}}});
+})();
+</script>
 <div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><div class="bgfx-layer" id="bgLayer"></div>
 <div id="fxLayer" aria-hidden="true"></div>
 <canvas id="decoCanvas" aria-hidden="true"></canvas></div>
@@ -10200,6 +10275,81 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
 </style>
 </head>
 <body class="__UI_INTRO_CLASS__">
+<script>
+/* STARLINE skin loader —— 插件用 api.ui.setSkin() 把外观存进 localStorage，登录页 / 主界面在插件加载之前就先套上，避免闪一下默认样式 */
+(function(){
+  if(window.SLSkin)return;
+  var KEY='starline.skin.v1',PAGE='app',DBN='starline-plugin-blobs',ROOT=document.documentElement,urls={};
+  function read(){try{var o=JSON.parse(localStorage.getItem(KEY)||'{}');return (o&&typeof o==='object')?o:{};}catch(e){return {};}}
+  function write(o){try{localStorage.setItem(KEY,JSON.stringify(o));return true;}catch(e){return false;}}
+  function num(v,d,a,b){v=parseFloat(v);if(!isFinite(v))v=d;return Math.min(b,Math.max(a,v));}
+  function clean(s){return String(s==null?'':s).replace(/<\/?style[^>]*>/gi,'').replace(/@import[^;]*;?/gi,'').slice(0,300000);}
+  function okSrc(u){return /^(https?:\/\/|data:image\/|data:video\/|blob:|idb:)/i.test(String(u||''));}
+  function idbGet(pid,key,cb){
+    try{
+      var rq=indexedDB.open(DBN,1);
+      rq.onupgradeneeded=function(){var d=rq.result;if(!d.objectStoreNames.contains('blobs')){var os=d.createObjectStore('blobs',{keyPath:'k'});os.createIndex('plugin','plugin',{unique:false});}};
+      rq.onsuccess=function(){try{var g=rq.result.transaction('blobs','readonly').objectStore('blobs').get(pid+'\u0000'+key);g.onsuccess=function(){cb(g.result&&g.result.blob||null);rq.result.close();};g.onerror=function(){cb(null);};}catch(e){cb(null);}};
+      rq.onerror=function(){cb(null);};
+    }catch(e){cb(null);}
+  }
+  function resolve(pid,src,cb){
+    if(/^idb:/i.test(src)){
+      var key=src.slice(4),k=pid+'\u0000'+key;
+      idbGet(pid,key,function(b){if(!b){cb('');return;}if(urls[k]){try{URL.revokeObjectURL(urls[k]);}catch(e){}}urls[k]=URL.createObjectURL(b);cb(urls[k]);});
+    }else cb(src);
+  }
+  function releaseUrls(pid){Object.keys(urls).forEach(function(k){if(k.indexOf(pid+'\u0000')===0){try{URL.revokeObjectURL(urls[k]);}catch(e){}delete urls[k];}});}
+  function layer(pid){return document.getElementById('slSkinBg-'+pid);}
+  function applyBg(pid,bg){
+    var el=layer(pid);
+    if(!bg||!bg.src||!okSrc(bg.src)){if(el){el.remove();}releaseUrls(pid);return;}
+    var host=document.body||ROOT,sig=bg.kind+'|'+bg.src;
+    if(!el){
+      el=document.createElement('div');el.id='slSkinBg-'+pid;el.className='sl-skin-bg';el.setAttribute('aria-hidden','true');
+      el.style.cssText='position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none';
+      el.innerHTML='<div class="sl-skin-media" style="position:absolute;inset:-6%"></div><div class="sl-skin-dim" style="position:absolute;inset:0"></div>';
+      host.insertBefore(el,host.firstChild);
+    }
+    var media=el.firstChild,dim=el.lastChild;
+    media.style.filter='blur('+num(bg.blur,0,0,80)+'px) saturate('+num(bg.saturate,1,.2,3)+') brightness('+num(bg.brightness,1,.3,2)+')';
+    dim.style.background='rgba('+(/^\d{1,3},\d{1,3},\d{1,3}$/.test(bg.dimColor||'')?bg.dimColor:'0,0,0')+','+num(bg.dim,.3,0,.95)+')';
+    if(el.getAttribute('data-sig')===sig)return;
+    el.setAttribute('data-sig',sig);media.innerHTML='';
+    resolve(pid,bg.src,function(url){
+      if(!url||el.getAttribute('data-sig')!==sig)return;
+      var m;
+      if(bg.kind==='video'){m=document.createElement('video');m.muted=true;m.loop=true;m.autoplay=true;m.setAttribute('playsinline','');m.setAttribute('muted','');}
+      else{m=document.createElement('img');m.alt='';m.draggable=false;}
+      m.style.cssText='width:100%;height:100%;object-fit:'+(bg.fit==='contain'?'contain':'cover')+';display:block';
+      m.src=url;media.appendChild(m);
+      if(m.play){var pr=m.play();if(pr&&pr.catch)pr.catch(function(){});}
+    });
+  }
+  /* s = { cls, css, bg, theme } —— 只对当前页面生效 */
+  function apply(pid,s){
+    s=s||{};
+    var st=document.getElementById('slSkinCss-'+pid);
+    if(!st){st=document.createElement('style');st.id='slSkinCss-'+pid;(document.head||ROOT).appendChild(st);}
+    var css=clean(s.css);if(st.textContent!==css)st.textContent=css;
+    var cls=/^[A-Za-z][\w-]{0,31}$/.test(String(s.cls||''))?String(s.cls):'';
+    if(st.getAttribute('data-cls')&&st.getAttribute('data-cls')!==cls)ROOT.classList.remove(st.getAttribute('data-cls'));
+    st.setAttribute('data-cls',cls);if(cls)ROOT.classList.add(cls);
+    if(s.theme==='light'||s.theme==='dark')ROOT.setAttribute('data-theme',s.theme);
+    applyBg(pid,s.bg);
+  }
+  function remove(pid,keepStore){
+    var st=document.getElementById('slSkinCss-'+pid);
+    if(st){var c=st.getAttribute('data-cls');if(c)ROOT.classList.remove(c);st.remove();}
+    var el=layer(pid);if(el)el.remove();
+    releaseUrls(pid);
+    if(!keepStore){var all=read();if(all[pid]){delete all[pid];write(all);}}
+  }
+  window.SLSkin={PAGE:PAGE,read:read,write:write,apply:apply,remove:remove,sanitize:clean,okSrc:okSrc};
+  var all=read();
+  Object.keys(all).forEach(function(pid){var e=all[pid],k=e&&e[PAGE];if(k&&typeof k==='object'){try{apply(pid,{cls:e.cls,theme:e.theme,css:k.css,bg:k.bg});}catch(x){}}});
+})();
+</script>
 <div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><div class="bgfx-layer" id="bgLayer"></div>
 <div id="fxLayer" aria-hidden="true"></div>
 <canvas id="decoCanvas" aria-hidden="true"></canvas></div>
@@ -17161,15 +17311,15 @@ __UI_SCRIPT__
     function asyncDialog(kind,message,opts){return dialogBox(kind,message,opts,rec.name);}
     function widgetsHost(){var h=ensureHost(rec.id);return h?h.widgets:document.createElement('div');}
     api={
-      appName:'STARLINE',apiVersion:'2.4.0',pluginId:rec.id,pluginName:rec.name,
+      appName:'STARLINE',apiVersion:'2.5.0',pluginId:rec.id,pluginName:rec.name,
       hasPermission:function(name){return granted.indexOf(String(name))>=0;},
       getPermissions:function(){return granted.slice();},
       toast:function(message){toast(String(message==null?'':message));return true;},
       log:function(){if(window.STARLINE_PLUGIN_LOG_LEVEL!=='silent'&&window.console&&console.log)console.log.apply(console,['['+rec.id+']'].concat([].slice.call(arguments)));},
       warn:function(){if(window.console&&console.warn)console.warn.apply(console,['['+rec.id+']'].concat([].slice.call(arguments)));},
       error:function(){if(window.console&&console.error)console.error.apply(console,['['+rec.id+']'].concat([].slice.call(arguments)));window.dispatchEvent(new CustomEvent('starline:plugin-error',{detail:{pluginId:rec.id,args:[].slice.call(arguments)}}));},
-      getAppInfo:function(){return {name:'STARLINE',apiVersion:'2.4.0',pluginId:rec.id,pluginName:rec.name,pluginVersion:rec.version||'1.0.0',language:api.getLanguage(),theme:api.getTheme()};},
-      getHostInfo:function(){return {platform:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)?'mobile':'desktop',isMobile:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent),safeArea:{top:0,right:0,bottom:0,left:0},dpr:window.devicePixelRatio||1,hostVersion:window.STARLINE_HOST_VERSION||'unknown',apiVersion:'2.4.0',features:{pluginsFolder:HOST_MODE,uiApi:true,studio:!!window.SLStudio,request:typeof window.starlineHostRequest==='function',asyncDialogs:true,pluginCommands:typeof window.starlineRegisterCommand==='function',safeArea:false}};},
+      getAppInfo:function(){return {name:'STARLINE',apiVersion:'2.5.0',pluginId:rec.id,pluginName:rec.name,pluginVersion:rec.version||'1.0.0',language:api.getLanguage(),theme:api.getTheme()};},
+      getHostInfo:function(){return {platform:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)?'mobile':'desktop',isMobile:/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent),safeArea:{top:0,right:0,bottom:0,left:0},dpr:window.devicePixelRatio||1,hostVersion:window.STARLINE_HOST_VERSION||'unknown',apiVersion:'2.5.0',features:{pluginsFolder:HOST_MODE,uiApi:true,studio:!!window.SLStudio,request:typeof window.starlineHostRequest==='function',asyncDialogs:true,pluginCommands:typeof window.starlineRegisterCommand==='function',safeArea:false}};},
       getTheme:function(){return document.documentElement.getAttribute('data-theme')||'system';},
       setTheme:function(theme){requirePermission('theme');if(typeof uiFestival==='function'&&uiFestival())return false;var v=String(theme||'');if(!/^(light|dark|system)$/.test(v))return false;if(typeof window.uiApplyTheme==='function')window.uiApplyTheme(v,true);else document.documentElement.setAttribute('data-theme',v==='system'?'dark':v);window.dispatchEvent(new CustomEvent('starline:themechange',{detail:{theme:v,pluginId:rec.id}}));return true;},
       getThemeTokens:function(){var s=getComputedStyle(document.documentElement);var tokens={bg:s.getPropertyValue('--surface').trim()||'#111',fg:s.getPropertyValue('--text').trim()||'#fff',border:s.getPropertyValue('--border-2').trim()||'#333',primary:s.getPropertyValue('--primary').trim()||'#6d8cff',radius:s.getPropertyValue('--radius').trim()||'12px',fontFamily:s.getPropertyValue('--font').trim()||'sans-serif'};Object.keys(tokens).forEach(function(k){document.documentElement.style.setProperty('--starline-'+k.replace(/[A-Z]/g,function(m){return '-'+m.toLowerCase();}),tokens[k]);});return tokens;},
@@ -17214,7 +17364,7 @@ __UI_SCRIPT__
       addCommand:function(id,spec){requirePermission('ui');spec=spec||{};id=String(id||'');if(id.indexOf(rec.id+'.')!==0)throw err('INVALID_COMMAND_ID','Command id must start with '+rec.id+'.');var cmd={id:id,title:String(spec.title||id),run:spec.run};commands.push(cmd);if(typeof window.starlineRegisterCommand==='function')window.starlineRegisterCommand({id:id,title:cmd.title,pluginId:rec.id,run:function(){return safeCall(cmd.run,[api]);}});else window.dispatchEvent(new CustomEvent('starline:command-register',{detail:{id:id,title:cmd.title,pluginId:rec.id}}));return {remove:function(){commands=commands.filter(function(x){return x!==cmd;});if(typeof window.starlineUnregisterCommand==='function')window.starlineUnregisterCommand(id);window.dispatchEvent(new CustomEvent('starline:command-unregister',{detail:{id:id,pluginId:rec.id}}));}};},
       setBadge:function(text){requirePermission('ui');var b=$('sbPluginBadge');if(b){b.textContent=String(text==null?'':text).slice(0,8);b.hidden=!String(text||'');}return !!b;},
       addStatusItem:function(spec){requirePermission('ui');spec=spec||{};if(statusItems.length>=3){api.warn('Maximum 3 status items per plugin.');return null;}var host=widgetsHost()||document.body;var b=document.createElement('button');b.className='ui-btn';b.type='button';b.textContent=String(spec.text||'');b.addEventListener('click',function(e){safeCall(spec.onClick,[e,api]);});host.appendChild(b);trackedNode(b);var removed=false,h={element:b,remove:function(){if(removed)return false;removed=true;statusItems=statusItems.filter(function(x){return x!==h;});removeNode(b);return true;},setText:function(v){if(!removed)b.textContent=String(v);}};statusItems.push(h);return h;},
-      requireApiVersion:function(range){var m=String(range||'').match(/^\s*(>=|>|=|<=|<)?\s*(\d+)\.(\d+)\.(\d+)/);if(!m)return false;var a=[2,4,0],b=[+m[2],+m[3],+m[4]],cmp=0;for(var i=0;i<3;i++){if(a[i]!==b[i]){cmp=a[i]>b[i]?1:-1;break;}}switch(m[1]||'='){case '>=':return cmp>=0;case '>':return cmp>0;case '<=':return cmp<=0;case '<':return cmp<0;default:return cmp===0;}},
+      requireApiVersion:function(range){var m=String(range||'').match(/^\s*(>=|>|=|<=|<)?\s*(\d+)\.(\d+)\.(\d+)/);if(!m)return false;var a=[2,5,0],b=[+m[2],+m[3],+m[4]],cmp=0;for(var i=0;i<3;i++){if(a[i]!==b[i]){cmp=a[i]>b[i]?1:-1;break;}}switch(m[1]||'='){case '>=':return cmp>=0;case '>':return cmp>0;case '<=':return cmp<=0;case '<':return cmp<0;default:return cmp===0;}},
       getStorageInfo:function(){if(HOST_MODE){return {configChars:JSON.stringify(PSTATE.config[rec.id]||{}).length,store:'plugins/plugins.json'};}var used=0;try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);used+=String(k||'').length+String(localStorage.getItem(k)||'').length;}}catch(e){}return {localStorageApproxChars:used,pluginConfigPrefix:'starline.plugin.'+rec.id+'.'};},
       getLocaleInfo:function(){return {language:api.getLanguage(),pluginName:rec.name};},
       destroy:function(){if(disposed)return false;disposed=true;Object.keys(listeners).forEach(function(k){listeners[k]=[];});externalCleanups.slice().forEach(function(fn){try{fn();}catch(e){}});timers.forEach(function(id){window.clearTimeout(id);window.clearInterval(id);});timers=[];panelHandles.forEach(function(h){try{h.remove();}catch(e){}});commands.forEach(function(c){if(typeof window.starlineUnregisterCommand==='function')window.starlineUnregisterCommand(c.id);});statusItems.slice().forEach(function(h){h.remove();});return true;}
@@ -17234,6 +17384,43 @@ __UI_SCRIPT__
       status:function(){return AUD.status;},
       getFrame:function(){requirePermission('audio');return AUD.frame;}
     };
+
+    /* ════════ api.blob —— 插件的二进制存储（图片 / 视频 / 音乐…），存在浏览器 IndexedDB，需要 'storage' 权限 ════════
+       await api.blob.put(key, blobOrFile, {name?}) → true；get(key) → Blob|null；url(key) → 对象地址（插件停用时自动释放）
+       list() → [{key,size,type,name,at}]；remove(key)；clear()；usage() → 字节数。
+       键只能用字母 / 数字 / _ . : -（最长 120）。单个文件上限 600 MB。
+       api.ui.setSkin 的 bg.src 可以写 'idb:<key>'，登录页 / 主界面启动时会直接从这里读背景。 */
+    api.blob=(function(){
+      var DBN='starline-plugin-blobs',MAXB=600*1024*1024,urls={};
+      function openDb(){return new Promise(function(res,rej){
+        if(!window.indexedDB){rej(new Error('IndexedDB is not available'));return;}
+        var rq=indexedDB.open(DBN,1);
+        rq.onupgradeneeded=function(){var d=rq.result;if(!d.objectStoreNames.contains('blobs')){var os=d.createObjectStore('blobs',{keyPath:'k'});os.createIndex('plugin','plugin',{unique:false});}};
+        rq.onsuccess=function(){res(rq.result);};rq.onerror=function(){rej(rq.error);};});}
+      function K(key){key=String(key==null?'':key);if(!/^[\w.:\-]{1,120}$/.test(key))throw err('BadBlobKey','Blob keys may use letters, digits and _ . : - (max 120 characters)');return rec.id+'\u0000'+key;}
+      function run(mode,fn){return openDb().then(function(d){return new Promise(function(res,rej){
+        var t=d.transaction('blobs',mode),os=t.objectStore('blobs'),r;
+        try{r=fn(os);}catch(e){d.close();rej(e);return;}
+        t.oncomplete=function(){var v=r&&r.result;d.close();res(v);};
+        t.onerror=t.onabort=function(){d.close();rej(t.error||new Error('IndexedDB transaction failed'));};});});}
+      function revoke(k){if(urls[k]){try{URL.revokeObjectURL(urls[k]);}catch(e){}delete urls[k];}}
+      externalCleanups.push(function(){Object.keys(urls).forEach(revoke);});
+      var B={
+        put:function(key,data,meta){
+          requirePermission('storage');var k=K(key);meta=meta||{};
+          var blob=(data instanceof Blob)?data:new Blob([data]);
+          if(blob.size>MAXB)return Promise.reject(err('BlobTooLarge','Blob is larger than 600 MB'));
+          revoke(k);
+          return run('readwrite',function(os){return os.put({k:k,plugin:rec.id,key:String(key),blob:blob,type:blob.type||'',size:blob.size,name:String(meta.name||data.name||'').slice(0,200),at:Date.now()});}).then(function(){return true;});},
+        get:function(key){requirePermission('storage');var k=K(key);return run('readonly',function(os){return os.get(k);}).then(function(r){return r&&r.blob?r.blob:null;});},
+        url:function(key){requirePermission('storage');var k=K(key);return B.get(key).then(function(b){if(!b)return null;revoke(k);urls[k]=URL.createObjectURL(b);return urls[k];});},
+        remove:function(key){requirePermission('storage');var k=K(key);revoke(k);return run('readwrite',function(os){return os.delete(k);}).then(function(){return true;});},
+        list:function(){requirePermission('storage');return run('readonly',function(os){return os.index('plugin').getAll(IDBKeyRange.only(rec.id));}).then(function(a){return (a||[]).map(function(r){return {key:r.key,size:r.size,type:r.type,name:r.name,at:r.at};});});},
+        clear:function(){requirePermission('storage');return B.list().then(function(a){return Promise.all(a.map(function(x){return B.remove(x.key);}));}).then(function(){return true;});},
+        usage:function(){return B.list().then(function(a){return a.reduce(function(n,x){return n+(x.size||0);},0);});}
+      };
+      return B;
+    })();
 
     /* ════════ api.ui —— 整体界面定制：布局 / 主题 / 样式 / DOM / 导航 / 页面 ════════
        权限：'appearance'（主题、CSS、布局、CSS 变量） 'dom'（隐藏 / 移动 / 插入 / 重排元素） 'ui'（导航项、页面、顶栏按钮）
@@ -17529,6 +17716,39 @@ __UI_SCRIPT__
           cu(remove);
           return {remove:remove};
         },
+        /* setSkin：持久皮肤。样式 / 背景立刻在当前页面生效，并存起来，下次启动时登录页和主界面在插件加载之前就套上。需要 appearance 权限
+           spec = { cls:'mw', theme:'dark'|'light', css:{app,login} 或一个字符串(两边共用),
+                    bg:{ kind:'image'|'video', src:'https://…' | 'idb:<api.blob 键>', fit, dim, dimColor:'r,g,b', blur, saturate, brightness }, loginBg:{…}(可选，登录页单独的背景) } */
+        setSkin:function(spec){
+          need('appearance');
+          var S=window.SLSkin;
+          if(!S)throw err('Unsupported','Skin loader is not available in this UI build');
+          function cl(v,d,a,b){v=parseFloat(v);if(!isFinite(v))v=d;return Math.min(b,Math.max(a,v));}
+          function normBg(b){
+            if(!b||typeof b!=='object'||!b.src)return null;
+            var src=String(b.src).slice(0,2000);if(!S.okSrc(src))return null;
+            return {kind:b.kind==='video'?'video':'image',src:src,fit:b.fit==='contain'?'contain':'cover',dim:cl(b.dim,.3,0,.95),
+              dimColor:/^\d{1,3},\d{1,3},\d{1,3}$/.test(String(b.dimColor||''))?String(b.dimColor):'0,0,0',blur:cl(b.blur,0,0,80),saturate:cl(b.saturate,1,.2,3),brightness:cl(b.brightness,1,.3,2)};
+          }
+          function norm(sp){
+            sp=sp||{};var c=sp.css,app='',login='';
+            if(typeof c==='string'){app=login=c;}else if(c&&typeof c==='object'){app=String(c.app||'');login=String(c.login||'');}
+            var bg=normBg(sp.bg);
+            return {cls:/^[A-Za-z][\w-]{0,31}$/.test(String(sp.cls||''))?String(sp.cls):'',theme:(sp.theme==='light'||sp.theme==='dark')?sp.theme:'',
+              app:{css:S.sanitize(app),bg:bg},login:{css:S.sanitize(login),bg:sp.loginBg?normBg(sp.loginBg):bg}};
+          }
+          var cur=norm(spec),removed=false;
+          function commit(){
+            var all=S.read();
+            all[rec.id]={cls:cur.cls,theme:cur.theme,app:cur.app,login:cur.login};
+            if(!S.write(all))api.warn('ui.setSkin: could not save the skin (localStorage full?) - it will not be applied before the plugin loads.');
+            S.apply(rec.id,{cls:cur.cls,theme:cur.theme,css:cur.app.css,bg:cur.app.bg});
+          }
+          commit();
+          function remove(){if(removed)return false;removed=true;S.remove(rec.id);return true;}
+          cu(remove);
+          return {update:function(sp){if(removed)return false;cur=norm(sp);commit();return true;},remove:remove};
+        },
         reset:function(){while(undo.length){var f=undo.pop();try{f();}catch(e){}}return true;}
       };
       externalCleanups.push(function(){ui.reset();});
@@ -17556,7 +17776,7 @@ __UI_SCRIPT__
     plugin.id=String(plugin.id||rec.id);plugin.name=String(plugin.name||rec.name||plugin.id);plugin.version=String(plugin.version||rec.version||'1.0.0');plugin.description=String(plugin.description||rec.description||'');
     return {plugin:plugin,api:api};
   }
-  function activate(rec){if(!rec.enabled)return;try{var r=instantiate(rec);if(!r.api.requireApiVersion('>='+String(rec.minApiVersion||'2.0.0')))throw new Error('Incompatible API version. Requires '+String(rec.minApiVersion||'2.0.0')+', host provides 2.4.0.');runtime[rec.id]=r;if(typeof r.plugin.activate==='function')r.plugin.activate(r.api);}catch(e){rec.lastError=e.message;rec.enabled=false;write();toast(t('pluginEnableFailed')+' '+rec.name);}}
+  function activate(rec){if(!rec.enabled)return;try{var r=instantiate(rec);if(!r.api.requireApiVersion('>='+String(rec.minApiVersion||'2.0.0')))throw new Error('Incompatible API version. Requires '+String(rec.minApiVersion||'2.0.0')+', host provides 2.5.0.');runtime[rec.id]=r;if(typeof r.plugin.activate==='function')r.plugin.activate(r.api);}catch(e){rec.lastError=e.message;rec.enabled=false;write();toast(t('pluginEnableFailed')+' '+rec.name);}}
   function deactivate(rec){var r=runtime[rec.id];if(r){try{if(typeof r.plugin.deactivate==='function')r.plugin.deactivate(r.api);if(r.api&&typeof r.api.destroy==='function')r.api.destroy();}catch(e){}delete runtime[rec.id];}var nodes=pluginNodes[rec.id]||[];nodes.forEach(function(n){try{if(n&&n.remove)n.remove();}catch(e){}});delete pluginNodes[rec.id];removeHost(rec.id);updateStats();}
   function updateStats(){
     var n=0;Object.keys(hosts).forEach(function(k){if(hosts[k]&&hosts[k].widgets)n+=hosts[k].widgets.children.length;});panelCount=n;
@@ -18046,6 +18266,8 @@ __UI_SCRIPT__
       {cat:'DOM',name:'ui.pin(selector, target, { position })',sig:'api.ui.pin(sel, target, { position:\'append\'|\'prepend\'|\'before\'|\'after\' }) -> { apply(), remove() }',desc:'Requires dom. Like ui.move, but persistent: whenever the UI re-renders and the element is recreated or taken out of the target, it is put back. Gives up (with a warning) if another script keeps fighting over the element. remove() puts the element back where it was.',zh:'需要 dom 权限。和 ui.move 类似，但是持久的：界面重新渲染、元素被重建或被挪出目标后，会自动放回去。如果有别的脚本一直在抢这个元素，会自动放弃并给出警告。remove() 把元素放回原位。',example:'api.ui.pin(\'.tb-actions > .tb-btn.close\', \'.sidebar\', { position: \'append\' });'},
       {cat:'Theme',name:'ui.rule(selector, styles, options?)',sig:'api.ui.rule(selector, { prop: value } | "css text", { important?: true, media? }) -> { update(styles), remove() }',desc:'Requires appearance. A persistent CSS rule: unlike setStyle it also applies to elements created later (cards, panels and lists are rebuilt often). Declarations are !important by default; numbers become px (except unitless properties such as opacity or z-index).',zh:'需要 appearance 权限。持久的 CSS 规则：和 setStyle 不同，它对以后新建的元素同样生效（卡片、面板、列表经常被重建）。声明默认带 !important；数字自动加 px（opacity、z-index 等无单位属性除外）。',example:'const r = api.ui.rule(\'@card\', { borderRadius: 22 });\n// r.update({ borderRadius: 4 });'},
       {cat:'DOM',name:'ui.hook(name, { before, around, after })',sig:'api.ui.hook("renderGrid", { before(args), around(next, args), after(result, args) }) -> { remove() }',desc:'Requires render. Wraps one of the app\'s global functions (renderGrid, openDetail, closeDetail, renderDetailHeroButtons, …) so you can run code before it, after it, or replace it. before() may return false to cancel the call; around(next, args) decides whether and how to call the original. Several plugins can hook the same function; removal is order-independent. Returns null when the function does not exist.',zh:'需要 render 权限。包住程序的某个全局函数（renderGrid / openDetail / closeDetail / renderDetailHeroButtons …），可在它之前、之后运行代码，或整个替换。before() 返回 false 可取消这次调用；around(next, args) 决定是否、怎样调用原函数。多个插件可以钩同一个函数，移除顺序无关。函数不存在时返回 null。',example:'api.ui.hook(\'renderDetailHeroButtons\', { after() { api.log(\'buttons redrawn\'); } });'},
+      {cat:'Theme',name:'ui.setSkin(spec)',sig:'api.ui.setSkin({ cls, theme, css:{app, login}, bg:{ kind, src, dim, blur, saturate, brightness }, loginBg? }) -> { update(spec), remove() }',desc:'Requires appearance. A persistent skin. The CSS and background apply to the current page at once and are also saved, so the login page and the main window get them at start-up, before plugins load (no flash of the default look). css can be a string (used on both pages) or { app, login }. bg.src is an https/data URL or idb:<key> pointing at a file stored with api.blob. cls is added to <html> while the skin is active, so write your CSS under html.<cls>. Removed when the plugin stops.',zh:'需要 appearance 权限。持久皮肤：样式和背景立刻在当前页面生效，同时存起来，下次启动时登录页和主界面在插件加载之前就先套上（不会闪一下默认样式）。css 可以是字符串（两个页面共用）或 { app, login }。bg.src 可以是 https / data 地址，或 idb:<键>（指向用 api.blob 存的文件）。cls 会在皮肤生效期间加到 <html> 上，所以 CSS 请写在 html.<cls> 下。插件停用时自动移除。',example:'const skin = api.ui.setSkin({ cls: \'my-skin\', css: { app: \'html.my-skin .card{border-radius:24px}\', login: \'html.my-skin .right{border-radius:28px}\' }, bg: { kind: \'image\', src: \'https://example.com/bg.jpg\', dim: 0.3 } });\n// skin.update({ ... });'},
+      {cat:'Storage',name:'blob.put / get / url / remove / list / clear / usage',sig:'await api.blob.put(key, fileOrBlob, {name?}); await api.blob.get(key) -> Blob|null; await api.blob.url(key) -> string|null; await api.blob.remove(key); await api.blob.list(); await api.blob.clear(); await api.blob.usage()',desc:'Requires storage. Binary storage for this plugin (images, video, music) in IndexedDB. Keys use letters, digits and _ . : - (max 120 characters); one blob can be up to 600 MB. url() gives an object URL that is released automatically when the plugin stops. A key can also be used as a skin background with src: "idb:<key>".',zh:'需要 storage 权限。本插件自己的二进制存储（图片、视频、音乐），放在 IndexedDB 里。键只能用字母、数字和 _ . : -（最长 120 字符），单个文件最大 600 MB。url() 返回对象地址，插件停用时自动释放。键也可以作为皮肤背景使用：src: "idb:<键>"。',example:'const [file] = await api.pickFile({ accept: \'image/*,video/*\', maxSize: 300 * 1024 * 1024 });\nawait api.blob.put(\'bg\', file, { name: file.name });\napi.ui.setSkin({ cls: \'x\', css: \'\', bg: { kind: file.type.startsWith(\'video\') ? \'video\' : \'image\', src: \'idb:bg\' } });'},
     ];
     var base=API_CATALOG.length;
     N.forEach(function(a,i){API_CATALOG.push({cat:a.cat,name:a.name,sig:a.sig,desc:a.desc,example:a.example});if(typeof UI_T!=='undefined'){if(UI_T.en)UI_T.en['pluginApiD'+(base+i)]=a.desc;if(UI_T.zh)UI_T.zh['pluginApiD'+(base+i)]=a.zh;}});
@@ -18057,7 +18279,7 @@ __UI_SCRIPT__
   function apiLabel(k){return t('pluginApi'+k.charAt(0).toUpperCase()+k.slice(1));}
   function apiEn(k){return (typeof UI_T!=='undefined'&&UI_T.en&&UI_T.en[k])||'';}
   function tx(key,fb){var v=t(key);return (v==null||v===key)?fb:v;}
-  function apiDocsMarkdown(){var out=['# STARLINE Plugin API Reference','API version: 2.4.0','','Plugins receive an `api` object in `activate(api)`, `render(container, api)` and `deactivate(api)`.','',apiEn('pluginApiWarning'),'','## Permission model','','| Permission | APIs / capability |','|---|---|','| `storage` | config APIs and addSettings persistence |','| `network` | request (host proxy required) |','| `theme` | setTheme |','| `language` | setLanguage |','| `navigation` | navigate |','| `clipboard-read` | readText |','| `clipboard-write` | copyText |','| `download` | downloadText |','| `cross-plugin` | onPlugin plus crossPlugin allowlist |','| `ui` | addCommand, setBadge, addStatusItem, ui.addNavItem / addPage / addTopbarButton |','| `appearance` | ui.applyTheme / setCssVars / injectCSS / rule / setFont / registerLayout / setLayout |','| `dom` | ui.hide / move / pin / reorder / insert / setStyle / setAttr / toggleClass / setText / onElement / definePart |','| `audio` | audio.start / getFrame (system audio spectrum, 32 bands; sensitive, asks for consent) |','| `layout` | ui.layout.* / ui.edit.* (needs plugins/starline-ui-studio.js) |','| `render` | ui.hook (built in since 2.4); ui.card / ui.banner / ui.takeover (need plugins/starline-ui-studio.js) |','| `data` | api.data.* / api.actions.* / data-sl-action (needs plugins/starline-ui-studio.js) |','','Missing permissions throw PermissionDenied for protected APIs. readText returns null and onPlugin returns a no-op unsubscribe when denied. New 2.1 plugins should declare explicit permissions.',''];API_CATALOG.forEach(function(a){out.push('## '+a.name,'','- Category: '+a.cat,'- Signature: `'+a.sig+'`','- Description: '+a.desc,'','```js',a.example,'```','');});out.push('## Minimal plugin template','','```js',"const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Example plugin',\n  activate(api) { api.toast('Enabled'); },\n  render(container, api) { container.textContent = 'Hello from plugin'; },\n  deactivate(api) {}\n};\nreturn plugin;",'```','');return out.join('\n');}
+  function apiDocsMarkdown(){var out=['# STARLINE Plugin API Reference','API version: 2.5.0','','Plugins receive an `api` object in `activate(api)`, `render(container, api)` and `deactivate(api)`.','',apiEn('pluginApiWarning'),'','## Permission model','','| Permission | APIs / capability |','|---|---|','| `storage` | config APIs, addSettings persistence and api.blob (binary storage) |','| `network` | request (host proxy required) |','| `theme` | setTheme |','| `language` | setLanguage |','| `navigation` | navigate |','| `clipboard-read` | readText |','| `clipboard-write` | copyText |','| `download` | downloadText |','| `cross-plugin` | onPlugin plus crossPlugin allowlist |','| `ui` | addCommand, setBadge, addStatusItem, ui.addNavItem / addPage / addTopbarButton |','| `appearance` | ui.applyTheme / setCssVars / injectCSS / rule / setSkin / setFont / registerLayout / setLayout |','| `dom` | ui.hide / move / pin / reorder / insert / setStyle / setAttr / toggleClass / setText / onElement / definePart |','| `audio` | audio.start / getFrame (system audio spectrum, 32 bands; sensitive, asks for consent) |','| `layout` | ui.layout.* / ui.edit.* (needs plugins/starline-ui-studio.js) |','| `render` | ui.hook (built in since 2.4); ui.card / ui.banner / ui.takeover (need plugins/starline-ui-studio.js) |','| `data` | api.data.* / api.actions.* / data-sl-action (needs plugins/starline-ui-studio.js) |','','Missing permissions throw PermissionDenied for protected APIs. readText returns null and onPlugin returns a no-op unsubscribe when denied. New 2.1 plugins should declare explicit permissions.',''];API_CATALOG.forEach(function(a){out.push('## '+a.name,'','- Category: '+a.cat,'- Signature: `'+a.sig+'`','- Description: '+a.desc,'','```js',a.example,'```','');});out.push('## Minimal plugin template','','```js',"const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Example plugin',\n  activate(api) { api.toast('Enabled'); },\n  render(container, api) { container.textContent = 'Hello from plugin'; },\n  deactivate(api) {}\n};\nreturn plugin;",'```','');return out.join('\n');}
   function apiTemplate(){return "const plugin = {\n  id: 'my-plugin',\n  name: 'My Plugin',\n  version: '1.0.0',\n  description: 'Describe what your plugin does',\n  activate(api) {\n    api.toast('My Plugin enabled');\n  },\n  render(container, api) {\n    const title = api.createElement('h3', { text: 'My Plugin' });\n    const button = api.createElement('button', { className: 'ui-btn', text: 'Click me' });\n    button.addEventListener('click', () => api.toast('Button clicked'));\n    container.append(title, button);\n  },\n  deactivate(api) {\n    // Clear any plugin-owned resources here. The host also cleans tracked timers/panels.\n  }\n};\nreturn plugin;\n";}
   function apiCopy(text){var value=String(text||'');if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(value).then(function(){toast(apiLabel('copied'));},function(){toast(apiLabel('copyFailed'));});return;}var ta=document.createElement('textarea');ta.value=value;document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();toast(ok?apiLabel('copied'):apiLabel('copyFailed'));}
   function apiDownload(name,text,mime){var blob=new Blob([text],{type:mime||'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
