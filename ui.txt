@@ -8809,7 +8809,7 @@ function mtApply(status) {
     requestAnimationFrame(function () {
       if (mtInst || !stage || !root.classList.contains('mt-on')) { return; }
       mtInst = TechText(stage, {
-        text: 'The server is under maintenance',
+        text: 'THE SEEVER IS UNDER MAINTENANCE',
         fontWeight: 600,
         fontSize: 150,
         reveal: 'letter',
