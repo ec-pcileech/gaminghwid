@@ -9005,6 +9005,11 @@ body.dragging .qp-drop-hint{display:block}
   animation:shim 1.6s linear infinite;
 }
 @keyframes shim{0%{background-position:180% 0}100%{background-position:-80% 0}}
+/* ── Dither Veil：未订阅游戏的封面特效画布（由 DitherVeilCards 注入，见下方 #ditherVeilCards 脚本）──
+   画布盖在 <img> 之上、徽章/收藏/渐变遮罩之下；第一帧渲染好才淡入，失败时原封面照常显示 */
+.card-img .dv-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;opacity:0;transition:opacity .3s ease}
+.card-img .dv-canvas.dv-ready{opacity:1}
+.card-img.dv-on::before{z-index:1}   /* 节日主题的 ::before 叠层（飘雪等）仍显示在画布之上 */
 .card-badge{
   position:absolute;top:12px;left:12px;z-index:2;
   font-size:10px;font-weight:700;
@@ -11358,6 +11363,856 @@ __UI_MARKUP__
   },6000);
 })();
 </script>
+<script id="ditherVeilCards">
+/* ═══════════════════════════════════════════════════════════════════════
+   Dither Veil · 游戏商店「未订阅」卡片封面特效
+   来源：React Bits <DitherVeil />（JS-CSS 版）。原组件依赖 React + ogl，
+   这里的 shader 与抖动算法 1:1 移植成原生 WebGL2，不需要任何外部依赖。
+
+   工作方式
+   · 1-bit 抖动的封面；鼠标划过的地方「烧穿」回全彩，松开后一格一格织回去；点击会放一圈冲击波
+   · 所有卡片共用 1 个离屏 WebGL2 上下文（浏览器限制同时存在的 WebGL 上下文数量，
+     一张卡一个上下文几十张就会炸）。每次渲染完把结果 drawImage 到该卡自己的 2D canvas 上，
+     所以静止的卡片不占 GPU、也不跑 rAF，只有悬停 / 拖尾 / 冲击波 / 入场动画时才会渲染
+   · 只处理 renderGrid() 里带 data-dv 的卡片（= 没订阅的游戏）；已订阅的卡片保持原样
+   · 封面图必须允许跨域读取（Access-Control-Allow-Origin）才能做 WebGL 贴图；
+     不允许时这张卡静默回退成原来的普通封面，不影响其它功能
+
+   对外：window.DitherVeilCards = { sync(root), refresh(), config, supported() }
+═══════════════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+/* ───────── 配置（对应 React Bits 组件的 props，可直接改）───────── */
+var CFG = {
+  fit: 'cover',            /* 卡片封面是 object-fit:cover，这里保持一致（组件默认 'contain'） */
+  pattern: 'floyd',        /* 'floyd' | 'atkinson' | 'bayer' | 'noise' | 'lines' */
+  pixelSize: 2,
+  levels: 2,
+  palette: 'duotone',      /* 'duotone' | 'rgb' */
+  inkColor: '#120f17',
+  paperColor: '#f4f1ea',
+  contrast: 1.15,
+  brightness: 0,
+  revealRadius: 200,
+  softness: 0.6,
+  linger: 1,
+  rimColor: '#a78bfa',
+  rim: 0,
+  reverse: false,
+  wander: false,
+  clickBurst: true,
+  radiusRefWidth: 600      /* 卡片比这个宽度窄时，笔刷半径按比例缩小（卡片只有 ~250px，半径 200 会一次烧穿整张） */
+};
+
+var ORDERED = { bayer: 0, noise: 1, lines: 2 };
+var KERNELS = {
+  atkinson: [[1,0,1/8],[2,0,1/8],[-1,1,1/8],[0,1,1/8],[1,1,1/8],[0,2,1/8]],
+  floyd:    [[1,0,7/16],[-1,1,3/16],[0,1,5/16],[1,1,1/16]]
+};
+var MASK_SCALE = 0.5, MAX_BURSTS = 4, BURST_SECONDS = 1.2, HOLD = 1.6, INTRO_MS = 1100;
+var REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+function dpr(){ return Math.min(window.devicePixelRatio || 1, 2); }
+
+var RGB_MEMO = {};
+function hexToRgb(hex){
+  var key = String(hex || '');
+  if (RGB_MEMO[key]) return RGB_MEMO[key];
+  var h = key.replace('#', '');
+  if (h.length === 3) h = h.replace(/./g, function(c){ return c + c; });
+  var n = parseInt(h.slice(0, 6), 16);
+  var out = isNaN(n) ? [0,0,0] : [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  RGB_MEMO[key] = out;
+  return out;
+}
+
+function fitScale(w, h, iw, ih, contain){
+  var ratio = w / h / (iw / ih);
+  if (contain) return ratio > 1 ? [ratio, 1] : [1, 1 / ratio];
+  return ratio > 1 ? [1, 1 / ratio] : [ratio, 1];
+}
+
+function wanderAt(t, w, h){
+  return [
+    w * (0.5 + 0.33 * Math.sin(t * 0.53) + 0.08 * Math.sin(t * 1.31 + 0.6)),
+    h * (0.5 + 0.28 * Math.sin(t * 0.71 + 1.1) + 0.07 * Math.cos(t * 1.57))
+  ];
+}
+
+/* 共用的小画布：测图片边缘底色 / 给 Floyd–Steinberg 取样 */
+var SCV = null, SCTX = null;
+function sampler(){
+  if (!SCTX){
+    SCV = document.createElement('canvas');
+    SCTX = SCV.getContext('2d', { willReadFrequently: true });
+  }
+  return SCTX;
+}
+
+function measureEdge(context, image){
+  var size = 32;
+  context.canvas.width = size;
+  context.canvas.height = size;
+  context.drawImage(image, 0, 0, size, size);
+  var data = context.getImageData(0, 0, size, size).data;
+  var sum = [0,0,0], squares = [0,0,0], count = 0;
+  for (var y = 0; y < size; y++){
+    for (var x = 0; x < size; x++){
+      if (x > 0 && y > 0 && x < size - 1 && y < size - 1) continue;
+      for (var c = 0; c < 3; c++){
+        var v = data[(y * size + x) * 4 + c] / 255;
+        sum[c] += v;
+        squares[c] += v * v;
+      }
+      count++;
+    }
+  }
+  var matte = [sum[0] / count, sum[1] / count, sum[2] / count];
+  var spread = 0;
+  for (var k = 0; k < 3; k++) spread += Math.sqrt(Math.max(0, squares[k] / count - matte[k] * matte[k]));
+  spread /= 3;
+  return { matte: matte, plain: spread < 0.06 };
+}
+
+/* 蓝噪声（void-and-cluster）：只有 pattern:'noise' 才会生成 */
+var BLUE = null;
+function getBlueNoise(){
+  if (BLUE) return BLUE;
+  var size = 64, n = size * size, wrap = size - 1, taps = [];
+  for (var dy = -6; dy <= 6; dy++){
+    for (var dx = -6; dx <= 6; dx++) taps.push(dx, dy, Math.exp(-(dx * dx + dy * dy) / 4.5));
+  }
+  var energy = new Float32Array(n), on = new Uint8Array(n);
+  function splat(i, sign){
+    var x = i % size, y = (i - x) / size;
+    for (var k = 0; k < taps.length; k += 3){
+      energy[((y + taps[k + 1]) & wrap) * size + ((x + taps[k]) & wrap)] += sign * taps[k + 2];
+    }
+  }
+  function find(state, highest){
+    var best = 0, value = highest ? -Infinity : Infinity;
+    for (var i = 0; i < n; i++){
+      if (on[i] !== state) continue;
+      if (highest ? energy[i] > value : energy[i] < value){ value = energy[i]; best = i; }
+    }
+    return best;
+  }
+  var seed = 7;
+  function random(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+  var initial = Math.round(n * 0.1);
+  for (var placed = 0; placed < initial; ){
+    var i0 = Math.floor(random() * n);
+    if (on[i0]) continue;
+    on[i0] = 1; splat(i0, 1); placed++;
+  }
+  for (var guard = 0; guard < n; guard++){
+    var cluster = find(1, true);
+    on[cluster] = 0; splat(cluster, -1);
+    var gap = find(0, false);
+    on[gap] = 1; splat(gap, 1);
+    if (gap === cluster) break;
+  }
+  var seedOn = on.slice(), seedEnergy = energy.slice(), rank = new Uint16Array(n);
+  for (var r = initial - 1; r >= 0; r--){
+    var cl = find(1, true);
+    on[cl] = 0; splat(cl, -1); rank[cl] = r;
+  }
+  on.set(seedOn); energy.set(seedEnergy);
+  for (var r2 = initial; r2 < n; r2++){
+    var gp = find(0, false);
+    on[gp] = 1; splat(gp, 1); rank[gp] = r2;
+  }
+  var data = new Uint8Array(n * 4);
+  for (var i = 0; i < n; i++){
+    var val = Math.floor((rank[i] / n) * 256);
+    data[i * 4] = val; data[i * 4 + 1] = val; data[i * 4 + 2] = val; data[i * 4 + 3] = 255;
+  }
+  BLUE = data;
+  return data;
+}
+
+/* 误差扩散（Floyd–Steinberg / Atkinson），蛇形扫描 */
+function diffuse(pixels, cols, rows, kernel, levels, rgb, grade){
+  var channels = rgb ? 3 : 1;
+  var values = new Float32Array(cols * rows * channels);
+  for (var i = 0; i < cols * rows; i++){
+    var r = pixels[i * 4] / 255, g = pixels[i * 4 + 1] / 255, b = pixels[i * 4 + 2] / 255;
+    if (rgb){
+      values[i * 3] = grade(r); values[i * 3 + 1] = grade(g); values[i * 3 + 2] = grade(b);
+    } else {
+      values[i] = grade(0.2126 * r + 0.7152 * g + 0.0722 * b);
+    }
+  }
+  var steps = levels - 1;
+  var out = new Uint8Array(cols * rows * 4);
+  for (var y = 0; y < rows; y++){
+    var dir = (y & 1) ? -1 : 1;
+    for (var ii = 0; ii < cols; ii++){
+      var x = dir > 0 ? ii : cols - 1 - ii;
+      var p = y * cols + x;
+      for (var c = 0; c < channels; c++){
+        var old = values[p * channels + c];
+        var q = Math.min(steps, Math.max(0, Math.round(old * steps))) / steps;
+        var err = old - q;
+        var byte = Math.round(q * 255);
+        if (rgb) out[p * 4 + c] = byte;
+        else { out[p * 4] = byte; out[p * 4 + 1] = byte; out[p * 4 + 2] = byte; }
+        for (var k = 0; k < kernel.length; k++){
+          var nx = x + kernel[k][0] * dir, ny = y + kernel[k][1];
+          if (nx < 0 || nx >= cols || ny >= rows) continue;
+          values[(ny * cols + nx) * channels + c] += err * kernel[k][2];
+        }
+      }
+      out[p * 4 + 3] = 255;
+    }
+  }
+  return out;
+}
+
+/* ───────── Shader（与原组件一致；顶点用 gl_VertexID 画全屏三角形，不需要顶点缓冲）───────── */
+var VS = [
+  '#version 300 es',
+  'out vec2 vUv;',
+  'void main() {',
+  '  vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));',
+  '  vUv = p;',
+  '  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);',
+  '}'
+].join('\n');
+
+var MASK_FS = [
+  '#version 300 es',
+  'precision highp float;',
+  'uniform sampler2D tPrev;',
+  'uniform vec2 uSize;',
+  'uniform vec2 uFrom;',
+  'uniform vec2 uTo;',
+  'uniform float uRadius;',
+  'uniform float uSoftness;',
+  'uniform float uStrength;',
+  'uniform float uFade;',
+  'uniform float uHold;',
+  'in vec2 vUv;',
+  'out vec4 fragColor;',
+  'float strokeDistance(vec2 p, vec2 a, vec2 b) {',
+  '  vec2 ab = b - a;',
+  '  float h = clamp(dot(p - a, ab) / max(dot(ab, ab), 0.0001), 0.0, 1.0);',
+  '  return length(p - a - ab * h);',
+  '}',
+  'void main() {',
+  '  vec2 p = vec2(vUv.x, 1.0 - vUv.y) * uSize;',
+  '  float trail = max(texture(tPrev, vUv).r - uFade, 0.0);',
+  '  float band = max(uRadius * uSoftness, 1.0) * uHold;',
+  '  float d = strokeDistance(p, uFrom, uTo);',
+  '  trail = max(trail, clamp((uRadius - d) / band, 0.0, 1.0) * uStrength);',
+  '  fragColor = vec4(trail, 0.0, 0.0, 1.0);',
+  '}'
+].join('\n');
+
+var VIEW_FS = [
+  '#version 300 es',
+  'precision highp float;',
+  'precision highp int;',
+  'uniform sampler2D tImage;',
+  'uniform sampler2D tMask;',
+  'uniform sampler2D tNoise;',
+  'uniform sampler2D tDiffused;',
+  'uniform vec2 uResolution;',
+  'uniform vec2 uCover;',
+  'uniform float uLod;',
+  'uniform float uCell;',
+  'uniform int uPattern;',
+  'uniform int uPalette;',
+  'uniform float uLevels;',
+  'uniform vec3 uInk;',
+  'uniform vec3 uPaper;',
+  'uniform vec3 uRimColor;',
+  'uniform float uRim;',
+  'uniform float uContrast;',
+  'uniform float uBrightness;',
+  'uniform float uReverse;',
+  'uniform float uIntro;',
+  'uniform float uHold;',
+  'uniform vec3 uMatte;',
+  'uniform float uKey;',
+  'uniform vec2 uSize;',
+  'uniform vec4 uBursts[4];',
+  'uniform float uBurstWidth;',
+  'in vec2 vUv;',
+  'out vec4 fragColor;',
+  'float bayer(vec2 cell) {',
+  '  ivec2 p = ivec2(mod(cell, 8.0));',
+  '  int v = p.x ^ p.y;',
+  '  int m = ((v & 1) << 5) | ((p.y & 1) << 4) | ((v & 2) << 2) | ((p.y & 2) << 1) | ((v & 4) >> 1) | ((p.y & 4) >> 2);',
+  '  return (float(m) + 0.5) / 64.0;',
+  '}',
+  'float blueNoise(vec2 cell) {',
+  '  return (texelFetch(tNoise, ivec2(mod(cell, 64.0)), 0).r * 255.0 + 0.5) / 256.0;',
+  '}',
+  'float engraving(vec2 cell) {',
+  '  float period = 6.0;',
+  '  float f = (mod(cell.x + cell.y, period) + 0.5) / period;',
+  '  return clamp(abs(f * 2.0 - 1.0) + (bayer(cell) - 0.5) * (2.0 / period), 0.0, 1.0);',
+  '}',
+  'vec2 imageUv(vec2 uv) {',
+  '  return (uv - 0.5) * uCover + 0.5;',
+  '}',
+  'float within(vec2 p) {',
+  '  vec2 s = step(vec2(0.0), p) * step(p, vec2(1.0));',
+  '  return s.x * s.y;',
+  '}',
+  'vec3 grade(vec3 c) {',
+  '  return pow(clamp((c - 0.5) * uContrast + 0.5 + uBrightness, 0.0, 1.0), vec3(1.6));',
+  '}',
+  'float shockwave(vec2 p) {',
+  '  float value = 0.0;',
+  '  for (int i = 0; i < 4; i++) {',
+  '    vec4 burst = uBursts[i];',
+  '    if (burst.w <= 0.0) continue;',
+  '    float offset = distance(p, burst.xy) - burst.z;',
+  '    float edge = offset > 0.0 ? offset / (uBurstWidth * 0.35) : -offset / uBurstWidth;',
+  '    value = max(value, clamp(1.0 - edge, 0.0, 1.0) * burst.w);',
+  '  }',
+  '  return value;',
+  '}',
+  'vec3 toned(vec3 c) {',
+  '  return uPalette == 1 ? grade(c) : grade(vec3(dot(c, vec3(0.2126, 0.7152, 0.0722))));',
+  '}',
+  'vec3 quantize(vec3 v, float t) {',
+  '  float steps = max(uLevels - 1.0, 1.0);',
+  '  vec3 s = v * steps;',
+  '  vec3 base = floor(s);',
+  '  return min(base + step(vec3(t), s - base), vec3(steps)) / steps;',
+  '}',
+  'void main() {',
+  '  vec2 px = vec2(gl_FragCoord.x, uResolution.y - gl_FragCoord.y);',
+  '  vec2 cell = floor(px / uCell);',
+  '  vec2 center = (cell + 0.5) * uCell;',
+  '  vec2 cellUv = vec2(center.x / uResolution.x, 1.0 - center.y / uResolution.y);',
+  '  vec2 sampleUv = imageUv(cellUv);',
+  '  float framed = within(sampleUv);',
+  '  vec3 level;',
+  '  if (uPattern == 3) {',
+  '    level = texelFetch(tDiffused, ivec2(cell), 0).rgb;',
+  '  } else {',
+  '    vec3 c = mix(uMatte, textureLod(tImage, sampleUv, uLod).rgb, framed);',
+  '    float t = uPattern == 1 ? blueNoise(cell) : (uPattern == 2 ? engraving(cell) : bayer(cell));',
+  '    level = quantize(toned(c), t);',
+  '  }',
+  '  vec3 color = mix(uInk, mix(uInk, uPaper, level), max(framed, uKey));',
+  '  vec3 backdrop = mix(uInk, uPaper, toned(uMatte));',
+  '  vec2 photoUv = imageUv(vUv);',
+  '  vec3 raw = texture(tImage, photoUv).rgb;',
+  '  float plain = uKey * (1.0 - smoothstep(0.05, 0.22, distance(raw, uMatte)));',
+  '  vec3 photo = mix(mix(uInk, backdrop, uKey), mix(raw, backdrop, plain), within(photoUv));',
+  '  vec2 point = vec2(cellUv.x, 1.0 - cellUv.y) * uSize;',
+  '  float mask = max(clamp(texture(tMask, cellUv).r * uHold, 0.0, 1.0), shockwave(point));',
+  '  float shown = mix(mask, 1.0 - mask, uReverse);',
+  '  float order = bayer(cell.yx);',
+  '  float low = order * (1.0 - uRim);',
+  '  color = mix(color, uRimColor, step(low, shown) * step(0.001, uRim));',
+  '  color = mix(color, photo, step(low + uRim, shown));',
+  '  vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);',
+  '  float spread = length((cellUv - 0.5) * aspect) / length(aspect * 0.5);',
+  '  float appear = step(spread * 0.72 + bayer(cell + vec2(3.0, 5.0)) * 0.28, uIntro * 1.001);',
+  '  fragColor = vec4(mix(uInk, color, appear), 1.0);',
+  '}'
+].join('\n');
+
+var MASK_UNIFORMS = ['tPrev','uSize','uFrom','uTo','uRadius','uSoftness','uStrength','uFade','uHold'];
+var VIEW_UNIFORMS = ['tImage','tMask','tNoise','tDiffused','uResolution','uCover','uLod','uCell','uPattern','uPalette',
+  'uLevels','uInk','uPaper','uRimColor','uRim','uContrast','uBrightness','uReverse','uIntro','uHold','uMatte','uKey',
+  'uSize','uBursts','uBurstWidth'];
+
+/* ───────── 共享 WebGL2 上下文 ───────── */
+var G = null;                 /* {ok, lost, epoch, canvas, gl, floatMask, mask, view, vao, dummy, noise} */
+var LIVE = [];                /* 所有存活的卡片实例 */
+var ACTIVE = [];              /* 当前需要逐帧渲染的实例 */
+var RAF = 0;
+var RO = null, IO = null;
+var BURST_BUF = new Float32Array(MAX_BURSTS * 4);
+var IMGS = {};                /* src -> {state:'loading'|'ok'|'fail', img, matte, plain, cbs, retried} */
+var INTRO_SEEN = {};          /* src -> true：入场动画每张封面只播一次（renderGrid 重绘不会重播） */
+
+function shader(gl, type, src){
+  var s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+    var msg = gl.getShaderInfoLog(s);
+    gl.deleteShader(s);
+    throw new Error('shader: ' + msg);
+  }
+  return s;
+}
+function program(gl, fs, names){
+  var p = gl.createProgram();
+  gl.attachShader(p, shader(gl, gl.VERTEX_SHADER, VS));
+  gl.attachShader(p, shader(gl, gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error('link: ' + gl.getProgramInfoLog(p));
+  var u = {};
+  for (var i = 0; i < names.length; i++) u[names[i]] = gl.getUniformLocation(p, names[i]);
+  return { p: p, u: u };
+}
+function texParams(gl, min, mag){
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, min);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, mag);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+}
+function dataTex(gl, data, w, h){
+  var t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, data);
+  texParams(gl, gl.NEAREST, gl.NEAREST);
+  return t;
+}
+function imageTex(gl, img){
+  var t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);   /* 跨域没放行时这里会抛 SecurityError */
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  texParams(gl, gl.LINEAR_MIPMAP_LINEAR, gl.LINEAR);
+  return t;
+}
+function maskTarget(gl, w, h){
+  var t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  if (G.floatMask) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+  else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  texParams(gl, gl.LINEAR, gl.LINEAR);
+  var fb = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  return { tex: t, fb: fb, w: w, h: h };
+}
+
+function setupGL(){
+  var gl = G.gl;
+  G.floatMask = !!gl.getExtension('EXT_color_buffer_float');
+  G.mask = program(gl, MASK_FS, MASK_UNIFORMS);
+  G.view = program(gl, VIEW_FS, VIEW_UNIFORMS);
+  G.vao = gl.createVertexArray();
+  G.dummy = dataTex(gl, new Uint8Array([0, 0, 0, 255]), 1, 1);
+  G.noise = null;
+  G.epoch++;
+}
+
+function initGL(){
+  if (G) return G.ok;
+  G = { ok: false, lost: false, epoch: 0, canvas: null, gl: null };
+  try {
+    var cv = document.createElement('canvas');
+    var gl = cv.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false });
+    if (!gl) throw new Error('WebGL2 unavailable');
+    G.canvas = cv; G.gl = gl;
+    cv.addEventListener('webglcontextlost', function(e){ e.preventDefault(); G.lost = true; }, false);
+    cv.addEventListener('webglcontextrestored', function(){
+      G.lost = false;
+      try { setupGL(); } catch (err) { G.ok = false; return; }
+      for (var i = 0; i < LIVE.length; i++){ LIVE[i].res = null; wake(LIVE[i]); }
+    }, false);
+    setupGL();
+    G.ok = true;
+  } catch (err) {
+    G.ok = false;
+    try { console.warn('[DitherVeil] disabled:', err); } catch (_) {}
+  }
+  return G.ok;
+}
+
+/* ───────── 封面图加载（跨域模式，按 src 缓存）───────── */
+function loadImg(src, cb){
+  var e = IMGS[src];
+  if (e){
+    if (e.state === 'ok') { cb(e); return; }
+    if (e.state === 'fail') { cb(null); return; }
+    e.cbs.push(cb);
+    return;
+  }
+  e = IMGS[src] = { state: 'loading', img: null, matte: [0,0,0], plain: false, cbs: [cb], retried: false };
+  function flush(){
+    var list = e.cbs; e.cbs = [];
+    for (var i = 0; i < list.length; i++) list[i](e.state === 'ok' ? e : null);
+  }
+  function fail(){ e.state = 'fail'; flush(); }
+  function attempt(url){
+    var im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.decoding = 'async';
+    im.onload = function(){
+      try {
+        var ed = measureEdge(sampler(), im);
+        e.matte = ed.matte; e.plain = ed.plain;
+      } catch (err) { fail(); return; }               /* 画布被污染 = 服务器没放行跨域 */
+      e.img = im; e.state = 'ok'; flush();
+    };
+    im.onerror = function(){
+      /* 普通 <img> 先缓存过一份没带 CORS 头的响应时，带 crossOrigin 再取会命中它而失败；换个查询参数重试一次 */
+      if (!e.retried && /^https?:/i.test(src)){
+        e.retried = true;
+        attempt(src + (src.indexOf('?') < 0 ? '?' : '&') + 'dv=1');
+      } else fail();
+    };
+    im.src = url;
+  }
+  attempt(src);
+}
+
+/* ───────── 调度 ───────── */
+function wake(v){
+  if (v.dead || !v.visible || !v.image) return;
+  if (!v.queued){ v.queued = true; v.last = performance.now(); ACTIVE.push(v); }
+  if (!RAF) RAF = requestAnimationFrame(loop);
+}
+function loop(now){
+  RAF = 0;
+  for (var i = ACTIVE.length - 1; i >= 0; i--){
+    var v = ACTIVE[i], keep = false;
+    try { keep = v.frame(now); }
+    catch (err) { try { console.warn('[DitherVeil]', err); } catch (_) {} v.dispose(); keep = false; }
+    if (!keep && ACTIVE[i] === v){ ACTIVE.splice(i, 1); v.queued = false; }
+  }
+  if (ACTIVE.length) RAF = requestAnimationFrame(loop);
+}
+function ensureObservers(){
+  if (!RO){
+    RO = new ResizeObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        var v = entries[i].target.dvInst;
+        if (v && !v.dead){ v.layout(); wake(v); }
+      }
+    });
+  }
+  if (!IO){
+    IO = new IntersectionObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        var v = entries[i].target.dvInst;
+        if (!v || v.dead) continue;
+        v.visible = entries[i].isIntersecting;
+        if (v.visible) wake(v);
+      }
+    }, { rootMargin: '120px' });
+  }
+}
+
+/* ───────── GPU 资源（每张卡一份：封面贴图 + 抖动贴图 + 两张拖尾遮罩）───────── */
+function freeMasks(r){
+  var gl = G.gl;
+  for (var i = 0; i < 2; i++){
+    if (r.masks[i]){ gl.deleteTexture(r.masks[i].tex); gl.deleteFramebuffer(r.masks[i].fb); r.masks[i] = null; }
+  }
+}
+function freeRes(r){
+  if (!r || !G || !G.gl || G.lost || r.epoch !== G.epoch) return;
+  var gl = G.gl;
+  if (r.imgTex) gl.deleteTexture(r.imgTex);
+  if (r.diffTex) gl.deleteTexture(r.diffTex);
+  freeMasks(r);
+}
+function ensureRes(v){
+  var r = v.res;
+  if (r && r.epoch === G.epoch) return r;
+  r = { epoch: G.epoch, imgTex: null, diffTex: null, dKey: '', masks: [null, null] };
+  try { r.imgTex = imageTex(G.gl, v.image); }
+  catch (err) { v.dispose(); return null; }               /* 贴图失败 → 这张卡回退成普通封面 */
+  v.res = r;
+  return r;
+}
+
+function updateDiffusion(v, cell, cw, ch){
+  var s = CFG, cols = Math.ceil(cw / cell), rows = Math.ceil(ch / cell);
+  var levels = Math.max(2, Math.round(s.levels));
+  var key = [s.pattern, levels, s.palette, s.contrast, s.brightness, s.fit, cols, rows, cw, ch].join('|');
+  if (v.dData && v.dData.key === key) return;
+  var ctx = sampler(), image = v.image;
+  var cx = v.cover[0], cy = v.cover[1], iw = image.naturalWidth, ih = image.naturalHeight;
+  SCV.width = cols; SCV.height = rows;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.fillStyle = 'rgb(' + (v.matte[0] * 255) + ',' + (v.matte[1] * 255) + ',' + (v.matte[2] * 255) + ')';
+  ctx.fillRect(0, 0, cols, rows);
+  var sx = (0.5 - 0.5 * cx) * iw, sy = (0.5 - 0.5 * cy) * ih;
+  var sw = ((cols * cell) / cw) * cx * iw, sh = ((rows * cell) / ch) * cy * ih;
+  var x0 = Math.max(sx, 0), y0 = Math.max(sy, 0), x1 = Math.min(sx + sw, iw), y1 = Math.min(sy + sh, ih);
+  if (x1 > x0 && y1 > y0){
+    ctx.drawImage(image, x0, y0, x1 - x0, y1 - y0,
+      ((x0 - sx) / sw) * cols, ((y0 - sy) / sh) * rows, ((x1 - x0) / sw) * cols, ((y1 - y0) / sh) * rows);
+  }
+  var grade = function(q){ return Math.pow(Math.min(1, Math.max(0, (q - 0.5) * s.contrast + 0.5 + s.brightness)), 1.6); };
+  var px = ctx.getImageData(0, 0, cols, rows).data;
+  v.dData = { key: key, cols: cols, rows: rows, data: diffuse(px, cols, rows, KERNELS[s.pattern], levels, s.palette === 'rgb', grade) };
+}
+function uploadDiffusion(v, r){
+  var d = v.dData;
+  if (!d || r.dKey === d.key) return;
+  var gl = G.gl;
+  if (r.diffTex) gl.deleteTexture(r.diffTex);
+  r.diffTex = dataTex(gl, d.data, d.cols, d.rows);
+  r.dKey = d.key;
+}
+
+/* ───────── 单张卡片 ───────── */
+function createVeil(host, src){
+  var cv = document.createElement('canvas');
+  cv.className = 'dv-canvas';
+  cv.setAttribute('aria-hidden', 'true');
+  var im0 = host.querySelector('img');
+  host.insertBefore(cv, im0 ? im0.nextSibling : host.firstChild);
+  var ctx = cv.getContext('2d', { alpha: false });
+
+  var v = {
+    host: host, cv: cv, ctx: ctx, src: src,
+    dead: false, visible: false, queued: false, ready: false,
+    res: null, image: null, matte: [0,0,0], plain: false,
+    w: 1, h: 1, dpr: 1, cover: [1,1],
+    dData: null, diffBlocked: false,
+    introStart: 0, introDone: false,
+    last: 0, trailUntil: 0, presence: 0, drift: 0,
+    ptr: { x: 0, y: 0, inside: false, fresh: true, placed: false },
+    brush: { x: 0, y: 0, px: 0, py: 0 },
+    bursts: []
+  };
+
+  v.layout = function(){
+    var w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight), d = dpr();
+    v.w = w; v.h = h; v.dpr = d;
+    var cw = Math.max(1, Math.round(w * d)), ch = Math.max(1, Math.round(h * d));
+    if (cv.width !== cw || cv.height !== ch){ cv.width = cw; cv.height = ch; }
+    if (!v.ptr.placed){ v.ptr.x = w / 2; v.ptr.y = h / 2; }
+  };
+
+  function locate(e){
+    var r = host.getBoundingClientRect();
+    var sx = r.width > 0 ? v.w / r.width : 1, sy = r.height > 0 ? v.h / r.height : 1;   /* 卡片入场/悬停有缩放，换算回 CSS 像素 */
+    v.ptr.x = (e.clientX - r.left) * sx;
+    v.ptr.y = (e.clientY - r.top) * sy;
+    v.ptr.placed = true;
+  }
+  function onMove(e){
+    locate(e);
+    if (!v.ptr.inside){ v.ptr.inside = true; v.ptr.fresh = true; }
+    wake(v);
+  }
+  function onLeave(){ v.ptr.inside = false; wake(v); }
+  function onDown(e){
+    onMove(e);
+    if (!CFG.clickBurst || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    v.bursts.push({ x: v.ptr.x, y: v.ptr.y, start: performance.now() });
+    if (v.bursts.length > MAX_BURSTS) v.bursts.shift();
+  }
+  var pass = { passive: true };
+  host.addEventListener('pointermove', onMove, pass);
+  host.addEventListener('pointerenter', onMove, pass);
+  host.addEventListener('pointerdown', onDown, pass);
+  host.addEventListener('pointerleave', onLeave, pass);
+  host.addEventListener('pointercancel', onLeave, pass);
+
+  v.dispose = function(){
+    if (v.dead) return;
+    v.dead = true;
+    var k = ACTIVE.indexOf(v); if (k >= 0) ACTIVE.splice(k, 1);
+    v.queued = false;
+    k = LIVE.indexOf(v); if (k >= 0) LIVE.splice(k, 1);
+    if (RO) RO.unobserve(host);
+    if (IO) IO.unobserve(host);
+    host.removeEventListener('pointermove', onMove);
+    host.removeEventListener('pointerenter', onMove);
+    host.removeEventListener('pointerdown', onDown);
+    host.removeEventListener('pointerleave', onLeave);
+    host.removeEventListener('pointercancel', onLeave);
+    freeRes(v.res); v.res = null;
+    v.image = null; v.dData = null;
+    if (host.dvInst === v) host.dvInst = null;
+    host.classList.remove('dv-on');
+    if (cv.parentNode) cv.parentNode.removeChild(cv);
+  };
+
+  v.frame = function(now){
+    if (v.dead || !G.ok || G.lost || !v.image) return false;
+    if (v.w < 2 || v.h < 2 || !host.isConnected) return false;
+
+    var s = CFG, gl = G.gl, w = v.w, h = v.h, ptr = v.ptr, brush = v.brush;
+    var dt = Math.min(0.05, Math.max(0, (now - v.last) / 1000));
+    v.last = now;
+
+    /* —— 笔刷位置 / 存在感 —— */
+    var wanderOn = s.wander && !REDUCED, tx = ptr.x, ty = ptr.y;
+    if (!ptr.inside && wanderOn){
+      v.drift = Math.min(1, v.drift + dt / 1.2);
+      var wp = wanderAt(now / 1000, w, h), kk = v.drift * v.drift * (3 - 2 * v.drift);
+      tx += (wp[0] - tx) * kk; ty += (wp[1] - ty) * kk;
+    } else v.drift = 0;
+    v.presence += ((ptr.inside || wanderOn ? 1 : 0) - v.presence) * (1 - Math.exp(-dt / 0.16));
+    if (ptr.fresh){
+      brush.x = tx; brush.px = tx; brush.y = ty; brush.py = ty;
+      ptr.fresh = false;
+    } else {
+      var follow = 1 - Math.exp(-dt / 0.035);
+      brush.x += (tx - brush.x) * follow;
+      brush.y += (ty - brush.y) * follow;
+    }
+
+    /* —— 笔刷半径：卡片比参考宽度窄就等比缩小 —— */
+    var radius = Math.max(24, s.revealRadius * Math.min(1, w / s.radiusRefWidth));
+    var bw = Math.max(18, radius * 0.9);
+
+    /* —— 冲击波 —— */
+    var bd = BURST_BUF; bd.fill(0);
+    for (var i = v.bursts.length - 1; i >= 0; i--){
+      if ((now - v.bursts[i].start) / 1000 >= BURST_SECONDS) v.bursts.splice(i, 1);
+    }
+    for (i = 0; i < v.bursts.length; i++){
+      var b = v.bursts[i], bk = Math.max(0, (now - b.start) / 1000 / BURST_SECONDS);
+      var reach = Math.hypot(Math.max(b.x, w - b.x), Math.max(b.y, h - b.y)) + bw;
+      bd[i * 4] = b.x; bd[i * 4 + 1] = b.y;
+      bd[i * 4 + 2] = reach * Math.sin(bk * Math.PI / 2);
+      bd[i * 4 + 3] = 1 - bk * bk * bk;
+    }
+    if (v.presence > 0.002) v.trailUntil = now + s.linger * 1000 + 150;
+
+    var r = ensureRes(v);
+    if (!r) return false;
+
+    var mw = Math.max(2, Math.round(w * MASK_SCALE)), mh = Math.max(2, Math.round(h * MASK_SCALE));
+    if (!r.masks[0] || r.masks[0].w !== mw || r.masks[0].h !== mh){
+      freeMasks(r);
+      r.masks = [maskTarget(gl, mw, mh), maskTarget(gl, mw, mh)];
+    }
+
+    /* —— Pass 1：拖尾遮罩（ping-pong）—— */
+    var M = G.mask, minFade = G.floatMask ? 0 : 1.5 / 255, fade = s.linger > 0 ? dt / s.linger : 1;
+    gl.bindVertexArray(G.vao);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, r.masks[1].fb);
+    gl.viewport(0, 0, mw, mh);
+    gl.useProgram(M.p);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, r.masks[0].tex);
+    gl.uniform1i(M.u.tPrev, 0);
+    gl.uniform2f(M.u.uSize, w, h);
+    gl.uniform2f(M.u.uFrom, brush.px, brush.py);
+    gl.uniform2f(M.u.uTo, brush.x, brush.y);
+    gl.uniform1f(M.u.uRadius, radius * (0.45 + 0.55 * v.presence));
+    gl.uniform1f(M.u.uSoftness, s.softness);
+    gl.uniform1f(M.u.uStrength, v.presence);
+    gl.uniform1f(M.u.uFade, Math.max(fade, minFade));
+    gl.uniform1f(M.u.uHold, HOLD);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    r.masks.reverse();
+    brush.px = brush.x; brush.py = brush.y;
+
+    /* —— 抖动图案选择 —— */
+    var cw = cv.width, ch = cv.height, cell = Math.max(1, Math.round(s.pixelSize * v.dpr));
+    v.cover = fitScale(cw, ch, v.image.naturalWidth, v.image.naturalHeight, s.fit === 'contain');
+    var pi = ORDERED[s.pattern]; if (pi === undefined) pi = 0;
+    if (KERNELS[s.pattern]){
+      pi = 0;                                              /* 误差扩散失败时退回 Bayer */
+      if (!v.diffBlocked){
+        try { updateDiffusion(v, cell, cw, ch); uploadDiffusion(v, r); pi = 3; }
+        catch (err) { v.diffBlocked = true; }
+      }
+    }
+    if (pi === 1 && !G.noise) G.noise = dataTex(gl, getBlueNoise(), 64, 64);
+
+    /* —— 入场动画：每张封面只播一次 —— */
+    if (!v.introStart){
+      v.introStart = now;
+      if (INTRO_SEEN[v.src]) v.introDone = true;
+      INTRO_SEEN[v.src] = true;
+    }
+    var intro = v.introDone ? 1 : Math.min(1, (now - v.introStart) / INTRO_MS);
+    if (intro >= 1) v.introDone = true;
+
+    /* —— Pass 2：画到共享画布 —— */
+    var V = G.view;
+    if (G.canvas.width !== cw || G.canvas.height !== ch){ G.canvas.width = cw; G.canvas.height = ch; }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, cw, ch);
+    gl.useProgram(V.p);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, r.imgTex);              gl.uniform1i(V.u.tImage, 0);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, r.masks[0].tex);        gl.uniform1i(V.u.tMask, 1);
+    gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D, G.noise || G.dummy);    gl.uniform1i(V.u.tNoise, 2);
+    gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D, (pi === 3 && r.diffTex) ? r.diffTex : G.dummy); gl.uniform1i(V.u.tDiffused, 3);
+
+    var texelsPerPixel = (v.cover[0] * v.image.naturalWidth) / cw;
+    gl.uniform2f(V.u.uResolution, cw, ch);
+    gl.uniform2f(V.u.uCover, v.cover[0], v.cover[1]);
+    gl.uniform1f(V.u.uLod, Math.log2(Math.max(cell * texelsPerPixel, 1)));
+    gl.uniform1f(V.u.uCell, cell);
+    gl.uniform1i(V.u.uPattern, pi);
+    gl.uniform1i(V.u.uPalette, s.palette === 'rgb' ? 1 : 0);
+    gl.uniform1f(V.u.uLevels, Math.max(2, Math.round(s.levels)));
+    gl.uniform3fv(V.u.uInk, hexToRgb(s.inkColor));
+    gl.uniform3fv(V.u.uPaper, hexToRgb(s.paperColor));
+    gl.uniform3fv(V.u.uRimColor, hexToRgb(s.rimColor));
+    gl.uniform1f(V.u.uRim, Math.min(Math.max(s.rim, 0), 0.95));
+    gl.uniform1f(V.u.uContrast, s.contrast);
+    gl.uniform1f(V.u.uBrightness, s.brightness);
+    gl.uniform1f(V.u.uReverse, s.reverse ? 1 : 0);
+    gl.uniform1f(V.u.uIntro, 1 - Math.pow(1 - intro, 2));
+    gl.uniform1f(V.u.uHold, HOLD);
+    gl.uniform3fv(V.u.uMatte, v.matte);
+    gl.uniform1f(V.u.uKey, v.plain ? 1 : 0);
+    gl.uniform2f(V.u.uSize, w, h);
+    gl.uniform4fv(V.u.uBursts, bd);
+    gl.uniform1f(V.u.uBurstWidth, bw);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    ctx.drawImage(G.canvas, 0, 0);                         /* 同一任务内拷贝，不需要 preserveDrawingBuffer */
+
+    if (!v.ready){ v.ready = true; cv.classList.add('dv-ready'); host.classList.add('dv-on'); }
+
+    var busy = ptr.inside || wanderOn || v.presence > 0.002 || v.bursts.length > 0 || now < v.trailUntil || intro < 1;
+    return busy && v.visible;
+  };
+
+  return v;
+}
+
+/* ───────── 对外接口 ───────── */
+function attach(card){
+  var host = card.querySelector('.card-img');
+  if (!host || host.dvInst) return;
+  var im = host.querySelector('img');
+  var src = im ? (im.getAttribute('src') || '') : '';
+  if (!src) return;
+  var cached = IMGS[src];
+  if (cached && cached.state === 'fail') return;           /* 这张封面之前已经确认不能做 WebGL 贴图 */
+  ensureObservers();
+  var v = createVeil(host, src);
+  host.dvInst = v;
+  LIVE.push(v);
+  loadImg(src, function(e){
+    if (v.dead) return;
+    if (!e){ v.dispose(); return; }                        /* 跨域不放行 / 加载失败 → 保持普通封面 */
+    v.image = e.img; v.matte = e.matte; v.plain = e.plain;
+    v.layout();
+    wake(v);
+  });
+  RO.observe(host);
+  IO.observe(host);
+}
+
+/* renderGrid() 每次重绘后调用：回收已被移除的卡片，给新的未订阅卡片挂上特效 */
+function sync(root){
+  for (var i = LIVE.length - 1; i >= 0; i--){
+    if (!LIVE[i].host.isConnected) LIVE[i].dispose();
+  }
+  if (!root || !initGL()) return;
+  var cards = root.querySelectorAll('.card[data-dv]');
+  for (var j = 0; j < cards.length; j++) attach(cards[j]);
+}
+
+function refresh(){ for (var i = 0; i < LIVE.length; i++) wake(LIVE[i]); }
+
+window.DitherVeilCards = { sync: sync, refresh: refresh, config: CFG, supported: function(){ return initGL(); } };
+})();
+</script>
 <script>
 __UI_SCRIPT__
 
@@ -13262,6 +14117,7 @@ __UI_SCRIPT__
         + '<span>' + uiEsc(sub) + '</span>'
         + reqBtn
         + '</div>';
+      try { if (window.DitherVeilCards) window.DitherVeilCards.sync(grid); } catch (e) {}
       return;
     }
 
@@ -13295,7 +14151,7 @@ __UI_SCRIPT__
       }
 
 
-      html += '<div class="card" data-game="' + g + '" onclick="openDetail(\'' + g + '\')">';
+      html += '<div class="card" data-game="' + g + '"' + (owned ? '' : ' data-dv="1"') + ' onclick="openDetail(\'' + g + '\')">';
       html += '<div class="card-img loading">';
       html += '<img src="' + meta.img + '" alt="" ';
       html += 'onload="this.classList.add(\'loaded\');this.parentNode.classList.remove(\'loading\')" ';
@@ -13348,6 +14204,8 @@ __UI_SCRIPT__
       html += '</div></div></div>';
     });
     grid.innerHTML = html;
+    /* 未订阅的卡片（data-dv）挂上 Dither Veil 特效；失败/不支持 WebGL2 时静默跳过 */
+    try { if (window.DitherVeilCards) window.DitherVeilCards.sync(grid); } catch (e) {}
     /* 列表模式：左边列表 + 右边常驻详情块
        还没悬停过 → 显示列表第一个；已经悬停过 → 保持最后一次那款（还在列表里的话） */
     var wrap = document.getElementById('gridWrap');
