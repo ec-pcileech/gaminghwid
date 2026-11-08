@@ -1091,22 +1091,6 @@ body[data-bgfx="off"]::before,body[data-bgstyle="image"]::before{display:none}
     radial-gradient(46% 56% at 62% 86%,color-mix(in srgb,var(--accent-3) 30%,transparent),transparent 70%);
   animation:fxAurora 20s ease-in-out infinite alternate;
 }
-@keyframes fxGrid{to{background-position:0 60px}}
-.bgfx-layer.grid::before{
-  content:'';position:absolute;left:-50%;right:-50%;bottom:-8%;height:78%;
-  background-image:
-    linear-gradient(color-mix(in srgb,var(--accent) 38%,transparent) 1px,transparent 1px),
-    linear-gradient(90deg,color-mix(in srgb,var(--accent) 38%,transparent) 1px,transparent 1px);
-  background-size:60px 60px;
-  transform:perspective(520px) rotateX(62deg);transform-origin:center bottom;
-  -webkit-mask-image:linear-gradient(to top,#000 15%,transparent 92%);
-  mask-image:linear-gradient(to top,#000 15%,transparent 92%);
-  animation:fxGrid 2.4s linear infinite;
-}
-.bgfx-layer.grid::after{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(60% 40% at 50% 100%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%);
-}
 .bgfx-layer.image{background-size:cover;background-position:center;animation:fxFade .6s ease}
 .bgfx-layer.image::after{content:'';position:absolute;inset:0;background:rgba(var(--bg-rgb),.55)}
 /* ══ 性能：毛玻璃半径收敛 ══════════════════════════════════════════════
@@ -2303,22 +2287,22 @@ var UI_T = {
 
 /* ── 额外 i18n ─────────────────────────────────────────────── */
 var UI_T_EXT = {
-  en:{"statusAvailable": "Available", "statusUpdating": "Updating", "statusOutdated": "Outdated", "gameUpdatingCannotLaunch": "This game is currently updating and cannot be launched.", "gameOutdatedCannotLaunch": "This game version is outdated and cannot be launched. Please wait for the latest version.", "profile": "Profile", "quickplay": "Quickplay", "quickAdd": "Add to Quickplay", "quickPick": "Pick a game to pin", "quickAllAdded": "All games are already pinned", "quickRemove": "Remove from Quickplay", "quickEmpty": "Nothing pinned yet — press +", "downloads": "Subscriptions", "searchGames": "Search games...", "toggleTheme": "Toggle theme", "noLicenses": "No active licenses", "featured": "Featured", "allGames": "All Games", "fAll": "All", "fOwned": "Owned", "fAvailable": "Available", "launch": "Launch", "buy": "Buy", "badgeOwned": "OWNED", "badgeNew": "NEW", "noGames": "No games found", "noGamesSub": "Try a different search or filter", "account": "Account", "accountSub": "Username and avatar", "username": "Username", "usernamePh": "Your name", "save": "Save", "avatar": "Avatar", "winScaleTitle": "Window Scale", "winScaleSub": "Scale the entire window UI", "prefLang": "Preferred Language", "prefLangSub": "Interface language", "subscription": "Subscription", "remaining": "Remaining", "readyInject": "Ready to launch", "injecting": "Downloading…", "injected": "Launched", "aboutTitle": "About", "developer": "Developer", "publisher": "Publisher", "release": "Release", "platform": "Platform", "genres": "Genres", "features": "Features", "wishAdded": "Added to wishlist", "wishRemoved": "Removed from wishlist", "wishAddTitle": "Add to wishlist", "wishRemoveTitle": "Remove from wishlist", "prevGame": "Previous game", "nextGame": "Next game", "prevImage": "Previous image", "nextImage": "Next image", "videoPlay": "Play", "videoPause": "Pause", "videoMute": "Mute", "videoUnmute": "Unmute", "videoFull": "Fullscreen", "videoExitFull": "Exit fullscreen", "videoUnmuteHint": "Click the speaker for sound", "videoNoAudio": "This video may have no audio track", "avatarUpdated": "Avatar updated", "usernameEmpty": "Username cannot be empty", "usernameSaved": "Username saved", "localAccount": "Cloud account", "tba": "TBA", "dlBlurb": "Hero-shooter enhancements — aim assist, wallhack, cooldown trackers.", "tFPS": "FPS", "tCompetitive": "Competitive", "tAction": "Action", "tAntiCheat": "Anti-Cheat", "tMultiplayer": "Multiplayer", "tCloudSave": "Cloud Save", "tMOBA": "MOBA", "tShooter": "Shooter", "tThirdPerson": "Third-Person", "tEarlyAccess": "Early Access", "tBattleRoyale": "Battle Royale", "tTactical": "Tactical", "tSurvival": "Survival", "tHardcore": "Hardcore", "tRealistic": "Realistic", "layoutTitle": "Game Catalog Layout", "layoutSub": "How games are listed in All Games", "layoutGrid": "Cards", "layoutList": "List", "bgTitle": "Background Effects", "bgSub": "Animated backdrop behind the app", "bgEnable": "Enable background effects", "bgAurora": "Aurora", "bgWaves": "Waves", "bgGrid": "Grid", "bgStars": "Starfield", "bgNetwork": "Network", "bgEmbers": "Embers", "bgImage": "Custom image", "bgChoose": "Choose image…", "bgClear": "Remove image", "bgImageBad": "Could not load that image", "bgImageSet": "Background image set", "accLogin": "Log in", "accRegister": "Register", "accLoginTitle": "Welcome back", "accRegTitle": "Create account", "accLoginHint": "Log in to continue", "accRegHint": "Free to register — subscribe per game later", "accUsername": "Username", "accPassword": "Password", "accConfirm": "Confirm password", "accRemember": "Remember me", "extracting": "Extracting…", "genreAll": "All genres", "genreNone": "No genres in the catalog yet", "adminTitle": "Administrator required", "adminBody": "STARLINE must be run as administrator. Click OK to close the program, then right-click {exe} and choose \u201cRun as administrator\u201d.", "adminRunAs": "Run as administrator", "adminOk": "OK", "adminLater": "Later", "accUserPh": "3-20 letters, numbers, _ . -", "accPassPh": "At least 8 characters", "accLoginBtn": "Log in", "accRegBtn": "Create account", "accErrEmpty": "Enter your username and password", "accErrUserFmt": "Username: 3-20 letters, numbers, _ . or -", "accErrPassShort": "Password must be at least 8 characters", "accErrMismatch": "Passwords do not match", "accErrExists": "That username is already taken", "accErrBad": "Wrong username or password", "accErrFail": "Something went wrong, please try again", "accSigningIn": "Signing in…", "accCreating": "Creating account…", "accWelcome": "Welcome back!", "accCreated": "Account created!", "accSession": "Session", "accSessionSub": "Signed in on this device", "accEmail": "Email", "accErrEmail": "Enter a valid email address", "accErrBanned": "This account has been banned", "accErrSuspended": "This account is suspended", "accErrHwid": "HWID mismatch — this account is bound to another PC", "accErrHwidPending": "HWID mismatch — a reset request is waiting for admin approval", "errKeyUsed": "This key has already been used", "errAuth": "Please sign in again", "reviewsTitle": "What players say", "reviewWrite": "Write a review", "reviewEmpty": "No reviews yet — be the first to share your experience!", "reviewSub": "Tell other players what you think about STARLINE.", "reviewMore": "Load more", "navAdmin": "Admin", "groupRelease": "Release", "groupAdmin": "Administrator", "adminPanel": "Admin panel", "adminPanelSub": "Users, subscriptions and HWID tickets", "adminRefresh": "Refresh", "adminUsers": "Users", "adminTickets": "HWID tickets", "adminSearch": "Search users…", "adminBan": "Ban", "adminUnban": "Unban", "adminNoUsers": "No users", "adminNoTickets": "No pending tickets", "adminFreeze": "Freeze", "adminUnfreeze": "Unfreeze", "adminFrozen": "frozen", "adminExpired": "expired", "adminApprove": "Approve", "adminReject": "Reject", "adminFailed": "Action failed", "adminReason": "Reason", "adminNone": "none", "adminLastLogin": "Last login", "adminConfirm": "Click again to confirm", "subsErr": "Could not load your subscriptions from the website", "reviewRating": "Rating", "reviewLabel": "Your review", "reviewPh": "At least 10 characters", "revErrShort": "Please write at least 10 characters.", "revOk": "Thanks! Your review is waiting for approval.", "revPending": "You already have a review waiting for approval.", "revErrLoad": "Could not load reviews.", "logout": "Log out", "noOwnedSub": "This account has no subscribed games", "reqBtn": "Request a game", "reqTitle": "Request a game", "reqSub": "Tell us which game you want and we will look into it.", "reqEmail": "Your email", "reqEmailPh": "you@example.com", "reqGame": "Game name", "reqGamePh": "e.g. Apex Legends", "reqSend": "Submit", "reqCancel": "Cancel", "reqSending": "Sending…", "reqOk": "Request sent — thank you!", "reqErrEmail": "Please enter a valid email address", "reqErrGame": "Please enter the game name", "reqErrRate": "Please wait a moment before sending another request", "reqFallback": "Could not send automatically — opening your email app", "fWish": "Wishlist", "noWishSub": "No games in your wishlist yet", "dzAdd": "Drop here to add “{g}” to wishlist", "dzRemove": "Drop here to remove “{g}” from wishlist", "dzView": "Drop here to view all wishlist", "qpDropHint": "Drop here to add to Quickplay", "qpExists": "Already in Quickplay", "colsLabel": "Cards per row", "colsAuto": "Auto", "accSwNo": "Don't have an account?", "accSwYes": "Already have an account?", "accSwReg": "Sign up, it's free!", "accSwLogin": "Log in"},
-  zh:{"statusAvailable": "可用", "statusUpdating": "更新中", "statusOutdated": "过时", "gameUpdatingCannotLaunch": "游戏处于更新中，暂时无法启动。请等待更新完成后再试。", "gameOutdatedCannotLaunch": "当前游戏版本已过时，暂时无法启动。请等待最新版本更新后再试。", "profile": "个人资料", "quickplay": "快速启动", "quickAdd": "添加快速启动", "quickPick": "选择要固定的游戏", "quickAllAdded": "所有游戏都已添加", "quickRemove": "从快速启动移除", "quickEmpty": "还没有固定的游戏 — 点击 +", "downloads": "订阅", "searchGames": "搜索游戏…", "toggleTheme": "切换主题", "noLicenses": "没有有效授权", "featured": "精选", "allGames": "全部游戏", "fAll": "全部", "fOwned": "已拥有", "fAvailable": "未拥有", "launch": "启动", "buy": "购买", "badgeOwned": "已拥有", "badgeNew": "新品", "noGames": "没有找到游戏", "noGamesSub": "换个关键词或筛选条件试试", "account": "账户", "accountSub": "用户名与头像", "username": "用户名", "usernamePh": "你的名字", "save": "保存", "avatar": "头像", "winScaleTitle": "窗口缩放", "winScaleSub": "缩放整个窗口界面", "prefLang": "首选语言", "prefLangSub": "界面语言", "subscription": "订阅", "remaining": "剩余时间", "readyInject": "准备就绪，可启动", "injecting": "下载中…", "injected": "已启动", "aboutTitle": "关于", "developer": "开发商", "publisher": "发行商", "release": "发行日期", "platform": "平台", "genres": "类型", "features": "特性", "wishAdded": "已加入收藏", "wishRemoved": "已取消收藏", "wishAddTitle": "加入收藏", "wishRemoveTitle": "取消收藏", "prevGame": "上一个游戏", "nextGame": "下一个游戏", "prevImage": "上一张", "nextImage": "下一张", "videoPlay": "播放", "videoPause": "暂停", "videoMute": "静音", "videoUnmute": "取消静音", "videoFull": "全屏", "videoExitFull": "退出全屏", "videoUnmuteHint": "点击喇叭开启声音", "videoNoAudio": "此视频可能没有音轨", "avatarUpdated": "头像已更新", "usernameEmpty": "用户名不能为空", "usernameSaved": "用户名已保存", "localAccount": "云端账户", "tba": "待定", "dlBlurb": "英雄射击增强功能 — 辅助瞄准、透视、冷却追踪。", "tFPS": "第一人称射击", "tCompetitive": "竞技", "tAction": "动作", "tAntiCheat": "反作弊", "tMultiplayer": "多人联机", "tCloudSave": "云存档", "tMOBA": "MOBA", "tShooter": "射击", "tThirdPerson": "第三人称", "tEarlyAccess": "抢先体验", "tBattleRoyale": "大逃杀", "tTactical": "战术", "tSurvival": "生存", "tHardcore": "硬核", "tRealistic": "拟真", "layoutTitle": "游戏目录样式", "layoutSub": "「全部游戏」的显示方式", "layoutGrid": "卡片", "layoutList": "列表", "bgTitle": "背景动效", "bgSub": "应用背后的动态背景", "bgEnable": "开启背景动效", "bgAurora": "极光", "bgWaves": "波浪", "bgGrid": "网格", "bgStars": "星空", "bgNetwork": "粒子连线", "bgEmbers": "火星", "bgImage": "本地图片", "bgChoose": "选择图片…", "bgClear": "移除图片", "bgImageBad": "无法加载该图片", "bgImageSet": "背景图片已设置", "accLogin": "登录", "accRegister": "注册", "accLoginTitle": "欢迎回来", "accRegTitle": "创建账户", "accLoginHint": "登录以继续", "accRegHint": "注册免费，进入游戏后再按需订阅", "accUsername": "用户名", "accPassword": "密码", "accConfirm": "确认密码", "accRemember": "记住我", "extracting": "解压中…", "genreAll": "全部类型", "genreNone": "目录里还没有类型信息", "adminTitle": "需要管理员权限", "adminBody": "STARLINE 必须以管理员身份运行。点「确定」后程序会关闭，请右键 {exe} 选择「以管理员身份运行」再打开。", "adminRunAs": "以管理员身份运行", "adminOk": "确定", "adminLater": "稍后", "accUserPh": "3-20 位字母、数字或 _ . -", "accPassPh": "至少 8 位", "accLoginBtn": "登录", "accRegBtn": "创建账户", "accErrEmpty": "请输入用户名和密码", "accErrUserFmt": "用户名：3-20 位字母、数字或 _ . -", "accErrPassShort": "密码至少需要 8 位", "accErrMismatch": "两次输入的密码不一致", "accErrExists": "该用户名已被使用", "accErrBad": "用户名或密码错误", "accErrFail": "出错了，请重试", "accSigningIn": "登录中…", "accCreating": "正在创建账户…", "accWelcome": "欢迎回来！", "accCreated": "账户已创建！", "accSession": "登录状态", "accSessionSub": "已在此设备登录", "accEmail": "邮箱", "accErrEmail": "请输入有效的邮箱地址", "accErrBanned": "该账户已被封禁", "accErrSuspended": "该账户已被暂停", "accErrHwid": "HWID 不匹配 — 该账户已绑定其他电脑", "accErrHwidPending": "HWID 不匹配 — 重置申请正在等待管理员审批", "errKeyUsed": "该卡密已被使用", "errAuth": "请重新登录", "reviewsTitle": "玩家评价", "reviewWrite": "写评价", "reviewEmpty": "还没有评价 — 来做第一个分享体验的人吧！", "reviewSub": "说说你对 STARLINE 的使用感受。", "reviewMore": "加载更多", "navAdmin": "管理", "groupRelease": "发布版本", "groupAdmin": "管理员", "adminPanel": "管理面板", "adminPanelSub": "用户、订阅与 HWID 工单", "adminRefresh": "刷新", "adminUsers": "用户", "adminTickets": "HWID 解绑工单", "adminSearch": "搜索用户…", "adminBan": "封禁", "adminUnban": "解封", "adminNoUsers": "没有用户", "adminNoTickets": "没有待处理工单", "adminFreeze": "冻结", "adminUnfreeze": "解冻", "adminFrozen": "已冻结", "adminExpired": "已过期", "adminApprove": "批准", "adminReject": "驳回", "adminFailed": "操作失败", "adminReason": "理由", "adminNone": "无", "adminLastLogin": "最后登录", "adminConfirm": "再点一次确认", "subsErr": "无法从网站获取你的订阅", "reviewRating": "评分", "reviewLabel": "你的评价", "reviewPh": "至少 10 个字", "revErrShort": "请至少写 10 个字。", "revOk": "谢谢！你的评价正在等待审核。", "revPending": "你已有一条评价在等待审核。", "revErrLoad": "评论加载失败。", "logout": "退出登录", "noOwnedSub": "当前账户没有订阅游戏", "reqBtn": "提交想要的游戏", "reqTitle": "提交想要的游戏", "reqSub": "告诉我们你想要哪款游戏，我们会认真考虑。", "reqEmail": "你的邮箱", "reqEmailPh": "you@example.com", "reqGame": "游戏名称", "reqGamePh": "例如：Apex 英雄", "reqSend": "提交", "reqCancel": "取消", "reqSending": "提交中…", "reqOk": "已提交，谢谢！", "reqErrEmail": "请输入有效的邮箱地址", "reqErrGame": "请输入游戏名称", "reqErrRate": "请稍等片刻再提交", "reqFallback": "无法自动发送，正在打开你的邮件应用", "fWish": "收藏", "noWishSub": "还没有收藏任何游戏", "dzAdd": "拖动到此处，将“{g}”添加至收藏", "dzRemove": "拖动到此处，将“{g}”移出收藏", "dzView": "拖动到此处，查看所有收藏", "qpDropHint": "拖到此处添加到快速启动", "qpExists": "已在快速启动中", "colsLabel": "每行卡片数", "colsAuto": "自动", "accSwNo": "还没有账号？", "accSwYes": "已有账号？", "accSwReg": "免费注册", "accSwLogin": "去登录"},
+  en:{"statusAvailable": "Available", "statusUpdating": "Updating", "statusOutdated": "Outdated", "gameUpdatingCannotLaunch": "This game is currently updating and cannot be launched.", "gameOutdatedCannotLaunch": "This game version is outdated and cannot be launched. Please wait for the latest version.", "profile": "Profile", "quickplay": "Quickplay", "quickAdd": "Add to Quickplay", "quickPick": "Pick a game to pin", "quickAllAdded": "All games are already pinned", "quickRemove": "Remove from Quickplay", "quickEmpty": "Nothing pinned yet — press +", "downloads": "Subscriptions", "searchGames": "Search games...", "toggleTheme": "Toggle theme", "noLicenses": "No active licenses", "featured": "Featured", "allGames": "All Games", "fAll": "All", "fOwned": "Owned", "fAvailable": "Available", "launch": "Launch", "buy": "Buy", "badgeOwned": "OWNED", "badgeNew": "NEW", "noGames": "No games found", "noGamesSub": "Try a different search or filter", "account": "Account", "accountSub": "Username and avatar", "username": "Username", "usernamePh": "Your name", "save": "Save", "avatar": "Avatar", "winScaleTitle": "Window Scale", "winScaleSub": "Scale the entire window UI", "prefLang": "Preferred Language", "prefLangSub": "Interface language", "subscription": "Subscription", "remaining": "Remaining", "readyInject": "Ready to launch", "injecting": "Downloading…", "injected": "Launched", "aboutTitle": "About", "developer": "Developer", "publisher": "Publisher", "release": "Release", "platform": "Platform", "genres": "Genres", "features": "Features", "wishAdded": "Added to wishlist", "wishRemoved": "Removed from wishlist", "wishAddTitle": "Add to wishlist", "wishRemoveTitle": "Remove from wishlist", "prevGame": "Previous game", "nextGame": "Next game", "prevImage": "Previous image", "nextImage": "Next image", "videoPlay": "Play", "videoPause": "Pause", "videoMute": "Mute", "videoUnmute": "Unmute", "videoFull": "Fullscreen", "videoExitFull": "Exit fullscreen", "videoUnmuteHint": "Click the speaker for sound", "videoNoAudio": "This video may have no audio track", "avatarUpdated": "Avatar updated", "usernameEmpty": "Username cannot be empty", "usernameSaved": "Username saved", "localAccount": "Cloud account", "tba": "TBA", "dlBlurb": "Hero-shooter enhancements — aim assist, wallhack, cooldown trackers.", "tFPS": "FPS", "tCompetitive": "Competitive", "tAction": "Action", "tAntiCheat": "Anti-Cheat", "tMultiplayer": "Multiplayer", "tCloudSave": "Cloud Save", "tMOBA": "MOBA", "tShooter": "Shooter", "tThirdPerson": "Third-Person", "tEarlyAccess": "Early Access", "tBattleRoyale": "Battle Royale", "tTactical": "Tactical", "tSurvival": "Survival", "tHardcore": "Hardcore", "tRealistic": "Realistic", "layoutTitle": "Game Catalog Layout", "layoutSub": "How games are listed in All Games", "layoutGrid": "Cards", "layoutList": "List", "bgTitle": "Background Effects", "bgSub": "Animated backdrop behind the app", "bgEnable": "Enable background effects", "bgAurora": "Aurora", "bgWaves": "Waves", "bgStars": "Starfield", "bgNetwork": "Network", "bgEmbers": "Embers", "bgImage": "Custom image", "bgChoose": "Choose image…", "bgClear": "Remove image", "bgImageBad": "Could not load that image", "bgImageSet": "Background image set", "accLogin": "Log in", "accRegister": "Register", "accLoginTitle": "Welcome back", "accRegTitle": "Create account", "accLoginHint": "Log in to continue", "accRegHint": "Free to register — subscribe per game later", "accUsername": "Username", "accPassword": "Password", "accConfirm": "Confirm password", "accRemember": "Remember me", "extracting": "Extracting…", "genreAll": "All genres", "genreNone": "No genres in the catalog yet", "adminTitle": "Administrator required", "adminBody": "STARLINE must be run as administrator. Click OK to close the program, then right-click {exe} and choose \u201cRun as administrator\u201d.", "adminRunAs": "Run as administrator", "adminOk": "OK", "adminLater": "Later", "accUserPh": "3-20 letters, numbers, _ . -", "accPassPh": "At least 8 characters", "accLoginBtn": "Log in", "accRegBtn": "Create account", "accErrEmpty": "Enter your username and password", "accErrUserFmt": "Username: 3-20 letters, numbers, _ . or -", "accErrPassShort": "Password must be at least 8 characters", "accErrMismatch": "Passwords do not match", "accErrExists": "That username is already taken", "accErrBad": "Wrong username or password", "accErrFail": "Something went wrong, please try again", "accSigningIn": "Signing in…", "accCreating": "Creating account…", "accWelcome": "Welcome back!", "accCreated": "Account created!", "accSession": "Session", "accSessionSub": "Signed in on this device", "accEmail": "Email", "accErrEmail": "Enter a valid email address", "accErrBanned": "This account has been banned", "accErrSuspended": "This account is suspended", "accErrHwid": "HWID mismatch — this account is bound to another PC", "accErrHwidPending": "HWID mismatch — a reset request is waiting for admin approval", "errKeyUsed": "This key has already been used", "errAuth": "Please sign in again", "reviewsTitle": "What players say", "reviewWrite": "Write a review", "reviewEmpty": "No reviews yet — be the first to share your experience!", "reviewSub": "Tell other players what you think about STARLINE.", "reviewMore": "Load more", "navAdmin": "Admin", "groupRelease": "Release", "groupAdmin": "Administrator", "adminPanel": "Admin panel", "adminPanelSub": "Users, subscriptions and HWID tickets", "adminRefresh": "Refresh", "adminUsers": "Users", "adminTickets": "HWID tickets", "adminSearch": "Search users…", "adminBan": "Ban", "adminUnban": "Unban", "adminNoUsers": "No users", "adminNoTickets": "No pending tickets", "adminFreeze": "Freeze", "adminUnfreeze": "Unfreeze", "adminFrozen": "frozen", "adminExpired": "expired", "adminApprove": "Approve", "adminReject": "Reject", "adminFailed": "Action failed", "adminReason": "Reason", "adminNone": "none", "adminLastLogin": "Last login", "adminConfirm": "Click again to confirm", "subsErr": "Could not load your subscriptions from the website", "reviewRating": "Rating", "reviewLabel": "Your review", "reviewPh": "At least 10 characters", "revErrShort": "Please write at least 10 characters.", "revOk": "Thanks! Your review is waiting for approval.", "revPending": "You already have a review waiting for approval.", "revErrLoad": "Could not load reviews.", "logout": "Log out", "noOwnedSub": "This account has no subscribed games", "reqBtn": "Request a game", "reqTitle": "Request a game", "reqSub": "Tell us which game you want and we will look into it.", "reqEmail": "Your email", "reqEmailPh": "you@example.com", "reqGame": "Game name", "reqGamePh": "e.g. Apex Legends", "reqSend": "Submit", "reqCancel": "Cancel", "reqSending": "Sending…", "reqOk": "Request sent — thank you!", "reqErrEmail": "Please enter a valid email address", "reqErrGame": "Please enter the game name", "reqErrRate": "Please wait a moment before sending another request", "reqFallback": "Could not send automatically — opening your email app", "fWish": "Wishlist", "noWishSub": "No games in your wishlist yet", "dzAdd": "Drop here to add “{g}” to wishlist", "dzRemove": "Drop here to remove “{g}” from wishlist", "dzView": "Drop here to view all wishlist", "qpDropHint": "Drop here to add to Quickplay", "qpExists": "Already in Quickplay", "colsLabel": "Cards per row", "colsAuto": "Auto", "accSwNo": "Don't have an account?", "accSwYes": "Already have an account?", "accSwReg": "Sign up, it's free!", "accSwLogin": "Log in"},
+  zh:{"statusAvailable": "可用", "statusUpdating": "更新中", "statusOutdated": "过时", "gameUpdatingCannotLaunch": "游戏处于更新中，暂时无法启动。请等待更新完成后再试。", "gameOutdatedCannotLaunch": "当前游戏版本已过时，暂时无法启动。请等待最新版本更新后再试。", "profile": "个人资料", "quickplay": "快速启动", "quickAdd": "添加快速启动", "quickPick": "选择要固定的游戏", "quickAllAdded": "所有游戏都已添加", "quickRemove": "从快速启动移除", "quickEmpty": "还没有固定的游戏 — 点击 +", "downloads": "订阅", "searchGames": "搜索游戏…", "toggleTheme": "切换主题", "noLicenses": "没有有效授权", "featured": "精选", "allGames": "全部游戏", "fAll": "全部", "fOwned": "已拥有", "fAvailable": "未拥有", "launch": "启动", "buy": "购买", "badgeOwned": "已拥有", "badgeNew": "新品", "noGames": "没有找到游戏", "noGamesSub": "换个关键词或筛选条件试试", "account": "账户", "accountSub": "用户名与头像", "username": "用户名", "usernamePh": "你的名字", "save": "保存", "avatar": "头像", "winScaleTitle": "窗口缩放", "winScaleSub": "缩放整个窗口界面", "prefLang": "首选语言", "prefLangSub": "界面语言", "subscription": "订阅", "remaining": "剩余时间", "readyInject": "准备就绪，可启动", "injecting": "下载中…", "injected": "已启动", "aboutTitle": "关于", "developer": "开发商", "publisher": "发行商", "release": "发行日期", "platform": "平台", "genres": "类型", "features": "特性", "wishAdded": "已加入收藏", "wishRemoved": "已取消收藏", "wishAddTitle": "加入收藏", "wishRemoveTitle": "取消收藏", "prevGame": "上一个游戏", "nextGame": "下一个游戏", "prevImage": "上一张", "nextImage": "下一张", "videoPlay": "播放", "videoPause": "暂停", "videoMute": "静音", "videoUnmute": "取消静音", "videoFull": "全屏", "videoExitFull": "退出全屏", "videoUnmuteHint": "点击喇叭开启声音", "videoNoAudio": "此视频可能没有音轨", "avatarUpdated": "头像已更新", "usernameEmpty": "用户名不能为空", "usernameSaved": "用户名已保存", "localAccount": "云端账户", "tba": "待定", "dlBlurb": "英雄射击增强功能 — 辅助瞄准、透视、冷却追踪。", "tFPS": "第一人称射击", "tCompetitive": "竞技", "tAction": "动作", "tAntiCheat": "反作弊", "tMultiplayer": "多人联机", "tCloudSave": "云存档", "tMOBA": "MOBA", "tShooter": "射击", "tThirdPerson": "第三人称", "tEarlyAccess": "抢先体验", "tBattleRoyale": "大逃杀", "tTactical": "战术", "tSurvival": "生存", "tHardcore": "硬核", "tRealistic": "拟真", "layoutTitle": "游戏目录样式", "layoutSub": "「全部游戏」的显示方式", "layoutGrid": "卡片", "layoutList": "列表", "bgTitle": "背景动效", "bgSub": "应用背后的动态背景", "bgEnable": "开启背景动效", "bgAurora": "极光", "bgWaves": "波浪", "bgStars": "星空", "bgNetwork": "粒子连线", "bgEmbers": "火星", "bgImage": "本地图片", "bgChoose": "选择图片…", "bgClear": "移除图片", "bgImageBad": "无法加载该图片", "bgImageSet": "背景图片已设置", "accLogin": "登录", "accRegister": "注册", "accLoginTitle": "欢迎回来", "accRegTitle": "创建账户", "accLoginHint": "登录以继续", "accRegHint": "注册免费，进入游戏后再按需订阅", "accUsername": "用户名", "accPassword": "密码", "accConfirm": "确认密码", "accRemember": "记住我", "extracting": "解压中…", "genreAll": "全部类型", "genreNone": "目录里还没有类型信息", "adminTitle": "需要管理员权限", "adminBody": "STARLINE 必须以管理员身份运行。点「确定」后程序会关闭，请右键 {exe} 选择「以管理员身份运行」再打开。", "adminRunAs": "以管理员身份运行", "adminOk": "确定", "adminLater": "稍后", "accUserPh": "3-20 位字母、数字或 _ . -", "accPassPh": "至少 8 位", "accLoginBtn": "登录", "accRegBtn": "创建账户", "accErrEmpty": "请输入用户名和密码", "accErrUserFmt": "用户名：3-20 位字母、数字或 _ . -", "accErrPassShort": "密码至少需要 8 位", "accErrMismatch": "两次输入的密码不一致", "accErrExists": "该用户名已被使用", "accErrBad": "用户名或密码错误", "accErrFail": "出错了，请重试", "accSigningIn": "登录中…", "accCreating": "正在创建账户…", "accWelcome": "欢迎回来！", "accCreated": "账户已创建！", "accSession": "登录状态", "accSessionSub": "已在此设备登录", "accEmail": "邮箱", "accErrEmail": "请输入有效的邮箱地址", "accErrBanned": "该账户已被封禁", "accErrSuspended": "该账户已被暂停", "accErrHwid": "HWID 不匹配 — 该账户已绑定其他电脑", "accErrHwidPending": "HWID 不匹配 — 重置申请正在等待管理员审批", "errKeyUsed": "该卡密已被使用", "errAuth": "请重新登录", "reviewsTitle": "玩家评价", "reviewWrite": "写评价", "reviewEmpty": "还没有评价 — 来做第一个分享体验的人吧！", "reviewSub": "说说你对 STARLINE 的使用感受。", "reviewMore": "加载更多", "navAdmin": "管理", "groupRelease": "发布版本", "groupAdmin": "管理员", "adminPanel": "管理面板", "adminPanelSub": "用户、订阅与 HWID 工单", "adminRefresh": "刷新", "adminUsers": "用户", "adminTickets": "HWID 解绑工单", "adminSearch": "搜索用户…", "adminBan": "封禁", "adminUnban": "解封", "adminNoUsers": "没有用户", "adminNoTickets": "没有待处理工单", "adminFreeze": "冻结", "adminUnfreeze": "解冻", "adminFrozen": "已冻结", "adminExpired": "已过期", "adminApprove": "批准", "adminReject": "驳回", "adminFailed": "操作失败", "adminReason": "理由", "adminNone": "无", "adminLastLogin": "最后登录", "adminConfirm": "再点一次确认", "subsErr": "无法从网站获取你的订阅", "reviewRating": "评分", "reviewLabel": "你的评价", "reviewPh": "至少 10 个字", "revErrShort": "请至少写 10 个字。", "revOk": "谢谢！你的评价正在等待审核。", "revPending": "你已有一条评价在等待审核。", "revErrLoad": "评论加载失败。", "logout": "退出登录", "noOwnedSub": "当前账户没有订阅游戏", "reqBtn": "提交想要的游戏", "reqTitle": "提交想要的游戏", "reqSub": "告诉我们你想要哪款游戏，我们会认真考虑。", "reqEmail": "你的邮箱", "reqEmailPh": "you@example.com", "reqGame": "游戏名称", "reqGamePh": "例如：Apex 英雄", "reqSend": "提交", "reqCancel": "取消", "reqSending": "提交中…", "reqOk": "已提交，谢谢！", "reqErrEmail": "请输入有效的邮箱地址", "reqErrGame": "请输入游戏名称", "reqErrRate": "请稍等片刻再提交", "reqFallback": "无法自动发送，正在打开你的邮件应用", "fWish": "收藏", "noWishSub": "还没有收藏任何游戏", "dzAdd": "拖动到此处，将“{g}”添加至收藏", "dzRemove": "拖动到此处，将“{g}”移出收藏", "dzView": "拖动到此处，查看所有收藏", "qpDropHint": "拖到此处添加到快速启动", "qpExists": "已在快速启动中", "colsLabel": "每行卡片数", "colsAuto": "自动", "accSwNo": "还没有账号？", "accSwYes": "已有账号？", "accSwReg": "免费注册", "accSwLogin": "去登录"},
 
 
 
-  ru:{"profile": "Профиль", "quickplay": "Быстрый запуск", "quickAdd": "Добавить в быстрый запуск", "quickPick": "Выберите игру для закрепления", "quickAllAdded": "Все игры уже закреплены", "quickRemove": "Убрать из быстрого запуска", "quickEmpty": "Пока ничего не закреплено — нажмите +", "downloads": "Подписки", "searchGames": "Поиск игр…", "toggleTheme": "Сменить тему", "noLicenses": "Нет активных лицензий", "featured": "Избранное", "allGames": "Все игры", "fAll": "Все", "fOwned": "Купленные", "fAvailable": "Доступные", "launch": "Запуск", "buy": "Купить", "badgeOwned": "КУПЛЕНО", "badgeNew": "НОВОЕ", "noGames": "Игры не найдены", "noGamesSub": "Попробуйте другой запрос или фильтр", "account": "Аккаунт", "accountSub": "Имя пользователя и аватар", "username": "Имя пользователя", "usernamePh": "Ваше имя", "save": "Сохранить", "avatar": "Аватар", "winScaleTitle": "Масштаб окна", "winScaleSub": "Масштабирует весь интерфейс", "prefLang": "Язык интерфейса", "prefLangSub": "Язык приложения", "subscription": "Подписка", "remaining": "Осталось", "readyInject": "Готово к запуску", "injecting": "Загрузка…", "injected": "Запущено", "aboutTitle": "Об игре", "developer": "Разработчик", "publisher": "Издатель", "release": "Дата выхода", "platform": "Платформа", "genres": "Жанры", "features": "Особенности", "wishAdded": "Добавлено в список желаний", "wishRemoved": "Удалено из списка желаний", "wishAddTitle": "Добавить в список желаний", "wishRemoveTitle": "Удалить из списка желаний", "prevGame": "Предыдущая игра", "nextGame": "Следующая игра", "prevImage": "Предыдущее изображение", "nextImage": "Следующее изображение", "videoPlay": "Воспроизвести", "videoPause": "Пауза", "videoMute": "Без звука", "videoUnmute": "Включить звук", "videoFull": "На весь экран", "videoExitFull": "Выйти из полноэкранного режима", "videoUnmuteHint": "Нажмите на динамик, чтобы включить звук", "videoNoAudio": "Возможно, в этом видео нет звуковой дорожки", "avatarUpdated": "Аватар обновлён", "usernameEmpty": "Имя пользователя не может быть пустым", "usernameSaved": "Имя пользователя сохранено", "localAccount": "Облачный аккаунт", "tba": "TBA", "dlBlurb": "Улучшения для геройского шутера — помощь в прицеливании, wallhack, отслеживание перезарядок.", "tFPS": "Шутер от первого лица", "tCompetitive": "Соревновательный", "tAction": "Экшен", "tAntiCheat": "Античит", "tMultiplayer": "Мультиплеер", "tCloudSave": "Облачные сохранения", "tMOBA": "MOBA", "tShooter": "Шутер", "tThirdPerson": "От третьего лица", "tEarlyAccess": "Ранний доступ", "tBattleRoyale": "Королевская битва", "tTactical": "Тактический", "tSurvival": "Выживание", "tHardcore": "Хардкор", "tRealistic": "Реалистичный", "layoutTitle": "Вид каталога игр", "layoutSub": "Как игры отображаются в «Все игры»", "layoutGrid": "Карточки", "layoutList": "Список", "bgTitle": "Фоновые эффекты", "bgSub": "Анимированный фон за приложением", "bgEnable": "Включить фоновые эффекты", "bgAurora": "Сияние", "bgWaves": "Волны", "bgGrid": "Сетка", "bgStars": "Звёзды", "bgNetwork": "Сеть частиц", "bgEmbers": "Искры", "bgImage": "Своё изображение", "bgChoose": "Выбрать изображение…", "bgClear": "Убрать изображение", "bgImageBad": "Не удалось загрузить изображение", "bgImageSet": "Фоновое изображение установлено", "accLogin": "Вход", "accRegister": "Регистрация", "accLoginTitle": "С возвращением", "accRegTitle": "Создать аккаунт", "accLoginHint": "Войдите, чтобы продолжить", "accRegHint": "Регистрация бесплатна — подписка на игры отдельно", "accUsername": "Имя пользователя", "accPassword": "Пароль", "accConfirm": "Подтвердите пароль", "accRemember": "Запомнить меня", "extracting": "Распаковка…", "genreAll": "Все жанры", "genreNone": "В каталоге пока нет жанров", "adminTitle": "Требуются права администратора", "adminBody": "STARLINE нужно запускать от имени администратора. Нажмите «ОК» — программа закроется, затем щёлкните правой кнопкой по {exe} и выберите «Запуск от имени администратора».", "adminRunAs": "Запуск от имени администратора", "adminOk": "ОК", "adminLater": "Позже", "accUserPh": "3–20 букв, цифр, _ . -", "accPassPh": "Не менее 8 символов", "accLoginBtn": "Войти", "accRegBtn": "Создать аккаунт", "accErrEmpty": "Введите имя пользователя и пароль", "accErrUserFmt": "Имя: 3–20 букв, цифр, _ . -", "accErrPassShort": "Пароль должен быть не короче 8 символов", "accErrMismatch": "Пароли не совпадают", "accErrExists": "Такое имя уже занято", "accErrBad": "Неверное имя пользователя или пароль", "accErrFail": "Что-то пошло не так, попробуйте снова", "accSigningIn": "Вход…", "accCreating": "Создание аккаунта…", "accWelcome": "С возвращением!", "accCreated": "Аккаунт создан!", "accSession": "Сессия", "accSessionSub": "Вы вошли на этом устройстве", "accEmail": "Эл. почта", "accErrEmail": "Введите корректный адрес эл. почты", "accErrBanned": "Этот аккаунт заблокирован", "accErrSuspended": "Аккаунт приостановлен", "accErrHwid": "Несовпадение HWID — аккаунт привязан к другому ПК", "accErrHwidPending": "Несовпадение HWID — запрос на сброс ждёт одобрения", "errKeyUsed": "Этот ключ уже использован", "errAuth": "Войдите снова", "reviewsTitle": "Отзывы игроков", "reviewWrite": "Написать отзыв", "reviewEmpty": "Отзывов пока нет — поделитесь опытом первым!", "reviewSub": "Расскажите другим игрокам о STARLINE.", "reviewMore": "Показать ещё", "navAdmin": "Админ", "groupRelease": "Release", "groupAdmin": "Администратор", "adminPanel": "Панель администратора", "adminPanelSub": "Пользователи, подписки и заявки HWID", "adminRefresh": "Обновить", "adminUsers": "Пользователи", "adminTickets": "Заявки HWID", "adminSearch": "Поиск пользователей…", "adminBan": "Забанить", "adminUnban": "Разбанить", "adminNoUsers": "Нет пользователей", "adminNoTickets": "Нет заявок", "adminFreeze": "Заморозить", "adminUnfreeze": "Разморозить", "adminFrozen": "заморожено", "adminExpired": "истёк", "adminApprove": "Одобрить", "adminReject": "Отклонить", "adminFailed": "Не удалось", "adminReason": "Причина", "adminNone": "нет", "adminLastLogin": "Последний вход", "adminConfirm": "Нажмите ещё раз для подтверждения", "subsErr": "Не удалось загрузить подписки с сайта", "reviewRating": "Оценка", "reviewLabel": "Ваш отзыв", "reviewPh": "Не менее 10 символов", "revErrShort": "Напишите не менее 10 символов.", "revOk": "Спасибо! Отзыв ждёт одобрения.", "revPending": "У вас уже есть отзыв на модерации.", "revErrLoad": "Не удалось загрузить отзывы.", "logout": "Выйти", "noOwnedSub": "У этого аккаунта нет подписок на игры", "reqBtn": "Предложить игру", "reqTitle": "Предложить игру", "reqSub": "Напишите, какую игру вы хотите, и мы её рассмотрим.", "reqEmail": "Ваша почта", "reqEmailPh": "you@example.com", "reqGame": "Название игры", "reqGamePh": "напр. Apex Legends", "reqSend": "Отправить", "reqCancel": "Отмена", "reqSending": "Отправка…", "reqOk": "Заявка отправлена — спасибо!", "reqErrEmail": "Введите корректный адрес почты", "reqErrGame": "Введите название игры", "reqErrRate": "Подождите немного перед следующей заявкой", "reqFallback": "Не удалось отправить автоматически — открываем почтовое приложение", "fWish": "Список желаний", "noWishSub": "В списке желаний пока пусто", "dzAdd": "Перетащите сюда, чтобы добавить «{g}» в список желаний", "dzRemove": "Перетащите сюда, чтобы убрать «{g}» из списка желаний", "dzView": "Перетащите сюда, чтобы открыть список желаний", "qpDropHint": "Перетащите сюда, чтобы добавить в быстрый запуск", "qpExists": "Уже в быстром запуске", "colsLabel": "Карточек в ряд", "colsAuto": "Авто", "accSwNo": "Нет аккаунта?", "accSwYes": "Уже есть аккаунт?", "accSwReg": "Зарегистрируйтесь бесплатно", "accSwLogin": "Войти"},
+  ru:{"profile": "Профиль", "quickplay": "Быстрый запуск", "quickAdd": "Добавить в быстрый запуск", "quickPick": "Выберите игру для закрепления", "quickAllAdded": "Все игры уже закреплены", "quickRemove": "Убрать из быстрого запуска", "quickEmpty": "Пока ничего не закреплено — нажмите +", "downloads": "Подписки", "searchGames": "Поиск игр…", "toggleTheme": "Сменить тему", "noLicenses": "Нет активных лицензий", "featured": "Избранное", "allGames": "Все игры", "fAll": "Все", "fOwned": "Купленные", "fAvailable": "Доступные", "launch": "Запуск", "buy": "Купить", "badgeOwned": "КУПЛЕНО", "badgeNew": "НОВОЕ", "noGames": "Игры не найдены", "noGamesSub": "Попробуйте другой запрос или фильтр", "account": "Аккаунт", "accountSub": "Имя пользователя и аватар", "username": "Имя пользователя", "usernamePh": "Ваше имя", "save": "Сохранить", "avatar": "Аватар", "winScaleTitle": "Масштаб окна", "winScaleSub": "Масштабирует весь интерфейс", "prefLang": "Язык интерфейса", "prefLangSub": "Язык приложения", "subscription": "Подписка", "remaining": "Осталось", "readyInject": "Готово к запуску", "injecting": "Загрузка…", "injected": "Запущено", "aboutTitle": "Об игре", "developer": "Разработчик", "publisher": "Издатель", "release": "Дата выхода", "platform": "Платформа", "genres": "Жанры", "features": "Особенности", "wishAdded": "Добавлено в список желаний", "wishRemoved": "Удалено из списка желаний", "wishAddTitle": "Добавить в список желаний", "wishRemoveTitle": "Удалить из списка желаний", "prevGame": "Предыдущая игра", "nextGame": "Следующая игра", "prevImage": "Предыдущее изображение", "nextImage": "Следующее изображение", "videoPlay": "Воспроизвести", "videoPause": "Пауза", "videoMute": "Без звука", "videoUnmute": "Включить звук", "videoFull": "На весь экран", "videoExitFull": "Выйти из полноэкранного режима", "videoUnmuteHint": "Нажмите на динамик, чтобы включить звук", "videoNoAudio": "Возможно, в этом видео нет звуковой дорожки", "avatarUpdated": "Аватар обновлён", "usernameEmpty": "Имя пользователя не может быть пустым", "usernameSaved": "Имя пользователя сохранено", "localAccount": "Облачный аккаунт", "tba": "TBA", "dlBlurb": "Улучшения для геройского шутера — помощь в прицеливании, wallhack, отслеживание перезарядок.", "tFPS": "Шутер от первого лица", "tCompetitive": "Соревновательный", "tAction": "Экшен", "tAntiCheat": "Античит", "tMultiplayer": "Мультиплеер", "tCloudSave": "Облачные сохранения", "tMOBA": "MOBA", "tShooter": "Шутер", "tThirdPerson": "От третьего лица", "tEarlyAccess": "Ранний доступ", "tBattleRoyale": "Королевская битва", "tTactical": "Тактический", "tSurvival": "Выживание", "tHardcore": "Хардкор", "tRealistic": "Реалистичный", "layoutTitle": "Вид каталога игр", "layoutSub": "Как игры отображаются в «Все игры»", "layoutGrid": "Карточки", "layoutList": "Список", "bgTitle": "Фоновые эффекты", "bgSub": "Анимированный фон за приложением", "bgEnable": "Включить фоновые эффекты", "bgAurora": "Сияние", "bgWaves": "Волны", "bgStars": "Звёзды", "bgNetwork": "Сеть частиц", "bgEmbers": "Искры", "bgImage": "Своё изображение", "bgChoose": "Выбрать изображение…", "bgClear": "Убрать изображение", "bgImageBad": "Не удалось загрузить изображение", "bgImageSet": "Фоновое изображение установлено", "accLogin": "Вход", "accRegister": "Регистрация", "accLoginTitle": "С возвращением", "accRegTitle": "Создать аккаунт", "accLoginHint": "Войдите, чтобы продолжить", "accRegHint": "Регистрация бесплатна — подписка на игры отдельно", "accUsername": "Имя пользователя", "accPassword": "Пароль", "accConfirm": "Подтвердите пароль", "accRemember": "Запомнить меня", "extracting": "Распаковка…", "genreAll": "Все жанры", "genreNone": "В каталоге пока нет жанров", "adminTitle": "Требуются права администратора", "adminBody": "STARLINE нужно запускать от имени администратора. Нажмите «ОК» — программа закроется, затем щёлкните правой кнопкой по {exe} и выберите «Запуск от имени администратора».", "adminRunAs": "Запуск от имени администратора", "adminOk": "ОК", "adminLater": "Позже", "accUserPh": "3–20 букв, цифр, _ . -", "accPassPh": "Не менее 8 символов", "accLoginBtn": "Войти", "accRegBtn": "Создать аккаунт", "accErrEmpty": "Введите имя пользователя и пароль", "accErrUserFmt": "Имя: 3–20 букв, цифр, _ . -", "accErrPassShort": "Пароль должен быть не короче 8 символов", "accErrMismatch": "Пароли не совпадают", "accErrExists": "Такое имя уже занято", "accErrBad": "Неверное имя пользователя или пароль", "accErrFail": "Что-то пошло не так, попробуйте снова", "accSigningIn": "Вход…", "accCreating": "Создание аккаунта…", "accWelcome": "С возвращением!", "accCreated": "Аккаунт создан!", "accSession": "Сессия", "accSessionSub": "Вы вошли на этом устройстве", "accEmail": "Эл. почта", "accErrEmail": "Введите корректный адрес эл. почты", "accErrBanned": "Этот аккаунт заблокирован", "accErrSuspended": "Аккаунт приостановлен", "accErrHwid": "Несовпадение HWID — аккаунт привязан к другому ПК", "accErrHwidPending": "Несовпадение HWID — запрос на сброс ждёт одобрения", "errKeyUsed": "Этот ключ уже использован", "errAuth": "Войдите снова", "reviewsTitle": "Отзывы игроков", "reviewWrite": "Написать отзыв", "reviewEmpty": "Отзывов пока нет — поделитесь опытом первым!", "reviewSub": "Расскажите другим игрокам о STARLINE.", "reviewMore": "Показать ещё", "navAdmin": "Админ", "groupRelease": "Release", "groupAdmin": "Администратор", "adminPanel": "Панель администратора", "adminPanelSub": "Пользователи, подписки и заявки HWID", "adminRefresh": "Обновить", "adminUsers": "Пользователи", "adminTickets": "Заявки HWID", "adminSearch": "Поиск пользователей…", "adminBan": "Забанить", "adminUnban": "Разбанить", "adminNoUsers": "Нет пользователей", "adminNoTickets": "Нет заявок", "adminFreeze": "Заморозить", "adminUnfreeze": "Разморозить", "adminFrozen": "заморожено", "adminExpired": "истёк", "adminApprove": "Одобрить", "adminReject": "Отклонить", "adminFailed": "Не удалось", "adminReason": "Причина", "adminNone": "нет", "adminLastLogin": "Последний вход", "adminConfirm": "Нажмите ещё раз для подтверждения", "subsErr": "Не удалось загрузить подписки с сайта", "reviewRating": "Оценка", "reviewLabel": "Ваш отзыв", "reviewPh": "Не менее 10 символов", "revErrShort": "Напишите не менее 10 символов.", "revOk": "Спасибо! Отзыв ждёт одобрения.", "revPending": "У вас уже есть отзыв на модерации.", "revErrLoad": "Не удалось загрузить отзывы.", "logout": "Выйти", "noOwnedSub": "У этого аккаунта нет подписок на игры", "reqBtn": "Предложить игру", "reqTitle": "Предложить игру", "reqSub": "Напишите, какую игру вы хотите, и мы её рассмотрим.", "reqEmail": "Ваша почта", "reqEmailPh": "you@example.com", "reqGame": "Название игры", "reqGamePh": "напр. Apex Legends", "reqSend": "Отправить", "reqCancel": "Отмена", "reqSending": "Отправка…", "reqOk": "Заявка отправлена — спасибо!", "reqErrEmail": "Введите корректный адрес почты", "reqErrGame": "Введите название игры", "reqErrRate": "Подождите немного перед следующей заявкой", "reqFallback": "Не удалось отправить автоматически — открываем почтовое приложение", "fWish": "Список желаний", "noWishSub": "В списке желаний пока пусто", "dzAdd": "Перетащите сюда, чтобы добавить «{g}» в список желаний", "dzRemove": "Перетащите сюда, чтобы убрать «{g}» из списка желаний", "dzView": "Перетащите сюда, чтобы открыть список желаний", "qpDropHint": "Перетащите сюда, чтобы добавить в быстрый запуск", "qpExists": "Уже в быстром запуске", "colsLabel": "Карточек в ряд", "colsAuto": "Авто", "accSwNo": "Нет аккаунта?", "accSwYes": "Уже есть аккаунт?", "accSwReg": "Зарегистрируйтесь бесплатно", "accSwLogin": "Войти"},
 
-  de:{"profile": "Profil", "quickplay": "Schnellstart", "quickAdd": "Zum Schnellstart hinzufügen", "quickPick": "Spiel zum Anheften wählen", "quickAllAdded": "Alle Spiele sind bereits angeheftet", "quickRemove": "Aus Schnellstart entfernen", "quickEmpty": "Noch nichts angeheftet — + drücken", "downloads": "Abos", "searchGames": "Spiele suchen…", "toggleTheme": "Design wechseln", "noLicenses": "Keine aktiven Lizenzen", "featured": "Empfohlen", "allGames": "Alle Spiele", "fAll": "Alle", "fOwned": "Gekauft", "fAvailable": "Verfügbar", "launch": "Starten", "buy": "Kaufen", "badgeOwned": "GEKAUFT", "badgeNew": "NEU", "noGames": "Keine Spiele gefunden", "noGamesSub": "Andere Suche oder Filter versuchen", "account": "Konto", "accountSub": "Benutzername und Avatar", "username": "Benutzername", "usernamePh": "Dein Name", "save": "Speichern", "avatar": "Avatar", "winScaleTitle": "Fenstergröße", "winScaleSub": "Skaliert die gesamte Oberfläche", "prefLang": "Bevorzugte Sprache", "prefLangSub": "Sprache der Oberfläche", "subscription": "Abo", "remaining": "Verbleibend", "readyInject": "Bereit zum Start", "injecting": "Wird geladen…", "injected": "Gestartet", "aboutTitle": "Über", "developer": "Entwickler", "publisher": "Publisher", "release": "Veröffentlichung", "platform": "Plattform", "genres": "Genres", "features": "Features", "wishAdded": "Zur Wunschliste hinzugefügt", "wishRemoved": "Von der Wunschliste entfernt", "wishAddTitle": "Zur Wunschliste hinzufügen", "wishRemoveTitle": "Von der Wunschliste entfernen", "prevGame": "Vorheriges Spiel", "nextGame": "Nächstes Spiel", "prevImage": "Vorheriges Bild", "nextImage": "Nächstes Bild", "videoPlay": "Wiedergabe", "videoPause": "Pause", "videoMute": "Stummschalten", "videoUnmute": "Ton einschalten", "videoFull": "Vollbild", "videoExitFull": "Vollbild beenden", "videoUnmuteHint": "Lautsprecher anklicken für Ton", "videoNoAudio": "Dieses Video hat eventuell keine Tonspur", "avatarUpdated": "Avatar aktualisiert", "usernameEmpty": "Benutzername darf nicht leer sein", "usernameSaved": "Benutzername gespeichert", "localAccount": "Cloud-Konto", "tba": "TBA", "dlBlurb": "Hero-Shooter-Verbesserungen — Aim Assist, Wallhack, Cooldown-Tracker.", "tFPS": "Ego-Shooter", "tCompetitive": "Kompetitiv", "tAction": "Action", "tAntiCheat": "Anti-Cheat", "tMultiplayer": "Multiplayer", "tCloudSave": "Cloud-Speicher", "tMOBA": "MOBA", "tShooter": "Shooter", "tThirdPerson": "Third-Person", "tEarlyAccess": "Early Access", "tBattleRoyale": "Battle Royale", "tTactical": "Taktisch", "tSurvival": "Survival", "tHardcore": "Hardcore", "tRealistic": "Realistisch", "layoutTitle": "Katalog-Layout", "layoutSub": "Darstellung in „Alle Spiele“", "layoutGrid": "Karten", "layoutList": "Liste", "bgTitle": "Hintergrundeffekte", "bgSub": "Animierter Hintergrund hinter der App", "bgEnable": "Hintergrundeffekte aktivieren", "bgAurora": "Polarlicht", "bgWaves": "Wellen", "bgGrid": "Raster", "bgStars": "Sternenfeld", "bgNetwork": "Partikelnetz", "bgEmbers": "Glut", "bgImage": "Eigenes Bild", "bgChoose": "Bild wählen…", "bgClear": "Bild entfernen", "bgImageBad": "Bild konnte nicht geladen werden", "bgImageSet": "Hintergrundbild gesetzt", "accLogin": "Anmelden", "accRegister": "Registrieren", "accLoginTitle": "Willkommen zurück", "accRegTitle": "Konto erstellen", "accLoginHint": "Anmelden, um fortzufahren", "accRegHint": "Registrierung kostenlos — Abos später pro Spiel", "accUsername": "Benutzername", "accPassword": "Passwort", "accConfirm": "Passwort bestätigen", "accRemember": "Angemeldet bleiben", "extracting": "Wird entpackt…", "genreAll": "Alle Genres", "genreNone": "Im Katalog gibt es noch keine Genres", "adminTitle": "Administratorrechte nötig", "adminBody": "STARLINE muss als Administrator ausgeführt werden. Nach OK wird das Programm beendet — danach {exe} rechtsklicken und „Als Administrator ausführen“ wählen.", "adminRunAs": "Als Administrator ausführen", "adminOk": "OK", "adminLater": "Später", "accUserPh": "3–20 Buchstaben, Zahlen, _ . -", "accPassPh": "Mindestens 8 Zeichen", "accLoginBtn": "Anmelden", "accRegBtn": "Konto erstellen", "accErrEmpty": "Benutzername und Passwort eingeben", "accErrUserFmt": "Benutzername: 3–20 Buchstaben, Zahlen, _ . -", "accErrPassShort": "Das Passwort braucht mindestens 8 Zeichen", "accErrMismatch": "Passwörter stimmen nicht überein", "accErrExists": "Dieser Benutzername ist schon vergeben", "accErrBad": "Benutzername oder Passwort falsch", "accErrFail": "Etwas ist schiefgelaufen, bitte erneut versuchen", "accSigningIn": "Anmeldung…", "accCreating": "Konto wird erstellt…", "accWelcome": "Willkommen zurück!", "accCreated": "Konto erstellt!", "accSession": "Sitzung", "accSessionSub": "Auf diesem Gerät angemeldet", "accEmail": "E-Mail", "accErrEmail": "Bitte eine gültige E-Mail-Adresse eingeben", "accErrBanned": "Dieses Konto wurde gesperrt", "accErrSuspended": "Dieses Konto ist vorübergehend gesperrt", "accErrHwid": "HWID stimmt nicht — das Konto ist an einen anderen PC gebunden", "accErrHwidPending": "HWID stimmt nicht — Reset-Anfrage wartet auf Freigabe", "errKeyUsed": "Dieser Schlüssel wurde bereits verwendet", "errAuth": "Bitte erneut anmelden", "reviewsTitle": "Was Spieler sagen", "reviewWrite": "Bewertung schreiben", "reviewEmpty": "Noch keine Bewertungen — teile als Erster deine Erfahrung!", "reviewSub": "Sag anderen Spielern, was du von STARLINE hältst.", "reviewMore": "Mehr laden", "navAdmin": "Admin", "groupRelease": "Release", "groupAdmin": "Administrator", "adminPanel": "Admin-Bereich", "adminPanelSub": "Benutzer, Abos und HWID-Tickets", "adminRefresh": "Aktualisieren", "adminUsers": "Benutzer", "adminTickets": "HWID-Tickets", "adminSearch": "Benutzer suchen…", "adminBan": "Sperren", "adminUnban": "Entsperren", "adminNoUsers": "Keine Benutzer", "adminNoTickets": "Keine offenen Tickets", "adminFreeze": "Einfrieren", "adminUnfreeze": "Auftauen", "adminFrozen": "eingefroren", "adminExpired": "abgelaufen", "adminApprove": "Annehmen", "adminReject": "Ablehnen", "adminFailed": "Aktion fehlgeschlagen", "adminReason": "Grund", "adminNone": "keine", "adminLastLogin": "Letzter Login", "adminConfirm": "Zum Bestätigen erneut klicken", "subsErr": "Abos konnten nicht von der Website geladen werden", "reviewRating": "Bewertung", "reviewLabel": "Deine Bewertung", "reviewPh": "Mindestens 10 Zeichen", "revErrShort": "Bitte mindestens 10 Zeichen schreiben.", "revOk": "Danke! Deine Bewertung wartet auf Freigabe.", "revPending": "Du hast bereits eine Bewertung zur Freigabe.", "revErrLoad": "Bewertungen konnten nicht geladen werden.", "logout": "Abmelden", "noOwnedSub": "Dieses Konto hat keine abonnierten Spiele", "reqBtn": "Spiel vorschlagen", "reqTitle": "Spiel vorschlagen", "reqSub": "Sag uns, welches Spiel du willst — wir schauen es uns an.", "reqEmail": "Deine E-Mail", "reqEmailPh": "you@example.com", "reqGame": "Spielname", "reqGamePh": "z. B. Apex Legends", "reqSend": "Senden", "reqCancel": "Abbrechen", "reqSending": "Wird gesendet…", "reqOk": "Anfrage gesendet — danke!", "reqErrEmail": "Bitte eine gültige E-Mail-Adresse eingeben", "reqErrGame": "Bitte den Spielnamen eingeben", "reqErrRate": "Bitte kurz warten, bevor du erneut sendest", "reqFallback": "Automatisch nicht möglich — E-Mail-App wird geöffnet", "fWish": "Wunschliste", "noWishSub": "Noch keine Spiele auf der Wunschliste", "dzAdd": "Hierher ziehen, um „{g}“ zur Wunschliste hinzuzufügen", "dzRemove": "Hierher ziehen, um „{g}“ von der Wunschliste zu entfernen", "dzView": "Hierher ziehen, um die Wunschliste zu öffnen", "qpDropHint": "Hierher ziehen, um zum Schnellstart hinzuzufügen", "qpExists": "Schon im Schnellstart", "colsLabel": "Karten pro Reihe", "colsAuto": "Auto", "accSwNo": "Noch kein Konto?", "accSwYes": "Schon ein Konto?", "accSwReg": "Kostenlos registrieren", "accSwLogin": "Anmelden"},
+  de:{"profile": "Profil", "quickplay": "Schnellstart", "quickAdd": "Zum Schnellstart hinzufügen", "quickPick": "Spiel zum Anheften wählen", "quickAllAdded": "Alle Spiele sind bereits angeheftet", "quickRemove": "Aus Schnellstart entfernen", "quickEmpty": "Noch nichts angeheftet — + drücken", "downloads": "Abos", "searchGames": "Spiele suchen…", "toggleTheme": "Design wechseln", "noLicenses": "Keine aktiven Lizenzen", "featured": "Empfohlen", "allGames": "Alle Spiele", "fAll": "Alle", "fOwned": "Gekauft", "fAvailable": "Verfügbar", "launch": "Starten", "buy": "Kaufen", "badgeOwned": "GEKAUFT", "badgeNew": "NEU", "noGames": "Keine Spiele gefunden", "noGamesSub": "Andere Suche oder Filter versuchen", "account": "Konto", "accountSub": "Benutzername und Avatar", "username": "Benutzername", "usernamePh": "Dein Name", "save": "Speichern", "avatar": "Avatar", "winScaleTitle": "Fenstergröße", "winScaleSub": "Skaliert die gesamte Oberfläche", "prefLang": "Bevorzugte Sprache", "prefLangSub": "Sprache der Oberfläche", "subscription": "Abo", "remaining": "Verbleibend", "readyInject": "Bereit zum Start", "injecting": "Wird geladen…", "injected": "Gestartet", "aboutTitle": "Über", "developer": "Entwickler", "publisher": "Publisher", "release": "Veröffentlichung", "platform": "Plattform", "genres": "Genres", "features": "Features", "wishAdded": "Zur Wunschliste hinzugefügt", "wishRemoved": "Von der Wunschliste entfernt", "wishAddTitle": "Zur Wunschliste hinzufügen", "wishRemoveTitle": "Von der Wunschliste entfernen", "prevGame": "Vorheriges Spiel", "nextGame": "Nächstes Spiel", "prevImage": "Vorheriges Bild", "nextImage": "Nächstes Bild", "videoPlay": "Wiedergabe", "videoPause": "Pause", "videoMute": "Stummschalten", "videoUnmute": "Ton einschalten", "videoFull": "Vollbild", "videoExitFull": "Vollbild beenden", "videoUnmuteHint": "Lautsprecher anklicken für Ton", "videoNoAudio": "Dieses Video hat eventuell keine Tonspur", "avatarUpdated": "Avatar aktualisiert", "usernameEmpty": "Benutzername darf nicht leer sein", "usernameSaved": "Benutzername gespeichert", "localAccount": "Cloud-Konto", "tba": "TBA", "dlBlurb": "Hero-Shooter-Verbesserungen — Aim Assist, Wallhack, Cooldown-Tracker.", "tFPS": "Ego-Shooter", "tCompetitive": "Kompetitiv", "tAction": "Action", "tAntiCheat": "Anti-Cheat", "tMultiplayer": "Multiplayer", "tCloudSave": "Cloud-Speicher", "tMOBA": "MOBA", "tShooter": "Shooter", "tThirdPerson": "Third-Person", "tEarlyAccess": "Early Access", "tBattleRoyale": "Battle Royale", "tTactical": "Taktisch", "tSurvival": "Survival", "tHardcore": "Hardcore", "tRealistic": "Realistisch", "layoutTitle": "Katalog-Layout", "layoutSub": "Darstellung in „Alle Spiele“", "layoutGrid": "Karten", "layoutList": "Liste", "bgTitle": "Hintergrundeffekte", "bgSub": "Animierter Hintergrund hinter der App", "bgEnable": "Hintergrundeffekte aktivieren", "bgAurora": "Polarlicht", "bgWaves": "Wellen", "bgStars": "Sternenfeld", "bgNetwork": "Partikelnetz", "bgEmbers": "Glut", "bgImage": "Eigenes Bild", "bgChoose": "Bild wählen…", "bgClear": "Bild entfernen", "bgImageBad": "Bild konnte nicht geladen werden", "bgImageSet": "Hintergrundbild gesetzt", "accLogin": "Anmelden", "accRegister": "Registrieren", "accLoginTitle": "Willkommen zurück", "accRegTitle": "Konto erstellen", "accLoginHint": "Anmelden, um fortzufahren", "accRegHint": "Registrierung kostenlos — Abos später pro Spiel", "accUsername": "Benutzername", "accPassword": "Passwort", "accConfirm": "Passwort bestätigen", "accRemember": "Angemeldet bleiben", "extracting": "Wird entpackt…", "genreAll": "Alle Genres", "genreNone": "Im Katalog gibt es noch keine Genres", "adminTitle": "Administratorrechte nötig", "adminBody": "STARLINE muss als Administrator ausgeführt werden. Nach OK wird das Programm beendet — danach {exe} rechtsklicken und „Als Administrator ausführen“ wählen.", "adminRunAs": "Als Administrator ausführen", "adminOk": "OK", "adminLater": "Später", "accUserPh": "3–20 Buchstaben, Zahlen, _ . -", "accPassPh": "Mindestens 8 Zeichen", "accLoginBtn": "Anmelden", "accRegBtn": "Konto erstellen", "accErrEmpty": "Benutzername und Passwort eingeben", "accErrUserFmt": "Benutzername: 3–20 Buchstaben, Zahlen, _ . -", "accErrPassShort": "Das Passwort braucht mindestens 8 Zeichen", "accErrMismatch": "Passwörter stimmen nicht überein", "accErrExists": "Dieser Benutzername ist schon vergeben", "accErrBad": "Benutzername oder Passwort falsch", "accErrFail": "Etwas ist schiefgelaufen, bitte erneut versuchen", "accSigningIn": "Anmeldung…", "accCreating": "Konto wird erstellt…", "accWelcome": "Willkommen zurück!", "accCreated": "Konto erstellt!", "accSession": "Sitzung", "accSessionSub": "Auf diesem Gerät angemeldet", "accEmail": "E-Mail", "accErrEmail": "Bitte eine gültige E-Mail-Adresse eingeben", "accErrBanned": "Dieses Konto wurde gesperrt", "accErrSuspended": "Dieses Konto ist vorübergehend gesperrt", "accErrHwid": "HWID stimmt nicht — das Konto ist an einen anderen PC gebunden", "accErrHwidPending": "HWID stimmt nicht — Reset-Anfrage wartet auf Freigabe", "errKeyUsed": "Dieser Schlüssel wurde bereits verwendet", "errAuth": "Bitte erneut anmelden", "reviewsTitle": "Was Spieler sagen", "reviewWrite": "Bewertung schreiben", "reviewEmpty": "Noch keine Bewertungen — teile als Erster deine Erfahrung!", "reviewSub": "Sag anderen Spielern, was du von STARLINE hältst.", "reviewMore": "Mehr laden", "navAdmin": "Admin", "groupRelease": "Release", "groupAdmin": "Administrator", "adminPanel": "Admin-Bereich", "adminPanelSub": "Benutzer, Abos und HWID-Tickets", "adminRefresh": "Aktualisieren", "adminUsers": "Benutzer", "adminTickets": "HWID-Tickets", "adminSearch": "Benutzer suchen…", "adminBan": "Sperren", "adminUnban": "Entsperren", "adminNoUsers": "Keine Benutzer", "adminNoTickets": "Keine offenen Tickets", "adminFreeze": "Einfrieren", "adminUnfreeze": "Auftauen", "adminFrozen": "eingefroren", "adminExpired": "abgelaufen", "adminApprove": "Annehmen", "adminReject": "Ablehnen", "adminFailed": "Aktion fehlgeschlagen", "adminReason": "Grund", "adminNone": "keine", "adminLastLogin": "Letzter Login", "adminConfirm": "Zum Bestätigen erneut klicken", "subsErr": "Abos konnten nicht von der Website geladen werden", "reviewRating": "Bewertung", "reviewLabel": "Deine Bewertung", "reviewPh": "Mindestens 10 Zeichen", "revErrShort": "Bitte mindestens 10 Zeichen schreiben.", "revOk": "Danke! Deine Bewertung wartet auf Freigabe.", "revPending": "Du hast bereits eine Bewertung zur Freigabe.", "revErrLoad": "Bewertungen konnten nicht geladen werden.", "logout": "Abmelden", "noOwnedSub": "Dieses Konto hat keine abonnierten Spiele", "reqBtn": "Spiel vorschlagen", "reqTitle": "Spiel vorschlagen", "reqSub": "Sag uns, welches Spiel du willst — wir schauen es uns an.", "reqEmail": "Deine E-Mail", "reqEmailPh": "you@example.com", "reqGame": "Spielname", "reqGamePh": "z. B. Apex Legends", "reqSend": "Senden", "reqCancel": "Abbrechen", "reqSending": "Wird gesendet…", "reqOk": "Anfrage gesendet — danke!", "reqErrEmail": "Bitte eine gültige E-Mail-Adresse eingeben", "reqErrGame": "Bitte den Spielnamen eingeben", "reqErrRate": "Bitte kurz warten, bevor du erneut sendest", "reqFallback": "Automatisch nicht möglich — E-Mail-App wird geöffnet", "fWish": "Wunschliste", "noWishSub": "Noch keine Spiele auf der Wunschliste", "dzAdd": "Hierher ziehen, um „{g}“ zur Wunschliste hinzuzufügen", "dzRemove": "Hierher ziehen, um „{g}“ von der Wunschliste zu entfernen", "dzView": "Hierher ziehen, um die Wunschliste zu öffnen", "qpDropHint": "Hierher ziehen, um zum Schnellstart hinzuzufügen", "qpExists": "Schon im Schnellstart", "colsLabel": "Karten pro Reihe", "colsAuto": "Auto", "accSwNo": "Noch kein Konto?", "accSwYes": "Schon ein Konto?", "accSwReg": "Kostenlos registrieren", "accSwLogin": "Anmelden"},
 
-  ja:{"profile": "プロフィール", "quickplay": "クイックプレイ", "quickAdd": "クイックプレイに追加", "quickPick": "固定するゲームを選択", "quickAllAdded": "すべてのゲームが追加済みです", "quickRemove": "クイックプレイから削除", "quickEmpty": "まだ何も固定されていません — ＋ を押してください", "downloads": "サブスク", "searchGames": "ゲームを検索…", "toggleTheme": "テーマ切替", "noLicenses": "有効なライセンスがありません", "featured": "注目", "allGames": "すべてのゲーム", "fAll": "すべて", "fOwned": "購入済み", "fAvailable": "未購入", "launch": "起動", "buy": "購入", "badgeOwned": "購入済み", "badgeNew": "新着", "noGames": "ゲームが見つかりません", "noGamesSub": "検索語やフィルターを変えてみてください", "account": "アカウント", "accountSub": "ユーザー名とアバター", "username": "ユーザー名", "usernamePh": "あなたの名前", "save": "保存", "avatar": "アバター", "winScaleTitle": "ウィンドウ倍率", "winScaleSub": "画面全体を拡大縮小します", "prefLang": "優先言語", "prefLangSub": "インターフェースの言語", "subscription": "サブスク", "remaining": "残り時間", "readyInject": "起動できます", "injecting": "ダウンロード中…", "injected": "起動しました", "aboutTitle": "概要", "developer": "開発元", "publisher": "販売元", "release": "発売日", "platform": "プラットフォーム", "genres": "ジャンル", "features": "特徴", "wishAdded": "ほしいものリストに追加しました", "wishRemoved": "ほしいものリストから削除しました", "wishAddTitle": "ほしいものリストに追加", "wishRemoveTitle": "ほしいものリストから削除", "prevGame": "前のゲーム", "nextGame": "次のゲーム", "prevImage": "前の画像", "nextImage": "次の画像", "videoPlay": "再生", "videoPause": "一時停止", "videoMute": "ミュート", "videoUnmute": "ミュート解除", "videoFull": "全画面", "videoExitFull": "全画面を終了", "videoUnmuteHint": "スピーカーをクリックして音を出す", "videoNoAudio": "この動画には音声トラックがない可能性があります", "avatarUpdated": "アバターを更新しました", "usernameEmpty": "ユーザー名を入力してください", "usernameSaved": "ユーザー名を保存しました", "localAccount": "クラウドアカウント", "tba": "未定", "dlBlurb": "ヒーローシューター向け強化 — エイムアシスト、壁抜き、クールダウン表示。", "tFPS": "FPS", "tCompetitive": "競技", "tAction": "アクション", "tAntiCheat": "アンチチート", "tMultiplayer": "マルチプレイ", "tCloudSave": "クラウドセーブ", "tMOBA": "MOBA", "tShooter": "シューター", "tThirdPerson": "三人称", "tEarlyAccess": "早期アクセス", "tBattleRoyale": "バトロワ", "tTactical": "タクティカル", "tSurvival": "サバイバル", "tHardcore": "ハードコア", "tRealistic": "リアル", "layoutTitle": "カタログ表示", "layoutSub": "「すべてのゲーム」の並べ方", "layoutGrid": "カード", "layoutList": "リスト", "bgTitle": "背景エフェクト", "bgSub": "アプリ背面のアニメーション背景", "bgEnable": "背景エフェクトを有効にする", "bgAurora": "オーロラ", "bgWaves": "波", "bgGrid": "グリッド", "bgStars": "星空", "bgNetwork": "粒子ネットワーク", "bgEmbers": "火の粉", "bgImage": "ローカル画像", "bgChoose": "画像を選択…", "bgClear": "画像を削除", "bgImageBad": "画像を読み込めませんでした", "bgImageSet": "背景画像を設定しました", "accLogin": "ログイン", "accRegister": "登録", "accLoginTitle": "おかえりなさい", "accRegTitle": "アカウント作成", "accLoginHint": "続けるにはログイン", "accRegHint": "登録は無料 — サブスクはゲームごと", "accUsername": "ユーザー名", "accPassword": "パスワード", "accConfirm": "パスワードの確認", "accRemember": "パスワードを記憶", "extracting": "解凍中…", "genreAll": "すべてのジャンル", "genreNone": "カタログにジャンル情報がありません", "adminTitle": "管理者権限が必要です", "adminBody": "STARLINE は管理者として実行する必要があります。「OK」で終了します。{exe} を右クリックし「管理者として実行」から開き直してください。", "adminRunAs": "管理者として実行", "adminOk": "OK", "adminLater": "後で", "accUserPh": "3〜20 文字：英数字か _ . -", "accPassPh": "8 文字以上", "accLoginBtn": "ログイン", "accRegBtn": "アカウント作成", "accErrEmpty": "ユーザー名とパスワードを入力してください", "accErrUserFmt": "ユーザー名：3〜20 文字の英数字か _ . -", "accErrPassShort": "パスワードは 8 文字以上必要です", "accErrMismatch": "パスワードが一致しません", "accErrExists": "そのユーザー名は使用済みです", "accErrBad": "ユーザー名かパスワードが違います", "accErrFail": "エラーが発生しました。もう一度お試しください", "accSigningIn": "ログイン中…", "accCreating": "アカウント作成中…", "accWelcome": "おかえりなさい！", "accCreated": "アカウントを作成しました！", "accSession": "ログイン状態", "accSessionSub": "この端末でログイン中", "accEmail": "メールアドレス", "accErrEmail": "有効なメールアドレスを入力してください", "accErrBanned": "このアカウントはBANされています", "accErrSuspended": "このアカウントは停止中です", "accErrHwid": "HWID が一致しません — このアカウントは別の PC に紐付いています", "accErrHwidPending": "HWID が一致しません — リセット申請が承認待ちです", "errKeyUsed": "このキーは既に使用されています", "errAuth": "もう一度ログインしてください", "reviewsTitle": "プレイヤーの声", "reviewWrite": "レビューを書く", "reviewEmpty": "まだレビューがありません — 最初の体験談を書きませんか？", "reviewSub": "STARLINE の感想を他のプレイヤーに伝えましょう。", "reviewMore": "もっと見る", "navAdmin": "管理", "groupRelease": "リリース版", "groupAdmin": "管理者", "adminPanel": "管理パネル", "adminPanelSub": "ユーザー・サブスク・HWID 申請", "adminRefresh": "更新", "adminUsers": "ユーザー", "adminTickets": "HWID 申請", "adminSearch": "ユーザーを検索…", "adminBan": "BAN", "adminUnban": "BAN 解除", "adminNoUsers": "ユーザーがいません", "adminNoTickets": "保留中の申請はありません", "adminFreeze": "凍結", "adminUnfreeze": "解除", "adminFrozen": "凍結中", "adminExpired": "期限切れ", "adminApprove": "承認", "adminReject": "拒否", "adminFailed": "操作に失敗しました", "adminReason": "理由", "adminNone": "なし", "adminLastLogin": "最終ログイン", "adminConfirm": "もう一度押して確定", "subsErr": "サイトからサブスク情報を取得できませんでした", "reviewRating": "評価", "reviewLabel": "レビュー内容", "reviewPh": "10 文字以上", "revErrShort": "10 文字以上入力してください。", "revOk": "ありがとうございます！レビューは承認待ちです。", "revPending": "承認待ちのレビューが既にあります。", "revErrLoad": "レビューを読み込めませんでした。", "logout": "ログアウト", "noOwnedSub": "このアカウントにはサブスク中のゲームがありません", "reqBtn": "ゲームをリクエスト", "reqTitle": "ゲームをリクエスト", "reqSub": "希望のゲームを教えてください。検討します。", "reqEmail": "メールアドレス", "reqEmailPh": "you@example.com", "reqGame": "ゲーム名", "reqGamePh": "例：Apex Legends", "reqSend": "送信", "reqCancel": "キャンセル", "reqSending": "送信中…", "reqOk": "送信しました — ありがとうございます！", "reqErrEmail": "有効なメールアドレスを入力してください", "reqErrGame": "ゲーム名を入力してください", "reqErrRate": "続けて送る前に少しお待ちください", "reqFallback": "自動送信できません — メールアプリを開きます", "fWish": "ほしいものリスト", "noWishSub": "ほしいものリストはまだ空です", "dzAdd": "ここにドロップして「{g}」をほしいものリストに追加", "dzRemove": "ここにドロップして「{g}」をほしいものリストから削除", "dzView": "ここにドロップしてほしいものリストを表示", "qpDropHint": "ここにドロップしてクイックプレイに追加", "qpExists": "すでにクイックプレイにあります", "colsLabel": "1 行のカード数", "colsAuto": "自動", "accSwNo": "アカウントをお持ちでないですか？", "accSwYes": "アカウントをお持ちですか？", "accSwReg": "無料で登録", "accSwLogin": "ログイン"},
+  ja:{"profile": "プロフィール", "quickplay": "クイックプレイ", "quickAdd": "クイックプレイに追加", "quickPick": "固定するゲームを選択", "quickAllAdded": "すべてのゲームが追加済みです", "quickRemove": "クイックプレイから削除", "quickEmpty": "まだ何も固定されていません — ＋ を押してください", "downloads": "サブスク", "searchGames": "ゲームを検索…", "toggleTheme": "テーマ切替", "noLicenses": "有効なライセンスがありません", "featured": "注目", "allGames": "すべてのゲーム", "fAll": "すべて", "fOwned": "購入済み", "fAvailable": "未購入", "launch": "起動", "buy": "購入", "badgeOwned": "購入済み", "badgeNew": "新着", "noGames": "ゲームが見つかりません", "noGamesSub": "検索語やフィルターを変えてみてください", "account": "アカウント", "accountSub": "ユーザー名とアバター", "username": "ユーザー名", "usernamePh": "あなたの名前", "save": "保存", "avatar": "アバター", "winScaleTitle": "ウィンドウ倍率", "winScaleSub": "画面全体を拡大縮小します", "prefLang": "優先言語", "prefLangSub": "インターフェースの言語", "subscription": "サブスク", "remaining": "残り時間", "readyInject": "起動できます", "injecting": "ダウンロード中…", "injected": "起動しました", "aboutTitle": "概要", "developer": "開発元", "publisher": "販売元", "release": "発売日", "platform": "プラットフォーム", "genres": "ジャンル", "features": "特徴", "wishAdded": "ほしいものリストに追加しました", "wishRemoved": "ほしいものリストから削除しました", "wishAddTitle": "ほしいものリストに追加", "wishRemoveTitle": "ほしいものリストから削除", "prevGame": "前のゲーム", "nextGame": "次のゲーム", "prevImage": "前の画像", "nextImage": "次の画像", "videoPlay": "再生", "videoPause": "一時停止", "videoMute": "ミュート", "videoUnmute": "ミュート解除", "videoFull": "全画面", "videoExitFull": "全画面を終了", "videoUnmuteHint": "スピーカーをクリックして音を出す", "videoNoAudio": "この動画には音声トラックがない可能性があります", "avatarUpdated": "アバターを更新しました", "usernameEmpty": "ユーザー名を入力してください", "usernameSaved": "ユーザー名を保存しました", "localAccount": "クラウドアカウント", "tba": "未定", "dlBlurb": "ヒーローシューター向け強化 — エイムアシスト、壁抜き、クールダウン表示。", "tFPS": "FPS", "tCompetitive": "競技", "tAction": "アクション", "tAntiCheat": "アンチチート", "tMultiplayer": "マルチプレイ", "tCloudSave": "クラウドセーブ", "tMOBA": "MOBA", "tShooter": "シューター", "tThirdPerson": "三人称", "tEarlyAccess": "早期アクセス", "tBattleRoyale": "バトロワ", "tTactical": "タクティカル", "tSurvival": "サバイバル", "tHardcore": "ハードコア", "tRealistic": "リアル", "layoutTitle": "カタログ表示", "layoutSub": "「すべてのゲーム」の並べ方", "layoutGrid": "カード", "layoutList": "リスト", "bgTitle": "背景エフェクト", "bgSub": "アプリ背面のアニメーション背景", "bgEnable": "背景エフェクトを有効にする", "bgAurora": "オーロラ", "bgWaves": "波", "bgStars": "星空", "bgNetwork": "粒子ネットワーク", "bgEmbers": "火の粉", "bgImage": "ローカル画像", "bgChoose": "画像を選択…", "bgClear": "画像を削除", "bgImageBad": "画像を読み込めませんでした", "bgImageSet": "背景画像を設定しました", "accLogin": "ログイン", "accRegister": "登録", "accLoginTitle": "おかえりなさい", "accRegTitle": "アカウント作成", "accLoginHint": "続けるにはログイン", "accRegHint": "登録は無料 — サブスクはゲームごと", "accUsername": "ユーザー名", "accPassword": "パスワード", "accConfirm": "パスワードの確認", "accRemember": "パスワードを記憶", "extracting": "解凍中…", "genreAll": "すべてのジャンル", "genreNone": "カタログにジャンル情報がありません", "adminTitle": "管理者権限が必要です", "adminBody": "STARLINE は管理者として実行する必要があります。「OK」で終了します。{exe} を右クリックし「管理者として実行」から開き直してください。", "adminRunAs": "管理者として実行", "adminOk": "OK", "adminLater": "後で", "accUserPh": "3〜20 文字：英数字か _ . -", "accPassPh": "8 文字以上", "accLoginBtn": "ログイン", "accRegBtn": "アカウント作成", "accErrEmpty": "ユーザー名とパスワードを入力してください", "accErrUserFmt": "ユーザー名：3〜20 文字の英数字か _ . -", "accErrPassShort": "パスワードは 8 文字以上必要です", "accErrMismatch": "パスワードが一致しません", "accErrExists": "そのユーザー名は使用済みです", "accErrBad": "ユーザー名かパスワードが違います", "accErrFail": "エラーが発生しました。もう一度お試しください", "accSigningIn": "ログイン中…", "accCreating": "アカウント作成中…", "accWelcome": "おかえりなさい！", "accCreated": "アカウントを作成しました！", "accSession": "ログイン状態", "accSessionSub": "この端末でログイン中", "accEmail": "メールアドレス", "accErrEmail": "有効なメールアドレスを入力してください", "accErrBanned": "このアカウントはBANされています", "accErrSuspended": "このアカウントは停止中です", "accErrHwid": "HWID が一致しません — このアカウントは別の PC に紐付いています", "accErrHwidPending": "HWID が一致しません — リセット申請が承認待ちです", "errKeyUsed": "このキーは既に使用されています", "errAuth": "もう一度ログインしてください", "reviewsTitle": "プレイヤーの声", "reviewWrite": "レビューを書く", "reviewEmpty": "まだレビューがありません — 最初の体験談を書きませんか？", "reviewSub": "STARLINE の感想を他のプレイヤーに伝えましょう。", "reviewMore": "もっと見る", "navAdmin": "管理", "groupRelease": "リリース版", "groupAdmin": "管理者", "adminPanel": "管理パネル", "adminPanelSub": "ユーザー・サブスク・HWID 申請", "adminRefresh": "更新", "adminUsers": "ユーザー", "adminTickets": "HWID 申請", "adminSearch": "ユーザーを検索…", "adminBan": "BAN", "adminUnban": "BAN 解除", "adminNoUsers": "ユーザーがいません", "adminNoTickets": "保留中の申請はありません", "adminFreeze": "凍結", "adminUnfreeze": "解除", "adminFrozen": "凍結中", "adminExpired": "期限切れ", "adminApprove": "承認", "adminReject": "拒否", "adminFailed": "操作に失敗しました", "adminReason": "理由", "adminNone": "なし", "adminLastLogin": "最終ログイン", "adminConfirm": "もう一度押して確定", "subsErr": "サイトからサブスク情報を取得できませんでした", "reviewRating": "評価", "reviewLabel": "レビュー内容", "reviewPh": "10 文字以上", "revErrShort": "10 文字以上入力してください。", "revOk": "ありがとうございます！レビューは承認待ちです。", "revPending": "承認待ちのレビューが既にあります。", "revErrLoad": "レビューを読み込めませんでした。", "logout": "ログアウト", "noOwnedSub": "このアカウントにはサブスク中のゲームがありません", "reqBtn": "ゲームをリクエスト", "reqTitle": "ゲームをリクエスト", "reqSub": "希望のゲームを教えてください。検討します。", "reqEmail": "メールアドレス", "reqEmailPh": "you@example.com", "reqGame": "ゲーム名", "reqGamePh": "例：Apex Legends", "reqSend": "送信", "reqCancel": "キャンセル", "reqSending": "送信中…", "reqOk": "送信しました — ありがとうございます！", "reqErrEmail": "有効なメールアドレスを入力してください", "reqErrGame": "ゲーム名を入力してください", "reqErrRate": "続けて送る前に少しお待ちください", "reqFallback": "自動送信できません — メールアプリを開きます", "fWish": "ほしいものリスト", "noWishSub": "ほしいものリストはまだ空です", "dzAdd": "ここにドロップして「{g}」をほしいものリストに追加", "dzRemove": "ここにドロップして「{g}」をほしいものリストから削除", "dzView": "ここにドロップしてほしいものリストを表示", "qpDropHint": "ここにドロップしてクイックプレイに追加", "qpExists": "すでにクイックプレイにあります", "colsLabel": "1 行のカード数", "colsAuto": "自動", "accSwNo": "アカウントをお持ちでないですか？", "accSwYes": "アカウントをお持ちですか？", "accSwReg": "無料で登録", "accSwLogin": "ログイン"},
 
-  es:{"profile": "Perfil", "quickplay": "Inicio rápido", "quickAdd": "Añadir a Inicio rápido", "quickPick": "Elige un juego para fijar", "quickAllAdded": "Todos los juegos ya están fijados", "quickRemove": "Quitar de Inicio rápido", "quickEmpty": "Nada fijado todavía — pulsa +", "downloads": "Suscripciones", "searchGames": "Buscar juegos…", "toggleTheme": "Cambiar tema", "noLicenses": "No hay licencias activas", "featured": "Destacados", "allGames": "Todos los juegos", "fAll": "Todos", "fOwned": "Adquiridos", "fAvailable": "Disponibles", "launch": "Iniciar", "buy": "Comprar", "badgeOwned": "ADQUIRIDO", "badgeNew": "NUEVO", "noGames": "No se encontraron juegos", "noGamesSub": "Prueba otra búsqueda o filtro", "account": "Cuenta", "accountSub": "Usuario y avatar", "username": "Usuario", "usernamePh": "Tu nombre", "save": "Guardar", "avatar": "Avatar", "winScaleTitle": "Escala de ventana", "winScaleSub": "Escala toda la interfaz", "prefLang": "Idioma preferido", "prefLangSub": "Idioma de la interfaz", "subscription": "Suscripción", "remaining": "Restante", "readyInject": "Listo para iniciar", "injecting": "Descargando…", "injected": "Iniciado", "aboutTitle": "Acerca de", "developer": "Desarrollador", "publisher": "Distribuidora", "release": "Lanzamiento", "platform": "Plataforma", "genres": "Géneros", "features": "Características", "wishAdded": "Añadido a la lista de deseos", "wishRemoved": "Quitado de la lista de deseos", "wishAddTitle": "Añadir a la lista de deseos", "wishRemoveTitle": "Quitar de la lista de deseos", "prevGame": "Juego anterior", "nextGame": "Juego siguiente", "prevImage": "Imagen anterior", "nextImage": "Imagen siguiente", "videoPlay": "Reproducir", "videoPause": "Pausa", "videoMute": "Silenciar", "videoUnmute": "Activar sonido", "videoFull": "Pantalla completa", "videoExitFull": "Salir de pantalla completa", "videoUnmuteHint": "Haz clic en el altavoz para oír", "videoNoAudio": "Puede que este vídeo no tenga pista de audio", "avatarUpdated": "Avatar actualizado", "usernameEmpty": "El usuario no puede estar vacío", "usernameSaved": "Usuario guardado", "localAccount": "Cuenta en la nube", "tba": "TBA", "dlBlurb": "Mejoras para hero shooters — ayuda de puntería, wallhack, seguimiento de recargas.", "tFPS": "FPS", "tCompetitive": "Competitivo", "tAction": "Acción", "tAntiCheat": "Antitrampas", "tMultiplayer": "Multijugador", "tCloudSave": "Guardado en la nube", "tMOBA": "MOBA", "tShooter": "Shooter", "tThirdPerson": "Tercera persona", "tEarlyAccess": "Acceso anticipado", "tBattleRoyale": "Battle Royale", "tTactical": "Táctico", "tSurvival": "Supervivencia", "tHardcore": "Hardcore", "tRealistic": "Realista", "layoutTitle": "Diseño del catálogo", "layoutSub": "Cómo se listan los juegos en «Todos los juegos»", "layoutGrid": "Tarjetas", "layoutList": "Lista", "bgTitle": "Efectos de fondo", "bgSub": "Fondo animado detrás de la app", "bgEnable": "Activar efectos de fondo", "bgAurora": "Aurora", "bgWaves": "Ondas", "bgGrid": "Rejilla", "bgStars": "Estrellas", "bgNetwork": "Red de partículas", "bgEmbers": "Brasas", "bgImage": "Imagen propia", "bgChoose": "Elegir imagen…", "bgClear": "Quitar imagen", "bgImageBad": "No se pudo cargar la imagen", "bgImageSet": "Imagen de fondo establecida", "accLogin": "Iniciar sesión", "accRegister": "Registrarse", "accLoginTitle": "Bienvenido de nuevo", "accRegTitle": "Crear cuenta", "accLoginHint": "Inicia sesión para continuar", "accRegHint": "Registro gratis — suscripción por juego después", "accUsername": "Usuario", "accPassword": "Contraseña", "accConfirm": "Confirmar contraseña", "accRemember": "Recordarme", "extracting": "Extrayendo…", "genreAll": "Todos los géneros", "genreNone": "El catálogo aún no tiene géneros", "adminTitle": "Se requieren permisos de administrador", "adminBody": "STARLINE debe ejecutarse como administrador. Al aceptar, el programa se cerrará; luego haz clic derecho en {exe} y elige «Ejecutar como administrador».", "adminRunAs": "Ejecutar como administrador", "adminOk": "Aceptar", "adminLater": "Más tarde", "accUserPh": "3-20 letras, números, _ . -", "accPassPh": "Al menos 8 caracteres", "accLoginBtn": "Iniciar sesión", "accRegBtn": "Crear cuenta", "accErrEmpty": "Introduce usuario y contraseña", "accErrUserFmt": "Usuario: 3-20 letras, números, _ . -", "accErrPassShort": "La contraseña necesita al menos 8 caracteres", "accErrMismatch": "Las contraseñas no coinciden", "accErrExists": "Ese usuario ya está en uso", "accErrBad": "Usuario o contraseña incorrectos", "accErrFail": "Algo falló, inténtalo de nuevo", "accSigningIn": "Iniciando sesión…", "accCreating": "Creando cuenta…", "accWelcome": "¡Bienvenido de nuevo!", "accCreated": "¡Cuenta creada!", "accSession": "Sesión", "accSessionSub": "Sesión iniciada en este dispositivo", "accEmail": "Correo electrónico", "accErrEmail": "Introduce un correo electrónico válido", "accErrBanned": "Esta cuenta ha sido bloqueada", "accErrSuspended": "Esta cuenta está suspendida", "accErrHwid": "HWID no coincide — la cuenta está vinculada a otro PC", "accErrHwidPending": "HWID no coincide — hay una solicitud de reinicio pendiente", "errKeyUsed": "Esta clave ya se ha usado", "errAuth": "Vuelve a iniciar sesión", "reviewsTitle": "Lo que dicen los jugadores", "reviewWrite": "Escribir una reseña", "reviewEmpty": "Aún no hay reseñas: ¡sé el primero en compartir tu experiencia!", "reviewSub": "Cuenta a otros jugadores qué opinas de STARLINE.", "reviewMore": "Ver más", "navAdmin": "Admin", "groupRelease": "Release", "groupAdmin": "Administrador", "adminPanel": "Panel de administración", "adminPanelSub": "Usuarios, suscripciones y tickets de HWID", "adminRefresh": "Actualizar", "adminUsers": "Usuarios", "adminTickets": "Tickets de HWID", "adminSearch": "Buscar usuarios…", "adminBan": "Banear", "adminUnban": "Desbanear", "adminNoUsers": "Sin usuarios", "adminNoTickets": "Sin tickets pendientes", "adminFreeze": "Congelar", "adminUnfreeze": "Descongelar", "adminFrozen": "congelado", "adminExpired": "caducado", "adminApprove": "Aprobar", "adminReject": "Rechazar", "adminFailed": "Acción fallida", "adminReason": "Motivo", "adminNone": "ninguno", "adminLastLogin": "Último acceso", "adminConfirm": "Pulsa otra vez para confirmar", "subsErr": "No se pudieron cargar tus suscripciones desde el sitio", "reviewRating": "Valoración", "reviewLabel": "Tu reseña", "reviewPh": "Al menos 10 caracteres", "revErrShort": "Escribe al menos 10 caracteres.", "revOk": "¡Gracias! Tu reseña está pendiente de aprobación.", "revPending": "Ya tienes una reseña pendiente de aprobación.", "revErrLoad": "No se pudieron cargar las reseñas.", "logout": "Cerrar sesión", "noOwnedSub": "Esta cuenta no tiene juegos suscritos", "reqBtn": "Pedir un juego", "reqTitle": "Pedir un juego", "reqSub": "Dinos qué juego quieres y lo tendremos en cuenta.", "reqEmail": "Tu correo", "reqEmailPh": "you@example.com", "reqGame": "Nombre del juego", "reqGamePh": "p. ej. Apex Legends", "reqSend": "Enviar", "reqCancel": "Cancelar", "reqSending": "Enviando…", "reqOk": "Solicitud enviada — ¡gracias!", "reqErrEmail": "Introduce un correo válido", "reqErrGame": "Introduce el nombre del juego", "reqErrRate": "Espera un momento antes de enviar otra solicitud", "reqFallback": "No se pudo enviar automáticamente — abriendo tu correo", "fWish": "Lista de deseos", "noWishSub": "Aún no hay juegos en tu lista de deseos", "dzAdd": "Suelta aquí para añadir «{g}» a la lista de deseos", "dzRemove": "Suelta aquí para quitar «{g}» de la lista de deseos", "dzView": "Suelta aquí para ver la lista de deseos", "qpDropHint": "Suelta aquí para añadir a Inicio rápido", "qpExists": "Ya está en Inicio rápido", "colsLabel": "Tarjetas por fila", "colsAuto": "Auto", "accSwNo": "¿No tienes cuenta?", "accSwYes": "¿Ya tienes cuenta?", "accSwReg": "Regístrate gratis", "accSwLogin": "Inicia sesión"},
+  es:{"profile": "Perfil", "quickplay": "Inicio rápido", "quickAdd": "Añadir a Inicio rápido", "quickPick": "Elige un juego para fijar", "quickAllAdded": "Todos los juegos ya están fijados", "quickRemove": "Quitar de Inicio rápido", "quickEmpty": "Nada fijado todavía — pulsa +", "downloads": "Suscripciones", "searchGames": "Buscar juegos…", "toggleTheme": "Cambiar tema", "noLicenses": "No hay licencias activas", "featured": "Destacados", "allGames": "Todos los juegos", "fAll": "Todos", "fOwned": "Adquiridos", "fAvailable": "Disponibles", "launch": "Iniciar", "buy": "Comprar", "badgeOwned": "ADQUIRIDO", "badgeNew": "NUEVO", "noGames": "No se encontraron juegos", "noGamesSub": "Prueba otra búsqueda o filtro", "account": "Cuenta", "accountSub": "Usuario y avatar", "username": "Usuario", "usernamePh": "Tu nombre", "save": "Guardar", "avatar": "Avatar", "winScaleTitle": "Escala de ventana", "winScaleSub": "Escala toda la interfaz", "prefLang": "Idioma preferido", "prefLangSub": "Idioma de la interfaz", "subscription": "Suscripción", "remaining": "Restante", "readyInject": "Listo para iniciar", "injecting": "Descargando…", "injected": "Iniciado", "aboutTitle": "Acerca de", "developer": "Desarrollador", "publisher": "Distribuidora", "release": "Lanzamiento", "platform": "Plataforma", "genres": "Géneros", "features": "Características", "wishAdded": "Añadido a la lista de deseos", "wishRemoved": "Quitado de la lista de deseos", "wishAddTitle": "Añadir a la lista de deseos", "wishRemoveTitle": "Quitar de la lista de deseos", "prevGame": "Juego anterior", "nextGame": "Juego siguiente", "prevImage": "Imagen anterior", "nextImage": "Imagen siguiente", "videoPlay": "Reproducir", "videoPause": "Pausa", "videoMute": "Silenciar", "videoUnmute": "Activar sonido", "videoFull": "Pantalla completa", "videoExitFull": "Salir de pantalla completa", "videoUnmuteHint": "Haz clic en el altavoz para oír", "videoNoAudio": "Puede que este vídeo no tenga pista de audio", "avatarUpdated": "Avatar actualizado", "usernameEmpty": "El usuario no puede estar vacío", "usernameSaved": "Usuario guardado", "localAccount": "Cuenta en la nube", "tba": "TBA", "dlBlurb": "Mejoras para hero shooters — ayuda de puntería, wallhack, seguimiento de recargas.", "tFPS": "FPS", "tCompetitive": "Competitivo", "tAction": "Acción", "tAntiCheat": "Antitrampas", "tMultiplayer": "Multijugador", "tCloudSave": "Guardado en la nube", "tMOBA": "MOBA", "tShooter": "Shooter", "tThirdPerson": "Tercera persona", "tEarlyAccess": "Acceso anticipado", "tBattleRoyale": "Battle Royale", "tTactical": "Táctico", "tSurvival": "Supervivencia", "tHardcore": "Hardcore", "tRealistic": "Realista", "layoutTitle": "Diseño del catálogo", "layoutSub": "Cómo se listan los juegos en «Todos los juegos»", "layoutGrid": "Tarjetas", "layoutList": "Lista", "bgTitle": "Efectos de fondo", "bgSub": "Fondo animado detrás de la app", "bgEnable": "Activar efectos de fondo", "bgAurora": "Aurora", "bgWaves": "Ondas", "bgStars": "Estrellas", "bgNetwork": "Red de partículas", "bgEmbers": "Brasas", "bgImage": "Imagen propia", "bgChoose": "Elegir imagen…", "bgClear": "Quitar imagen", "bgImageBad": "No se pudo cargar la imagen", "bgImageSet": "Imagen de fondo establecida", "accLogin": "Iniciar sesión", "accRegister": "Registrarse", "accLoginTitle": "Bienvenido de nuevo", "accRegTitle": "Crear cuenta", "accLoginHint": "Inicia sesión para continuar", "accRegHint": "Registro gratis — suscripción por juego después", "accUsername": "Usuario", "accPassword": "Contraseña", "accConfirm": "Confirmar contraseña", "accRemember": "Recordarme", "extracting": "Extrayendo…", "genreAll": "Todos los géneros", "genreNone": "El catálogo aún no tiene géneros", "adminTitle": "Se requieren permisos de administrador", "adminBody": "STARLINE debe ejecutarse como administrador. Al aceptar, el programa se cerrará; luego haz clic derecho en {exe} y elige «Ejecutar como administrador».", "adminRunAs": "Ejecutar como administrador", "adminOk": "Aceptar", "adminLater": "Más tarde", "accUserPh": "3-20 letras, números, _ . -", "accPassPh": "Al menos 8 caracteres", "accLoginBtn": "Iniciar sesión", "accRegBtn": "Crear cuenta", "accErrEmpty": "Introduce usuario y contraseña", "accErrUserFmt": "Usuario: 3-20 letras, números, _ . -", "accErrPassShort": "La contraseña necesita al menos 8 caracteres", "accErrMismatch": "Las contraseñas no coinciden", "accErrExists": "Ese usuario ya está en uso", "accErrBad": "Usuario o contraseña incorrectos", "accErrFail": "Algo falló, inténtalo de nuevo", "accSigningIn": "Iniciando sesión…", "accCreating": "Creando cuenta…", "accWelcome": "¡Bienvenido de nuevo!", "accCreated": "¡Cuenta creada!", "accSession": "Sesión", "accSessionSub": "Sesión iniciada en este dispositivo", "accEmail": "Correo electrónico", "accErrEmail": "Introduce un correo electrónico válido", "accErrBanned": "Esta cuenta ha sido bloqueada", "accErrSuspended": "Esta cuenta está suspendida", "accErrHwid": "HWID no coincide — la cuenta está vinculada a otro PC", "accErrHwidPending": "HWID no coincide — hay una solicitud de reinicio pendiente", "errKeyUsed": "Esta clave ya se ha usado", "errAuth": "Vuelve a iniciar sesión", "reviewsTitle": "Lo que dicen los jugadores", "reviewWrite": "Escribir una reseña", "reviewEmpty": "Aún no hay reseñas: ¡sé el primero en compartir tu experiencia!", "reviewSub": "Cuenta a otros jugadores qué opinas de STARLINE.", "reviewMore": "Ver más", "navAdmin": "Admin", "groupRelease": "Release", "groupAdmin": "Administrador", "adminPanel": "Panel de administración", "adminPanelSub": "Usuarios, suscripciones y tickets de HWID", "adminRefresh": "Actualizar", "adminUsers": "Usuarios", "adminTickets": "Tickets de HWID", "adminSearch": "Buscar usuarios…", "adminBan": "Banear", "adminUnban": "Desbanear", "adminNoUsers": "Sin usuarios", "adminNoTickets": "Sin tickets pendientes", "adminFreeze": "Congelar", "adminUnfreeze": "Descongelar", "adminFrozen": "congelado", "adminExpired": "caducado", "adminApprove": "Aprobar", "adminReject": "Rechazar", "adminFailed": "Acción fallida", "adminReason": "Motivo", "adminNone": "ninguno", "adminLastLogin": "Último acceso", "adminConfirm": "Pulsa otra vez para confirmar", "subsErr": "No se pudieron cargar tus suscripciones desde el sitio", "reviewRating": "Valoración", "reviewLabel": "Tu reseña", "reviewPh": "Al menos 10 caracteres", "revErrShort": "Escribe al menos 10 caracteres.", "revOk": "¡Gracias! Tu reseña está pendiente de aprobación.", "revPending": "Ya tienes una reseña pendiente de aprobación.", "revErrLoad": "No se pudieron cargar las reseñas.", "logout": "Cerrar sesión", "noOwnedSub": "Esta cuenta no tiene juegos suscritos", "reqBtn": "Pedir un juego", "reqTitle": "Pedir un juego", "reqSub": "Dinos qué juego quieres y lo tendremos en cuenta.", "reqEmail": "Tu correo", "reqEmailPh": "you@example.com", "reqGame": "Nombre del juego", "reqGamePh": "p. ej. Apex Legends", "reqSend": "Enviar", "reqCancel": "Cancelar", "reqSending": "Enviando…", "reqOk": "Solicitud enviada — ¡gracias!", "reqErrEmail": "Introduce un correo válido", "reqErrGame": "Introduce el nombre del juego", "reqErrRate": "Espera un momento antes de enviar otra solicitud", "reqFallback": "No se pudo enviar automáticamente — abriendo tu correo", "fWish": "Lista de deseos", "noWishSub": "Aún no hay juegos en tu lista de deseos", "dzAdd": "Suelta aquí para añadir «{g}» a la lista de deseos", "dzRemove": "Suelta aquí para quitar «{g}» de la lista de deseos", "dzView": "Suelta aquí para ver la lista de deseos", "qpDropHint": "Suelta aquí para añadir a Inicio rápido", "qpExists": "Ya está en Inicio rápido", "colsLabel": "Tarjetas por fila", "colsAuto": "Auto", "accSwNo": "¿No tienes cuenta?", "accSwYes": "¿Ya tienes cuenta?", "accSwReg": "Regístrate gratis", "accSwLogin": "Inicia sesión"},
 
-  tr:{"profile": "Profil", "quickplay": "Hızlı Başlat", "quickAdd": "Hızlı Başlat'a ekle", "quickPick": "Sabitlenecek oyunu seç", "quickAllAdded": "Tüm oyunlar zaten sabitlendi", "quickRemove": "Hızlı Başlat'tan çıkar", "quickEmpty": "Henüz bir şey sabitlenmedi — + tuşuna bas", "downloads": "Abonelikler", "searchGames": "Oyun ara…", "toggleTheme": "Temayı değiştir", "noLicenses": "Etkin lisans yok", "featured": "Öne çıkanlar", "allGames": "Tüm oyunlar", "fAll": "Tümü", "fOwned": "Sahip olunan", "fAvailable": "Uygun", "launch": "Başlat", "buy": "Satın al", "badgeOwned": "SAHİP", "badgeNew": "YENİ", "noGames": "Oyun bulunamadı", "noGamesSub": "Farklı bir arama veya filtre dene", "account": "Hesap", "accountSub": "Kullanıcı adı ve avatar", "username": "Kullanıcı adı", "usernamePh": "Adınız", "save": "Kaydet", "avatar": "Avatar", "winScaleTitle": "Pencere ölçeği", "winScaleSub": "Tüm arayüzü ölçekler", "prefLang": "Tercih edilen dil", "prefLangSub": "Arayüz dili", "subscription": "Abonelik", "remaining": "Kalan", "readyInject": "Başlatmaya hazır", "injecting": "İndiriliyor…", "injected": "Başlatıldı", "aboutTitle": "Hakkında", "developer": "Geliştirici", "publisher": "Yayıncı", "release": "Çıkış", "platform": "Platform", "genres": "Türler", "features": "Özellikler", "wishAdded": "İstek listesine eklendi", "wishRemoved": "İstek listesinden çıkarıldı", "wishAddTitle": "İstek listesine ekle", "wishRemoveTitle": "İstek listesinden çıkar", "prevGame": "Önceki oyun", "nextGame": "Sonraki oyun", "prevImage": "Önceki görsel", "nextImage": "Sonraki görsel", "videoPlay": "Oynat", "videoPause": "Duraklat", "videoMute": "Sesi kapat", "videoUnmute": "Sesi aç", "videoFull": "Tam ekran", "videoExitFull": "Tam ekrandan çık", "videoUnmuteHint": "Ses için hoparlöre tıkla", "videoNoAudio": "Bu videoda ses parçası olmayabilir", "avatarUpdated": "Avatar güncellendi", "usernameEmpty": "Kullanıcı adı boş olamaz", "usernameSaved": "Kullanıcı adı kaydedildi", "localAccount": "Bulut hesabı", "tba": "TBA", "dlBlurb": "Kahraman nişancı geliştirmeleri — nişan yardımı, wallhack, bekleme takibi.", "tFPS": "FPS", "tCompetitive": "Rekabetçi", "tAction": "Aksiyon", "tAntiCheat": "Hile koruması", "tMultiplayer": "Çok oyunculu", "tCloudSave": "Bulut kaydı", "tMOBA": "MOBA", "tShooter": "Nişancı", "tThirdPerson": "Üçüncü şahıs", "tEarlyAccess": "Erken erişim", "tBattleRoyale": "Battle Royale", "tTactical": "Taktik", "tSurvival": "Hayatta kalma", "tHardcore": "Zorlu", "tRealistic": "Gerçekçi", "layoutTitle": "Katalog düzeni", "layoutSub": "Oyunların „Tüm oyunlar“ listesindeki görünümü", "layoutGrid": "Kartlar", "layoutList": "Liste", "bgTitle": "Arka plan efektleri", "bgSub": "Uygulamanın arkasında hareketli arka plan", "bgEnable": "Arka plan efektlerini aç", "bgAurora": "Kutup ışığı", "bgWaves": "Dalgalar", "bgGrid": "Izgara", "bgStars": "Yıldızlar", "bgNetwork": "Parçacık ağı", "bgEmbers": "Kıvılcımlar", "bgImage": "Kendi resmim", "bgChoose": "Resim seç…", "bgClear": "Resmi kaldır", "bgImageBad": "Resim yüklenemedi", "bgImageSet": "Arka plan resmi ayarlandı", "accLogin": "Giriş yap", "accRegister": "Kayıt ol", "accLoginTitle": "Tekrar hoş geldin", "accRegTitle": "Hesap oluştur", "accLoginHint": "Devam etmek için giriş yap", "accRegHint": "Kayıt ücretsiz — abonelikler oyun bazında", "accUsername": "Kullanıcı adı", "accPassword": "Parola", "accConfirm": "Parolayı doğrula", "accRemember": "Beni hatırla", "extracting": "Çıkarılıyor…", "genreAll": "Tüm türler", "genreNone": "Katalogda henüz tür bilgisi yok", "adminTitle": "Yönetici izni gerekli", "adminBody": "STARLINE yönetici olarak çalıştırılmalıdır. Tamam'a basınca program kapanır; sonra {exe} dosyasına sağ tıklayıp «Yönetici olarak çalıştır» seçin.", "adminRunAs": "Yönetici olarak çalıştır", "adminOk": "Tamam", "adminLater": "Sonra", "accUserPh": "3-20 harf, sayı, _ . -", "accPassPh": "En az 8 karakter", "accLoginBtn": "Giriş yap", "accRegBtn": "Hesap oluştur", "accErrEmpty": "Kullanıcı adı ve parola girin", "accErrUserFmt": "Kullanıcı adı: 3-20 harf, sayı, _ . -", "accErrPassShort": "Parola en az 8 karakter olmalı", "accErrMismatch": "Parolalar eşleşmiyor", "accErrExists": "Bu kullanıcı adı alınmış", "accErrBad": "Kullanıcı adı veya parola yanlış", "accErrFail": "Bir şeyler ters gitti, tekrar deneyin", "accSigningIn": "Giriş yapılıyor…", "accCreating": "Hesap oluşturuluyor…", "accWelcome": "Tekrar hoş geldin!", "accCreated": "Hesap oluşturuldu!", "accSession": "Oturum", "accSessionSub": "Bu cihazda oturum açık", "accEmail": "E-posta", "accErrEmail": "Geçerli bir e-posta girin", "accErrBanned": "Bu hesap yasaklandı", "accErrSuspended": "Bu hesap askıya alındı", "accErrHwid": "HWID uyuşmuyor — hesap başka bir PC'ye bağlı", "accErrHwidPending": "HWID uyuşmuyor — sıfırlama talebi onay bekliyor", "errKeyUsed": "Bu anahtar zaten kullanıldı", "errAuth": "Lütfen tekrar giriş yapın", "reviewsTitle": "Oyuncular ne diyor", "reviewWrite": "Değerlendirme yaz", "reviewEmpty": "Henüz değerlendirme yok — deneyimini ilk paylaşan sen ol!", "reviewSub": "STARLINE hakkında ne düşündüğünü diğer oyunculara anlat.", "reviewMore": "Daha fazla göster", "navAdmin": "Yönetim", "groupRelease": "Release", "groupAdmin": "Yönetici", "adminPanel": "Yönetim paneli", "adminPanelSub": "Kullanıcılar, abonelikler ve HWID talepleri", "adminRefresh": "Yenile", "adminUsers": "Kullanıcılar", "adminTickets": "HWID talepleri", "adminSearch": "Kullanıcı ara…", "adminBan": "Yasakla", "adminUnban": "Yasağı kaldır", "adminNoUsers": "Kullanıcı yok", "adminNoTickets": "Bekleyen talep yok", "adminFreeze": "Dondur", "adminUnfreeze": "Çöz", "adminFrozen": "donduruldu", "adminExpired": "süresi doldu", "adminApprove": "Onayla", "adminReject": "Reddet", "adminFailed": "İşlem başarısız", "adminReason": "Sebep", "adminNone": "yok", "adminLastLogin": "Son giriş", "adminConfirm": "Onaylamak için tekrar bas", "subsErr": "Abonelikler site üzerinden alınamadı", "reviewRating": "Puan", "reviewLabel": "Değerlendirmen", "reviewPh": "En az 10 karakter", "revErrShort": "En az 10 karakter yazın.", "revOk": "Teşekkürler! Değerlendirmen onay bekliyor.", "revPending": "Onay bekleyen bir değerlendirmen var.", "revErrLoad": "Değerlendirmeler yüklenemedi.", "logout": "Çıkış yap", "noOwnedSub": "Bu hesabın abone olduğu oyun yok", "reqBtn": "Oyun iste", "reqTitle": "Oyun iste", "reqSub": "Hangi oyunu istediğini yaz, değerlendirelim.", "reqEmail": "E-postan", "reqEmailPh": "you@example.com", "reqGame": "Oyun adı", "reqGamePh": "örn. Apex Legends", "reqSend": "Gönder", "reqCancel": "İptal", "reqSending": "Gönderiliyor…", "reqOk": "İstek gönderildi — teşekkürler!", "reqErrEmail": "Geçerli bir e-posta gir", "reqErrGame": "Oyun adını gir", "reqErrRate": "Yeni istek için biraz bekleyin", "reqFallback": "Otomatik gönderilemedi — e-posta uygulaması açılıyor", "fWish": "İstek listesi", "noWishSub": "İstek listende henüz oyun yok", "dzAdd": "«{g}» oyununu istek listesine eklemek için buraya bırak", "dzRemove": "«{g}» oyununu istek listesinden çıkarmak için buraya bırak", "dzView": "Tüm istek listesini görmek için buraya bırak", "qpDropHint": "Hızlı Başlat'a eklemek için buraya bırak", "qpExists": "Zaten Hızlı Başlat'ta", "colsLabel": "Satır başına kart", "colsAuto": "Otomatik", "accSwNo": "Hesabın yok mu?", "accSwYes": "Zaten hesabın var mı?", "accSwReg": "Ücretsiz kayıt ol", "accSwLogin": "Giriş yap"},
+  tr:{"profile": "Profil", "quickplay": "Hızlı Başlat", "quickAdd": "Hızlı Başlat'a ekle", "quickPick": "Sabitlenecek oyunu seç", "quickAllAdded": "Tüm oyunlar zaten sabitlendi", "quickRemove": "Hızlı Başlat'tan çıkar", "quickEmpty": "Henüz bir şey sabitlenmedi — + tuşuna bas", "downloads": "Abonelikler", "searchGames": "Oyun ara…", "toggleTheme": "Temayı değiştir", "noLicenses": "Etkin lisans yok", "featured": "Öne çıkanlar", "allGames": "Tüm oyunlar", "fAll": "Tümü", "fOwned": "Sahip olunan", "fAvailable": "Uygun", "launch": "Başlat", "buy": "Satın al", "badgeOwned": "SAHİP", "badgeNew": "YENİ", "noGames": "Oyun bulunamadı", "noGamesSub": "Farklı bir arama veya filtre dene", "account": "Hesap", "accountSub": "Kullanıcı adı ve avatar", "username": "Kullanıcı adı", "usernamePh": "Adınız", "save": "Kaydet", "avatar": "Avatar", "winScaleTitle": "Pencere ölçeği", "winScaleSub": "Tüm arayüzü ölçekler", "prefLang": "Tercih edilen dil", "prefLangSub": "Arayüz dili", "subscription": "Abonelik", "remaining": "Kalan", "readyInject": "Başlatmaya hazır", "injecting": "İndiriliyor…", "injected": "Başlatıldı", "aboutTitle": "Hakkında", "developer": "Geliştirici", "publisher": "Yayıncı", "release": "Çıkış", "platform": "Platform", "genres": "Türler", "features": "Özellikler", "wishAdded": "İstek listesine eklendi", "wishRemoved": "İstek listesinden çıkarıldı", "wishAddTitle": "İstek listesine ekle", "wishRemoveTitle": "İstek listesinden çıkar", "prevGame": "Önceki oyun", "nextGame": "Sonraki oyun", "prevImage": "Önceki görsel", "nextImage": "Sonraki görsel", "videoPlay": "Oynat", "videoPause": "Duraklat", "videoMute": "Sesi kapat", "videoUnmute": "Sesi aç", "videoFull": "Tam ekran", "videoExitFull": "Tam ekrandan çık", "videoUnmuteHint": "Ses için hoparlöre tıkla", "videoNoAudio": "Bu videoda ses parçası olmayabilir", "avatarUpdated": "Avatar güncellendi", "usernameEmpty": "Kullanıcı adı boş olamaz", "usernameSaved": "Kullanıcı adı kaydedildi", "localAccount": "Bulut hesabı", "tba": "TBA", "dlBlurb": "Kahraman nişancı geliştirmeleri — nişan yardımı, wallhack, bekleme takibi.", "tFPS": "FPS", "tCompetitive": "Rekabetçi", "tAction": "Aksiyon", "tAntiCheat": "Hile koruması", "tMultiplayer": "Çok oyunculu", "tCloudSave": "Bulut kaydı", "tMOBA": "MOBA", "tShooter": "Nişancı", "tThirdPerson": "Üçüncü şahıs", "tEarlyAccess": "Erken erişim", "tBattleRoyale": "Battle Royale", "tTactical": "Taktik", "tSurvival": "Hayatta kalma", "tHardcore": "Zorlu", "tRealistic": "Gerçekçi", "layoutTitle": "Katalog düzeni", "layoutSub": "Oyunların „Tüm oyunlar“ listesindeki görünümü", "layoutGrid": "Kartlar", "layoutList": "Liste", "bgTitle": "Arka plan efektleri", "bgSub": "Uygulamanın arkasında hareketli arka plan", "bgEnable": "Arka plan efektlerini aç", "bgAurora": "Kutup ışığı", "bgWaves": "Dalgalar", "bgStars": "Yıldızlar", "bgNetwork": "Parçacık ağı", "bgEmbers": "Kıvılcımlar", "bgImage": "Kendi resmim", "bgChoose": "Resim seç…", "bgClear": "Resmi kaldır", "bgImageBad": "Resim yüklenemedi", "bgImageSet": "Arka plan resmi ayarlandı", "accLogin": "Giriş yap", "accRegister": "Kayıt ol", "accLoginTitle": "Tekrar hoş geldin", "accRegTitle": "Hesap oluştur", "accLoginHint": "Devam etmek için giriş yap", "accRegHint": "Kayıt ücretsiz — abonelikler oyun bazında", "accUsername": "Kullanıcı adı", "accPassword": "Parola", "accConfirm": "Parolayı doğrula", "accRemember": "Beni hatırla", "extracting": "Çıkarılıyor…", "genreAll": "Tüm türler", "genreNone": "Katalogda henüz tür bilgisi yok", "adminTitle": "Yönetici izni gerekli", "adminBody": "STARLINE yönetici olarak çalıştırılmalıdır. Tamam'a basınca program kapanır; sonra {exe} dosyasına sağ tıklayıp «Yönetici olarak çalıştır» seçin.", "adminRunAs": "Yönetici olarak çalıştır", "adminOk": "Tamam", "adminLater": "Sonra", "accUserPh": "3-20 harf, sayı, _ . -", "accPassPh": "En az 8 karakter", "accLoginBtn": "Giriş yap", "accRegBtn": "Hesap oluştur", "accErrEmpty": "Kullanıcı adı ve parola girin", "accErrUserFmt": "Kullanıcı adı: 3-20 harf, sayı, _ . -", "accErrPassShort": "Parola en az 8 karakter olmalı", "accErrMismatch": "Parolalar eşleşmiyor", "accErrExists": "Bu kullanıcı adı alınmış", "accErrBad": "Kullanıcı adı veya parola yanlış", "accErrFail": "Bir şeyler ters gitti, tekrar deneyin", "accSigningIn": "Giriş yapılıyor…", "accCreating": "Hesap oluşturuluyor…", "accWelcome": "Tekrar hoş geldin!", "accCreated": "Hesap oluşturuldu!", "accSession": "Oturum", "accSessionSub": "Bu cihazda oturum açık", "accEmail": "E-posta", "accErrEmail": "Geçerli bir e-posta girin", "accErrBanned": "Bu hesap yasaklandı", "accErrSuspended": "Bu hesap askıya alındı", "accErrHwid": "HWID uyuşmuyor — hesap başka bir PC'ye bağlı", "accErrHwidPending": "HWID uyuşmuyor — sıfırlama talebi onay bekliyor", "errKeyUsed": "Bu anahtar zaten kullanıldı", "errAuth": "Lütfen tekrar giriş yapın", "reviewsTitle": "Oyuncular ne diyor", "reviewWrite": "Değerlendirme yaz", "reviewEmpty": "Henüz değerlendirme yok — deneyimini ilk paylaşan sen ol!", "reviewSub": "STARLINE hakkında ne düşündüğünü diğer oyunculara anlat.", "reviewMore": "Daha fazla göster", "navAdmin": "Yönetim", "groupRelease": "Release", "groupAdmin": "Yönetici", "adminPanel": "Yönetim paneli", "adminPanelSub": "Kullanıcılar, abonelikler ve HWID talepleri", "adminRefresh": "Yenile", "adminUsers": "Kullanıcılar", "adminTickets": "HWID talepleri", "adminSearch": "Kullanıcı ara…", "adminBan": "Yasakla", "adminUnban": "Yasağı kaldır", "adminNoUsers": "Kullanıcı yok", "adminNoTickets": "Bekleyen talep yok", "adminFreeze": "Dondur", "adminUnfreeze": "Çöz", "adminFrozen": "donduruldu", "adminExpired": "süresi doldu", "adminApprove": "Onayla", "adminReject": "Reddet", "adminFailed": "İşlem başarısız", "adminReason": "Sebep", "adminNone": "yok", "adminLastLogin": "Son giriş", "adminConfirm": "Onaylamak için tekrar bas", "subsErr": "Abonelikler site üzerinden alınamadı", "reviewRating": "Puan", "reviewLabel": "Değerlendirmen", "reviewPh": "En az 10 karakter", "revErrShort": "En az 10 karakter yazın.", "revOk": "Teşekkürler! Değerlendirmen onay bekliyor.", "revPending": "Onay bekleyen bir değerlendirmen var.", "revErrLoad": "Değerlendirmeler yüklenemedi.", "logout": "Çıkış yap", "noOwnedSub": "Bu hesabın abone olduğu oyun yok", "reqBtn": "Oyun iste", "reqTitle": "Oyun iste", "reqSub": "Hangi oyunu istediğini yaz, değerlendirelim.", "reqEmail": "E-postan", "reqEmailPh": "you@example.com", "reqGame": "Oyun adı", "reqGamePh": "örn. Apex Legends", "reqSend": "Gönder", "reqCancel": "İptal", "reqSending": "Gönderiliyor…", "reqOk": "İstek gönderildi — teşekkürler!", "reqErrEmail": "Geçerli bir e-posta gir", "reqErrGame": "Oyun adını gir", "reqErrRate": "Yeni istek için biraz bekleyin", "reqFallback": "Otomatik gönderilemedi — e-posta uygulaması açılıyor", "fWish": "İstek listesi", "noWishSub": "İstek listende henüz oyun yok", "dzAdd": "«{g}» oyununu istek listesine eklemek için buraya bırak", "dzRemove": "«{g}» oyununu istek listesinden çıkarmak için buraya bırak", "dzView": "Tüm istek listesini görmek için buraya bırak", "qpDropHint": "Hızlı Başlat'a eklemek için buraya bırak", "qpExists": "Zaten Hızlı Başlat'ta", "colsLabel": "Satır başına kart", "colsAuto": "Otomatik", "accSwNo": "Hesabın yok mu?", "accSwYes": "Zaten hesabın var mı?", "accSwReg": "Ücretsiz kayıt ol", "accSwLogin": "Giriş yap"},
 
-  pt:{"profile": "Perfil", "quickplay": "Início rápido", "quickAdd": "Adicionar ao Início rápido", "quickPick": "Escolha um jogo para fixar", "quickAllAdded": "Todos os jogos já estão fixados", "quickRemove": "Remover do Início rápido", "quickEmpty": "Nada fixado ainda — pressione +", "downloads": "Assinaturas", "searchGames": "Procurar jogos…", "toggleTheme": "Alternar tema", "noLicenses": "Sem licenças ativas", "featured": "Destaques", "allGames": "Todos os jogos", "fAll": "Todos", "fOwned": "Adquiridos", "fAvailable": "Disponíveis", "launch": "Iniciar", "buy": "Comprar", "badgeOwned": "ADQUIRIDO", "badgeNew": "NOVO", "noGames": "Nenhum jogo encontrado", "noGamesSub": "Tente outra busca ou filtro", "account": "Conta", "accountSub": "Nome de usuário e avatar", "username": "Nome de usuário", "usernamePh": "Seu nome", "save": "Salvar", "avatar": "Avatar", "winScaleTitle": "Escala da janela", "winScaleSub": "Escala toda a interface", "prefLang": "Idioma preferido", "prefLangSub": "Idioma da interface", "subscription": "Assinatura", "remaining": "Restante", "readyInject": "Pronto para iniciar", "injecting": "Baixando…", "injected": "Iniciado", "aboutTitle": "Sobre", "developer": "Desenvolvedora", "publisher": "Publicadora", "release": "Lançamento", "platform": "Plataforma", "genres": "Gêneros", "features": "Recursos", "wishAdded": "Adicionado à lista de desejos", "wishRemoved": "Removido da lista de desejos", "wishAddTitle": "Adicionar à lista de desejos", "wishRemoveTitle": "Remover da lista de desejos", "prevGame": "Jogo anterior", "nextGame": "Próximo jogo", "prevImage": "Imagem anterior", "nextImage": "Próxima imagem", "videoPlay": "Reproduzir", "videoPause": "Pausar", "videoMute": "Silenciar", "videoUnmute": "Ativar som", "videoFull": "Tela cheia", "videoExitFull": "Sair da tela cheia", "videoUnmuteHint": "Clique no alto-falante para ouvir", "videoNoAudio": "Este vídeo pode não ter faixa de áudio", "avatarUpdated": "Avatar atualizado", "usernameEmpty": "O nome de usuário não pode ficar vazio", "usernameSaved": "Nome de usuário salvo", "localAccount": "Conta na nuvem", "tba": "TBA", "dlBlurb": "Melhorias para hero shooters — assistência de mira, wallhack, monitor de recarga.", "tFPS": "FPS", "tCompetitive": "Competitivo", "tAction": "Ação", "tAntiCheat": "Anticheat", "tMultiplayer": "Multijogador", "tCloudSave": "Save na nuvem", "tMOBA": "MOBA", "tShooter": "Shooter", "tThirdPerson": "Terceira pessoa", "tEarlyAccess": "Acesso antecipado", "tBattleRoyale": "Battle Royale", "tTactical": "Tático", "tSurvival": "Sobrevivência", "tHardcore": "Hardcore", "tRealistic": "Realista", "layoutTitle": "Layout do catálogo", "layoutSub": "Como os jogos aparecem em «Todos os jogos»", "layoutGrid": "Cartões", "layoutList": "Lista", "bgTitle": "Efeitos de fundo", "bgSub": "Fundo animado atrás do app", "bgEnable": "Ativar efeitos de fundo", "bgAurora": "Aurora", "bgWaves": "Ondas", "bgGrid": "Grade", "bgStars": "Estrelas", "bgNetwork": "Rede de partículas", "bgEmbers": "Brasas", "bgImage": "Imagem própria", "bgChoose": "Escolher imagem…", "bgClear": "Remover imagem", "bgImageBad": "Não foi possível carregar a imagem", "bgImageSet": "Imagem de fundo definida", "accLogin": "Entrar", "accRegister": "Registrar", "accLoginTitle": "Bem-vindo de volta", "accRegTitle": "Criar conta", "accLoginHint": "Entre para continuar", "accRegHint": "Registro grátis — assinatura por jogo depois", "accUsername": "Nome de usuário", "accPassword": "Senha", "accConfirm": "Confirmar senha", "accRemember": "Lembrar de mim", "extracting": "Extraindo…", "genreAll": "Todos os gêneros", "genreNone": "O catálogo ainda não tem gêneros", "adminTitle": "Permissão de administrador necessária", "adminBody": "O STARLINE precisa ser executado como administrador. Ao clicar em OK o programa fecha; depois clique com o botão direito em {exe} e escolha «Executar como administrador».", "adminRunAs": "Executar como administrador", "adminOk": "OK", "adminLater": "Depois", "accUserPh": "3-20 letras, números, _ . -", "accPassPh": "Pelo menos 8 caracteres", "accLoginBtn": "Entrar", "accRegBtn": "Criar conta", "accErrEmpty": "Informe usuário e senha", "accErrUserFmt": "Usuário: 3-20 letras, números, _ . -", "accErrPassShort": "A senha precisa de pelo menos 8 caracteres", "accErrMismatch": "As senhas não coincidem", "accErrExists": "Esse nome de usuário já está em uso", "accErrBad": "Usuário ou senha incorretos", "accErrFail": "Algo deu errado, tente novamente", "accSigningIn": "Entrando…", "accCreating": "Criando conta…", "accWelcome": "Bem-vindo de volta!", "accCreated": "Conta criada!", "accSession": "Sessão", "accSessionSub": "Conectado neste dispositivo", "accEmail": "E-mail", "accErrEmail": "Informe um e-mail válido", "accErrBanned": "Esta conta foi banida", "accErrSuspended": "Esta conta está suspensa", "accErrHwid": "HWID não confere — a conta está vinculada a outro PC", "accErrHwidPending": "HWID não confere — pedido de redefinição pendente", "errKeyUsed": "Esta chave já foi usada", "errAuth": "Faça login novamente", "reviewsTitle": "O que os jogadores dizem", "reviewWrite": "Escrever avaliação", "reviewEmpty": "Ainda não há avaliações — seja o primeiro a compartilhar sua experiência!", "reviewSub": "Conte a outros jogadores o que você acha do STARLINE.", "reviewMore": "Ver mais", "navAdmin": "Admin", "groupRelease": "Release", "groupAdmin": "Administrador", "adminPanel": "Painel de administração", "adminPanelSub": "Usuários, assinaturas e tickets de HWID", "adminRefresh": "Atualizar", "adminUsers": "Usuários", "adminTickets": "Tickets de HWID", "adminSearch": "Procurar usuários…", "adminBan": "Banir", "adminUnban": "Desbanir", "adminNoUsers": "Sem usuários", "adminNoTickets": "Sem tickets pendentes", "adminFreeze": "Congelar", "adminUnfreeze": "Descongelar", "adminFrozen": "congelado", "adminExpired": "expirado", "adminApprove": "Aprovar", "adminReject": "Rejeitar", "adminFailed": "Falha na ação", "adminReason": "Motivo", "adminNone": "nenhum", "adminLastLogin": "Último acesso", "adminConfirm": "Clique de novo para confirmar", "subsErr": "Não foi possível carregar suas assinaturas do site", "reviewRating": "Nota", "reviewLabel": "Sua avaliação", "reviewPh": "Pelo menos 10 caracteres", "revErrShort": "Escreva pelo menos 10 caracteres.", "revOk": "Obrigado! Sua avaliação está aguardando aprovação.", "revPending": "Você já tem uma avaliação aguardando aprovação.", "revErrLoad": "Não foi possível carregar as avaliações.", "logout": "Sair", "noOwnedSub": "Esta conta não tem jogos assinados", "reqBtn": "Pedir um jogo", "reqTitle": "Pedir um jogo", "reqSub": "Diga qual jogo você quer e vamos avaliar.", "reqEmail": "Seu e-mail", "reqEmailPh": "you@example.com", "reqGame": "Nome do jogo", "reqGamePh": "ex.: Apex Legends", "reqSend": "Enviar", "reqCancel": "Cancelar", "reqSending": "Enviando…", "reqOk": "Pedido enviado — obrigado!", "reqErrEmail": "Informe um e-mail válido", "reqErrGame": "Informe o nome do jogo", "reqErrRate": "Aguarde um momento antes de enviar outro pedido", "reqFallback": "Não foi possível enviar automaticamente — abrindo seu e-mail", "fWish": "Lista de desejos", "noWishSub": "Ainda não há jogos na sua lista de desejos", "dzAdd": "Solte aqui para adicionar «{g}» à lista de desejos", "dzRemove": "Solte aqui para remover «{g}» da lista de desejos", "dzView": "Solte aqui para ver a lista de desejos", "qpDropHint": "Solte aqui para adicionar ao Início rápido", "qpExists": "Já está no Início rápido", "colsLabel": "Cartões por linha", "colsAuto": "Automático", "accSwNo": "Não tem conta?", "accSwYes": "Já tem conta?", "accSwReg": "Cadastre-se grátis", "accSwLogin": "Entrar"}
+  pt:{"profile": "Perfil", "quickplay": "Início rápido", "quickAdd": "Adicionar ao Início rápido", "quickPick": "Escolha um jogo para fixar", "quickAllAdded": "Todos os jogos já estão fixados", "quickRemove": "Remover do Início rápido", "quickEmpty": "Nada fixado ainda — pressione +", "downloads": "Assinaturas", "searchGames": "Procurar jogos…", "toggleTheme": "Alternar tema", "noLicenses": "Sem licenças ativas", "featured": "Destaques", "allGames": "Todos os jogos", "fAll": "Todos", "fOwned": "Adquiridos", "fAvailable": "Disponíveis", "launch": "Iniciar", "buy": "Comprar", "badgeOwned": "ADQUIRIDO", "badgeNew": "NOVO", "noGames": "Nenhum jogo encontrado", "noGamesSub": "Tente outra busca ou filtro", "account": "Conta", "accountSub": "Nome de usuário e avatar", "username": "Nome de usuário", "usernamePh": "Seu nome", "save": "Salvar", "avatar": "Avatar", "winScaleTitle": "Escala da janela", "winScaleSub": "Escala toda a interface", "prefLang": "Idioma preferido", "prefLangSub": "Idioma da interface", "subscription": "Assinatura", "remaining": "Restante", "readyInject": "Pronto para iniciar", "injecting": "Baixando…", "injected": "Iniciado", "aboutTitle": "Sobre", "developer": "Desenvolvedora", "publisher": "Publicadora", "release": "Lançamento", "platform": "Plataforma", "genres": "Gêneros", "features": "Recursos", "wishAdded": "Adicionado à lista de desejos", "wishRemoved": "Removido da lista de desejos", "wishAddTitle": "Adicionar à lista de desejos", "wishRemoveTitle": "Remover da lista de desejos", "prevGame": "Jogo anterior", "nextGame": "Próximo jogo", "prevImage": "Imagem anterior", "nextImage": "Próxima imagem", "videoPlay": "Reproduzir", "videoPause": "Pausar", "videoMute": "Silenciar", "videoUnmute": "Ativar som", "videoFull": "Tela cheia", "videoExitFull": "Sair da tela cheia", "videoUnmuteHint": "Clique no alto-falante para ouvir", "videoNoAudio": "Este vídeo pode não ter faixa de áudio", "avatarUpdated": "Avatar atualizado", "usernameEmpty": "O nome de usuário não pode ficar vazio", "usernameSaved": "Nome de usuário salvo", "localAccount": "Conta na nuvem", "tba": "TBA", "dlBlurb": "Melhorias para hero shooters — assistência de mira, wallhack, monitor de recarga.", "tFPS": "FPS", "tCompetitive": "Competitivo", "tAction": "Ação", "tAntiCheat": "Anticheat", "tMultiplayer": "Multijogador", "tCloudSave": "Save na nuvem", "tMOBA": "MOBA", "tShooter": "Shooter", "tThirdPerson": "Terceira pessoa", "tEarlyAccess": "Acesso antecipado", "tBattleRoyale": "Battle Royale", "tTactical": "Tático", "tSurvival": "Sobrevivência", "tHardcore": "Hardcore", "tRealistic": "Realista", "layoutTitle": "Layout do catálogo", "layoutSub": "Como os jogos aparecem em «Todos os jogos»", "layoutGrid": "Cartões", "layoutList": "Lista", "bgTitle": "Efeitos de fundo", "bgSub": "Fundo animado atrás do app", "bgEnable": "Ativar efeitos de fundo", "bgAurora": "Aurora", "bgWaves": "Ondas", "bgStars": "Estrelas", "bgNetwork": "Rede de partículas", "bgEmbers": "Brasas", "bgImage": "Imagem própria", "bgChoose": "Escolher imagem…", "bgClear": "Remover imagem", "bgImageBad": "Não foi possível carregar a imagem", "bgImageSet": "Imagem de fundo definida", "accLogin": "Entrar", "accRegister": "Registrar", "accLoginTitle": "Bem-vindo de volta", "accRegTitle": "Criar conta", "accLoginHint": "Entre para continuar", "accRegHint": "Registro grátis — assinatura por jogo depois", "accUsername": "Nome de usuário", "accPassword": "Senha", "accConfirm": "Confirmar senha", "accRemember": "Lembrar de mim", "extracting": "Extraindo…", "genreAll": "Todos os gêneros", "genreNone": "O catálogo ainda não tem gêneros", "adminTitle": "Permissão de administrador necessária", "adminBody": "O STARLINE precisa ser executado como administrador. Ao clicar em OK o programa fecha; depois clique com o botão direito em {exe} e escolha «Executar como administrador».", "adminRunAs": "Executar como administrador", "adminOk": "OK", "adminLater": "Depois", "accUserPh": "3-20 letras, números, _ . -", "accPassPh": "Pelo menos 8 caracteres", "accLoginBtn": "Entrar", "accRegBtn": "Criar conta", "accErrEmpty": "Informe usuário e senha", "accErrUserFmt": "Usuário: 3-20 letras, números, _ . -", "accErrPassShort": "A senha precisa de pelo menos 8 caracteres", "accErrMismatch": "As senhas não coincidem", "accErrExists": "Esse nome de usuário já está em uso", "accErrBad": "Usuário ou senha incorretos", "accErrFail": "Algo deu errado, tente novamente", "accSigningIn": "Entrando…", "accCreating": "Criando conta…", "accWelcome": "Bem-vindo de volta!", "accCreated": "Conta criada!", "accSession": "Sessão", "accSessionSub": "Conectado neste dispositivo", "accEmail": "E-mail", "accErrEmail": "Informe um e-mail válido", "accErrBanned": "Esta conta foi banida", "accErrSuspended": "Esta conta está suspensa", "accErrHwid": "HWID não confere — a conta está vinculada a outro PC", "accErrHwidPending": "HWID não confere — pedido de redefinição pendente", "errKeyUsed": "Esta chave já foi usada", "errAuth": "Faça login novamente", "reviewsTitle": "O que os jogadores dizem", "reviewWrite": "Escrever avaliação", "reviewEmpty": "Ainda não há avaliações — seja o primeiro a compartilhar sua experiência!", "reviewSub": "Conte a outros jogadores o que você acha do STARLINE.", "reviewMore": "Ver mais", "navAdmin": "Admin", "groupRelease": "Release", "groupAdmin": "Administrador", "adminPanel": "Painel de administração", "adminPanelSub": "Usuários, assinaturas e tickets de HWID", "adminRefresh": "Atualizar", "adminUsers": "Usuários", "adminTickets": "Tickets de HWID", "adminSearch": "Procurar usuários…", "adminBan": "Banir", "adminUnban": "Desbanir", "adminNoUsers": "Sem usuários", "adminNoTickets": "Sem tickets pendentes", "adminFreeze": "Congelar", "adminUnfreeze": "Descongelar", "adminFrozen": "congelado", "adminExpired": "expirado", "adminApprove": "Aprovar", "adminReject": "Rejeitar", "adminFailed": "Falha na ação", "adminReason": "Motivo", "adminNone": "nenhum", "adminLastLogin": "Último acesso", "adminConfirm": "Clique de novo para confirmar", "subsErr": "Não foi possível carregar suas assinaturas do site", "reviewRating": "Nota", "reviewLabel": "Sua avaliação", "reviewPh": "Pelo menos 10 caracteres", "revErrShort": "Escreva pelo menos 10 caracteres.", "revOk": "Obrigado! Sua avaliação está aguardando aprovação.", "revPending": "Você já tem uma avaliação aguardando aprovação.", "revErrLoad": "Não foi possível carregar as avaliações.", "logout": "Sair", "noOwnedSub": "Esta conta não tem jogos assinados", "reqBtn": "Pedir um jogo", "reqTitle": "Pedir um jogo", "reqSub": "Diga qual jogo você quer e vamos avaliar.", "reqEmail": "Seu e-mail", "reqEmailPh": "you@example.com", "reqGame": "Nome do jogo", "reqGamePh": "ex.: Apex Legends", "reqSend": "Enviar", "reqCancel": "Cancelar", "reqSending": "Enviando…", "reqOk": "Pedido enviado — obrigado!", "reqErrEmail": "Informe um e-mail válido", "reqErrGame": "Informe o nome do jogo", "reqErrRate": "Aguarde um momento antes de enviar outro pedido", "reqFallback": "Não foi possível enviar automaticamente — abrindo seu e-mail", "fWish": "Lista de desejos", "noWishSub": "Ainda não há jogos na sua lista de desejos", "dzAdd": "Solte aqui para adicionar «{g}» à lista de desejos", "dzRemove": "Solte aqui para remover «{g}» da lista de desejos", "dzView": "Solte aqui para ver a lista de desejos", "qpDropHint": "Solte aqui para adicionar ao Início rápido", "qpExists": "Já está no Início rápido", "colsLabel": "Cartões por linha", "colsAuto": "Automático", "accSwNo": "Não tem conta?", "accSwYes": "Já tem conta?", "accSwReg": "Cadastre-se grátis", "accSwLogin": "Entrar"}
 };
 (function(){
   for (var c in UI_T_EXT) {
@@ -3034,6 +3018,8 @@ function uiApplyDynamic(spec){
   /* banner 角饰跟着装饰类型走（万圣节/圣诞/四季）*/
   var hero = document.getElementById('hero');
   if (hero) { hero.setAttribute('data-deco', spec.deco || 'none'); }
+  /* Topography 背景的颜色 = 菜单强调色（--accent），深浅主题也随之切换 */
+  try { if (typeof TopoBg !== 'undefined' && TopoBg) { TopoBg.refresh(); } } catch (e) {}
 }
 var uiThemeAnimTimer = null;
 function uiThemeAnimate(){
@@ -4521,12 +4507,1573 @@ function decoInit(){
   });
 })();
 
+  /* ════════ Topography 背景（React Bits <Topography /> 的原生 JS 移植）════════
+     原组件是纯 WebGL2（无第三方依赖），引擎部分保持原样，只把 React 外壳换成下面的控制器：
+       · 强调色 = APP 菜单强调色（--accent，侧栏激活项用的就是它），改色 / 切深浅主题会实时跟随
+       · 深色主题用发光叠加，浅色主题自动切到 lightMode（墨线）
+       · 有自己独立的 WebGL 画布 #bgTopo（旧的 #bgCanvas 已被 2D 上下文占用，不能复用）
+       · 背景在毛玻璃界面之下，所以默认 30fps、DPR 上限 1.5，省 GPU；要更丝滑把 TOPO_CFG.maxFps 调高
+     对外：TopoBg.start() / stop() / refresh()；start() 返回 false 表示 WebGL2 不可用（调用方回退到极光）。 */
+  var TopoBg = (function(){
+  'use strict';
+
+  var TOPO_CFG = {
+    color: '#4f7cff',        /* 读不到 --accent 时的兜底色 */
+    lineCount: 22, lineWidth: 1.2, majorLines: true,
+    elevation: 1, foreground: 0.2, scale: 1, detail: 0.35, tilt: 32,
+    speed: 0.25, direction: 'forward', morph: 0.2,
+    glow: 0.6, depthOfField: 0.4, fog: 0.35, brightness: 1, opacity: 1,
+    mouseInteraction: true, hoverEffect: 'lift', mouseRadius: 1, mouseStrength: 0.6,
+    trail: 0.3, parallax: 0.5, clickEffect: 'pulse',
+    markers: 'none', glitch: 0, intro: true,
+    maxFps: 30, maxDpr: 1.5
+  };
+
+  const FOV = 0.32;
+  const ORBIT = 9;
+  const NEAR = 0.05;
+  const FAR = 160;
+  const HEIGHT = 1.7;
+  const FREQUENCY = 0.45;
+  const INTRO_SECONDS = 2.8;
+  const MAX_PULSES = 4;
+  const BLOOM_LEVELS = 4;
+  const SCULPT_SIZE = 256;
+  const SCULPT_SPAN = 48;
+  const MAX_CELLS = 200000;
+  const SUN = [-0.81, 0.58, -0.02];
+  const DIRECTIONS = { forward: [0, 1], backward: [0, -1], left: [-1, 0], right: [1, 0] };
+  const HOVER_EFFECTS = ['lift', 'trace', 'light'];
+  const MARKER_STYLES = { plus: 0, dots: 1 };
+  const MARKER_SPACING = 1.25;
+
+  const COMMON = `
+precision highp float;
+precision highp int;
+
+uniform float uFrequency;
+uniform vec2 uMorph;
+uniform sampler2D uSculpt;
+uniform float uSculptOn;
+uniform vec4 uPulses[${MAX_PULSES}];
+uniform vec3 uEye;
+uniform vec3 uForward;
+uniform vec3 uNear;
+
+uint lattice(ivec2 p) {
+  uvec2 q = uvec2(p + 1073741824);
+  uint h = q.x * 2654435761u + q.y * 2246822519u;
+  h = (h ^ (h >> 15u)) * 739982445u;
+  h = (h ^ (h >> 12u)) * 695872825u;
+  return h ^ (h >> 15u);
+}
+
+float corner(ivec2 c, vec2 f) {
+  uint h = lattice(c);
+  vec2 g = vec2(float(h & 65535u), float(h >> 16u)) / 32767.5 - 1.0;
+  return dot(g, f);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = p - i;
+  ivec2 c = ivec2(i);
+  vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+  float a = corner(c, f);
+  float b = corner(c + ivec2(1, 0), f - vec2(1.0, 0.0));
+  float d = corner(c + ivec2(0, 1), f - vec2(0.0, 1.0));
+  float e = corner(c + ivec2(1, 1), f - vec2(1.0, 1.0));
+  return mix(mix(a, b, u.x), mix(d, e, u.x), u.y);
+}
+
+vec2 octave(vec2 p, vec2 shift) {
+  return vec2(1.6 * p.x - 1.2 * p.y, 1.2 * p.x + 1.6 * p.y) + shift;
+}
+
+float relief(vec2 t) {
+  vec2 p = t * uFrequency;
+  vec2 w = vec2(noise(p * 0.42 + uMorph), noise(p * 0.42 - uMorph.yx + vec2(5.2, 1.3)));
+  p += w * 0.8;
+  float n = noise(p) * 0.55;
+  p = octave(p, vec2(7.1, 3.7));
+  n += noise(p) * 0.15;
+  p = octave(p, vec2(1.9, 8.3));
+  n += noise(p) * 0.04;
+  float s = log(1.0 + exp(7.0 * (3.0 * n + 0.05))) / 7.0;
+  return s * s * 1.4 + 0.1 * n;
+}
+
+float swell(vec2 t) {
+  float lift = 0.0;
+  for (int i = 0; i < ${MAX_PULSES}; i++) {
+    vec4 p = uPulses[i];
+    if (p.w <= 0.0) continue;
+    float x = (length(t - p.xy) - p.z) / (0.28 + p.z * 0.05);
+    lift += exp(-x * x) * p.w;
+  }
+  return lift;
+}
+
+vec4 sculpted(vec2 t) {
+  return uSculptOn > 0.5 ? textureLod(uSculpt, t / ${SCULPT_SPAN}.0, 0.0) : vec4(0.0);
+}
+
+float settle(vec2 world) {
+  float depth = dot(vec3(world.x, 0.0, world.y) - uEye, uForward);
+  float x = clamp((depth - uNear.x) / max(uNear.y - uNear.x, 1e-3), 0.0, 1.0);
+  return mix(uNear.z, 1.0, x * x * x * (x * (x * 6.0 - 15.0) + 10.0));
+}
+`;
+
+  const FIELD = `#version 300 es
+${COMMON}
+uniform ivec2 uBase;
+uniform float uCell;
+uniform float uDetail;
+layout(location = 0) out vec4 outField;
+layout(location = 1) out vec4 outHeight;
+
+void main() {
+  vec2 t = vec2(uBase + ivec2(gl_FragCoord.xy)) * uCell;
+  vec4 carved = sculpted(t);
+  float ring = swell(t);
+  float ground = relief(t) + carved.r + ring * 0.14;
+  vec2 dp = t * uFrequency * 5.0 + vec2(13.1, 4.7);
+  float fine = noise(dp) * 0.6 + noise(octave(dp, vec2(2.3, 6.1))) * 0.3;
+  outField = vec4(carved.g, ring, ground, carved.r);
+  outHeight = vec4(ground + uDetail * 0.1 * fine, 0.0, 0.0, 1.0);
+}`;
+
+  const terrainVertex = baked => `#version 300 es
+#define BAKED ${baked ? 1 : 0}
+${COMMON}
+uniform sampler2D uField;
+uniform ivec2 uOrigin;
+uniform ivec2 uCamCell;
+uniform vec2 uCamFrac;
+uniform float uCell;
+uniform int uStride;
+uniform float uHeight;
+uniform mat4 uViewProj;
+out vec2 vTexel;
+out vec2 vTerrain;
+out float vDepth;
+out float vLift;
+out vec3 vNormal;
+
+float ground(vec2 t) {
+  return relief(t) + swell(t) * 0.14;
+}
+
+void main() {
+  ivec2 step = ivec2(gl_VertexID >> 1, gl_InstanceID + (gl_VertexID & 1)) * uStride;
+  ivec2 local = uOrigin + step;
+  vec2 terrain = vec2(local + uCamCell) * uCell;
+  vec2 world = vec2(local) * uCell - uCamFrac;
+  float k = settle(world);
+#if BAKED
+  ivec2 texel = step + 2;
+  vec4 c = texelFetch(uField, texel, 0);
+  vec4 l = texelFetch(uField, texel - ivec2(1, 0), 0);
+  vec4 r = texelFetch(uField, texel + ivec2(1, 0), 0);
+  vec4 d = texelFetch(uField, texel - ivec2(0, 1), 0);
+  vec4 u = texelFetch(uField, texel + ivec2(0, 1), 0);
+  float h = (c.b - c.a) * k + c.a;
+  float dx = (l.b - l.a - r.b + r.a) * k + l.a - r.a;
+  float dz = (d.b - d.a - u.b + u.a) * k + d.a - u.a;
+  vNormal = vec3(dx * uHeight / (2.0 * uCell), 1.0, dz * uHeight / (2.0 * uCell));
+  vTexel = vec2(texel) + 0.5;
+#else
+  float h = ground(terrain) * k;
+  float hx = ground(terrain + vec2(0.04, 0.0)) * k;
+  float hz = ground(terrain + vec2(0.0, 0.04)) * k;
+  vNormal = vec3((h - hx) * uHeight / 0.04, 1.0, (h - hz) * uHeight / 0.04);
+  vTexel = vec2(0.0);
+#endif
+  vec4 clip = uViewProj * vec4(world.x, h * uHeight, world.y, 1.0);
+  gl_Position = clip;
+  vTerrain = terrain;
+  vDepth = clip.w;
+  vLift = h * uHeight;
+}`;
+
+  const terrainFragment = baked => `#version 300 es
+#define BAKED ${baked ? 1 : 0}
+${COMMON}
+uniform sampler2D uField;
+uniform highp sampler2D uHeightField;
+uniform float uDetail;
+uniform float uLines;
+uniform float uLineWidth;
+uniform float uMajor;
+uniform vec3 uColor;
+uniform float uBrightness;
+uniform vec2 uFade;
+uniform vec3 uFocus;
+uniform vec4 uHeat;
+uniform vec4 uLamp;
+uniform vec4 uTrace;
+uniform vec3 uSun;
+uniform float uRefDepth;
+uniform float uReveal;
+uniform float uLightMode;
+uniform float uOpacity;
+uniform vec4 uGlitch[3];
+uniform float uGlitchSeed;
+uniform float uPixel;
+in vec2 vTexel;
+in vec2 vTerrain;
+in float vDepth;
+in float vLift;
+in vec3 vNormal;
+out vec4 outColor;
+
+float smoother(float x) {
+  x = clamp(x, 0.0, 1.0);
+  return x * x * x * (x * (x * 6.0 - 15.0) + 10.0);
+}
+
+float stroke(float dist, float width, float soft, float density, float crowd) {
+  float cover = max(0.0, min(min(width, soft), 0.5 * (width + soft) - dist)) / soft;
+  return mix(cover, min(width * density, 1.0) * 0.6, crowd);
+}
+
+float sampleHeight(vec2 coord, out vec2 slope) {
+  vec2 u = coord - 0.5;
+  vec2 i = floor(u + 0.5);
+  vec2 f = u - i;
+  vec3 wx = vec3(0.5 * (0.5 - f.x) * (0.5 - f.x), 0.75 - f.x * f.x, 0.5 * (0.5 + f.x) * (0.5 + f.x));
+  vec3 wy = vec3(0.5 * (0.5 - f.y) * (0.5 - f.y), 0.75 - f.y * f.y, 0.5 * (0.5 + f.y) * (0.5 + f.y));
+  vec3 dx = vec3(f.x - 0.5, -2.0 * f.x, 0.5 + f.x);
+  vec3 dy = vec3(f.y - 0.5, -2.0 * f.y, 0.5 + f.y);
+  ivec2 base = ivec2(i) - 1;
+  float total = 0.0;
+  slope = vec2(0.0);
+  for (int y = 0; y < 3; y++) {
+    float a = texelFetch(uHeightField, base + ivec2(0, y), 0).r;
+    float b = texelFetch(uHeightField, base + ivec2(1, y), 0).r;
+    float c = texelFetch(uHeightField, base + ivec2(2, y), 0).r;
+    float row = a * wx.x + b * wx.y + c * wx.z;
+    total += row * wy[y];
+    slope += vec2((a * dx.x + b * dx.y + c * dx.z) * wy[y], row * dy[y]);
+  }
+  return total;
+}
+
+void main() {
+  float py = gl_FragCoord.y / uPixel;
+  float shift = 0.0;
+  float split = 0.0;
+  for (int i = 0; i < 3; i++) {
+    if (py >= uGlitch[i].x && py < uGlitch[i].y) {
+      shift = uGlitch[i].z * uPixel;
+      split = uGlitch[i].w * uPixel;
+    }
+  }
+  vec2 spot = vTerrain - dFdx(vTerrain) * shift;
+#if BAKED
+  vec2 ex = dFdx(vTexel);
+  vec2 ey = dFdy(vTexel);
+  vec2 coord = vTexel - ex * shift;
+  vec2 slope;
+  float h = sampleHeight(coord, slope);
+  vec4 field = texture(uField, coord / vec2(textureSize(uField, 0)));
+  float trail = field.r;
+  float ring = field.g;
+  float gx = dot(slope, ex) * uLines;
+  float gy = dot(slope, ey) * uLines;
+#else
+  vec2 dp = spot * uFrequency * 5.0 + vec2(13.1, 4.7);
+  float ring = swell(spot);
+  float h = relief(spot) + ring * 0.14 + uDetail * 0.1 * (noise(dp) * 0.6 + noise(octave(dp, vec2(2.3, 6.1))) * 0.3);
+  float trail = 0.0;
+  float gx = dFdx(h) * uLines;
+  float gy = dFdy(h) * uLines;
+#endif
+
+  float lc = h * uLines + 0.5;
+  float density = max(sqrt(gx * gx + gy * gy), 1e-5);
+  float dist = abs(fract(lc + 0.5) - 0.5) / density;
+  float major = uMajor * (1.0 - step(0.5, mod(floor(lc + 0.5), 5.0)));
+
+  vec2 hd = spot - uHeat.xy;
+  float heat = exp(-dot(hd, hd) / (uHeat.z * uHeat.z)) * uHeat.w + trail * 0.6;
+  float energy = heat + ring;
+
+  float depth = max(vDepth, 0.01);
+  float persp = clamp(sqrt(uRefDepth / depth), 0.6, 1.6);
+  float width = uLineWidth * persp * (1.0 + 0.6 * major) * (1.0 + 0.45 * min(energy, 1.5));
+  float soft = 1.0 + min(uFocus.y * abs(1.0 - uFocus.x / depth), uFocus.z);
+  float crowd = smoothstep(0.3, 0.75, density * max(width, soft));
+  float cover = stroke(dist, width, soft, density, crowd);
+  vec3 cover3 = vec3(cover);
+  if (split > 0.0) {
+    float offset = split * density;
+    cover3.r = stroke(abs(fract(lc + offset + 0.5) - 0.5) / density, width, soft, density, crowd);
+    cover3.b = stroke(abs(fract(lc - offset + 0.5) - 0.5) / density, width, soft, density, crowd);
+    vec2 block = floor(vec2(gl_FragCoord.x / (uPixel * 26.0), py / 5.0)) + uGlitchSeed * 71.0;
+    float drop = fract(sin(dot(block, vec2(12.9898, 78.233))) * 43758.5453);
+    cover3 *= drop > 0.82 ? 0.1 : 1.2;
+  }
+
+  vec3 normal = normalize(vNormal);
+  float sun = clamp(dot(normal, uSun), 0.0, 1.0);
+  vec3 toLamp = uLamp.xyz - vec3(vTerrain.x, vLift, vTerrain.y);
+  float lampDistance = length(toLamp);
+  float lamp = clamp(dot(normal, toLamp / max(lampDistance, 1e-3)), 0.0, 1.0) * uLamp.w / (1.0 + lampDistance * lampDistance * 0.9);
+  float level = mix(0.45, 1.05, smoothstep(0.0, 1.1, h)) * mix(0.35, 1.25, sun * sun) * (1.0 + 0.6 * major);
+  level += heat * 1.4 + ring * 3.0 + lamp * 1.2;
+
+  float fade = 1.0 - smoother((depth - uFade.x) / max(uFade.y - uFade.x, 1e-3));
+  vec3 light = cover3 * level;
+
+  if (uTrace.y > 0.0) {
+    float traceWidth = uLineWidth * persp * 1.8;
+    float trace = stroke(abs(h - uTrace.x) * uLines / density, traceWidth, soft, density, crowd);
+    vec2 td = spot - uTrace.zw;
+    light += trace * uTrace.y * mix(0.35, 1.0, exp(-dot(td, td) / 20.0)) * 2.6;
+  }
+  light *= fade * uBrightness * uReveal;
+
+  if (uLightMode > 0.5) {
+    float ink = (1.0 - exp(-max(max(light.r, light.g), light.b) * 1.8)) * 0.92 * uOpacity;
+    outColor = vec4(uColor * ink, ink);
+    return;
+  }
+
+  vec3 color = 1.0 - exp(-uColor * light * 1.8);
+  float top = max(max(color.r, color.g), color.b);
+  float dither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
+  color = max(color + dither / 255.0 * step(0.002, top), 0.0);
+  outColor = vec4(color, max(max(color.r, color.g), color.b)) * uOpacity;
+}`;
+
+  const MARKER_VERTEX = `#version 300 es
+${COMMON}
+uniform ivec2 uOrigin;
+uniform ivec2 uCamCell;
+uniform vec2 uCamFrac;
+uniform float uSpacing;
+uniform int uColumns;
+uniform float uHeight;
+uniform mat4 uViewProj;
+uniform vec2 uView;
+uniform float uSize;
+uniform float uRefDepth;
+uniform vec4 uHeat;
+uniform float uTime;
+uniform vec4 uGlitch[3];
+uniform float uPixel;
+out vec2 vCorner;
+out float vSize;
+out float vGlow;
+out float vFrame;
+out float vDepth;
+
+void main() {
+  ivec2 local = uOrigin + ivec2(gl_InstanceID % uColumns, gl_InstanceID / uColumns);
+  ivec2 id = local + uCamCell;
+  vec2 terrain = vec2(id) * uSpacing;
+  vec2 world = vec2(local) * uSpacing - uCamFrac;
+  float ring = swell(terrain);
+  float h = (relief(terrain) + ring * 0.14) * settle(world) + sculpted(terrain).r;
+  vec4 clip = uViewProj * vec4(world.x, h * uHeight + 0.05, world.y, 1.0);
+  uint seed = lattice(id + ivec2(911, 377));
+  float a = float(seed & 1023u) / 1023.0;
+  float b = float((seed >> 10u) & 1023u) / 1023.0;
+  vec2 hd = terrain - uHeat.xy;
+  float heat = exp(-dot(hd, hd) / (uHeat.z * uHeat.z)) * uHeat.w;
+  float blink = step(0.92, a) * (0.5 + 0.5 * sin(uTime * (1.4 + b * 2.2) + b * 40.0));
+  float size = uSize * clamp(sqrt(uRefDepth / max(clip.w, 0.01)), 0.6, 1.3) * (1.0 + 0.4 * heat + 0.35 * blink);
+  float frame = max(smoothstep(0.55, 0.95, blink), smoothstep(0.3, 0.8, heat));
+  vec2 corner = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)) * 2.0 - 1.0;
+  vec2 offset = corner * (size * (frame > 0.001 ? 2.6 : 1.0) + 1.5);
+  float py = (clip.y / clip.w * 0.5 + 0.5) * uView.y / uPixel;
+  float shift = 0.0;
+  for (int i = 0; i < 3; i++) {
+    if (py >= uGlitch[i].x && py < uGlitch[i].y) shift = uGlitch[i].z;
+  }
+  clip.xy += (offset + vec2(shift * uPixel, 0.0)) / uView * 2.0 * clip.w;
+  gl_Position = clip;
+  vCorner = offset;
+  vSize = size;
+  vFrame = frame;
+  vGlow = 0.5 + 0.4 * b + blink * 0.9 + heat * 1.8 + ring * 3.0;
+  vDepth = clip.w;
+}`;
+
+  const MARKER_FRAGMENT = `#version 300 es
+precision highp float;
+uniform vec3 uColor;
+uniform vec2 uFade;
+uniform float uReveal;
+uniform float uBrightness;
+uniform float uLightMode;
+uniform float uOpacity;
+uniform float uStyle;
+uniform float uPixel;
+in vec2 vCorner;
+in float vSize;
+in float vGlow;
+in float vFrame;
+in float vDepth;
+out vec4 outColor;
+
+float smoother(float x) {
+  x = clamp(x, 0.0, 1.0);
+  return x * x * x * (x * (x * 6.0 - 15.0) + 10.0);
+}
+
+void main() {
+  vec2 a = abs(vCorner);
+  float cover;
+  if (uStyle < 0.5) {
+    float thick = max(0.6 * uPixel, 0.5);
+    float across = clamp(vSize - a.x + 0.5, 0.0, 1.0) * clamp(thick - a.y + 0.5, 0.0, 1.0);
+    float down = clamp(vSize - a.y + 0.5, 0.0, 1.0) * clamp(thick - a.x + 0.5, 0.0, 1.0);
+    cover = max(across, down);
+  } else {
+    cover = clamp(vSize * 0.42 - length(vCorner) + 0.5, 0.0, 1.0);
+  }
+  if (vFrame > 0.001) {
+    float edge = vSize * 2.3;
+    float reach = edge * 0.45;
+    float line = max(0.5 * uPixel, 0.5);
+    float sides = clamp(line - abs(a.x - edge) + 0.5, 0.0, 1.0) * clamp(a.y - edge + reach + 0.5, 0.0, 1.0) * clamp(edge + line - a.y + 0.5, 0.0, 1.0);
+    float caps = clamp(line - abs(a.y - edge) + 0.5, 0.0, 1.0) * clamp(a.x - edge + reach + 0.5, 0.0, 1.0) * clamp(edge + line - a.x + 0.5, 0.0, 1.0);
+    cover = max(cover, max(sides, caps) * vFrame * 0.8);
+  }
+  float fade = 1.0 - smoother((vDepth - uFade.x) / max(uFade.y - uFade.x, 1e-3));
+  float light = cover * vGlow * fade * fade * uReveal * uBrightness;
+  if (uLightMode > 0.5) {
+    float ink = (1.0 - exp(-light * 1.8)) * 0.92 * uOpacity;
+    outColor = vec4(uColor * ink, ink);
+    return;
+  }
+  vec3 color = 1.0 - exp(-uColor * light * 1.8);
+  outColor = vec4(color, max(max(color.r, color.g), color.b)) * uOpacity;
+}`;
+
+  const FULLSCREEN = `#version 300 es
+void main() {
+  vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
+  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+}`;
+
+  const SCULPT = `#version 300 es
+precision highp float;
+uniform sampler2D uPrevious;
+uniform vec4 uSegment;
+uniform vec4 uBrush;
+uniform vec4 uBurst;
+uniform vec2 uDecay;
+out vec4 outColor;
+
+vec2 wrapped(vec2 d) {
+  return d - ${SCULPT_SPAN}.0 * floor(d / ${SCULPT_SPAN}.0 + 0.5);
+}
+
+void main() {
+  vec4 previous = texelFetch(uPrevious, ivec2(gl_FragCoord.xy), 0);
+  vec2 t = gl_FragCoord.xy / ${SCULPT_SIZE}.0 * ${SCULPT_SPAN}.0;
+  vec2 a = wrapped(t - uSegment.xy);
+  vec2 ab = uSegment.zw - uSegment.xy;
+  float k = clamp(dot(a, ab) / max(dot(ab, ab), 1e-6), 0.0, 1.0);
+  vec2 d = a - ab * k;
+  float g = exp(-dot(d, d) / (uBrush.x * uBrush.x)) * uBrush.w;
+  float height = previous.r * uDecay.x;
+  height += (uBrush.y - height) * g * uBrush.z;
+  float heat = previous.g * uDecay.y;
+  heat += (1.0 - heat) * g * uBrush.z;
+  vec2 b = wrapped(t - uBurst.xy);
+  height += uBurst.w * exp(-dot(b, b) / (uBurst.z * uBurst.z));
+  outColor = vec4(height, heat, 0.0, 1.0);
+}`;
+
+  const DOWNSAMPLE = `#version 300 es
+precision highp float;
+uniform sampler2D uSource;
+uniform vec2 uTarget;
+uniform vec2 uTexel;
+out vec4 outColor;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uTarget;
+  vec4 color = texture(uSource, uv - uTexel);
+  color += texture(uSource, uv + uTexel);
+  color += texture(uSource, uv + vec2(uTexel.x, -uTexel.y));
+  color += texture(uSource, uv + vec2(-uTexel.x, uTexel.y));
+  outColor = min(color * 0.25, vec4(1.0));
+}`;
+
+  const BLUR = `#version 300 es
+precision highp float;
+uniform sampler2D uSource;
+uniform vec2 uTarget;
+uniform vec2 uStep;
+out vec4 outColor;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uTarget;
+  vec4 color = texture(uSource, uv) * 0.181862;
+  color += (texture(uSource, uv + uStep * 1.423135) + texture(uSource, uv - uStep * 1.423135)) * 0.284316;
+  color += (texture(uSource, uv + uStep * 3.326702) + texture(uSource, uv - uStep * 3.326702)) * 0.106598;
+  color += (texture(uSource, uv + uStep * 5.242989) + texture(uSource, uv - uStep * 5.242989)) * 0.018156;
+  outColor = color;
+}`;
+
+  const COMPOSITE = `#version 300 es
+precision highp float;
+uniform sampler2D uBloom0;
+uniform sampler2D uBloom1;
+uniform sampler2D uBloom2;
+uniform sampler2D uBloom3;
+uniform vec2 uView;
+uniform float uGlow;
+uniform float uLightMode;
+out vec4 outColor;
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uView;
+  vec4 halo = texture(uBloom0, uv) * 0.4;
+  halo += texture(uBloom1, uv) * 0.3;
+  halo += texture(uBloom2, uv) * 0.2;
+  halo += texture(uBloom3, uv) * 0.1;
+  if (uLightMode > 0.5) {
+    outColor = halo * uGlow * 0.35;
+    return;
+  }
+  vec3 color = halo.rgb * uGlow * 1.6;
+  color = color / (1.0 + color);
+  outColor = vec4(color, max(max(color.r, color.g), color.b));
+}`;
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const smoother = x => {
+    const t = clamp(x, 0, 1);
+    return t * t * t * (t * (t * 6 - 15) + 10);
+  };
+
+  const lattice = (x, y) => {
+    let h = (Math.imul(x + 1073741824, 2654435761) + Math.imul(y + 1073741824, 2246822519)) >>> 0;
+    h = Math.imul(h ^ (h >>> 15), 739982445) >>> 0;
+    h = Math.imul(h ^ (h >>> 12), 695872825) >>> 0;
+    return (h ^ (h >>> 15)) >>> 0;
+  };
+
+  const corner = (cx, cy, fx, fy) => {
+    const h = lattice(cx, cy);
+    return ((h & 65535) / 32767.5 - 1) * fx + ((h >>> 16) / 32767.5 - 1) * fy;
+  };
+
+  const noise = (x, y) => {
+    const ix = Math.floor(x);
+    const iy = Math.floor(y);
+    const fx = x - ix;
+    const fy = y - iy;
+    const ux = fx * fx * fx * (fx * (fx * 6 - 15) + 10);
+    const uy = fy * fy * fy * (fy * (fy * 6 - 15) + 10);
+    const a = corner(ix, iy, fx, fy);
+    const b = corner(ix + 1, iy, fx - 1, fy);
+    const d = corner(ix, iy + 1, fx, fy - 1);
+    const e = corner(ix + 1, iy + 1, fx - 1, fy - 1);
+    const top = a + (b - a) * ux;
+    return top + (d + (e - d) * ux - top) * uy;
+  };
+
+  const relief = (tx, tz, frequency, morphX, morphZ) => {
+    let px = tx * frequency;
+    let pz = tz * frequency;
+    const wx = noise(px * 0.42 + morphX, pz * 0.42 + morphZ);
+    const wz = noise(px * 0.42 - morphZ + 5.2, pz * 0.42 - morphX + 1.3);
+    px += wx * 0.8;
+    pz += wz * 0.8;
+    let n = noise(px, pz) * 0.55;
+    const qx = 1.6 * px - 1.2 * pz + 7.1;
+    const qz = 1.2 * px + 1.6 * pz + 3.7;
+    n += noise(qx, qz) * 0.15;
+    n += noise(1.6 * qx - 1.2 * qz + 1.9, 1.2 * qx + 1.6 * qz + 8.3) * 0.04;
+    const s = Math.log(1 + Math.exp(7 * (3 * n + 0.05))) / 7;
+    return s * s * 1.4 + 0.1 * n;
+  };
+
+  const fineDetail = (tx, tz, frequency) => {
+    const px = tx * frequency * 5 + 13.1;
+    const pz = tz * frequency * 5 + 4.7;
+    return noise(px, pz) * 0.6 + noise(1.6 * px - 1.2 * pz + 2.3, 1.2 * px + 1.6 * pz + 6.1) * 0.3;
+  };
+
+  const compile = (gl, type, source) => {
+    const shader = gl.createShader(type);
+    if (!shader) return null;
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
+    try { console.warn('[Topography] shader:', gl.getShaderInfoLog(shader)); } catch (e) {}
+    gl.deleteShader(shader);
+    return null;
+  };
+
+  const link = (gl, vertexSource, fragmentSource) => {
+    const vertex = compile(gl, gl.VERTEX_SHADER, vertexSource);
+    const fragment = compile(gl, gl.FRAGMENT_SHADER, fragmentSource);
+    const program = gl.createProgram();
+    if (!vertex || !fragment || !program) return null;
+    gl.attachShader(program, vertex);
+    gl.attachShader(program, fragment);
+    gl.linkProgram(program);
+    gl.deleteShader(vertex);
+    gl.deleteShader(fragment);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.deleteProgram(program);
+      return null;
+    }
+    const uniforms = {};
+    const total = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < total; i++) {
+      const info = gl.getActiveUniform(program, i);
+      if (info) uniforms[info.name.replace(/\[0\]$/, '')] = gl.getUniformLocation(program, info.name);
+    }
+    return { program, uniforms };
+  };
+
+  const toRgb = hex => {
+    let h = String(hex || '#ffffff')
+      .replace('#', '')
+      .trim();
+    if (h.length === 3 || h.length === 4)
+      h = h
+        .slice(0, 3)
+        .split('')
+        .map(c => c + c)
+        .join('');
+    const num = parseInt(h.slice(0, 6), 16);
+    if (Number.isNaN(num)) return [1, 1, 1];
+    return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
+  };
+
+  const orient = (yaw, pitch) => {
+    const cp = Math.cos(pitch);
+    const f = [Math.sin(yaw) * cp, -Math.sin(pitch), Math.cos(yaw) * cp];
+    const r = [Math.cos(yaw), 0, -Math.sin(yaw)];
+    const u = [f[1] * r[2] - f[2] * r[1], f[2] * r[0] - f[0] * r[2], f[0] * r[1] - f[1] * r[0]];
+    return { f, r, u };
+  };
+
+  const lens = aspect => clamp(0.4877 / aspect, FOV, 0.6);
+
+  const viewProjection = ({ eye, f, r, u }, aspect, out) => {
+    const t = 1 / lens(aspect);
+    const nf = 1 / (NEAR - FAR);
+    const view = [
+      r[0],
+      u[0],
+      -f[0],
+      0,
+      r[1],
+      u[1],
+      -f[1],
+      0,
+      r[2],
+      u[2],
+      -f[2],
+      0,
+      -(r[0] * eye[0] + r[1] * eye[1] + r[2] * eye[2]),
+      -(u[0] * eye[0] + u[1] * eye[1] + u[2] * eye[2]),
+      f[0] * eye[0] + f[1] * eye[1] + f[2] * eye[2],
+      1
+    ];
+    const projection = [t / aspect, 0, 0, 0, 0, t, 0, 0, 0, 0, (FAR + NEAR) * nf, -1, 0, 0, 2 * FAR * NEAR * nf, 0];
+    for (let c = 0; c < 4; c++) {
+      for (let row = 0; row < 4; row++) {
+        let sum = 0;
+        for (let k = 0; k < 4; k++) sum += projection[k * 4 + row] * view[c * 4 + k];
+        out[c * 4 + row] = sum;
+      }
+    }
+    return out;
+  };
+
+  /* 把 props 整理成引擎用的 settings（与原组件里的 settings 对象一致，外加 maxFps） */
+  const normalize = o => ({
+    color: o.color,
+    lineCount: clamp(o.lineCount, 2, 80),
+    lineWidth: Math.max(0.2, o.lineWidth),
+    majorLines: o.majorLines,
+    elevation: clamp(o.elevation, 0, 3),
+    foreground: clamp(o.foreground, 0, 1),
+    scale: clamp(o.scale, 0.2, 5),
+    detail: clamp(o.detail, 0, 1),
+    tilt: clamp(o.tilt, 12, 90),
+    speed: o.speed,
+    direction: DIRECTIONS[o.direction] || DIRECTIONS.forward,
+    morph: Math.max(0, o.morph),
+    glow: Math.max(0, o.glow),
+    depthOfField: clamp(o.depthOfField, 0, 1),
+    fog: clamp(o.fog, 0, 1),
+    brightness: Math.max(0, o.brightness),
+    opacity: clamp(o.opacity, 0, 1),
+    mouseInteraction: o.mouseInteraction,
+    hoverEffect: HOVER_EFFECTS.indexOf(o.hoverEffect) >= 0 ? o.hoverEffect : 'lift',
+    mouseRadius: Math.max(0.1, o.mouseRadius),
+    mouseStrength: Math.max(0, o.mouseStrength),
+    trail: clamp(o.trail, 0, 1),
+    parallax: clamp(o.parallax, 0, 1),
+    clickEffect: o.clickEffect,
+    markers: MARKER_STYLES[o.markers] !== undefined ? MARKER_STYLES[o.markers] : -1,
+    glitch: clamp(o.glitch, 0, 1),
+    intro: o.intro,
+    lightMode: !!o.lightMode,
+    dpr: o.dpr,
+    maxFps: o.maxFps
+  });
+
+  /* ───────── 引擎（原组件 useEffect 内部逻辑，React 外壳去掉）───────── */
+  const createEngine = (container, canvas, getSettings, onRestore) => {
+    const settingsRef = { get current() { return getSettings(); } };
+    const ratio = Math.min(settingsRef.current.dpr || window.devicePixelRatio || 1, 2);
+    const gl = canvas.getContext('webgl2', {
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: ratio < 1.5,
+      depth: true,
+      stencil: false,
+      powerPreference: 'default'
+    });
+    if (!container || !canvas || !gl) return null;
+
+    const floatTargets = !!gl.getExtension('EXT_color_buffer_float');
+    const terrain = link(gl, terrainVertex(floatTargets), terrainFragment(floatTargets));
+    const fieldProgram = floatTargets ? link(gl, FULLSCREEN, FIELD) : null;
+    const sculptProgram = floatTargets ? link(gl, FULLSCREEN, SCULPT) : null;
+    const downProgram = link(gl, FULLSCREEN, DOWNSAMPLE);
+    const blurProgram = link(gl, FULLSCREEN, BLUR);
+    const compositeProgram = link(gl, FULLSCREEN, COMPOSITE);
+    const markerProgram = link(gl, MARKER_VERTEX, MARKER_FRAGMENT);
+    if (!terrain || !downProgram || !blurProgram || !compositeProgram || !markerProgram) return null;
+
+    const onContextLost = event => event.preventDefault();
+    const onContextRestored = () => { if (onRestore) onRestore(); };
+    canvas.addEventListener('webglcontextlost', onContextLost);
+    canvas.addEventListener('webglcontextrestored', onContextRestored);
+
+    const vao = gl.createVertexArray();
+    const format = floatTargets ? gl.RGBA16F : gl.RGBA8;
+
+    const createTexture = (width, height, internal, wrap) => {
+      const texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texStorage2D(gl.TEXTURE_2D, 1, internal, width, height);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrap);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrap);
+      return texture;
+    };
+
+    const createTarget = () => ({
+      texture: null,
+      framebuffer: gl.createFramebuffer(),
+      depth: null,
+      width: 0,
+      height: 0
+    });
+
+    const allocate = (target, width, height, withDepth) => {
+      if (target.texture && target.width === width && target.height === height) return;
+      if (target.texture) gl.deleteTexture(target.texture);
+      target.texture = createTexture(width, height, format, gl.CLAMP_TO_EDGE);
+      target.width = width;
+      target.height = height;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, target.framebuffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, target.texture, 0);
+      if (withDepth) {
+        if (!target.depth) target.depth = gl.createRenderbuffer();
+        gl.bindRenderbuffer(gl.RENDERBUFFER, target.depth);
+        gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT24, width, height);
+        gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, target.depth);
+      }
+    };
+
+    const source = createTarget();
+    const levels = Array.from({ length: BLOOM_LEVELS }, () => [createTarget(), createTarget()]);
+    const sculpt = sculptProgram
+      ? [0, 1].map(() => {
+          const texture = createTexture(SCULPT_SIZE, SCULPT_SIZE, gl.RG16F, gl.REPEAT);
+          const framebuffer = gl.createFramebuffer();
+          gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+          gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+          gl.clearColor(0, 0, 0, 0);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          return { texture, framebuffer };
+        })
+      : null;
+    const blank = createTexture(1, 1, gl.RGBA8, gl.REPEAT);
+    const field = { texture: null, heights: null, framebuffer: gl.createFramebuffer(), width: 0, height: 0 };
+    let sculptIndex = 0;
+
+    const reserveField = (width, height) => {
+      if (field.texture && width <= field.width && height <= field.height) return;
+      if (field.texture) gl.deleteTexture(field.texture);
+      if (field.heights) gl.deleteTexture(field.heights);
+      field.width = Math.max(width, Math.ceil(field.width * 1.25), 64);
+      field.height = Math.max(height, Math.ceil(field.height * 1.25), 64);
+      field.texture = createTexture(field.width, field.height, gl.RGBA16F, gl.CLAMP_TO_EDGE);
+      field.heights = createTexture(field.width, field.height, gl.R32F, gl.CLAMP_TO_EDGE);
+      gl.bindTexture(gl.TEXTURE_2D, field.heights);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, field.framebuffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, field.texture, 0);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT1, gl.TEXTURE_2D, field.heights, 0);
+      gl.drawBuffers([gl.COLOR_ATTACHMENT0, gl.COLOR_ATTACHMENT1]);
+    };
+
+    const bind = (unit, texture) => {
+      gl.activeTexture(gl.TEXTURE0 + unit);
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+    };
+
+    const reduce = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || false;
+    const matrix = new Float32Array(16);
+    const pulseData = new Float32Array(MAX_PULSES * 4);
+    const glitchData = new Float32Array(12);
+    const glitch = { until: 0, next: 1.5, roll: 0, seed: 0 };
+    let entropy = 7919;
+    const random = () => {
+      entropy = (entropy * 16807) % 2147483647;
+      return (entropy - 1) / 2147483646;
+    };
+    const pulses = [];
+    const pointer = { x: 0, y: 0, inside: false };
+    const view = { width: 1, height: 1, ratio: 1, cell: 0.05, cellKey: '' };
+    const state = {
+      intro: settingsRef.current.intro && !reduce ? 0 : 1,
+      rise: 1,
+      travelX: 0,
+      travelZ: 0,
+      morph: 0,
+      yaw: 0,
+      pitch: 0,
+      yawVelocity: 0,
+      pitchVelocity: 0,
+      presence: 0,
+      focus: ORBIT,
+      hit: null,
+      brushFrom: null,
+      sculptLife: 0,
+      burst: null,
+      level: 0,
+      trace: 0,
+      clock: 0,
+      tilt: settingsRef.current.tilt,
+      elevation: settingsRef.current.elevation,
+      scale: settingsRef.current.scale
+    };
+    state.rise = smoother(state.intro);
+    let raf = 0;
+    let last = 0;
+    let lastPaint = 0;
+    let visible = true;
+    let quiet = 0;
+    let dead = false;
+
+    const camera = () => {
+      const pitch = Math.min((state.tilt * Math.PI) / 180 + state.pitch, Math.PI / 2 - 1e-4);
+      const frame = orient(state.yaw, pitch);
+      const lift = state.elevation * HEIGHT * state.rise * 0.18;
+      const clearance = state.elevation * HEIGHT * state.rise * 1.3 + 0.9;
+      const distance = Math.max(ORBIT, (clearance - lift) / Math.sin(pitch));
+      return {
+        ...frame,
+        distance,
+        eye: [-frame.f[0] * distance, lift - frame.f[1] * distance, -frame.f[2] * distance]
+      };
+    };
+
+    const rayDirection = (cam, nx, ny) => {
+      const aspect = view.width / view.height;
+      const t = lens(aspect);
+      const d = [0, 1, 2].map(i => cam.f[i] + cam.r[i] * nx * t * aspect + cam.u[i] * ny * t);
+      const length = Math.hypot(d[0], d[1], d[2]);
+      return d.map(v => v / length);
+    };
+
+    const along = (cam, d) => d[0] * cam.f[0] + d[1] * cam.f[1] + d[2] * cam.f[2];
+
+    const groundDepth = (cam, ny) => {
+      const d = rayDirection(cam, 0, ny);
+      if (d[1] > -1e-3) return Infinity;
+      return (cam.eye[1] / -d[1]) * along(cam, d);
+    };
+
+    const nearRange = (cam, s) => [groundDepth(cam, -1) * 0.9, cam.distance, s.foreground];
+
+    const settleAt = (cam, near, x, z) => {
+      const depth = (x - cam.eye[0]) * cam.f[0] - cam.eye[1] * cam.f[1] + (z - cam.eye[2]) * cam.f[2];
+      return near[2] + (1 - near[2]) * smoother((depth - near[0]) / Math.max(near[1] - near[0], 1e-3));
+    };
+
+    const pick = (cam, s, nx, ny) => {
+      const d = rayDirection(cam, nx, ny);
+      const height = state.elevation * HEIGHT * state.rise;
+      const frequency = FREQUENCY / state.scale;
+      const near = nearRange(cam, s);
+      const above = distance => {
+        const x = cam.eye[0] + d[0] * distance;
+        const z = cam.eye[2] + d[2] * distance;
+        const ground = relief(state.travelX + x, state.travelZ + z, frequency, state.morph * 0.37, state.morph * 0.23);
+        return cam.eye[1] + d[1] * distance - ground * height * settleAt(cam, near, x, z);
+      };
+      let distance = NEAR;
+      let gap = above(distance);
+      for (let i = 0; i < 200 && distance < FAR * 0.5; i++) {
+        const next = distance + Math.max(0.02, gap * 0.4);
+        const value = above(next);
+        if (value < 0) {
+          let lo = distance;
+          let hi = next;
+          for (let k = 0; k < 10; k++) {
+            const mid = (lo + hi) * 0.5;
+            if (above(mid) < 0) hi = mid;
+            else lo = mid;
+          }
+          return {
+            x: state.travelX + cam.eye[0] + d[0] * hi,
+            y: cam.eye[1] + d[1] * hi,
+            z: state.travelZ + cam.eye[2] + d[2] * hi,
+            depth: hi * along(cam, d)
+          };
+        }
+        distance = next;
+        gap = value;
+      }
+      return null;
+    };
+
+    const footprint = (cam, s, fadeEnd) => {
+      const ceiling = state.elevation * HEIGHT * state.rise * 1.7 + 0.2 + s.mouseStrength;
+      const box = { minX: Infinity, maxX: -Infinity, minZ: Infinity, maxZ: -Infinity, near: Infinity };
+      const add = (d, distance) => {
+        const x = cam.eye[0] + d[0] * distance;
+        const z = cam.eye[2] + d[2] * distance;
+        box.minX = Math.min(box.minX, x);
+        box.maxX = Math.max(box.maxX, x);
+        box.minZ = Math.min(box.minZ, z);
+        box.maxZ = Math.max(box.maxZ, z);
+      };
+      for (const nx of [-1.08, 0, 1.08]) {
+        for (const ny of [-1.08, 1.08]) {
+          const d = rayDirection(cam, nx, ny);
+          const forward = Math.max(along(cam, d), 1e-3);
+          let near = NEAR;
+          let far = (fadeEnd * 1.05) / forward;
+          if (d[1] < -1e-4) {
+            near = Math.max(NEAR, (cam.eye[1] - ceiling) / -d[1]);
+            far = Math.min(far, cam.eye[1] / -d[1]);
+          }
+          near = Math.min(near, far);
+          add(d, near);
+          add(d, far);
+          box.near = Math.min(box.near, near * forward);
+        }
+      }
+      return box;
+    };
+
+    const grid = (box, cell) => {
+      const camX = Math.floor(state.travelX / cell);
+      const camZ = Math.floor(state.travelZ / cell);
+      const fracX = state.travelX - camX * cell;
+      const fracZ = state.travelZ - camZ * cell;
+      const k0 = Math.floor((box.minX + fracX) / cell) - 2;
+      const m0 = Math.floor((box.minZ + fracZ) / cell) - 2;
+      const columns = clamp(Math.ceil((box.maxX + fracX) / cell) + 2 - k0, 1, 4000);
+      const rows = clamp(Math.ceil((box.maxZ + fracZ) / cell) + 2 - m0, 1, Math.floor((MAX_CELLS * 1.5) / columns));
+      return { cell, camX, camZ, fracX, fracZ, k0, m0, columns, rows };
+    };
+
+    const render = () => {
+      const s = settingsRef.current;
+      const cam = camera();
+      viewProjection(cam, view.width / view.height, matrix);
+
+      const bottom = groundDepth(cam, -1);
+      const top = Math.min(groundDepth(cam, 1), cam.distance * 3.2);
+      const horizon = Math.max(top, bottom * 1.6, cam.distance * 1.4);
+      const fadeEnd = horizon + (bottom * 1.8 - horizon) * s.fog;
+      const fadeStart = fadeEnd * 0.7 + (bottom * 0.7 - fadeEnd * 0.7) * s.fog;
+      const box = footprint(cam, s, fadeEnd);
+
+      const cellKey = `${view.width}x${view.height}@${view.ratio}|${Math.round(state.tilt / 4)}|${Math.round(state.elevation * 5)}|${s.fog}`;
+      if (cellKey !== view.cellKey) {
+        view.cellKey = cellKey;
+        const focal = (view.height * view.ratio * 0.5) / lens(view.width / view.height);
+        let cell = clamp((14 * Math.max(box.near, 0.5)) / focal, 0.02, 0.4);
+        const cells = ((box.maxX - box.minX) * (box.maxZ - box.minZ)) / (cell * cell);
+        if (cells > MAX_CELLS) cell *= Math.sqrt(cells / MAX_CELLS);
+        view.cell = cell;
+      }
+
+      const color = toRgb(s.color);
+      const height = state.elevation * HEIGHT * state.rise;
+      const layout = grid(box, view.cell);
+      const near = nearRange(cam, s);
+      const dots = s.markers >= 0 ? grid(box, MARKER_SPACING) : null;
+      const touch = state.hit && s.mouseInteraction ? state.presence : 0;
+      const heatStrength = touch * (0.35 + 0.5 * s.mouseStrength);
+      const focusScale = s.depthOfField * view.height * 0.016;
+      const reveal = smoother(state.intro / 0.35);
+      const hitX = state.hit ? state.hit.x : 0;
+      const hitZ = state.hit ? state.hit.z : 0;
+
+      pulseData.fill(0);
+      pulses.forEach((p, i) => {
+        pulseData.set([p.x, p.z, p.age * 4.2, Math.exp(-p.age * 1.1) * smoother(p.age / 0.08)], i * 4);
+      });
+
+      gl.bindVertexArray(vao);
+      if (fieldProgram) {
+        const width = layout.columns + 7;
+        const height2 = layout.rows + 7;
+        reserveField(width, height2);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, field.framebuffer);
+        gl.viewport(0, 0, width, height2);
+        gl.useProgram(fieldProgram.program);
+        const f = fieldProgram.uniforms;
+        bind(0, sculpt ? sculpt[sculptIndex].texture : blank);
+        gl.uniform1i(f.uSculpt, 0);
+        gl.uniform1f(f.uSculptOn, sculpt ? 1 : 0);
+        gl.uniform1f(f.uFrequency, FREQUENCY / state.scale);
+        gl.uniform2f(f.uMorph, state.morph * 0.37, state.morph * 0.23);
+        gl.uniform4fv(f.uPulses, pulseData);
+        gl.uniform2i(f.uBase, layout.k0 - 2 + layout.camX, layout.m0 - 2 + layout.camZ);
+        gl.uniform1f(f.uCell, layout.cell);
+        gl.uniform1f(f.uDetail, s.detail);
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.BLEND);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      }
+
+      const drawTerrain = (pixel, width, targetHeight, stride) => {
+        gl.viewport(0, 0, width, targetHeight);
+        gl.useProgram(terrain.program);
+        const u = terrain.uniforms;
+        bind(0, fieldProgram ? field.texture : blank);
+        gl.uniform1i(u.uField, 0);
+        bind(1, fieldProgram ? field.heights : blank);
+        gl.uniform1i(u.uHeightField, 1);
+        gl.uniform1f(u.uFrequency, FREQUENCY / state.scale);
+        gl.uniform2f(u.uMorph, state.morph * 0.37, state.morph * 0.23);
+        gl.uniform4fv(u.uPulses, pulseData);
+        gl.uniform2i(u.uOrigin, layout.k0, layout.m0);
+        gl.uniform2i(u.uCamCell, layout.camX, layout.camZ);
+        gl.uniform2f(u.uCamFrac, layout.fracX, layout.fracZ);
+        gl.uniform1f(u.uCell, layout.cell);
+        gl.uniform1i(u.uStride, stride);
+        gl.uniform1f(u.uHeight, height);
+        gl.uniform3fv(u.uEye, cam.eye);
+        gl.uniform3fv(u.uForward, cam.f);
+        gl.uniform3fv(u.uNear, near);
+        gl.uniform1f(u.uRefDepth, cam.distance);
+        gl.uniformMatrix4fv(u.uViewProj, false, matrix);
+        gl.uniform1f(u.uDetail, s.detail);
+        gl.uniform1f(u.uLines, s.lineCount);
+        gl.uniform1f(u.uLineWidth, s.lineWidth * pixel);
+        gl.uniform1f(u.uMajor, s.majorLines ? 1 : 0);
+        gl.uniform3fv(u.uColor, color);
+        gl.uniform1f(u.uBrightness, s.brightness);
+        gl.uniform2f(u.uFade, fadeStart, fadeEnd);
+        gl.uniform3f(u.uFocus, state.focus, focusScale * pixel, view.height * 0.03 * pixel);
+        gl.uniform4f(u.uHeat, hitX, hitZ, 0.9 * s.mouseRadius, heatStrength);
+        gl.uniform4f(u.uLamp, hitX, state.hit ? state.hit.y + 1.4 : 0, hitZ, heatStrength);
+        gl.uniform4f(u.uTrace, state.level, state.trace, hitX, hitZ);
+        gl.uniform3fv(u.uSun, SUN);
+        gl.uniform1f(u.uReveal, reveal);
+        gl.uniform1f(u.uLightMode, s.lightMode ? 1 : 0);
+        gl.uniform1f(u.uOpacity, s.opacity);
+        gl.uniform4fv(u.uGlitch, glitchData);
+        gl.uniform1f(u.uGlitchSeed, glitch.seed);
+        gl.uniform1f(u.uPixel, pixel);
+        gl.enable(gl.DEPTH_TEST);
+        gl.depthFunc(gl.LESS);
+        gl.disable(gl.BLEND);
+        gl.clearColor(0, 0, 0, 0);
+        gl.clearDepth(1);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.drawArraysInstanced(
+          gl.TRIANGLE_STRIP,
+          0,
+          2 * (Math.ceil(layout.columns / stride) + 1),
+          Math.ceil(layout.rows / stride)
+        );
+        if (dots) {
+          gl.useProgram(markerProgram.program);
+          const m = markerProgram.uniforms;
+          bind(2, sculpt ? sculpt[sculptIndex].texture : blank);
+          gl.uniform1i(m.uSculpt, 2);
+          gl.uniform1f(m.uSculptOn, sculpt ? 1 : 0);
+          gl.uniform1f(m.uFrequency, FREQUENCY / state.scale);
+          gl.uniform2f(m.uMorph, state.morph * 0.37, state.morph * 0.23);
+          gl.uniform4fv(m.uPulses, pulseData);
+          gl.uniform3fv(m.uEye, cam.eye);
+          gl.uniform3fv(m.uForward, cam.f);
+          gl.uniform3fv(m.uNear, near);
+          gl.uniform2i(m.uOrigin, dots.k0, dots.m0);
+          gl.uniform2i(m.uCamCell, dots.camX, dots.camZ);
+          gl.uniform2f(m.uCamFrac, dots.fracX, dots.fracZ);
+          gl.uniform1f(m.uSpacing, dots.cell);
+          gl.uniform1i(m.uColumns, dots.columns + 1);
+          gl.uniform1f(m.uHeight, height);
+          gl.uniformMatrix4fv(m.uViewProj, false, matrix);
+          gl.uniform2f(m.uView, width, targetHeight);
+          gl.uniform1f(m.uSize, 4 * pixel);
+          gl.uniform1f(m.uRefDepth, cam.distance);
+          gl.uniform4f(m.uHeat, hitX, hitZ, 1.2 * s.mouseRadius, heatStrength);
+          gl.uniform1f(m.uTime, state.clock);
+          gl.uniform4fv(m.uGlitch, glitchData);
+          gl.uniform1f(m.uPixel, pixel);
+          gl.uniform3fv(m.uColor, color);
+          gl.uniform2f(m.uFade, fadeStart, fadeEnd);
+          gl.uniform1f(m.uReveal, reveal);
+          gl.uniform1f(m.uBrightness, s.brightness);
+          gl.uniform1f(m.uLightMode, s.lightMode ? 1 : 0);
+          gl.uniform1f(m.uOpacity, s.opacity);
+          gl.uniform1f(m.uStyle, s.markers);
+          gl.depthFunc(gl.LEQUAL);
+          gl.depthMask(false);
+          gl.enable(gl.BLEND);
+          gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+          gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, (dots.columns + 1) * (dots.rows + 1));
+          gl.disable(gl.BLEND);
+          gl.depthMask(true);
+        }
+        gl.disable(gl.DEPTH_TEST);
+      };
+
+      const bloom = s.glow > 0.001;
+      if (bloom) {
+        const width = Math.max(1, Math.round(view.width / 2));
+        const targetHeight = Math.max(1, Math.round(view.height / 2));
+        allocate(source, width, targetHeight, true);
+        levels.forEach((pair, index) => {
+          const w = Math.max(1, Math.round(view.width / 2 ** (index + 2)));
+          const h = Math.max(1, Math.round(view.height / 2 ** (index + 2)));
+          allocate(pair[0], w, h, false);
+          allocate(pair[1], w, h, false);
+        });
+        gl.bindFramebuffer(gl.FRAMEBUFFER, source.framebuffer);
+        drawTerrain(0.5, width, targetHeight, 2);
+        let from = source;
+        levels.forEach(([front, back]) => {
+          gl.bindFramebuffer(gl.FRAMEBUFFER, front.framebuffer);
+          gl.viewport(0, 0, front.width, front.height);
+          gl.useProgram(downProgram.program);
+          bind(0, from.texture);
+          gl.uniform1i(downProgram.uniforms.uSource, 0);
+          gl.uniform2f(downProgram.uniforms.uTarget, front.width, front.height);
+          gl.uniform2f(downProgram.uniforms.uTexel, 1 / from.width, 1 / from.height);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+          gl.useProgram(blurProgram.program);
+          gl.uniform1i(blurProgram.uniforms.uSource, 0);
+          gl.uniform2f(blurProgram.uniforms.uTarget, back.width, back.height);
+          gl.bindFramebuffer(gl.FRAMEBUFFER, back.framebuffer);
+          bind(0, front.texture);
+          gl.uniform2f(blurProgram.uniforms.uStep, 1 / front.width, 0);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+          gl.bindFramebuffer(gl.FRAMEBUFFER, front.framebuffer);
+          bind(0, back.texture);
+          gl.uniform2f(blurProgram.uniforms.uStep, 0, 1 / back.height);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+          from = front;
+        });
+      }
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      drawTerrain(view.ratio, canvas.width, canvas.height, 1);
+
+      if (bloom) {
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.useProgram(compositeProgram.program);
+        const c = compositeProgram.uniforms;
+        levels.forEach(([front], index) => {
+          bind(index, front.texture);
+          gl.uniform1i(c[`uBloom${index}`], index);
+        });
+        gl.uniform2f(c.uView, canvas.width, canvas.height);
+        gl.uniform1f(c.uGlow, s.glow * reveal);
+        gl.uniform1f(c.uLightMode, s.lightMode ? 1 : 0);
+        gl.enable(gl.BLEND);
+        if (s.lightMode) gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        else gl.blendFunc(gl.ONE, gl.ONE);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.disable(gl.BLEND);
+      }
+      for (let unit = BLOOM_LEVELS; unit >= 0; unit--) bind(unit, null);
+    };
+
+    const updateSculpt = (s, dt) => {
+      if (!sculpt || !sculptProgram) return false;
+      const brush = s.mouseInteraction && s.hoverEffect === 'lift' && state.presence > 0.001 ? state.hit : null;
+      const burst = state.burst;
+      if (!brush && !burst && state.sculptLife <= 0) return false;
+      const from = state.brushFrom || brush;
+      const read = sculpt[sculptIndex];
+      const write = sculpt[1 - sculptIndex];
+      gl.bindFramebuffer(gl.FRAMEBUFFER, write.framebuffer);
+      gl.viewport(0, 0, SCULPT_SIZE, SCULPT_SIZE);
+      gl.useProgram(sculptProgram.program);
+      const u = sculptProgram.uniforms;
+      bind(0, read.texture);
+      gl.uniform1i(u.uPrevious, 0);
+      if (brush && from) gl.uniform4f(u.uSegment, from.x, from.z, brush.x, brush.z);
+      else gl.uniform4f(u.uSegment, 0, 0, 0, 0);
+      gl.uniform4f(
+        u.uBrush,
+        1.1 * s.mouseRadius,
+        0.9 * s.mouseStrength,
+        1 - Math.exp(-dt * 7),
+        brush ? state.presence : 0
+      );
+      if (burst) {
+        const before = smoother(burst.age / 0.7);
+        burst.age += dt;
+        const amount = (smoother(burst.age / 0.7) - before) * 0.9 * Math.max(s.mouseStrength, 0.3);
+        gl.uniform4f(u.uBurst, burst.x, burst.z, 1.6 * s.mouseRadius, amount);
+        if (burst.age >= 0.7) state.burst = null;
+      } else {
+        gl.uniform4f(u.uBurst, 0, 0, 1, 0);
+      }
+      const tau = 0.25 + 3 * s.trail * s.trail;
+      gl.uniform2f(u.uDecay, Math.exp(-dt / tau), Math.exp(-dt / 0.7));
+      gl.disable(gl.BLEND);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      sculptIndex = 1 - sculptIndex;
+      state.brushFrom = brush ? { x: brush.x, z: brush.z } : null;
+      if (brush || burst) state.sculptLife = tau * 6;
+      else state.sculptLife -= dt;
+      return true;
+    };
+
+    let sizedDpr = settingsRef.current.dpr;
+
+    const resize = () => {
+      if (dead) return;
+      const s = settingsRef.current;
+      sizedDpr = s.dpr;
+      view.width = Math.max(1, container.clientWidth);
+      view.height = Math.max(1, container.clientHeight);
+      view.ratio = Math.min(s.dpr || window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.round(view.width * view.ratio));
+      canvas.height = Math.max(1, Math.round(view.height * view.ratio));
+      render();
+      wake();
+    };
+
+    const frame = now => {
+      raf = 0;
+      if (dead || !visible || document.hidden) return;
+      const s = settingsRef.current;
+      /* 帧率上限：背景在毛玻璃之下，30fps 肉眼无差别；未到点就跳过这一帧（last 不动，下一帧的 dt 自动累加） */
+      if (lastPaint && s.maxFps > 0 && now - lastPaint < 1000 / s.maxFps - 2) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+      lastPaint = now;
+      if (s.dpr !== sizedDpr) resize();
+      const dt = last ? clamp((now - last) / 1000, 0, 1 / 20) : 1 / 60;
+      last = now;
+
+      if (!s.intro || reduce) state.intro = 1;
+      else if (state.intro < 1) state.intro = Math.min(1, state.intro + dt / INTRO_SECONDS);
+      state.rise = smoother(state.intro);
+      const ease = reduce ? 1 : 1 - Math.exp(-dt / 0.4);
+      state.tilt += (s.tilt - state.tilt) * ease;
+      state.elevation += (s.elevation - state.elevation) * ease;
+      state.scale = s.scale;
+
+      state.clock += dt;
+      const glitching = reduce ? 0 : s.glitch;
+      if (glitching > 0) {
+        if (state.clock >= glitch.next && state.clock >= glitch.until) {
+          glitch.until = state.clock + 0.1 + random() * 0.22 * (0.5 + glitching);
+          glitch.next = glitch.until + (9 - 7.4 * glitching) * (0.45 + random() * 1.1);
+          glitch.roll = 0;
+        }
+        if (state.clock < glitch.until) {
+          if (state.clock >= glitch.roll) {
+            glitchData.fill(0);
+            const count = 1 + Math.floor(random() * 3);
+            for (let i = 0; i < count; i++) {
+              const band = 3 + random() * random() * view.height * 0.14;
+              const y = random() * view.height;
+              const shift = (random() - 0.5) * 2 * (10 + 46 * glitching);
+              glitchData.set([y, y + band, shift, 1 + random() * 3 * glitching], i * 4);
+            }
+            glitch.seed = random();
+            glitch.roll = state.clock + 0.04 + random() * 0.05;
+          }
+        } else glitchData.fill(0);
+      } else glitchData.fill(0);
+
+      if (!reduce) {
+        state.travelX += s.direction[0] * s.speed * 0.8 * dt;
+        state.travelZ += s.direction[1] * s.speed * 0.8 * dt;
+        state.morph += s.morph * 0.12 * dt;
+      }
+
+      const engaged = pointer.inside && s.mouseInteraction;
+      state.presence += ((engaged ? 1 : 0) - state.presence) * (1 - Math.exp(-dt / (engaged ? 0.18 : 0.45)));
+
+      const nx = (pointer.x / view.width) * 2 - 1;
+      const ny = 1 - (pointer.y / view.height) * 2;
+      const lean = reduce || !engaged ? 0 : s.parallax;
+      const targetYaw = nx * lean * 0.09;
+      const targetPitch = -ny * lean * 0.045;
+      state.yawVelocity += (38 * (targetYaw - state.yaw) - 11 * state.yawVelocity) * dt;
+      state.pitchVelocity += (38 * (targetPitch - state.pitch) - 11 * state.pitchVelocity) * dt;
+      state.yaw += state.yawVelocity * dt;
+      state.pitch += state.pitchVelocity * dt;
+
+      const cam = camera();
+      if (engaged) {
+        state.hit = pick(cam, s, nx, ny);
+        if (state.hit && state.brushFrom) {
+          const jump = Math.hypot(state.hit.x - state.brushFrom.x, state.hit.z - state.brushFrom.z);
+          if (jump > 3 * s.mouseRadius) state.brushFrom = null;
+        }
+      } else if (state.presence < 0.002) {
+        state.hit = null;
+        state.brushFrom = null;
+      }
+
+      const tracing = state.hit && s.mouseInteraction && s.hoverEffect === 'trace' ? state.presence : 0;
+      if (state.hit) {
+        const frequency = FREQUENCY / state.scale;
+        const target =
+          relief(state.hit.x, state.hit.z, frequency, state.morph * 0.37, state.morph * 0.23) +
+          s.detail * 0.1 * fineDetail(state.hit.x, state.hit.z, frequency);
+        state.level = state.trace < 0.01 ? target : state.level + (target - state.level) * (1 - Math.exp(-dt / 0.09));
+      }
+      state.trace += (tracing - state.trace) * (1 - Math.exp(-dt / 0.2));
+
+      const focusTarget = state.hit && s.depthOfField > 0 ? state.hit.depth : cam.distance;
+      state.focus += (focusTarget - state.focus) * (1 - Math.exp(-dt / 0.35));
+
+      for (let i = pulses.length - 1; i >= 0; i--) {
+        pulses[i].age += dt;
+        if (pulses[i].age > 4) pulses.splice(i, 1);
+      }
+
+      const sculpting = updateSculpt(s, dt);
+      render();
+
+      const settling =
+        Math.abs(s.tilt - state.tilt) > 0.01 ||
+        Math.abs(s.elevation - state.elevation) > 1e-4 ||
+        Math.abs(state.yaw - targetYaw) > 1e-4 ||
+        Math.abs(state.pitch - targetPitch) > 1e-4 ||
+        Math.abs(state.yawVelocity) > 1e-4 ||
+        Math.abs(state.pitchVelocity) > 1e-4 ||
+        Math.abs(focusTarget - state.focus) > 1e-3 ||
+        Math.abs(tracing - state.trace) > 1e-3;
+      const busy =
+        (!reduce && (s.speed !== 0 || s.morph !== 0 || s.glitch > 0 || s.markers >= 0)) ||
+        state.intro < 1 ||
+        pulses.length > 0 ||
+        sculpting ||
+        settling ||
+        (state.presence > 0.001 && state.presence < 0.999);
+      quiet = busy ? 0 : quiet + dt;
+      if (quiet < 0.5) raf = requestAnimationFrame(frame);
+    };
+
+    function wake() {
+      quiet = 0;
+      if (!dead && !raf && visible && !document.hidden) {
+        last = 0;
+        raf = requestAnimationFrame(frame);
+      }
+    }
+
+    const locate = event => {
+      const rect = container.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      return { x, y, inside: x >= 0 && y >= 0 && x <= rect.width && y <= rect.height };
+    };
+
+    const onPointerMove = event => {
+      const { x, y, inside } = locate(event);
+      const was = pointer.inside;
+      pointer.inside = inside;
+      if (inside) {
+        pointer.x = x;
+        pointer.y = y;
+      }
+      if (inside || was) wake();
+    };
+
+    const onPointerDown = event => {
+      const s = settingsRef.current;
+      const { x, y, inside } = locate(event);
+      if (!inside) return;
+      pointer.x = x;
+      pointer.y = y;
+      pointer.inside = true;
+      wake();
+      if (s.glitch > 0 && !reduce) {
+        glitch.until = state.clock + 0.16;
+        glitch.roll = 0;
+      }
+      if (!s.mouseInteraction || (s.clickEffect !== 'pulse' && s.clickEffect !== 'peak')) return;
+      const hit = pick(camera(), s, (x / view.width) * 2 - 1, 1 - (y / view.height) * 2);
+      if (!hit) return;
+      if (s.clickEffect === 'peak' && sculpt) {
+        state.burst = { x: hit.x, z: hit.z, age: 0 };
+      } else if (s.clickEffect === 'pulse') {
+        if (pulses.length >= MAX_PULSES) pulses.shift();
+        pulses.push({ x: hit.x, z: hit.z, age: 0 });
+      }
+    };
+
+    const onPointerUp = event => {
+      if (event.pointerType !== 'touch') return;
+      pointer.inside = false;
+      wake();
+    };
+
+    const onPointerLeave = () => {
+      pointer.inside = false;
+      wake();
+    };
+
+    const onVisibility = () => wake();
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+    const intersection = new IntersectionObserver(entries => {
+      visible = entries.some(entry => entry.isIntersecting);
+      if (visible) wake();
+    });
+    intersection.observe(container);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('pointerup', onPointerUp, { passive: true });
+    window.addEventListener('pointercancel', onPointerUp, { passive: true });
+    document.documentElement.addEventListener('pointerleave', onPointerLeave);
+    document.addEventListener('visibilitychange', onVisibility);
+    resize();
+
+    const destroy = () => {
+      dead = true;
+      cancelAnimationFrame(raf);
+      raf = 0;
+      resizeObserver.disconnect();
+      intersection.disconnect();
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+      document.documentElement.removeEventListener('pointerleave', onPointerLeave);
+      document.removeEventListener('visibilitychange', onVisibility);
+      canvas.removeEventListener('webglcontextlost', onContextLost);
+      canvas.removeEventListener('webglcontextrestored', onContextRestored);
+      [source, ...levels.flat()].forEach(target => {
+        if (target.texture) gl.deleteTexture(target.texture);
+        if (target.depth) gl.deleteRenderbuffer(target.depth);
+        gl.deleteFramebuffer(target.framebuffer);
+      });
+      if (sculpt) sculpt.forEach(target => {
+        gl.deleteTexture(target.texture);
+        gl.deleteFramebuffer(target.framebuffer);
+      });
+      gl.deleteTexture(blank);
+      gl.deleteVertexArray(vao);
+      if (field.texture) gl.deleteTexture(field.texture);
+      if (field.heights) gl.deleteTexture(field.heights);
+      gl.deleteFramebuffer(field.framebuffer);
+      [terrain, fieldProgram, sculptProgram, downProgram, blurProgram, compositeProgram, markerProgram].forEach(
+        program => program && gl.deleteProgram(program.program)
+      );
+      const lose = gl.getExtension('WEBGL_lose_context');
+      if (lose) lose.loseContext();
+    };
+
+    return { wake, destroy };
+  };
+
+  /* ───────── 控制器：强调色 / 深浅主题 → settings，启停，画布管理 ───────── */
+  var engine = null;
+  var SETTINGS = null;
+
+  /* 菜单强调色：--accent（侧栏激活项的指示条 / 高亮都用它）。读不到就用 TOPO_CFG.color */
+  function readAccent(){
+    try {
+      var raw = (getComputedStyle(document.body || document.documentElement).getPropertyValue('--accent') || '').trim();
+      if (!raw) return null;
+      var cx = document.createElement('canvas').getContext('2d');
+      if (!cx) return null;
+      cx.fillStyle = '#000'; cx.fillStyle = raw;
+      var f = String(cx.fillStyle), m;
+      if ((m = /^#([0-9a-f]{6})$/i.exec(f))) return '#' + m[1];
+      if ((m = /^rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(f))) {
+        return '#' + [m[1], m[2], m[3]].map(function(v){ return ('0' + (+v).toString(16)).slice(-2); }).join('');
+      }
+    } catch (e) {}
+    return null;
+  }
+  function buildSettings(){
+    var o = {};
+    for (var k in TOPO_CFG) o[k] = TOPO_CFG[k];
+    o.color = readAccent() || TOPO_CFG.color;
+    o.lightMode = document.documentElement.getAttribute('data-theme') === 'light';
+    o.dpr = Math.min(window.devicePixelRatio || 1, TOPO_CFG.maxDpr);
+    SETTINGS = normalize(o);
+  }
+  function getCanvas(){ return document.getElementById('bgTopo'); }
+
+  function start(){
+    var container = document.getElementById('bgFx');
+    var canvas = getCanvas();
+    if (!container || !canvas) return false;
+    buildSettings();
+    if (engine) { canvas.style.display = 'block'; engine.wake(); return true; }
+    /* 每次启动都换一块新画布：销毁时 loseContext() 过的画布拿不到可用的新上下文 */
+    var fresh = canvas.cloneNode(false);
+    canvas.parentNode.replaceChild(fresh, canvas);
+    fresh.style.display = 'block';
+    try { engine = createEngine(container, fresh, function(){ return SETTINGS; }, restart); }
+    catch (e) { engine = null; try { console.warn('[Topography] disabled:', e); } catch (_) {} }
+    if (!engine) { fresh.style.display = 'none'; return false; }
+    return true;
+  }
+  function stop(){
+    if (engine) { try { engine.destroy(); } catch (e) {} engine = null; }
+    var c = getCanvas();
+    if (c) c.style.display = 'none';
+  }
+  function restart(){ stop(); start(); }
+  /* 主题 / 强调色变了：下一帧起生效（场景一直在动，不需要额外重绘）*/
+  function refresh(){
+    if (!engine) return;
+    buildSettings();
+    engine.wake();
+  }
+
+  return { start: start, stop: stop, refresh: refresh, config: TOPO_CFG };
+  })();
+
+  uiAddT({ bgTopography: ['Topography', '地形等高线', 'Топография', 'Topografie', '地形', 'Topografía', 'Topografya', 'Topografia'] });
+
   /* ════════ 背景动效 ════════ */
   var BGFX_ON = !(UI_CFG && UI_CFG.bgFx === false);
   var BGFX_STYLE = (UI_CFG && UI_CFG.bgStyle) || 'aurora';
+  if (BGFX_STYLE === 'grid') BGFX_STYLE = 'topography';   /* 「网格」已移除：旧配置自动沿用到 Topography */
   var BG_IMAGE = "__BG_IMAGE__";
-  var BGFX_STYLES = ['aurora', 'waves', 'grid', 'stars', 'network', 'embers', 'image'];
-  var BGFX_NAME_KEY = { aurora:'bgAurora', waves:'bgWaves', grid:'bgGrid', stars:'bgStars',
+  var BGFX_STYLES = ['aurora', 'waves', 'topography', 'stars', 'network', 'embers', 'image'];
+  var BGFX_NAME_KEY = { aurora:'bgAurora', waves:'bgWaves', topography:'bgTopography', stars:'bgStars',
                         network:'bgNetwork', embers:'bgEmbers', image:'bgImage' };
   var BGFX_CANVAS = { waves:1, stars:1, network:1, embers:1 };
   var BGFX_MAX_CHARS = 600000;
@@ -4688,7 +6235,7 @@ function decoInit(){
     var cv = document.getElementById('bgCanvas');
     if (!fx || !layer || !cv) return;
     bgfxStop();
-    if (!BGFX_ON) { body.setAttribute('data-bgfx', 'off'); fx.hidden = true; return; }
+    if (!BGFX_ON) { body.setAttribute('data-bgfx', 'off'); fx.hidden = true; TopoBg.stop(); return; }
     var st = BGFX_STYLE;
     if (BGFX_STYLES.indexOf(st) < 0 || (st === 'image' && !BG_IMAGE)) st = 'aurora';
     BGFX_STYLE = st;
@@ -4698,6 +6245,11 @@ function decoInit(){
     layer.className = 'bgfx-layer ' + st;
     layer.style.backgroundImage = (st === 'image') ? 'url("' + BG_IMAGE + '")' : '';
     cv.style.display = BGFX_CANVAS[st] ? 'block' : 'none';
+    if (st === 'topography') {
+      if (!TopoBg.start()) layer.className = 'bgfx-layer aurora';   /* 不支持 WebGL2 → 回退到极光 */
+    } else {
+      TopoBg.stop();
+    }
     if (BGFX_CANVAS[st] && !document.hidden) {
       bgfxReadColors(); bgfxResize(); bgfx.last = 0;
       bgfx.raf = requestAnimationFrame(bgfxLoop);
@@ -6157,7 +7709,7 @@ __UI_CSS__
   Object.keys(all).forEach(function(pid){var e=all[pid],k=e&&e[PAGE];if(k&&typeof k==='object'){try{apply(pid,{cls:e.cls,theme:e.theme,css:k.css,bg:k.bg});}catch(x){}}});
 })();
 </script>
-<div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><div class="bgfx-layer" id="bgLayer"></div>
+<div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><canvas id="bgTopo" style="display:none"></canvas><div class="bgfx-layer" id="bgLayer"></div>
 <div id="fxLayer" aria-hidden="true"></div>
 <canvas id="decoCanvas" aria-hidden="true"></canvas></div>
 <div class="drag-strip" onmousedown="uiDrag(event)"></div>
@@ -7463,10 +9015,9 @@ input{outline:none;border:none;background:none}
 .bg-prev.p-waves{background-image:
   radial-gradient(120% 60% at 30% 115%,rgba(59,130,246,.85) 45%,transparent 46%),
   radial-gradient(120% 60% at 75% 125%,rgba(99,102,241,.7) 45%,transparent 46%)}
-.bg-prev.p-grid{background-image:
-  linear-gradient(rgba(96,165,250,.55) 1px,transparent 1px),
-  linear-gradient(90deg,rgba(96,165,250,.55) 1px,transparent 1px);
-  background-size:12px 12px}
+.bg-prev.p-topography{background-image:
+  repeating-radial-gradient(ellipse 55% 85% at 28% 78%,transparent 0 4px,color-mix(in srgb,var(--accent) 72%,transparent) 4px 5px),
+  repeating-radial-gradient(ellipse 60% 90% at 78% 30%,transparent 0 5px,color-mix(in srgb,var(--accent) 52%,transparent) 5px 6px)}
 .bg-prev.p-stars{background-image:
   radial-gradient(1.4px 1.4px at 18% 28%,#fff 50%,transparent),radial-gradient(1px 1px at 52% 60%,#fff 50%,transparent),
   radial-gradient(1.6px 1.6px at 80% 22%,#fff 50%,transparent),radial-gradient(1px 1px at 35% 78%,#cbd5ff 50%,transparent),
@@ -10355,7 +11906,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
   Object.keys(all).forEach(function(pid){var e=all[pid],k=e&&e[PAGE];if(k&&typeof k==='object'){try{apply(pid,{cls:e.cls,theme:e.theme,css:k.css,bg:k.bg});}catch(x){}}});
 })();
 </script>
-<div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><div class="bgfx-layer" id="bgLayer"></div>
+<div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><canvas id="bgTopo" style="display:none"></canvas><div class="bgfx-layer" id="bgLayer"></div>
 <div id="fxLayer" aria-hidden="true"></div>
 <canvas id="decoCanvas" aria-hidden="true"></canvas></div>
 <div class="app">
