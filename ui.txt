@@ -9557,7 +9557,8 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 }
 
 __UI_CSS__
-/* ═══════════════ Maintenance screen: ElectricLogo (React Bits JS-CSS style port) ═══ */
+/* ═══════════════ 维护页（games.txt: #APP_STATUS maintenance）═══════════════
+   维护中：登录卡片 / 星空整个隐藏，只剩 STARLINE（左上）+ 关闭按钮（右上）+ ElectricLogo 与维护提示 */
 .mt-ovl{
   position:fixed;inset:0;z-index:500;display:none;flex-direction:column;
   color:var(--text);
@@ -9583,45 +9584,16 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
 .mt-close:active{transform:scale(.94)}
 .mt-close svg{width:17px;height:17px}
 .mt-main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 24px 56px}
-.mt-stage{width:100%;max-width:1200px;height:480px;max-height:100%;position:relative;color:var(--text)}
-.mt-electric-content{
-  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;transform:translateY(-18px);gap:18px;
-}
-.electric-logo{
-  position:relative;width:min(100%,480px);height:310px;overflow:visible;
-  display:grid;place-items:center;isolation:isolate;
-}
-.electric-logo-img{
-  position:relative;z-index:2;display:block;width:100%;height:100%;object-fit:contain;
-  transform:scale(.7);filter:url(#mt-electric-filter) drop-shadow(0 0 12px #ad6dff);
-  animation:mt-electric-pulse 1.8s ease-in-out infinite alternate;
-}
-.electric-logo::before,.electric-logo::after{
-  content:"";position:absolute;inset:12% 8%;z-index:1;pointer-events:none;
-  background:conic-gradient(from 0deg at 50% 50%,transparent 0 8%,rgba(236,199,255,.95) 9%,transparent 10% 24%,rgba(173,109,255,.9) 25%,transparent 26% 44%,rgba(236,199,255,.8) 45%,transparent 46% 68%,rgba(173,109,255,.9) 69%,transparent 70%);
-  filter:blur(1px) drop-shadow(0 0 8px #ad6dff);opacity:.65;
-  mask-image:radial-gradient(ellipse,transparent 35%,#000 65%,transparent 76%);
-  animation:mt-electric-arcs 2.5s steps(5,end) infinite;
-}
-.electric-logo::after{transform:rotate(37deg) scale(.92);opacity:.45;animation-delay:-.7s}
-@keyframes mt-electric-pulse{from{filter:url(#mt-electric-filter) drop-shadow(0 0 8px #ad6dff)}to{filter:url(#mt-electric-filter) drop-shadow(0 0 22px #ad6dff) drop-shadow(0 0 36px rgba(236,199,255,.55))}}
-@keyframes mt-electric-arcs{0%,100%{opacity:.2;transform:rotate(0deg) scale(.9)}23%{opacity:.9;transform:rotate(14deg) scale(1.04)}47%{opacity:.35;transform:rotate(-9deg) scale(.96)}72%{opacity:.8;transform:rotate(5deg) scale(1.02)}}
-.mt-maintenance-label{
-  margin:0;text-align:center;font-family:var(--font-mono,var(--font));
-  font-size:clamp(18px,2.4vw,28px);font-weight:700;letter-spacing:.24em;
-  color:var(--text);text-shadow:0 0 14px rgba(173,109,255,.42);
-}
-.mt-maintenance-label::after{
-  content:"";display:block;width:86px;height:2px;margin:14px auto 0;
-  background:linear-gradient(90deg,transparent,#ad6dff,#ecc7ff,transparent);
-  box-shadow:0 0 12px #ad6dff;
-}
-@media(max-width:600px){
-  .mt-main{padding:0 14px 40px}
-  .electric-logo{height:240px}
-  .mt-maintenance-label{letter-spacing:.14em}
-}
+.mt-stage{width:100%;max-width:1200px;height:520px;max-height:100%;position:relative;color:var(--text);display:flex;align-items:center;justify-content:center}
+.mt-content{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transform:translateY(-5%)}
+.mt-electric{width:min(230px,52vw);height:230px;max-height:36vh;position:relative;overflow:visible;filter:drop-shadow(0 0 18px rgba(173,109,255,.24))}
+.mt-electric canvas{display:block;width:100%;height:100%}.mt-electric>.electric-logo{width:100%;height:100%}
+.mt-caption{width:100%;height:115px;max-height:20vh;position:relative;color:var(--text);text-align:center}
+.mt-caption .tech-text{height:100%;width:100%}
+.mt-caption .tech-text-canvas{width:100%;height:100%}
+@media(max-width:600px){.mt-content{gap:10px}.mt-electric{width:190px;height:190px}.mt-caption{height:90px}}
+.tech-text{position:relative;width:100%;height:100%;touch-action:pan-y;user-select:none}
+.tech-text-canvas{display:block;width:100%;height:100%}
 </style>
 
 </head>
@@ -9826,24 +9798,7 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
-  <div class="mt-main">
-    <div class="mt-stage" id="mtStage">
-      <div class="mt-electric-content">
-        <div class="electric-logo" aria-label="STARLINE electric logo">
-          <svg aria-hidden="true" width="0" height="0" style="position:absolute">
-            <filter id="mt-electric-filter">
-              <feTurbulence type="fractalNoise" baseFrequency="0.018 0.08" numOctaves="2" seed="7">
-                <animate attributeName="seed" values="7;13;19;7" dur="1.2s" repeatCount="indefinite"/>
-              </feTurbulence>
-              <feDisplacementMap in="SourceGraphic" scale="5" />
-            </filter>
-          </svg>
-          <img class="electric-logo-img" src="/logo.svg" alt="STARLINE" draggable="false">
-        </div>
-        <div class="mt-maintenance-label">UNDER MAINTENANCE</div>
-      </div>
-    </div>
-  </div>
+  <div class="mt-main"><div class="mt-stage"><div class="mt-content"><div class="mt-electric" id="mtElectric" aria-hidden="true"></div><div class="mt-caption" id="mtStage"></div></div></div></div>
 </div>
 __UI_MARKUP__
 <script>
@@ -10770,21 +10725,152 @@ function TechText(container, options) {
   };
 }
 
-/* ═══════════════ Maintenance mode: status-driven ElectricLogo display ═══════════════
-   Host initializes UI_CFG.appStatus and later sends APP_STATUS:<status>.
-   On maintenance, show the centered electric logo and UNDER MAINTENANCE label.
-   When status returns to available, restore the normal login screen. */
+/* ═══════════════ React Bits 官方 ElectricLogo（JS-CSS Registry）═══════════════
+   从官方 registry 读取原始 JSX/CSS，并在 WebView2 中编译挂载；不是 Canvas 仿制版。
+   依赖通过 CDN 加载：React 18、ReactDOM 18、Babel Standalone、OGL。
+   WebView2 首次进入维护页需要联网完成加载；之后在当前页面会话中复用模块。 */
+var mtElectricInst = null;
+var mtElectricModulePromise = null;
+var STARLINE_ELECTRIC_LOGO_SRC = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22%23fff%22%3E%3Cpath%20d%3D%22M73.14%2C0.06%2074.31%2C0.64%2074.68%2C1.35%2075.19%2C6.24%2075.95%2C9.12%2075.97%2C11.50%2075.64%2C13.27%2074.59%2C15.36%2073.46%2C17.06%2071.59%2C19.08%2068.59%2C21.16%2060.74%2C24.99%2049.10%2C31.20%2031.51%2C40.12%2029.54%2C40.99%2027.77%2C41.10%2026.31%2C40.27%2024.23%2C40.12%2023.46%2C39.75%2022.90%2C38.85%2022.33%2C37.09%2021.91%2C34.63%2021.84%2C31.11%2022.36%2C27.35%2023.99%2C23.19%2026.14%2C20.33%2028.84%2C18.43%2031.53%2C17.16%2056.72%2C6.61%2067.92%2C1.46%2072.86%2C0.00Z%22%2F%3E%3Cpath%20d%3D%22M15.02%2C26.12%2015.52%2C26.18%2016.27%2C26.70%2018.07%2C29.90%2025.01%2C45.33%2028.04%2C51.23%2029.47%2C51.12%2035.46%2C48.79%2073.19%2C30.76%2075.79%2C28.90%2078.02%2C27.84%2080.71%2C27.33%2083.26%2C27.33%2084.88%2C28.84%2085.78%2C30.65%2086.41%2C34.43%2086.29%2C37.60%2085.82%2C39.58%2084.30%2C42.16%2080.61%2C45.60%2079.44%2C47.00%2077.51%2C48.28%2069.54%2C52.57%2040.33%2C66.81%2038.03%2C68.20%2037.07%2C69.14%2036.96%2C69.85%2038.03%2C72.43%2047.13%2C89.70%2049.53%2C94.82%2049.68%2C96.49%2049.40%2C97.39%2048.83%2C98.14%2046.93%2C99.23%2043.52%2C100.00%2039.33%2C100.00%2035.21%2C99.37%2032.65%2C98.61%2028.91%2C96.79%2027.35%2C96.37%2026.24%2C95.58%2026.11%2C95.29%2026.30%2C95.12%2027.50%2C94.95%2027.46%2C94.01%209.45%2C57.94%206.70%2C51.99%204.42%2C47.80%203.60%2C45.76%203.07%2C45.02%201.05%2C44.88%200.54%2C44.21%200.14%2C42.60%200.00%2C37.85%200.45%2C36.04%201.67%2C33.76%203.40%2C32.11%2010.42%2C27.40%2014.82%2C26.13Z%22%2F%3E%3Cpath%20d%3D%22M96.35%2C50.09%2097.90%2C50.23%2099.03%2C51.27%2099.34%2C53.21%2099.51%2C59.77%20100.00%2C63.30%2099.78%2C64.84%2099.30%2C65.87%2095.33%2C71.34%2092.78%2C73.22%2088.99%2C75.35%2080.90%2C79.40%2055.23%2C93.31%2053.62%2C93.87%2049.78%2C92.96%2049.90%2C92.37%2051.25%2C92.16%2049.14%2C91.57%2048.54%2C91.03%2047.90%2C89.89%2047.34%2C87.28%2047.29%2C82.84%2047.85%2C79.21%2049.48%2C74.85%2051.27%2C72.27%2053.22%2C70.46%2054.76%2C69.43%2063.19%2C65.65%2078.69%2C58.08%2089.14%2C52.68%2091.95%2C50.83%2093.40%2C50.39%2095.96%2C50.10Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E";
+
+function mtLoadScriptOnce(id, src) {
+  if (document.getElementById(id)) {
+    return new Promise(function(resolve, reject) {
+      var el = document.getElementById(id);
+      if (el.dataset.loaded === '1') return resolve();
+      if (el.dataset.failed === '1') return reject(new Error('Failed to load ' + src));
+      el.addEventListener('load', function(){ resolve(); }, {once:true});
+      el.addEventListener('error', function(){ reject(new Error('Failed to load ' + src)); }, {once:true});
+    });
+  }
+  return new Promise(function(resolve, reject) {
+    var el = document.createElement('script');
+    el.id = id;
+    el.src = src;
+    el.async = true;
+    el.onload = function(){ el.dataset.loaded = '1'; resolve(); };
+    el.onerror = function(){ el.dataset.failed = '1'; reject(new Error('Failed to load ' + src)); };
+    document.head.appendChild(el);
+  });
+}
+
+function mtLoadOfficialElectricLogo() {
+  if (mtElectricModulePromise) return mtElectricModulePromise;
+  mtElectricModulePromise = mtLoadScriptOnce('starline-react-runtime', 'https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js')
+  .then(function(){
+    return Promise.all([
+      mtLoadScriptOnce('starline-react-dom-runtime', 'https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js'),
+      mtLoadScriptOnce('starline-babel-runtime', 'https://cdn.jsdelivr.net/npm/@babel/standalone@7.26.10/babel.min.js')
+    ]);
+  }).then(function(){
+    return Promise.all([
+      import('https://esm.sh/ogl@1.0.11'),
+      fetch('https://cdn.jsdelivr.net/gh/DavidHDev/react-bits@b0422bb475ac9ec1fe1680290970494ceff5d4eb/public/r/ElectricLogo-JS-CSS.json', {cache:'force-cache'}).then(function(response){
+        if (!response.ok) throw new Error('React Bits registry HTTP ' + response.status);
+        return response.json();
+      })
+    ]);
+  }).then(function(values){
+    var OGL = values[0], registry = values[1];
+    var file = (registry.files || []).find(function(item){ return item.path === 'ElectricLogo.jsx'; });
+    var cssFile = (registry.files || []).find(function(item){ return item.path === 'ElectricLogo.css'; });
+    if (!file || !file.content) throw new Error('ElectricLogo.jsx missing from official registry');
+    if (cssFile && cssFile.content && !document.getElementById('starline-electric-logo-css')) {
+      var style = document.createElement('style');
+      style.id = 'starline-electric-logo-css';
+      style.textContent = cssFile.content;
+      document.head.appendChild(style);
+    }
+    var source = file.content
+      .replace(/^import\s+\{[^}]+\}\s+from\s+['"]react['"];?\s*/m, '')
+      .replace(/^import\s+\{[^}]+\}\s+from\s+['"]ogl['"];?\s*/m, '')
+      .replace(/^import\s+['"][^'"]+['"];?\s*/gm, '')
+      .replace(/^export\s+default\s+ElectricLogo;?\s*$/m, '');
+    var compiled = Babel.transform(source, {presets:['react'], filename:'ElectricLogo.jsx'}).code;
+    var factory = new Function('React', 'OGL',
+      'const { useEffect, useRef } = React;\n' +
+      'const { Renderer, Program, Mesh, Triangle, Texture } = OGL;\n' +
+      compiled + '\nreturn ElectricLogo;'
+    );
+    return factory(React, OGL);
+  }).catch(function(error){
+    mtElectricModulePromise = null;
+    throw error;
+  });
+  return mtElectricModulePromise;
+}
+
+function ElectricLogo(container, options) {
+  var cancelled = false;
+  var reactRoot = null;
+  var handle = {
+    destroy: function(){
+      cancelled = true;
+      if (reactRoot) {
+        try { reactRoot.unmount(); } catch (e) {}
+        reactRoot = null;
+      }
+      if (container) container.innerHTML = '';
+    }
+  };
+  mtLoadOfficialElectricLogo().then(function(Component){
+    if (cancelled || !container || !container.isConnected || !document.documentElement.classList.contains('mt-on')) return;
+    if (!window.ReactDOM || !window.ReactDOM.createRoot) throw new Error('ReactDOM.createRoot unavailable');
+    reactRoot = window.ReactDOM.createRoot(container);
+    reactRoot.render(window.React.createElement(Component, Object.assign({
+      src: STARLINE_ELECTRIC_LOGO_SRC,
+      color: '#ecc7ff', glowColor: '#ad6dff', scale: 0.7,
+      strands: 4, bend: 0.6, crackle: 1.5, arcs: 1,
+      speed: 2.5, interactive: true
+    }, options || {})));
+  }).catch(function(error){
+    if (!cancelled) {
+      console.error('[STARLINE] Official React Bits ElectricLogo failed to load:', error);
+      container.setAttribute('data-electric-error', 'true');
+    }
+  });
+  return handle;
+}
+
+/* ═══════════════ 维护模式（games.txt 头部 #APP_STATUS maintenance）═══════════════
+   · 宿主把状态放在 UI_CFG.appStatus（启动时），之后每次变化再推 APP_STATUS:<状态>
+   · maintenance：登录界面整个隐藏，换成 TechText 维护页；左上角 STARLINE，右上角关闭按钮
+   · 恢复 available：自动回到登录界面 */
 var mtInst = null;
 function mtApply(status) {
   var on = String(status || '').toLowerCase() === 'maintenance';
   var root = document.documentElement;
   var ovl = document.getElementById('mtOvl');
+  var stage = document.getElementById('mtStage');
   if (on) {
+    if (mtInst || mtElectricInst) { return; }
     root.classList.add('mt-on');
     if (ovl) { ovl.setAttribute('aria-hidden', 'false'); }
+    /* 等覆盖层显示出来、有了尺寸再挂载官方 WebGL/React 组件。 */
+    requestAnimationFrame(function () {
+      if (mtInst || mtElectricInst || !stage || !root.classList.contains('mt-on')) { return; }
+      mtElectricInst = ElectricLogo(document.getElementById('mtElectric'), {src:STARLINE_ELECTRIC_LOGO_SRC,color:'#ecc7ff',glowColor:'#ad6dff',scale:.7,strands:4,bend:.6,crackle:1.5,arcs:1,speed:2.5,interactive:true});
+      mtInst = TechText(stage, {
+        text: 'UNDER MAINTENANCE',
+        fontWeight: 700,
+        fontSize: 58,
+        reveal: 'letter',
+        dashLength: 4,
+        dashGap: 2,
+        specks: 15,
+        intro: 'none',
+        introDuration: 2,
+        clickKick: true,
+        guides: false
+      });
+    });
   } else {
+    if (!mtInst && !mtElectricInst && !root.classList.contains('mt-on')) { return; }
     root.classList.remove('mt-on');
     if (ovl) { ovl.setAttribute('aria-hidden', 'true'); }
+    if (mtInst) { mtInst.destroy(); mtInst = null; }
+    if (mtElectricInst) { mtElectricInst.destroy(); mtElectricInst = null; }
+    if (stage) { stage.innerHTML = ''; }
   }
 }
 (function () {
