@@ -9631,6 +9631,21 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
   transform:translate(-50%,calc(-100% - 72px));
 }
 .electric-logo{overflow:hidden}
+/* 维护页右下角 · 国旗语言切换（略抬高，避开窗口缩放手柄） */
+.mt-lang{
+  position:absolute;right:18px;bottom:28px;z-index:4;
+  width:44px;height:34px;display:grid;place-items:center;padding:0;
+  border-radius:12px;border:1px solid var(--border-2);
+  background:var(--surface-2);color:var(--text-2);
+  box-shadow:var(--shadow-1);
+  transition:background var(--tr-fast),border-color var(--tr-fast),color var(--tr-fast),transform var(--tr-fast);
+  -webkit-app-region:no-drag;cursor:pointer;
+}
+.mt-lang:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--text)}
+.mt-lang.open{background:var(--accent-soft);border-color:var(--accent);color:var(--text)}
+.mt-lang:active{transform:scale(.96)}
+.mt-lang .lg-flag{width:24px;height:18px;display:block}
+.mt-lang .lg-flag svg{display:block;width:100%;height:100%;fill:initial;stroke:none}
 </style>
 
 </head>
@@ -9841,6 +9856,9 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
     </button>
   </div>
   <div class="mt-main"><div class="mt-stage" id="mtStage"></div><div class="mt-logo" id="mtLogo" aria-hidden="true"></div></div>
+  <!-- 右下角国旗 · 点击弹出语言列表（带箭头） -->
+  <button class="mt-lang" id="mtLang" type="button" title="Language" data-ui-title="language"
+    aria-haspopup="listbox" aria-expanded="false" aria-controls="lgPop"></button>
 </div>
 __UI_MARKUP__
 <script>
@@ -13458,11 +13476,23 @@ html[data-layout="rail-r"] .sb-task.closing{animation-name:sbTaskOutR}
 }
 .lg-pop[hidden]{display:none}
 @keyframes lgPopIn{from{opacity:0;transform:translateY(-8px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes lgPopInUp{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
 .lg-pop::before{
   content:"";position:absolute;top:-7px;left:var(--lg-ar,24px);
   width:12px;height:12px;box-sizing:border-box;background:var(--surface-solid);
   border-left:1px solid var(--border-2);border-top:1px solid var(--border-2);
   border-top-left-radius:3px;transform:rotate(45deg);
+}
+/* 从下方按钮弹出：箭头朝下，弹窗在按钮上方 */
+.lg-pop.lg-up{
+  transform-origin:calc(var(--lg-ar,24px) + 6px) calc(100% + 8px);
+  animation:lgPopInUp .18s cubic-bezier(.2,.8,.2,1);
+}
+.lg-pop.lg-up::before{
+  top:auto;bottom:-7px;
+  border-left:none;border-top:none;
+  border-right:1px solid var(--border-2);border-bottom:1px solid var(--border-2);
+  border-top-left-radius:0;border-bottom-right-radius:3px;
 }
 .lg-item{
   position:relative;display:flex;align-items:center;gap:5px;width:100%;padding:7px 10px;
@@ -23159,11 +23189,16 @@ __UI_SCRIPT__
 })();
 </script>
 <script>
-/* ═══════ 顶栏语言按钮：国旗 → 点击在下方弹出带箭头的语言列表（国旗 · 5px · 语言名称） ═══════ */
+/* ═══════ 语言按钮：顶栏 #tbLang + 维护页右下角 #mtLang
+   点击弹出带箭头的语言列表；维护页按钮在下方，弹窗向上展开 ═══════ */
 (function(){
-  var btn=document.getElementById('tbLang'),pop=document.getElementById('lgPop');
-  if(!btn||!pop||typeof UI_LANGS==='undefined')return;
+  var btnTb=document.getElementById('tbLang');
+  var btnMt=document.getElementById('mtLang');
+  var pop=document.getElementById('lgPop');
+  if(!pop||typeof UI_LANGS==='undefined')return;
+  if(!btnTb&&!btnMt)return;
   document.body.appendChild(pop);
+  var activeBtn=null; /* 当前打开弹窗的按钮 */
   var CK='<svg class="lg-ck" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
   var PEN='<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
   var PLUS='<svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
@@ -23172,11 +23207,13 @@ __UI_SCRIPT__
   function find(code){for(var i=0;i<UI_LANGS.length;i++)if(UI_LANGS[i].code===code)return UI_LANGS[i];return null;}
   function flag(l){return '<span class="lg-flag">'+uiFlagSvg(l.flag)+'</span>';}
 
-  function paintBtn(){
+  function paintOne(btn){
+    if(!btn)return;
     var l=find(cur())||UI_LANGS[0];
     btn.innerHTML=flag(l);
     try{btn.title=uiT('language');}catch(e){}
   }
+  function paintBtn(){paintOne(btnTb);paintOne(btnMt);}
   function render(){
     var c=cur(),h='';
     UI_LANGS.forEach(function(l){
@@ -23188,25 +23225,47 @@ __UI_SCRIPT__
     h+='<div class="lg-sep"></div><button type="button" class="lg-item lg-add" data-add="1"><span class="lg-ico">'+PLUS+'</span><span class="lg-name">'+uiEsc(uiT('ctNew'))+'</span></button>';
     pop.innerHTML=h;
   }
-  /* 箭头对准国旗按钮中心，弹窗在按钮正下方 */
+  /* 顶栏：弹窗在按钮下方；维护页右下角：弹窗在按钮上方（箭头朝下） */
   function place(){
-    var br=btn.getBoundingClientRect(),vw=document.documentElement.clientWidth;
-    var w=pop.offsetWidth,cx=br.left+br.width/2;
+    if(!activeBtn)return;
+    var br=activeBtn.getBoundingClientRect(),vw=document.documentElement.clientWidth,vh=document.documentElement.clientHeight;
+    var w=pop.offsetWidth,h=pop.offsetHeight,cx=br.left+br.width/2;
     var left=Math.max(12,Math.min(Math.round(cx-w/2),vw-12-w));
-    pop.style.left=left+'px';pop.style.top=Math.round(br.bottom+12)+'px';
+    var up=(activeBtn===btnMt)||(br.bottom+12+h>vh-8);
+    pop.classList.toggle('lg-up',up);
+    if(up){
+      pop.style.top=Math.max(8,Math.round(br.top-12-h))+'px';
+    }else{
+      pop.style.top=Math.round(br.bottom+12)+'px';
+    }
+    pop.style.left=left+'px';
     pop.style.setProperty('--lg-ar',Math.max(14,Math.min(w-26,Math.round(cx-left-6)))+'px');
   }
-  function open(){
+  function open(btn){
+    activeBtn=btn;
     render();pop.hidden=false;place();
-    btn.classList.add('open');btn.setAttribute('aria-expanded','true');
+    if(btnTb){btnTb.classList.toggle('open',btn===btnTb);btnTb.setAttribute('aria-expanded',btn===btnTb?'true':'false');}
+    if(btnMt){btnMt.classList.toggle('open',btn===btnMt);btnMt.setAttribute('aria-expanded',btn===btnMt?'true':'false');}
   }
   function close(){
     if(pop.hidden)return;
-    pop.hidden=true;btn.classList.remove('open');btn.setAttribute('aria-expanded','false');
+    pop.hidden=true;pop.classList.remove('lg-up');
+    if(btnTb){btnTb.classList.remove('open');btnTb.setAttribute('aria-expanded','false');}
+    if(btnMt){btnMt.classList.remove('open');btnMt.setAttribute('aria-expanded','false');}
+    activeBtn=null;
   }
   window.lgClose=close;
 
-  btn.addEventListener('click',function(e){e.stopPropagation();if(pop.hidden)open();else close();});
+  function bind(btn){
+    if(!btn)return;
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(!pop.hidden&&activeBtn===btn)close();
+      else open(btn);
+    });
+  }
+  bind(btnTb);bind(btnMt);
+
   pop.addEventListener('click',function(e){
     var ed=e.target.closest?e.target.closest('.lg-edit'):null;
     if(ed){close();if(window.uiOpenTransEditor)uiOpenTransEditor(ed.getAttribute('data-edit'));return;}
@@ -23218,11 +23277,15 @@ __UI_SCRIPT__
   });
   document.addEventListener('mousedown',function(e){
     if(pop.hidden)return;
-    var t=e.target;if(btn.contains(t)||pop.contains(t))return;
+    var t=e.target;
+    if(pop.contains(t))return;
+    if(btnTb&&btnTb.contains(t))return;
+    if(btnMt&&btnMt.contains(t))return;
     close();
   },true);
   document.addEventListener('keydown',function(e){
-    if(pop.hidden||(e.key!=='ArrowDown'&&e.key!=='ArrowUp'))return;
+    if(pop.hidden||(e.key!=='ArrowDown'&&e.key!=='ArrowUp'&&e.key!=='Escape'))return;
+    if(e.key==='Escape'){close();return;}
     var items=Array.prototype.slice.call(pop.querySelectorAll('.lg-item'));if(!items.length)return;
     e.preventDefault();
     var i=items.indexOf(document.activeElement);
@@ -23231,7 +23294,6 @@ __UI_SCRIPT__
   });
   window.addEventListener('resize',function(){if(!pop.hidden)place();});
 
-  /* 语言变化（含设置页、宿主推送）时同步按钮上的国旗和列表选中态 */
   var prev=window.onUiLangChanged;
   window.onUiLangChanged=function(){
     var r=typeof prev==='function'?prev.apply(this,arguments):undefined;
