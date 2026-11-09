@@ -9324,29 +9324,39 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
   background:var(--lg-field);color:var(--lg-fg);
   font-family:var(--font);font-size:16px;letter-spacing:0;text-transform:none;outline:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
-  transition:background var(--tr),border-color var(--tr),box-shadow var(--tr),color .18s ease,text-shadow .18s ease,letter-spacing .18s ease;
+  transition:background var(--tr),border-color var(--tr),box-shadow var(--tr),color .15s ease;
 }
-/* 只模糊文字本身，输入框边框/背景保持清晰 */
-.right .key-input.pw-blur{
+/* 隐藏密码时：输入框文字透明，背景/边框完全不动；真正的模糊只作用在旁路文字层 */
+.right .field-wrap.pw-hidden .key-input{
   color:transparent;
-  text-shadow:0 0 7px var(--lg-fg);
-  letter-spacing:.08em;
+  -webkit-text-fill-color:transparent;
   caret-color:var(--lg-fg);
 }
-.right .key-input.pw-blur::placeholder{
-  color:var(--lg-fg3);
-  text-shadow:none;
-  letter-spacing:0;
+.right .field-wrap.pw-hidden .key-input::placeholder{
+  color:transparent;
+  -webkit-text-fill-color:transparent;
 }
+/* 旁路文字层：只模糊这段文字，绝不影响 input 背景 */
+.right .pw-echo{
+  position:absolute;left:20px;right:50px;top:0;bottom:0;
+  display:flex;align-items:center;
+  font-family:var(--font);font-size:16px;letter-spacing:.06em;
+  color:var(--lg-fg);white-space:pre;overflow:hidden;
+  pointer-events:none;user-select:none;
+  opacity:0;filter:blur(4.5px);
+  transition:opacity .15s ease;
+}
+.right .field-wrap.pw-hidden .pw-echo{opacity:1}
 .right .key-input::placeholder{color:var(--lg-fg3);font-family:var(--font);letter-spacing:0}
 .right .key-input:hover{background:var(--lg-field-hi)}
 .right .key-input:focus{background:var(--lg-field-hi);border-color:var(--lg-field-line);box-shadow:0 0 0 4px rgba(var(--lg-star),.06)}
 .right .key-input.is-err{border-color:var(--err);box-shadow:0 0 0 3px rgba(239,68,68,.16)}
 .right .key-input.is-ok{border-color:var(--ok);box-shadow:0 0 0 3px rgba(16,185,129,.16)}
 .right .key-input:-webkit-autofill{-webkit-text-fill-color:var(--lg-fg);caret-color:var(--lg-fg);transition:background-color 9999s ease 0s}
+.right .field-wrap.pw-hidden .key-input:-webkit-autofill{-webkit-text-fill-color:transparent}
 .right .paste-btn{
   position:absolute;right:10px;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
-  color:var(--lg-fg3);transition:color var(--tr),background var(--tr);
+  color:var(--lg-fg3);transition:color var(--tr),background var(--tr);z-index:2;
 }
 .right .paste-btn svg{width:19px;height:19px;display:block}
 .right .paste-btn .pw-icon-hide{display:none}
@@ -9747,16 +9757,18 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
     </div>
     <div class="field">
       <div class="field-label" data-ui="accPassword">Password</div>
-      <div class="field-wrap">
+      <div class="field-wrap pw-hidden" id="accPassWrap">
         <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input class="key-input acc-input pw-blur" id="accPass" type="text" maxlength="64"
+        <input class="key-input acc-input" id="accPass" type="text" maxlength="64"
           autocomplete="current-password" spellcheck="false" data-ui-ph="accPassword"
           placeholder="Password"
-          onkeydown="if(event.key==='Enter')accSubmit()" oninput="accClearErr()">
+          onkeydown="if(event.key==='Enter')accSubmit()" oninput="accClearErr();accSyncPwEcho()">
+        <!-- 旁路文字层：只模糊这段文字，输入框背景永远清晰 -->
+        <span class="pw-echo" id="accPassEcho" aria-hidden="true"></span>
         <button class="paste-btn" type="button" id="accPwBtn" onclick="accTogglePw()" tabindex="-1" aria-label="Toggle password">
-          <!-- 隐藏状态：显示「眼睛」图标（点击可显示） -->
+          <!-- 隐藏状态：眼睛图标 -->
           <svg class="pw-icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          <!-- 显示状态：显示「眼睛划掉」图标（点击可隐藏） -->
+          <!-- 显示状态：眼睛划掉图标 -->
           <svg class="pw-icon-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
       </div>
@@ -12136,12 +12148,18 @@ function accSetMode(m) {
   accApplyText();
   if (typeof lgFit === 'function') { lgFit(); }
 }
-function accTogglePw() {
+function accSyncPwEcho() {
   var a = document.getElementById('accPass');
+  var echo = document.getElementById('accPassEcho');
+  if (a && echo) { echo.textContent = a.value || ''; }
+}
+function accTogglePw() {
+  var wrap = document.getElementById('accPassWrap');
   var btn = document.getElementById('accPwBtn');
-  if (!a) { return; }
-  var show = a.classList.toggle('pw-blur'); /* true = now blurred (hidden) */
-  if (btn) { btn.classList.toggle('is-shown', !show); }
+  if (!wrap) { return; }
+  var hidden = wrap.classList.toggle('pw-hidden'); /* true = now hidden (blurred text) */
+  if (btn) { btn.classList.toggle('is-shown', !hidden); }
+  accSyncPwEcho();
 }
 /* 「记住我」：取消勾选立刻让宿主忘掉已保存的密码 */
 function accRememberChanged(){
@@ -12235,6 +12253,7 @@ window.chrome.webview.addEventListener('message', function(e) {
     var box = document.getElementById('accRemember');
     if (pEl && sw) { pEl.value = sw; if (box) { box.checked = true; } }
     else if (box && !su) { box.checked = false; }
+    if (typeof accSyncPwEcho === 'function') { accSyncPwEcho(); }
   }
   else if (msg.indexOf('ACC_OK:') === 0) {
     var parts = msg.slice(7).split('|'), name = parts[0], kind = parts[1];
