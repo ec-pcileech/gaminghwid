@@ -12,7 +12,7 @@
 #               · 也认：maintenance / maintain / maintaining / 维护中 / 维护 / 维修中
 #  ────────────────────────────────────────────────────────────────────────
 #APP_VERSION 3.1.7
-#APP_STATUS available
+#APP_STATUS maintenance
 #APP_DOWNLOAD https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/STARLINE.exe
 #
 #  格式说明
