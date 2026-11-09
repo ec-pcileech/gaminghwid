@@ -3018,8 +3018,10 @@ function uiApplyDynamic(spec){
   /* banner 角饰跟着装饰类型走（万圣节/圣诞/四季）*/
   var hero = document.getElementById('hero');
   if (hero) { hero.setAttribute('data-deco', spec.deco || 'none'); }
-  /* Topography 背景的颜色 = 菜单强调色（--accent），深浅主题也随之切换 */
+  /* Topography 的颜色 = 菜单强调色（--accent）；LightRays / Ferrofluid 颜色固定，只跟随深浅主题（lightMode）*/
   try { if (typeof TopoBg !== 'undefined' && TopoBg) { TopoBg.refresh(); } } catch (e) {}
+  try { if (typeof RaysBg !== 'undefined' && RaysBg) { RaysBg.refresh(); } } catch (e) {}
+  try { if (typeof FerroBg !== 'undefined' && FerroBg) { FerroBg.refresh(); } } catch (e) {}
 }
 var uiThemeAnimTimer = null;
 function uiThemeAnimate(){
@@ -6067,15 +6069,1532 @@ void main() {
 
   uiAddT({ bgTopography: ['Topography', '地形等高线', 'Топография', 'Topografie', '地形', 'Topografía', 'Topografya', 'Topografia'] });
 
+  /* ════════ LightRays 背景（React Bits <LightRays /> 的原生 JS 移植）════════
+     纯 WebGL2、无第三方依赖，引擎保持原样，React 外壳换成下面的控制器：
+       · 颜色固定为 raysColor（#ffffff），不跟随强调色；只按「深色 / 浅色主题」切换 lightMode
+         （深色 = 发光叠加，浅色 = 墨线）
+       · 独立 WebGL 画布 #bgRays；背景在毛玻璃之下，默认 30fps 上限
+     对外：RaysBg.start() / stop() / refresh()；start() 返回 false = WebGL2 不可用（调用方回退到极光）。 */
+  var RaysBg = (function(){
+  'use strict';
+
+  var RAYS_CFG = {
+    raysOrigin: 'top-center', raysColor: '#ffffff', raysSpeed: 2.1, lightSpread: 0.71,
+    rayLength: 3.3, rayDensity: 1.4, tilt: 0, raySharpness: 0.4, glow: 0.6, haze: 0.25,
+    atmosphere: 1, intensity: 1, pulsating: false, fadeDistance: 1, saturation: 1,
+    followMouse: true, mouseInfluence: 0.1, cursorShadow: true, clickPulse: true,
+    noiseAmount: 0, distortion: 0, intro: true, opacity: 1,
+    maxDevicePixelRatio: 2,
+    maxFps: 30
+  };
+
+  const PIXEL_BUDGET = 2.4e6;
+  const MAX_PULSES = 4;
+
+  const ORIGINS = {
+    'top-left': { anchor: [0, -0.2], dir: [0, 1] },
+    'top-center': { anchor: [0.5, -0.2], dir: [0, 1] },
+    'top-right': { anchor: [1, -0.2], dir: [0, 1] },
+    left: { anchor: [-0.2, 0.5], dir: [1, 0] },
+    right: { anchor: [1.2, 0.5], dir: [-1, 0] },
+    'bottom-left': { anchor: [0, 1.2], dir: [0, -1] },
+    'bottom-center': { anchor: [0.5, 1.2], dir: [0, -1] },
+    'bottom-right': { anchor: [1, 1.2], dir: [0, -1] }
+  };
+
+  const VERTEX = `#version 300 es
+const vec2 corners[3] = vec2[3](vec2(-1.0, -1.0), vec2(3.0, -1.0), vec2(-1.0, 3.0));
+void main() {
+  gl_Position = vec4(corners[gl_VertexID], 0.0, 1.0);
+}`;
+
+  const FRAGMENT = `#version 300 es
+precision highp float;
+uniform vec2 uResolution;
+uniform float uScale;
+uniform float uTime;
+uniform vec2 uSource;
+uniform vec2 uAim;
+uniform float uReach;
+uniform vec3 uColor;
+uniform float uSpread;
+uniform float uLength;
+uniform float uFade;
+uniform float uSaturation;
+uniform float uPulsating;
+uniform float uNoise;
+uniform float uDistortion;
+uniform float uDensity;
+uniform float uSharpness;
+uniform float uGlow;
+uniform float uHaze;
+uniform float uAtmosphere;
+uniform float uIntensity;
+uniform vec4 uShadow;
+uniform vec4 uPulses[${MAX_PULSES}];
+uniform vec2 uIntro;
+uniform float uLight;
+uniform float uOpacity;
+out vec4 fragColor;
+
+float hash(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+
+float valueNoise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = p - i;
+  vec2 w = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), w.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), w.x), w.y);
+}
+
+float shape(float strength, float width) {
+  float edge = max(mix(0.5, 0.08, uSharpness), width);
+  return mix(strength, smoothstep(0.62 - edge, 0.62 + edge, strength), uSharpness);
+}
+
+void main() {
+  vec2 coord = vec2(gl_FragCoord.x, uResolution.y - gl_FragCoord.y) / uScale;
+  vec2 delta = coord - uSource;
+  float distance = length(delta);
+  vec2 dir = delta / max(distance, 1e-4);
+  float cosAngle = dot(dir, uAim);
+  float angle = cosAngle + uDistortion * sin(uTime * 2.0 + distance * 0.02) * 0.2;
+  float slope = fwidth(angle);
+  float depth = distance / uReach;
+
+  float source = exp(-depth * depth * 9.0) * 0.9 + exp(-depth * 3.2) * 0.25;
+  float glowLight = uGlow * source * smoothstep(-0.2, 0.6, cosAngle);
+  float spread = pow(max(angle, 0.0), 1.0 / uSpread);
+  float lengthFalloff = clamp(1.0 - distance / (uReach * uLength), 0.0, 1.0);
+  float fadeFalloff = clamp(1.0 - distance / (uReach * uFade), 0.5, 1.0);
+  float envelope = spread * lengthFalloff * fadeFalloff;
+  float reveal = uIntensity * uIntro.y * (1.0 - smoothstep(uIntro.x - 0.35, uIntro.x, depth));
+  if ((envelope * 1.6 + glowLight) * reveal < 0.0015) {
+    fragColor = vec4(0.0);
+    return;
+  }
+
+  float phaseA = angle * 36.2214 * uDensity + uTime * 1.5;
+  float phaseB = -angle * 21.11349 * uDensity + uTime * 1.5;
+  float phaseC = angle * 22.3991 * uDensity + uTime * 1.1;
+  float phaseD = -angle * 18.0234 * uDensity + uTime * 1.1;
+  float strengthA = clamp(0.75 + 0.15 * sin(phaseA) + 0.2 * cos(phaseB), 0.0, 1.0);
+  float strengthB = clamp(0.75 + 0.15 * sin(phaseC) + 0.2 * cos(phaseD), 0.0, 1.0);
+  float widthA = abs(0.15 * 36.2214 * cos(phaseA) + 0.2 * 21.11349 * sin(phaseB)) * uDensity * slope;
+  float widthB = abs(0.15 * 22.3991 * cos(phaseC) + 0.2 * 18.0234 * sin(phaseD)) * uDensity * slope;
+  float pulseA = uPulsating > 0.5 ? 0.8 + 0.2 * sin(uTime * 4.5) : 1.0;
+  float pulseB = uPulsating > 0.5 ? 0.8 + 0.2 * sin(uTime * 3.3) : 1.0;
+  float rayLight = envelope * (0.5 * shape(strengthA, widthA) * pulseA + 0.4 * shape(strengthB, widthB) * pulseB);
+
+  if (uHaze > 0.0) {
+    float around = atan(uAim.x * dir.y - uAim.y * dir.x, cosAngle);
+    vec2 drift = vec2(around * 2.2 + uTime * 0.035, depth * 2.6 - uTime * 0.11);
+    float fog = 0.65 * valueNoise(drift * vec2(3.0, 1.0)) + 0.35 * valueNoise(drift * vec2(7.0, 2.3) + 4.1);
+    rayLight *= mix(1.0, 0.25 + 1.2 * fog, uHaze);
+  }
+
+  if (uShadow.z > 0.0) {
+    vec2 toCursor = uShadow.xy - uSource;
+    float cursorDistance = length(toCursor);
+    float along = dot(delta, toCursor) / max(cursorDistance * cursorDistance, 1e-4);
+    float side = abs(delta.x * toCursor.y - delta.y * toCursor.x) / max(cursorDistance, 1e-4);
+    float trail = max(along - 1.0, 0.0);
+    float width = uShadow.w * along + 0.22 * trail * cursorDistance;
+    float behind = smoothstep(0.97, 1.25, along) * exp(-trail * 1.1);
+    float shade = (1.0 - smoothstep(width * 0.3, width * 1.6, side)) * behind;
+    rayLight *= 1.0 - uShadow.z * 0.62 * shade;
+  }
+
+  float boost = 0.0;
+  for (int i = 0; i < ${MAX_PULSES}; i++) {
+    vec4 wave = uPulses[i];
+    if (wave.z <= 0.0) continue;
+    float x = (depth - wave.x) / wave.y;
+    boost += wave.z * exp(-x * x);
+  }
+  float light = (rayLight * (1.0 + boost) + glowLight) * reveal;
+
+  if (uNoise > 0.0) {
+    float n = fract(sin(dot(coord * 0.02 + uTime * 0.1, vec2(12.9898, 78.233))) * 43758.5453123);
+    light *= 1.0 - uNoise + uNoise * n;
+  }
+
+  float near = clamp(1.2 - distance / (uResolution.y / uScale), 0.0, 1.0);
+  vec3 tint = mix(vec3(0.9), vec3(0.1, 0.3, 0.5) + near * vec3(0.8, 0.6, 0.5), uAtmosphere);
+  float gray = dot(tint, vec3(0.299, 0.587, 0.114));
+  vec3 hue = max(mix(vec3(gray), tint, uSaturation), 0.0) * uColor;
+
+  float grain = (fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715)))) - 0.5) / 255.0;
+  if (uLight > 0.5) {
+    vec3 color = hue * light;
+    float energy = max(color.r, max(color.g, color.b));
+    vec3 tone = clamp(1.0 - (1.0 - hue / max(max(hue.r, max(hue.g, hue.b)), 1e-4)) * 1.8, 0.0, 1.0);
+    float warm = clamp((min(tone.r, tone.g) - tone.b) * 2.0, 0.0, 1.0);
+    vec3 ink = tone * (mix(0.66, 0.94, warm) - 0.1 * smoothstep(0.4, 1.2, energy));
+    float density = clamp(0.82 * (1.0 - exp(-1.5 * energy * energy)) * uOpacity + grain, 0.0, 1.0);
+    fragColor = vec4(ink * density, density);
+    return;
+  }
+  float level = light < 0.75 ? light : 0.75 + 0.25 * (1.0 - exp(-(light - 0.75) / 0.25));
+  float top = max(hue.r, max(hue.g, hue.b));
+  hue = mix(hue, vec3(top), smoothstep(0.8, 1.0, level) * 0.45);
+  vec3 shown = clamp(hue * level, 0.0, 1.0) * level;
+  fragColor = vec4(clamp(shown + grain, 0.0, level) * uOpacity, level * uOpacity);
+}`;
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const parseColor = value => {
+    const text = String(value || '').trim();
+    const hex = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(text);
+    if (hex) {
+      const full = hex[1].length === 3 ? hex[1].replace(/./g, digit => digit + digit) : hex[1];
+      return [0, 2, 4].map(index => parseInt(full.slice(index, index + 2), 16) / 255);
+    }
+    const rgb = /^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(text);
+    if (rgb) return [rgb[1], rgb[2], rgb[3]].map(channel => clamp(parseFloat(channel) / 255, 0, 1));
+    return null;
+  };
+
+  const compile = (gl, type, source) => {
+    const shader = gl.createShader(type);
+    if (!shader) return null;
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      try { console.warn('[LightRays] shader:', gl.getShaderInfoLog(shader)); } catch (e) {}
+      gl.deleteShader(shader);
+      return null;
+    }
+    return shader;
+  };
+
+  const link = gl => {
+    const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX);
+    const fragment = compile(gl, gl.FRAGMENT_SHADER, FRAGMENT);
+    const program = vertex && fragment ? gl.createProgram() : null;
+    if (!vertex || !fragment || !program) {
+      if (vertex) gl.deleteShader(vertex);
+      if (fragment) gl.deleteShader(fragment);
+      return null;
+    }
+    gl.attachShader(program, vertex);
+    gl.attachShader(program, fragment);
+    gl.linkProgram(program);
+    gl.deleteShader(vertex);
+    gl.deleteShader(fragment);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.deleteProgram(program);
+      return null;
+    }
+    const uniforms = {};
+    const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (let index = 0; index < count; index++) {
+      const info = gl.getActiveUniform(program, index);
+      if (info) uniforms[info.name.replace(/\[0\]$/, '')] = gl.getUniformLocation(program, info.name);
+    }
+    return { program, uniforms };
+  };
+
+  const smoother = t => {
+    const x = clamp(t, 0, 1);
+    return x * x * x * (x * (x * 6 - 15) + 10);
+  };
+
+  /* props → 引擎用的 settings（与原组件一致，外加 maxFps） */
+  const normalize = o => ({
+    origin: ORIGINS[o.raysOrigin] || ORIGINS['top-center'],
+    color: parseColor(o.raysColor) || [1, 1, 1],
+    speed: Math.max(0, o.raysSpeed),
+    spread: Math.max(0.001, o.lightSpread),
+    length: Math.max(0.01, o.rayLength),
+    density: clamp(o.rayDensity, 0.1, 6),
+    tilt: (clamp(o.tilt, -90, 90) * Math.PI) / 180,
+    sharpness: clamp(o.raySharpness, 0, 1),
+    glow: Math.max(0, o.glow),
+    haze: clamp(o.haze, 0, 1),
+    atmosphere: clamp(o.atmosphere, 0, 1),
+    intensity: Math.max(0, o.intensity),
+    pulsating: o.pulsating,
+    fade: Math.max(0.01, o.fadeDistance),
+    saturation: Math.max(0, o.saturation),
+    follow: o.followMouse,
+    influence: clamp(o.mouseInfluence, 0, 1),
+    cursorShadow: o.cursorShadow,
+    clickPulse: o.clickPulse,
+    noise: clamp(o.noiseAmount, 0, 1),
+    distortion: o.distortion,
+    intro: o.intro,
+    light: !!o.lightMode,
+    opacity: clamp(o.opacity, 0, 1),
+    maxRatio: clamp(o.maxDevicePixelRatio, 0.5, 3),
+    maxFps: o.maxFps
+  });
+
+  /* ───────── 引擎（原组件 useEffect 内部逻辑，React 外壳去掉）───────── */
+  const createEngine = (container, canvas, getSettings, onRestore, skipIntro) => {
+    const settingsRef = { get current() { return getSettings(); } };
+    const gl = canvas.getContext('webgl2', {
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      powerPreference: 'default'
+    });
+    const shader = gl ? link(gl) : null;
+    if (!gl || !shader) return null;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const vao = gl.createVertexArray();
+    const size = { width: 1, height: 1, ratio: 1 };
+    const pointer = { x: 0.5, y: 0.5, inside: false, seen: false };
+    const aim = { x: 0.5, y: 0.5 };
+    const shade = { x: 0.5, y: 0.5, presence: 0 };
+    const pulses = [];
+    const pulseData = new Float32Array(MAX_PULSES * 4);
+    let time = 0;
+    let opening = settingsRef.current.intro && !reduced && !skipIntro ? 0 : 1;
+    let raf = 0;
+    let last = 0;
+    let lastPaint = 0;
+    let visible = true;
+    let pageVisible = document.visibilityState !== 'hidden';
+    let lost = false;
+    let dead = false;
+
+    const resize = () => {
+      const s = settingsRef.current;
+      const rect = container.getBoundingClientRect();
+      const cssWidth = Math.max(1, rect.width);
+      const cssHeight = Math.max(1, rect.height);
+      const detail = s.density * (0.35 + 0.65 * s.sharpness);
+      const sampling = Math.max(clamp(0.35 + 0.3 * detail, 0.5, 2), s.noise > 0 ? 1 : 0);
+      const ratio = Math.min(
+        window.devicePixelRatio || 1,
+        s.maxRatio,
+        sampling,
+        Math.sqrt(PIXEL_BUDGET / (cssWidth * cssHeight))
+      );
+      const width = Math.max(1, Math.round(cssWidth * ratio));
+      const height = Math.max(1, Math.round(cssHeight * ratio));
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+      size.width = cssWidth;
+      size.height = cssHeight;
+      size.ratio = width / cssWidth;
+    };
+
+    const frame = now => {
+      raf = 0;
+      if (dead || lost) return;
+      const s = settingsRef.current;
+      /* 帧率上限：未到点就跳过这一帧（last 不动，下一帧 dt 自动累加） */
+      if (lastPaint && s.maxFps > 0 && now - lastPaint < 1000 / s.maxFps - 2) {
+        if (visible && pageVisible) raf = requestAnimationFrame(frame);
+        return;
+      }
+      lastPaint = now;
+      const dt = clamp((now - last) / 1000 || 0, 0, 0.05);
+      last = Math.max(last, now);
+      time += dt * s.speed * (reduced ? 0.35 : 1);
+      if (opening < 1) opening = Math.min(1, opening + dt / 1.8);
+
+      const steer = 1 - Math.exp(-dt / 0.2);
+      const aimX = s.follow && pointer.seen ? pointer.x : 0.5;
+      const aimY = s.follow && pointer.seen ? pointer.y : 0.5;
+      aim.x += (aimX - aim.x) * steer;
+      aim.y += (aimY - aim.y) * steer;
+      const glide = 1 - Math.exp(-dt / 0.08);
+      shade.x += (pointer.x - shade.x) * glide;
+      shade.y += (pointer.y - shade.y) * glide;
+      const shading = pointer.inside && s.cursorShadow && !reduced;
+      shade.presence += ((shading ? 1 : 0) - shade.presence) * (1 - Math.exp(-dt / (shading ? 0.25 : 0.5)));
+
+      for (let index = pulses.length - 1; index >= 0; index--) {
+        pulses[index].age += dt;
+        if (pulses[index].age >= 2) pulses.splice(index, 1);
+      }
+      pulseData.fill(0);
+      pulses.forEach((pulse, index) => {
+        const t = pulse.age;
+        pulseData[index * 4] = 0.05 + t * 1.05;
+        pulseData[index * 4 + 1] = 0.14 + t * 0.14;
+        pulseData[index * 4 + 2] = 0.9 * smoother(t / 0.15) * (1 - smoother(t / 2));
+      });
+
+      const width = size.width;
+      const height = size.height;
+      const sourceX = s.origin.anchor[0] * width;
+      const sourceY = s.origin.anchor[1] * height;
+      const cos = Math.cos(s.tilt);
+      const sin = Math.sin(s.tilt);
+      let dirX = s.origin.dir[0] * cos - s.origin.dir[1] * sin;
+      let dirY = s.origin.dir[0] * sin + s.origin.dir[1] * cos;
+      if (s.follow && s.influence > 0) {
+        const mx = aim.x * width - sourceX;
+        const my = aim.y * height - sourceY;
+        const ml = Math.hypot(mx, my) || 1;
+        const bx = dirX + (mx / ml - dirX) * s.influence;
+        const by = dirY + (my / ml - dirY) * s.influence;
+        const bl = Math.hypot(bx, by) || 1;
+        dirX = bx / bl;
+        dirY = by / bl;
+      }
+      const eased = 1 - Math.pow(1 - opening, 3);
+
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      gl.useProgram(shader.program);
+      gl.bindVertexArray(vao);
+      const u = shader.uniforms;
+      gl.uniform2f(u.uResolution, canvas.width, canvas.height);
+      gl.uniform1f(u.uScale, size.ratio);
+      gl.uniform1f(u.uTime, time);
+      gl.uniform2f(u.uSource, sourceX, sourceY);
+      gl.uniform2f(u.uAim, dirX, dirY);
+      gl.uniform1f(u.uReach, Math.max(width, height));
+      gl.uniform3f(u.uColor, s.color[0], s.color[1], s.color[2]);
+      gl.uniform1f(u.uSpread, s.spread);
+      gl.uniform1f(u.uLength, s.length);
+      gl.uniform1f(u.uFade, s.fade);
+      gl.uniform1f(u.uSaturation, s.saturation);
+      gl.uniform1f(u.uPulsating, s.pulsating ? 1 : 0);
+      gl.uniform1f(u.uNoise, s.noise);
+      gl.uniform1f(u.uDistortion, s.distortion);
+      gl.uniform1f(u.uDensity, s.density);
+      gl.uniform1f(u.uSharpness, s.sharpness);
+      gl.uniform1f(u.uGlow, s.glow);
+      gl.uniform1f(u.uHaze, s.haze);
+      gl.uniform1f(u.uAtmosphere, s.atmosphere);
+      gl.uniform1f(u.uIntensity, s.intensity);
+      gl.uniform4f(u.uShadow, shade.x * width, shade.y * height, shade.presence, 16);
+      gl.uniform4fv(u.uPulses, pulseData);
+      gl.uniform2f(u.uIntro, eased * 2.6, smoother(opening / 0.5));
+      gl.uniform1f(u.uLight, s.light ? 1 : 0);
+      gl.uniform1f(u.uOpacity, s.opacity);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+      const settling =
+        Math.abs(aim.x - aimX) > 1e-4 ||
+        Math.abs(aim.y - aimY) > 1e-4 ||
+        (shade.presence > 1e-3 && Math.abs(shade.x - pointer.x) + Math.abs(shade.y - pointer.y) > 1e-4) ||
+        Math.abs((shading ? 1 : 0) - shade.presence) > 1e-3 ||
+        pulses.length > 0;
+      const busy = s.speed > 0 || opening < 1 || settling;
+      if (busy && visible && pageVisible) raf = requestAnimationFrame(frame);
+    };
+
+    const wake = () => {
+      if (dead || raf || lost || !visible || !pageVisible) return;
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    };
+
+    const locate = event => {
+      const rect = container.getBoundingClientRect();
+      return {
+        x: (event.clientX - rect.left) / Math.max(1, rect.width),
+        y: (event.clientY - rect.top) / Math.max(1, rect.height),
+        inside:
+          event.clientX >= rect.left &&
+          event.clientX <= rect.right &&
+          event.clientY >= rect.top &&
+          event.clientY <= rect.bottom
+      };
+    };
+
+    const onPointerMove = event => {
+      const spot = locate(event);
+      if (!pointer.inside && spot.inside) {
+        shade.x = spot.x;
+        shade.y = spot.y;
+      }
+      pointer.x = spot.x;
+      pointer.y = spot.y;
+      pointer.inside = spot.inside;
+      pointer.seen = true;
+      wake();
+    };
+    const onPointerDown = event => {
+      const s = settingsRef.current;
+      const spot = locate(event);
+      if (!spot.inside || !s.clickPulse || reduced) return;
+      pulses.push({ age: 0 });
+      if (pulses.length > MAX_PULSES) pulses.shift();
+      wake();
+    };
+    const onLeave = () => {
+      pointer.inside = false;
+      wake();
+    };
+    const onPointerUp = event => {
+      if (event.pointerType !== 'mouse') onLeave();
+    };
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('pointerup', onPointerUp, { passive: true });
+    window.addEventListener('pointercancel', onPointerUp, { passive: true });
+    document.documentElement.addEventListener('pointerleave', onLeave);
+
+    const onLost = event => {
+      event.preventDefault();
+      lost = true;
+      cancelAnimationFrame(raf);
+      raf = 0;
+    };
+    const onRestored = () => { if (onRestore) onRestore(); };
+    canvas.addEventListener('webglcontextlost', onLost);
+    canvas.addEventListener('webglcontextrestored', onRestored);
+
+    const resizeObserver = new ResizeObserver(() => {
+      resize();
+      wake();
+    });
+    resizeObserver.observe(container);
+
+    const intersection = new IntersectionObserver(entries => {
+      visible = entries.some(entry => entry.isIntersecting);
+      wake();
+    });
+    intersection.observe(container);
+
+    const onVisibility = () => {
+      pageVisible = document.visibilityState !== 'hidden';
+      wake();
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    resize();
+    wake();
+
+    const destroy = () => {
+      dead = true;
+      cancelAnimationFrame(raf);
+      raf = 0;
+      resizeObserver.disconnect();
+      intersection.disconnect();
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+      document.documentElement.removeEventListener('pointerleave', onLeave);
+      document.removeEventListener('visibilitychange', onVisibility);
+      canvas.removeEventListener('webglcontextlost', onLost);
+      canvas.removeEventListener('webglcontextrestored', onRestored);
+      if (!gl.isContextLost()) {
+        gl.deleteVertexArray(vao);
+        gl.deleteProgram(shader.program);
+        const lose = gl.getExtension('WEBGL_lose_context');
+        if (lose) lose.loseContext();
+      }
+    };
+
+    /* 原组件里 wakeRef 的行为：设置变了就重新量一次尺寸再唤醒 */
+    return { wake: () => { resize(); wake(); }, destroy };
+  };
+
+  /* ───────── 控制器：只按深/浅主题切 lightMode（颜色固定，不读强调色）───────── */
+  var engine = null;
+  var SETTINGS = null;
+
+  function themeIsLight(){ return document.documentElement.getAttribute('data-theme') === 'light'; }
+  function buildSettings(){
+    var o = {};
+    for (var k in RAYS_CFG) o[k] = RAYS_CFG[k];
+    o.lightMode = themeIsLight();
+    SETTINGS = normalize(o);
+  }
+  function startInner(skipIntro){
+    var container = document.getElementById('bgFx');
+    var canvas = document.getElementById('bgRays');
+    if (!container || !canvas) return false;
+    buildSettings();
+    if (engine) { canvas.style.display = 'block'; engine.wake(); return true; }
+    /* 每次启动换一块新画布：销毁时 loseContext() 过的画布拿不到可用的新上下文 */
+    var fresh = canvas.cloneNode(false);
+    canvas.parentNode.replaceChild(fresh, canvas);
+    fresh.style.display = 'block';
+    try { engine = createEngine(container, fresh, function(){ return SETTINGS; }, restart, skipIntro); }
+    catch (e) { engine = null; try { console.warn('[LightRays] disabled:', e); } catch (_) {} }
+    if (!engine) { fresh.style.display = 'none'; return false; }
+    return true;
+  }
+  function start(){ return startInner(false); }
+  function stop(){
+    if (engine) { try { engine.destroy(); } catch (e) {} engine = null; }
+    var c = document.getElementById('bgRays');
+    if (c) c.style.display = 'none';
+  }
+  function restart(){ stop(); startInner(true); }   /* WebGL 上下文恢复：重建，不重播入场动画 */
+  function refresh(){
+    if (!engine) return;
+    buildSettings();
+    engine.wake();
+  }
+
+  return { start: start, stop: stop, refresh: refresh, config: RAYS_CFG };
+  })();
+
+  /* ════════ Ferrofluid 背景（React Bits <Ferrofluid /> 的原生 JS 移植）════════
+     纯 WebGL2、无第三方依赖，引擎保持原样（模拟 + 包围盒 + 射线步进三个 pass）。
+       · 颜色用组件配置的三盏灯 #ffffff，不跟随强调色；只按深/浅主题切换 lightMode
+       · 独立 WebGL 画布 #bgFerro；射线步进最吃 GPU，所以默认 30fps、DPR 上限 1.25
+     对外：FerroBg.start() / stop() / refresh()；start() 返回 false = WebGL2 不可用（回退到极光）。 */
+  var FerroBg = (function(){
+  'use strict';
+
+  var FERRO_CFG = {
+    colors: ['#ffffff', '#ffffff', '#ffffff'],
+    speed: 0.5, scale: 1.6, spikeHeight: 1, sharpness: 2.5, turbulence: 1, fluidity: 0.5,
+    tilt: 48, magnetism: 1, variation: 0, flowDirection: 'down', brightness: 1,
+    mouseInteraction: true, mouseStrength: 1, mouseRadius: 0.22, mouseDampening: 0.15,
+    clickPulse: true, intro: true, transparent: true, color: undefined, opacity: 1,
+    paused: false,
+    maxFps: 30, maxDpr: 1.25
+  };
+
+  const CELL = 1 / 3;
+  const BOUND_CELL = 1;
+  const INTRO_SECONDS = 2.4;
+  const FOV = (38 * Math.PI) / 180;
+  const FLOW = { up: [0, 1], down: [0, -1], left: [-1, 0], right: [1, 0], none: [0, 0] };
+
+  const VERTEX = `#version 300 es
+in vec2 aPosition;
+void main() {
+  gl_Position = vec4(aPosition, 0.0, 1.0);
+}`;
+
+  const SIM_FRAGMENT = `#version 300 es
+precision highp float;
+uniform sampler2D uState;
+uniform vec2 uGridOrigin;
+uniform float uCell;
+uniform float uDt;
+uniform float uTime;
+uniform vec2 uFlow;
+uniform float uTurbulence;
+uniform float uMagnetism;
+uniform float uFieldScale;
+uniform vec2 uSeed;
+uniform vec4 uCursor;
+uniform vec4 uPulse;
+uniform float uPulseSpeed;
+uniform float uPulseWidth;
+uniform vec3 uIntro;
+uniform float uSpikeHeight;
+uniform float uMound;
+uniform float uStiffness;
+uniform float uDamping;
+uniform float uSettle;
+out vec4 outState;
+
+float hash(vec2 p) {
+  vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+  p3 += dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  vec2 u = f * f * f * (f * (f * 6.0 - 15.0) + 10.0);
+  float a = hash(i);
+  float b = hash(i + vec2(1.0, 0.0));
+  float c = hash(i + vec2(0.0, 1.0));
+  float d = hash(i + vec2(1.0, 1.0));
+  return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+}
+
+float flowField(vec2 p) {
+  vec2 q = p / uFieldScale + uSeed;
+  vec2 drift = uFlow * uTime * 0.55;
+  vec2 warp = vec2(noise(q * 0.6 + vec2(uTime * 0.07, 3.1)), noise(q * 0.6 - vec2(7.3, uTime * 0.06))) - 0.5;
+  vec2 r = q + warp * 1.8 * uTurbulence - drift;
+  float n = noise(r) * 0.65 + noise(r * 2.03 + 11.7 - drift * 0.5) * 0.35;
+  return smoothstep(0.44, 0.86, n);
+}
+
+void main() {
+  vec2 texel = floor(gl_FragCoord.xy);
+  vec2 p = uGridOrigin + (texel + 0.5) * uCell;
+  vec4 prev = texelFetch(uState, ivec2(texel), 0);
+  float swell = flowField(p);
+  float field = uMagnetism * (0.03 + 1.0 * swell * swell);
+  vec2 dc = p - uCursor.xy;
+  float falloff = dot(dc, dc) / (uCursor.w * uCursor.w);
+  field += uCursor.z * exp(-falloff);
+  float mound = uCursor.z * exp(-falloff / 2.2);
+  if (uPulse.w > 0.0) {
+    float ring = length(p - uPulse.xy) - uPulse.z * uPulseSpeed;
+    float envelope = smoothstep(0.0, 0.08, uPulse.z) * exp(-uPulse.z * 1.1);
+    field += uPulse.w * envelope * exp(-ring * ring / (uPulseWidth * uPulseWidth));
+  }
+  float front = clamp((uIntro.z - length(p - uIntro.xy)) / 3.0, 0.0, 1.0);
+  front = front * front * (3.0 - 2.0 * front);
+  float target = uSpikeHeight * min(pow(max(field * front - 0.04, 0.0), 1.6), 1.0);
+  float height = prev.x;
+  float velocity = prev.y;
+  if (uSettle > 0.5) {
+    height = target;
+    velocity = 0.0;
+  } else {
+    float steps = ceil(uDt / 0.008);
+    float h = uDt / steps;
+    for (int k = 0; k < 8; k++) {
+      if (float(k) >= steps) break;
+      velocity += (uStiffness * (target - height) - uDamping * velocity) * h;
+      height += velocity * h;
+    }
+    if (height < 0.0) {
+      height = 0.0;
+      velocity = max(velocity, 0.0);
+    }
+  }
+  outState = vec4(height, velocity, mound * front * uMound, 1.0);
+}`;
+
+  const BOUND_FRAGMENT = `#version 300 es
+precision highp float;
+uniform sampler2D uState;
+uniform vec2 uGridOrigin;
+uniform float uCell;
+uniform vec2 uStateSize;
+uniform float uBoundCell;
+out vec4 outBound;
+
+void main() {
+  vec2 center = uGridOrigin + (floor(gl_FragCoord.xy) + 0.5) * uBoundCell;
+  vec2 base = floor((center - uGridOrigin) / uCell);
+  float top = 0.0;
+  float peak = 0.0;
+  for (int y = -4; y <= 4; y++) {
+    for (int x = -4; x <= 4; x++) {
+      vec2 texel = clamp(base + vec2(float(x), float(y)), vec2(0.0), uStateSize - 1.0);
+      vec4 s = texelFetch(uState, ivec2(texel), 0);
+      top = max(top, max(s.x, 0.0) * 1.05 + s.z);
+      peak = max(peak, s.x);
+    }
+  }
+  outBound = vec4(top, peak, 0.0, 1.0);
+}`;
+
+  const RENDER_FRAGMENT = `#version 300 es
+precision highp float;
+uniform sampler2D uField;
+uniform sampler2D uBound;
+uniform vec2 uGridOrigin;
+uniform vec2 uGridSpan;
+uniform vec2 uBoundSpan;
+uniform float uCellSize;
+uniform vec2 uResolution;
+uniform vec3 uCamera;
+uniform vec3 uForward;
+uniform vec3 uUpward;
+uniform float uTanHalf;
+uniform float uPixelAngle;
+uniform float uFar;
+uniform float uFogStart;
+uniform float uTop;
+uniform float uBottom;
+uniform float uTime;
+uniform vec4 uCursor;
+uniform float uMound;
+uniform float uRound;
+uniform float uSpan;
+uniform float uExponent;
+uniform float uWarp;
+uniform vec3 uKey;
+uniform vec3 uStrip;
+uniform vec3 uFill;
+uniform float uExposure;
+uniform float uLight;
+uniform float uOpaque;
+uniform vec3 uBase;
+uniform float uOpacity;
+out vec4 outColor;
+
+const float G = 7.2551975;
+const vec2 E1 = vec2(0.8660254, 0.5);
+const vec2 E2 = vec2(-0.8660254, 0.5);
+const vec2 E3 = vec2(0.0, -1.0);
+const mat2 TURN = mat2(0.9902681, 0.1391731, -0.1391731, 0.9902681);
+const float F0 = 0.06;
+
+vec3 mound(vec2 p) {
+  vec2 d = p - uCursor.xy;
+  float inv = 1.0 / (uCursor.w * uCursor.w * 2.2);
+  float e = uCursor.z * exp(-dot(d, d) * inv);
+  return vec3(e, -2.0 * inv * e * d) * uMound;
+}
+
+vec2 lattice(vec2 p) {
+  vec2 q = TURN * p;
+  float t = uTime * 0.35;
+  return q + uWarp * vec2(sin(q.y * 0.9 + t), cos(q.x * 0.8 - t * 0.8));
+}
+
+float detail(float t) {
+  return smoothstep(3.0, 8.0, 1.0 / max(t * uPixelAngle, 1e-5)) * (1.0 - smoothstep(uFogStart, mix(uFogStart, uFar, 0.7), t));
+}
+
+float profile(float u, out float rate) {
+  float root = sqrt(max(1.0 - u, 0.0) + uRound * uRound);
+  rate = 0.5 / (uSpan * root);
+  return clamp(1.0 - (root - uRound) / uSpan, 0.0, 1.0);
+}
+
+float spikes(vec2 p, float a, float rise, out float clearance) {
+  clearance = 10.0;
+  if (a < 0.002) return 0.0;
+  vec2 q = lattice(p);
+  float u = (cos(G * dot(E1, q)) + cos(G * dot(E2, q)) + cos(G * dot(E3, q)) + 1.5) / 4.5;
+  if (a > 0.05) {
+    float root = uRound + (1.0 - pow(clamp(rise / a, 0.0, 1.0), 1.0 / uExponent)) * uSpan;
+    clearance = sqrt(max(1.0 - u, 0.0) / 8.77) - sqrt(max(root * root - uRound * uRound, 0.0) / 8.77);
+  }
+  float rate;
+  return a * pow(profile(u, rate), uExponent);
+}
+
+vec2 spikesSlope(vec2 p, float a, vec2 aSlope) {
+  if (a < 0.002) return vec2(0.0);
+  vec2 q = lattice(p);
+  float c1 = G * dot(E1, q);
+  float c2 = G * dot(E2, q);
+  float c3 = G * dot(E3, q);
+  float u = (cos(c1) + cos(c2) + cos(c3) + 1.5) / 4.5;
+  vec2 du = -(G / 4.5) * (sin(c1) * E1 + sin(c2) * E2 + sin(c3) * E3) * TURN;
+  float rate;
+  float s = max(profile(u, rate), 1e-4);
+  float shape = pow(s, uExponent);
+  return a * uExponent * shape / s * rate * du + aSlope * shape;
+}
+
+float surface(vec2 p, float z, float t, out float clearance) {
+  vec4 f = texture(uField, (p - uGridOrigin) / uGridSpan);
+  return f.z + spikes(p, f.x * detail(t), z - f.z, clearance);
+}
+
+vec2 bound(vec2 p) {
+  return texture(uBound, (p - uGridOrigin) / uBoundSpan).rg;
+}
+
+float panel(vec3 r, vec3 dir, vec3 up, vec2 extent, float soft) {
+  vec3 side = normalize(cross(dir, up));
+  vec3 top = cross(side, dir);
+  float facing = dot(r, dir);
+  if (facing <= 0.0) return 0.0;
+  vec2 q = vec2(dot(r, side), dot(r, top)) / facing;
+  vec2 e = smoothstep(extent + soft, extent - soft, abs(q));
+  return e.x * e.y;
+}
+
+vec3 studio(vec3 r, vec3 rd, float soft) {
+  vec3 z = vec3(0.0, 0.0, 1.0);
+  vec3 col = uKey * 4.2 * panel(r, normalize(vec3(-0.3, -0.5, 0.81)), z, vec2(0.36, 0.22), 0.08 + soft);
+  col += uStrip * 1.5 * panel(r, normalize(vec3(-0.9, -0.2, 0.38)), z, vec2(0.12, 0.7), 0.07 + soft);
+  col += uStrip * 1.5 * panel(r, normalize(vec3(0.9, -0.1, 0.42)), z, vec2(0.12, 0.7), 0.07 + soft);
+  float lift = asin(clamp(r.z, -1.0, 1.0)) - asin(clamp(-rd.z, -1.0, 1.0));
+  col += uFill * 0.45 * smoothstep(0.08 - soft, 0.7 + soft, lift) * smoothstep(1.6, 1.0, lift);
+  return col;
+}
+
+vec4 finish(vec3 light, vec3 paper, float alpha) {
+  if (uLight > 0.5) {
+    if (uOpaque > 0.5) return vec4(mix(uBase, paper, alpha) * uOpacity, uOpacity);
+    vec3 shade = mix(vec3(1.0), paper, alpha * uOpacity);
+    float cover = 1.0 - min(shade.r, min(shade.g, shade.b));
+    return vec4(shade - (1.0 - cover), cover);
+  }
+  vec3 glow = light * alpha * uOpacity;
+  if (uOpaque > 0.5) return vec4(uBase + glow, 1.0);
+  return vec4(glow, max(glow.r, max(glow.g, glow.b)));
+}
+
+void main() {
+  vec2 ndc = (gl_FragCoord.xy - 0.5 * uResolution) / (0.5 * uResolution.y);
+  vec3 side = normalize(cross(uForward, uUpward));
+  vec3 rd = normalize(uForward + (ndc.x * side + ndc.y * uUpward) * uTanHalf);
+  if (rd.z > -0.004) {
+    outColor = finish(vec3(0.0), vec3(1.0), 0.0);
+    return;
+  }
+  float tTop = max((uTop - uCamera.z) / rd.z, 0.0);
+  float tEnd = min((uBottom - uCamera.z) / rd.z, uFar);
+  if (tTop >= tEnd) {
+    outColor = finish(vec3(0.0), vec3(1.0), 0.0);
+    return;
+  }
+  float sink = max(-rd.z, 0.2);
+  float glide = max(length(rd.xy), 0.05);
+  float chunk = 0.9 / glide;
+  float t = tEnd;
+  float tPrev = tEnd;
+  bool found = false;
+  bool smoothHit = false;
+  float t0 = tTop;
+  vec2 b0 = bound(uCamera.xy + rd.xy * t0);
+  for (int c = 0; c < 64; c++) {
+    if (t0 >= tEnd) break;
+    float t1 = min(t0 + chunk, tEnd);
+    vec2 b1 = bound(uCamera.xy + rd.xy * t1);
+    float b = max(b0.x, b1.x) + 0.03;
+    float z1 = uCamera.z + rd.z * t1;
+    if (z1 > b) {
+      t0 = t1;
+      b0 = b1;
+      continue;
+    }
+    float tt = max(t0, (b - uCamera.z) / rd.z);
+    if (max(b0.y, b1.y) < 0.002) {
+      for (int k = 0; k < 3; k++) {
+        vec3 probe = uCamera + rd * tt;
+        tt += (probe.z - mound(probe.xy).x) / sink * 0.95;
+      }
+      if (tt <= t1 + 0.02 || t1 >= tEnd) {
+        t = tt;
+        smoothHit = true;
+        break;
+      }
+      t0 = t1;
+      b0 = b1;
+      continue;
+    }
+    float tp = tt;
+    for (int k = 0; k < 48; k++) {
+      vec3 pos = uCamera + rd * tt;
+      float clearance;
+      float gap = pos.z - surface(pos.xy, pos.z, tt, clearance);
+      if (gap < 0.0) {
+        found = true;
+        break;
+      }
+      tp = tt;
+      float pixel = tt * uPixelAngle;
+      float limit = pos.z > bound(pos.xy).x + 0.02 ? 0.6 / glide : max(clearance * 0.9, pixel) / glide;
+      tt += max(min(gap * 0.75 / sink, limit), pixel);
+      if (tt > t1) break;
+    }
+    if (found) {
+      t = tt;
+      tPrev = tp;
+      break;
+    }
+    t0 = t1;
+    b0 = b1;
+  }
+
+  vec3 pos;
+  vec2 slope;
+  if (smoothHit || !found) {
+    pos = uCamera + rd * t;
+    slope = mound(pos.xy).yz;
+  } else {
+    float lo = tPrev;
+    float hi = t;
+    for (int k = 0; k < 4; k++) {
+      float mid = 0.5 * (lo + hi);
+      vec3 probe = uCamera + rd * mid;
+      float clearance;
+      if (probe.z - surface(probe.xy, probe.z, mid, clearance) < 0.0) hi = mid;
+      else lo = mid;
+    }
+    t = hi;
+    pos = uCamera + rd * t;
+    vec2 uv = (pos.xy - uGridOrigin) / uGridSpan;
+    vec2 step = uCellSize / uGridSpan;
+    float fade = detail(t);
+    float a = texture(uField, uv).x * fade;
+    vec2 aSlope = vec2(
+      texture(uField, uv + vec2(step.x, 0.0)).x - texture(uField, uv - vec2(step.x, 0.0)).x,
+      texture(uField, uv + vec2(0.0, step.y)).x - texture(uField, uv - vec2(0.0, step.y)).x
+    ) * fade / (2.0 * uCellSize);
+    slope = mound(pos.xy).yz + spikesSlope(pos.xy, a, aSlope);
+  }
+
+  vec3 n = normalize(vec3(-slope, 1.0));
+  vec3 r = reflect(rd, n);
+  float soft = length(fwidth(r)) * 0.6;
+  float facing = max(dot(n, -rd), 0.0);
+  float fresnel = F0 + (1.0 - F0) * pow(1.0 - facing, 5.0);
+  float rim = pow(1.0 - clamp(abs(dot(rd, n)), 0.0, 1.0), 3.0) * smoothstep(0.85, 0.4, n.z);
+  float distance = 1.0 - smoothstep(uFogStart, uFar, t);
+
+  if (uLight > 0.5) {
+    vec3 key = normalize(vec3(-0.45, -0.55, 0.7));
+    float lambert = clamp(dot(n, key) / key.z, 0.0, 1.0);
+    float diffuse = mix(0.62, 1.0, lambert);
+    float room = mix(0.3, 1.0, smoothstep(-0.25, 0.3, r.z));
+    room -= 0.3 * rim;
+    float lum = mix(diffuse, room, fresnel);
+    lum = 1.0 - (1.0 - lum) * clamp(uExposure / 3.0, 0.0, 1.5);
+    vec3 shadow = mix(vec3(0.0), uStrip, 0.45);
+    vec3 paper = mix(shadow, vec3(1.0), clamp(lum, 0.0, 1.0));
+    outColor = finish(vec3(0.0), paper, distance);
+    return;
+  }
+
+  vec3 shine = 1.0 - exp(-(studio(r, rd, soft) * fresnel + uFill * rim * 0.35) * uExposure);
+  outColor = finish(shine, vec3(1.0), distance);
+}`;
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const shapeOf = sharpness => {
+    const edge = clamp((sharpness - 1) / 4, 0, 1);
+    const round = 1 - edge * 0.7;
+    const exponent = 1.05 + edge * 1.2;
+    const span = Math.sqrt(1 + round * round) - round;
+    return { round, exponent, span };
+  };
+
+  const compile = (gl, type, source) => {
+    const shader = gl.createShader(type);
+    if (!shader) return null;
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
+    if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
+    try { console.warn('[Ferrofluid] shader:', gl.getShaderInfoLog(shader)); } catch (e) {}
+    gl.deleteShader(shader);
+    return null;
+  };
+
+  const link = (gl, fragmentSource) => {
+    const vertex = compile(gl, gl.VERTEX_SHADER, VERTEX);
+    const fragment = compile(gl, gl.FRAGMENT_SHADER, fragmentSource);
+    const program = gl.createProgram();
+    if (!vertex || !fragment || !program) return null;
+    gl.attachShader(program, vertex);
+    gl.attachShader(program, fragment);
+    gl.bindAttribLocation(program, 0, 'aPosition');
+    gl.linkProgram(program);
+    gl.deleteShader(vertex);
+    gl.deleteShader(fragment);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      gl.deleteProgram(program);
+      return null;
+    }
+    const uniforms = {};
+    const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < count; i++) {
+      const info = gl.getActiveUniform(program, i);
+      if (info) uniforms[info.name.replace('[0]', '')] = gl.getUniformLocation(program, info.name);
+    }
+    return { program, uniforms };
+  };
+
+  /* props → 引擎用的 settings（与原组件一致，外加 maxFps / dpr）*/
+  const normalize = o => ({
+    colors: Array.isArray(o.colors) && o.colors.length ? o.colors.slice(0, 3) : ['#ffffff'],
+    speed: Math.max(0, o.speed),
+    scale: clamp(o.scale, 0.2, 6),
+    spikeHeight: Math.max(0, o.spikeHeight),
+    sharpness: clamp(o.sharpness, 0.6, 6),
+    turbulence: Math.max(0, o.turbulence),
+    fluidity: clamp(o.fluidity, 0, 1),
+    tilt: clamp(o.tilt, 10, 70),
+    magnetism: Math.max(0, o.magnetism),
+    variation: o.variation,
+    flow: FLOW[o.flowDirection] || FLOW.down,
+    brightness: Math.max(0, o.brightness),
+    mouseInteraction: o.mouseInteraction,
+    mouseStrength: Math.max(0, o.mouseStrength),
+    mouseRadius: clamp(o.mouseRadius, 0.02, 2),
+    mouseDampening: Math.max(0, o.mouseDampening),
+    clickPulse: o.clickPulse,
+    intro: o.intro,
+    lightMode: !!o.lightMode,
+    transparent: o.transparent,
+    color: o.color,
+    opacity: clamp(o.opacity, 0, 1),
+    paused: o.paused,
+    dpr: o.dpr,
+    maxFps: o.maxFps
+  });
+
+  /* ───────── 引擎（原组件 useEffect 内部逻辑，React 外壳去掉）───────── */
+  const createEngine = (container, canvas, getSettings, onRestore, skipIntro) => {
+    const settingsRef = { get current() { return getSettings(); } };
+    const gl = canvas.getContext('webgl2', {
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,
+      depth: false,
+      stencil: false
+    });
+    if (!container || !canvas || !gl) return null;
+
+    const floatTargets = Boolean(gl.getExtension('EXT_color_buffer_float'));
+    const sim = link(gl, SIM_FRAGMENT);
+    const bounds = link(gl, BOUND_FRAGMENT);
+    const render = link(gl, RENDER_FRAGMENT);
+    if (!sim || !bounds || !render) return null;
+
+    const buffer = gl.createBuffer();
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    const makeTarget = (width, height, filter) => {
+      const texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      if (floatTargets) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, width, height, 0, gl.RGBA, gl.HALF_FLOAT, null);
+      else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      const framebuffer = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      return { texture, framebuffer };
+    };
+    const dropTarget = target => {
+      if (!target) return;
+      gl.deleteTexture(target.texture);
+      gl.deleteFramebuffer(target.framebuffer);
+    };
+
+    const probe = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+    const cache = new Map();
+    const parse = (value, fallback) => {
+      if (!value) return fallback;
+      const key = String(value);
+      if (cache.has(key)) return cache.get(key);
+      let rgb = fallback;
+      if (probe) {
+        probe.clearRect(0, 0, 1, 1);
+        probe.fillStyle = '#000000';
+        probe.fillStyle = key;
+        probe.fillRect(0, 0, 1, 1);
+        const d = probe.getImageData(0, 0, 1, 1).data;
+        rgb = [d[0] / 255, d[1] / 255, d[2] / 255];
+      }
+      cache.set(key, rgb);
+      return rgb;
+    };
+
+    const reduce = (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) || false;
+    const tanHalf = Math.tan(FOV / 2);
+    const view = { width: 1, height: 1, worldHeight: 10, scale: 0, tilt: -1, reach: 1 };
+    const camera = { x: 0, y: 0, z: 1, forward: [0, 1, 0], upward: [0, 0, 1], far: 10, distance: 4 };
+    const grid = { width: 0, height: 0, originX: 0, originY: 0, boundWidth: 0, boundHeight: 0 };
+    let states = [];
+    let boundTarget = null;
+    let current = 0;
+    let settle = true;
+
+    const pointer = { x: 0, y: 0, inside: false };
+    const cursor = { x: 0, y: 0, strength: 0 };
+    const pulse = { x: 0, y: 0, age: 10 };
+    let wander = 0;
+    let presence = settingsRef.current.intro && !reduce && !skipIntro ? 0 : 1;
+    let shape = shapeOf(settingsRef.current.sharpness);
+    let shapeKey = settingsRef.current.sharpness;
+    let raf = 0;
+    let last = 0;
+    let lastPaint = 0;
+    let visible = true;
+    let dead = false;
+
+    const castRay = (x, y) => {
+      const aspect = view.width / view.height;
+      const sx = x * aspect * tanHalf;
+      const sy = y * tanHalf;
+      const fx = camera.forward[0], fy = camera.forward[1], fz = camera.forward[2];
+      const uy = camera.upward[1], uz = camera.upward[2];
+      const dx = fx + sx;
+      const dy = fy + sy * uy;
+      const dz = fz + sy * uz;
+      const length = Math.hypot(dx, dy, dz) || 1;
+      return [dx / length, dy / length, dz / length];
+    };
+
+    const groundAt = (x, y) => {
+      const d = castRay(x, y);
+      const t = d[2] < -0.004 ? Math.min(-camera.z / d[2], camera.far) : camera.far;
+      return [camera.x + d[0] * t, camera.y + d[1] * t];
+    };
+
+    const layout = () => {
+      const s = settingsRef.current;
+      const width = Math.max(1, container.clientWidth);
+      const height = Math.max(1, container.clientHeight);
+      const ratio = Math.min(s.dpr || window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.round(width * ratio));
+      canvas.height = Math.max(1, Math.round(height * ratio));
+      view.width = canvas.width;
+      view.height = canvas.height;
+      view.worldHeight = 22 / s.scale;
+      view.scale = s.scale;
+      view.tilt = s.tilt;
+      const pitch = ((90 - s.tilt) * Math.PI) / 180;
+      const distance = view.worldHeight / (2 * tanHalf);
+      camera.forward = [0, Math.cos(pitch), -Math.sin(pitch)];
+      camera.upward = [0, Math.sin(pitch), Math.cos(pitch)];
+      camera.x = 0;
+      camera.y = -distance * Math.cos(pitch);
+      camera.z = distance * Math.sin(pitch);
+      camera.far = distance * 2.5;
+      camera.distance = distance;
+      const corners = [groundAt(-1, -1), groundAt(1, -1), groundAt(-1, 1), groundAt(1, 1), groundAt(0, 1)];
+      const xs = corners.map(c => c[0]);
+      const ys = corners.map(c => c[1]);
+      const minX = Math.min.apply(null, xs) - 3;
+      const maxX = Math.max.apply(null, xs) + 3;
+      const minY = Math.min.apply(null, ys) - 3;
+      const maxY = Math.max.apply(null, ys) + 3;
+      view.reach = Math.max.apply(null, corners.map(c => Math.hypot(c[0], c[1]))) + 4;
+      const gridWidth = Math.ceil((maxX - minX) / CELL) + 2;
+      const gridHeight = Math.ceil((maxY - minY) / CELL) + 2;
+      grid.originX = minX;
+      grid.originY = minY;
+      if (gridWidth !== grid.width || gridHeight !== grid.height) {
+        states.forEach(dropTarget);
+        dropTarget(boundTarget);
+        states = [makeTarget(gridWidth, gridHeight, gl.LINEAR), makeTarget(gridWidth, gridHeight, gl.LINEAR)];
+        grid.width = gridWidth;
+        grid.height = gridHeight;
+        grid.boundWidth = Math.ceil((gridWidth * CELL) / BOUND_CELL);
+        grid.boundHeight = Math.ceil((gridHeight * CELL) / BOUND_CELL);
+        boundTarget = makeTarget(grid.boundWidth, grid.boundHeight, gl.NEAREST);
+        current = 0;
+      }
+      settle = true;
+    };
+
+    const toWorld = (clientX, clientY) => {
+      const rect = container.getBoundingClientRect();
+      const x = ((clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1;
+      const y = 1 - ((clientY - rect.top) / Math.max(1, rect.height)) * 2;
+      return groundAt(x, y);
+    };
+
+    const step = dt => {
+      const s = settingsRef.current;
+      if (s.scale !== view.scale || s.tilt !== view.tilt) layout();
+      const motion = s.paused ? 0 : 1;
+      wander += dt * motion * (reduce ? 0 : s.speed);
+      presence = s.intro && !reduce ? Math.min(1, presence + (dt * motion) / INTRO_SECONDS) : 1;
+      pulse.age += dt * motion;
+
+      const engaged = s.mouseInteraction && pointer.inside;
+      const follow = s.mouseDampening > 0 ? 1 - Math.exp(-dt / s.mouseDampening) : 1;
+      if (engaged) {
+        cursor.x += (pointer.x - cursor.x) * follow;
+        cursor.y += (pointer.y - cursor.y) * follow;
+      }
+      const targetStrength = engaged ? s.mouseStrength * 1.4 : 0;
+      cursor.strength += (targetStrength - cursor.strength) * (1 - Math.exp(-dt / 0.35));
+      if (Math.abs(targetStrength - cursor.strength) < 0.001) cursor.strength = targetStrength;
+    };
+
+    const draw = dt => {
+      if (!boundTarget || states.length < 2) return;
+      const s = settingsRef.current;
+      const worldUnit = view.worldHeight;
+      const radius = s.mouseRadius * worldUnit;
+      const fullHeight = 1.2 * s.spikeHeight;
+      if (s.sharpness !== shapeKey) {
+        shapeKey = s.sharpness;
+        shape = shapeOf(s.sharpness);
+      }
+      const reveal = presence * presence * (3 - 2 * presence);
+      gl.bindVertexArray(vao);
+      gl.activeTexture(gl.TEXTURE0);
+
+      const read = states[current];
+      const write = states[1 - current];
+      gl.bindFramebuffer(gl.FRAMEBUFFER, write.framebuffer);
+      gl.viewport(0, 0, grid.width, grid.height);
+      gl.useProgram(sim.program);
+      const su = sim.uniforms;
+      gl.bindTexture(gl.TEXTURE_2D, read.texture);
+      gl.uniform1i(su.uState, 0);
+      gl.uniform2f(su.uGridOrigin, grid.originX, grid.originY);
+      gl.uniform1f(su.uCell, CELL);
+      gl.uniform1f(su.uDt, Math.max(dt, 0.001));
+      gl.uniform1f(su.uTime, wander);
+      gl.uniform2f(su.uFlow, s.flow[0], s.flow[1]);
+      gl.uniform1f(su.uTurbulence, s.turbulence);
+      gl.uniform1f(su.uMagnetism, s.magnetism);
+      gl.uniform1f(su.uFieldScale, 5.5);
+      gl.uniform2f(su.uSeed, s.variation * 17.31, s.variation * 9.73);
+      gl.uniform4f(su.uCursor, cursor.x, cursor.y, cursor.strength, radius);
+      gl.uniform4f(su.uPulse, pulse.x, pulse.y, pulse.age, pulse.age < 4 ? 1.1 : 0);
+      gl.uniform1f(su.uPulseSpeed, worldUnit * 0.45);
+      gl.uniform1f(su.uPulseWidth, 1.4);
+      gl.uniform3f(su.uIntro, 0, 0, reveal * (view.reach + 3));
+      gl.uniform1f(su.uSpikeHeight, fullHeight);
+      gl.uniform1f(su.uMound, 0.6);
+      gl.uniform1f(su.uStiffness, 150);
+      gl.uniform1f(su.uDamping, 22 - s.fluidity * 15);
+      gl.uniform1f(su.uSettle, settle || !floatTargets || reduce ? 1 : 0);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      settle = false;
+      current = 1 - current;
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, boundTarget.framebuffer);
+      gl.viewport(0, 0, grid.boundWidth, grid.boundHeight);
+      gl.useProgram(bounds.program);
+      const bu = bounds.uniforms;
+      gl.bindTexture(gl.TEXTURE_2D, write.texture);
+      gl.uniform1i(bu.uState, 0);
+      gl.uniform2f(bu.uGridOrigin, grid.originX, grid.originY);
+      gl.uniform1f(bu.uCell, CELL);
+      gl.uniform2f(bu.uStateSize, grid.width, grid.height);
+      gl.uniform1f(bu.uBoundCell, BOUND_CELL);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, view.width, view.height);
+      gl.useProgram(render.program);
+      const ru = render.uniforms;
+      gl.bindTexture(gl.TEXTURE_2D, write.texture);
+      gl.uniform1i(ru.uField, 0);
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, boundTarget.texture);
+      gl.uniform1i(ru.uBound, 1);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.uniform2f(ru.uGridOrigin, grid.originX, grid.originY);
+      gl.uniform2f(ru.uGridSpan, grid.width * CELL, grid.height * CELL);
+      gl.uniform2f(ru.uBoundSpan, grid.boundWidth * BOUND_CELL, grid.boundHeight * BOUND_CELL);
+      gl.uniform1f(ru.uCellSize, CELL);
+      gl.uniform2f(ru.uResolution, view.width, view.height);
+      gl.uniform3f(ru.uCamera, camera.x, camera.y, camera.z);
+      gl.uniform3fv(ru.uForward, camera.forward);
+      gl.uniform3fv(ru.uUpward, camera.upward);
+      gl.uniform1f(ru.uTanHalf, tanHalf);
+      gl.uniform1f(ru.uPixelAngle, (2 * tanHalf) / view.height);
+      gl.uniform1f(ru.uFar, camera.far);
+      gl.uniform1f(ru.uFogStart, camera.distance * 0.95);
+      gl.uniform1f(ru.uTop, fullHeight * 1.6 + 0.6 * 3 + 0.1);
+      gl.uniform1f(ru.uBottom, -0.05);
+      gl.uniform1f(ru.uTime, wander * 2);
+      gl.uniform4f(ru.uCursor, cursor.x, cursor.y, cursor.strength, radius);
+      gl.uniform1f(ru.uMound, 0.6);
+      gl.uniform1f(ru.uRound, shape.round);
+      gl.uniform1f(ru.uSpan, shape.span);
+      gl.uniform1f(ru.uExponent, shape.exponent);
+      gl.uniform1f(ru.uWarp, 0.06 * s.turbulence);
+      const lights = s.colors.map(value => parse(value, [1, 1, 1]));
+      const key = lights[0];
+      const strip = lights[1] || key;
+      const fill = lights[2] || strip;
+      gl.uniform3fv(ru.uKey, key);
+      gl.uniform3fv(ru.uStrip, strip);
+      gl.uniform3fv(ru.uFill, fill);
+      gl.uniform1f(ru.uExposure, 3 * s.brightness);
+      gl.uniform1f(ru.uLight, s.lightMode ? 1 : 0);
+      gl.uniform1f(ru.uOpaque, s.transparent ? 0 : 1);
+      gl.uniform3fv(ru.uBase, parse(s.color, s.lightMode ? [1, 1, 1] : [0.0706, 0.0588, 0.0902]));
+      gl.uniform1f(ru.uOpacity, s.opacity);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    };
+
+    const frame = now => {
+      raf = 0;
+      if (dead || !visible || document.hidden) return;
+      const s = settingsRef.current;
+      /* 帧率上限：射线步进最吃 GPU，30fps 在毛玻璃之下肉眼无差别；未到点跳过（last 不动，dt 自动累加）*/
+      if (lastPaint && s.maxFps > 0 && now - lastPaint < 1000 / s.maxFps - 2) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+      lastPaint = now;
+      const dt = last ? clamp((now - last) / 1000, 0.0005, 0.05) : 1 / 60;
+      last = now;
+      step(dt);
+      draw(dt);
+      raf = requestAnimationFrame(frame);
+    };
+
+    const wake = () => {
+      if (!dead && !raf && visible && !document.hidden) raf = requestAnimationFrame(frame);
+    };
+
+    const resize = () => {
+      if (dead) return;
+      layout();
+      draw(0);
+      wake();
+    };
+
+    const locate = event => {
+      const rect = container.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      pointer.inside = x >= 0 && y >= 0 && x <= rect.width && y <= rect.height;
+      const w = toWorld(event.clientX, event.clientY);
+      pointer.x = w[0];
+      pointer.y = w[1];
+    };
+
+    const onPointerMove = event => {
+      const wasInside = pointer.inside;
+      locate(event);
+      if (pointer.inside && !wasInside && cursor.strength < 0.05) {
+        cursor.x = pointer.x;
+        cursor.y = pointer.y;
+      }
+      wake();
+    };
+
+    const onPointerDown = event => {
+      onPointerMove(event);
+      if (!pointer.inside || !settingsRef.current.clickPulse || reduce) return;
+      pulse.x = pointer.x;
+      pulse.y = pointer.y;
+      pulse.age = 0;
+    };
+
+    const onPointerUp = event => {
+      if (event.pointerType !== 'mouse') pointer.inside = false;
+    };
+
+    const onPointerLeave = () => {
+      pointer.inside = false;
+    };
+
+    const onVisibility = () => {
+      last = 0;
+      wake();
+    };
+
+    const onLost = event => { event.preventDefault(); dead = true; cancelAnimationFrame(raf); raf = 0; };
+    const onRestored = () => { if (onRestore) onRestore(); };
+    canvas.addEventListener('webglcontextlost', onLost);
+    canvas.addEventListener('webglcontextrestored', onRestored);
+
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(container);
+    const intersection = new IntersectionObserver(entries => {
+      visible = entries.some(entry => entry.isIntersecting);
+      if (visible) {
+        last = 0;
+        wake();
+      }
+    });
+    intersection.observe(container);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('pointerdown', onPointerDown, { passive: true });
+    window.addEventListener('pointerup', onPointerUp, { passive: true });
+    window.addEventListener('pointercancel', onPointerUp, { passive: true });
+    document.documentElement.addEventListener('pointerleave', onPointerLeave);
+    document.addEventListener('visibilitychange', onVisibility);
+    resize();
+
+    let lastDpr = settingsRef.current.dpr;
+    const poke = () => {
+      const s = settingsRef.current;
+      if (s.dpr !== lastDpr) {
+        lastDpr = s.dpr;
+        resize();
+        return;
+      }
+      wake();
+    };
+
+    const destroy = () => {
+      dead = true;
+      cancelAnimationFrame(raf);
+      raf = 0;
+      resizeObserver.disconnect();
+      intersection.disconnect();
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerdown', onPointerDown);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
+      document.documentElement.removeEventListener('pointerleave', onPointerLeave);
+      document.removeEventListener('visibilitychange', onVisibility);
+      canvas.removeEventListener('webglcontextlost', onLost);
+      canvas.removeEventListener('webglcontextrestored', onRestored);
+      states.forEach(dropTarget);
+      dropTarget(boundTarget);
+      gl.deleteProgram(sim.program);
+      gl.deleteProgram(bounds.program);
+      gl.deleteProgram(render.program);
+      gl.deleteBuffer(buffer);
+      gl.deleteVertexArray(vao);
+      const lose = gl.getExtension('WEBGL_lose_context');
+      if (lose) lose.loseContext();
+    };
+
+    return { wake: poke, destroy };
+  };
+
+  /* ───────── 控制器：只按深/浅主题切 lightMode（颜色固定，不读强调色）───────── */
+  var engine = null;
+  var SETTINGS = null;
+
+  function themeIsLight(){ return document.documentElement.getAttribute('data-theme') === 'light'; }
+  function buildSettings(){
+    var o = {};
+    for (var k in FERRO_CFG) o[k] = FERRO_CFG[k];
+    o.lightMode = themeIsLight();
+    o.dpr = Math.min(window.devicePixelRatio || 1, FERRO_CFG.maxDpr);
+    SETTINGS = normalize(o);
+  }
+  function startInner(skipIntro){
+    var container = document.getElementById('bgFx');
+    var canvas = document.getElementById('bgFerro');
+    if (!container || !canvas) return false;
+    buildSettings();
+    if (engine) { canvas.style.display = 'block'; engine.wake(); return true; }
+    var fresh = canvas.cloneNode(false);
+    canvas.parentNode.replaceChild(fresh, canvas);
+    fresh.style.display = 'block';
+    try { engine = createEngine(container, fresh, function(){ return SETTINGS; }, restart, skipIntro); }
+    catch (e) { engine = null; try { console.warn('[Ferrofluid] disabled:', e); } catch (_) {} }
+    if (!engine) { fresh.style.display = 'none'; return false; }
+    return true;
+  }
+  function start(){ return startInner(false); }
+  function stop(){
+    if (engine) { try { engine.destroy(); } catch (e) {} engine = null; }
+    var c = document.getElementById('bgFerro');
+    if (c) c.style.display = 'none';
+  }
+  function restart(){ stop(); startInner(true); }
+  function refresh(){
+    if (!engine) return;
+    buildSettings();
+    engine.wake();
+  }
+
+  return { start: start, stop: stop, refresh: refresh, config: FERRO_CFG };
+  })();
+
+  uiAddT({
+    bgLightRays: ['Light Rays', '光线', 'Лучи света', 'Lichtstrahlen', '光線', 'Rayos de luz', 'Işık huzmeleri', 'Raios de luz'],
+    bgFerrofluid: ['Ferrofluid', '磁流体', 'Феррожидкость', 'Ferrofluid', '磁性流体', 'Ferrofluido', 'Ferrofluid', 'Ferrofluido']
+  });
+
   /* ════════ 背景动效 ════════ */
   var BGFX_ON = !(UI_CFG && UI_CFG.bgFx === false);
   var BGFX_STYLE = (UI_CFG && UI_CFG.bgStyle) || 'aurora';
   if (BGFX_STYLE === 'grid') BGFX_STYLE = 'topography';   /* 「网格」已移除：旧配置自动沿用到 Topography */
   var BG_IMAGE = "__BG_IMAGE__";
-  var BGFX_STYLES = ['aurora', 'waves', 'topography', 'stars', 'network', 'embers', 'image'];
-  var BGFX_NAME_KEY = { aurora:'bgAurora', waves:'bgWaves', topography:'bgTopography', stars:'bgStars',
+  var BGFX_STYLES = ['aurora', 'waves', 'topography', 'lightrays', 'ferrofluid', 'stars', 'network', 'embers', 'image'];
+  var BGFX_NAME_KEY = { aurora:'bgAurora', waves:'bgWaves', topography:'bgTopography', lightrays:'bgLightRays', ferrofluid:'bgFerrofluid', stars:'bgStars',
                         network:'bgNetwork', embers:'bgEmbers', image:'bgImage' };
   var BGFX_CANVAS = { waves:1, stars:1, network:1, embers:1 };
+  /* WebGL 背景：各有独立画布，同一时间只跑选中的那一个，其余释放 GPU */
+  var BG_GL = { topography: TopoBg, lightrays: RaysBg, ferrofluid: FerroBg };
+  function bgGlStop(keep){ for (var k in BG_GL) { if (BG_GL[k] !== keep) BG_GL[k].stop(); } }
   var BGFX_MAX_CHARS = 600000;
   var bgfx = { raf:0, last:0, w:0, h:0, t:0, parts:[],
                rgb:[[59,130,246],[99,102,241],[56,189,248]] };
@@ -6235,7 +7754,7 @@ void main() {
     var cv = document.getElementById('bgCanvas');
     if (!fx || !layer || !cv) return;
     bgfxStop();
-    if (!BGFX_ON) { body.setAttribute('data-bgfx', 'off'); fx.hidden = true; TopoBg.stop(); return; }
+    if (!BGFX_ON) { body.setAttribute('data-bgfx', 'off'); fx.hidden = true; bgGlStop(null); return; }
     var st = BGFX_STYLE;
     if (BGFX_STYLES.indexOf(st) < 0 || (st === 'image' && !BG_IMAGE)) st = 'aurora';
     BGFX_STYLE = st;
@@ -6245,11 +7764,9 @@ void main() {
     layer.className = 'bgfx-layer ' + st;
     layer.style.backgroundImage = (st === 'image') ? 'url("' + BG_IMAGE + '")' : '';
     cv.style.display = BGFX_CANVAS[st] ? 'block' : 'none';
-    if (st === 'topography') {
-      if (!TopoBg.start()) layer.className = 'bgfx-layer aurora';   /* 不支持 WebGL2 → 回退到极光 */
-    } else {
-      TopoBg.stop();
-    }
+    var glfx = BG_GL[st];
+    bgGlStop(glfx);
+    if (glfx && !glfx.start()) layer.className = 'bgfx-layer aurora';   /* 不支持 WebGL2 → 回退到极光 */
     if (BGFX_CANVAS[st] && !document.hidden) {
       bgfxReadColors(); bgfxResize(); bgfx.last = 0;
       bgfx.raf = requestAnimationFrame(bgfxLoop);
@@ -8149,7 +9666,7 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
   Object.keys(all).forEach(function(pid){var e=all[pid],k=e&&e[PAGE];if(k&&typeof k==='object'){try{apply(pid,{cls:e.cls,theme:e.theme,css:k.css,bg:k.bg});}catch(x){}}});
 })();
 </script>
-<div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><canvas id="bgTopo" style="display:none"></canvas><div class="bgfx-layer" id="bgLayer"></div>
+<div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><canvas id="bgTopo" style="display:none"></canvas><canvas id="bgRays" style="display:none"></canvas><canvas id="bgFerro" style="display:none"></canvas><div class="bgfx-layer" id="bgLayer"></div>
 <div id="fxLayer" aria-hidden="true"></div>
 <canvas id="decoCanvas" aria-hidden="true"></canvas></div>
 <div class="drag-strip" onmousedown="uiDrag(event)"></div>
@@ -10439,6 +11956,13 @@ input{outline:none;border:none;background:none}
 .bg-prev.p-topography{background-image:
   repeating-radial-gradient(ellipse 55% 85% at 28% 78%,transparent 0 4px,color-mix(in srgb,var(--accent) 72%,transparent) 4px 5px),
   repeating-radial-gradient(ellipse 60% 90% at 78% 30%,transparent 0 5px,color-mix(in srgb,var(--accent) 52%,transparent) 5px 6px)}
+.bg-prev.p-lightrays{background-image:
+  radial-gradient(ellipse 60% 55% at 50% -8%,rgba(255,255,255,.55),transparent 72%),
+  repeating-conic-gradient(from 150deg at 50% -12%,rgba(255,255,255,.24) 0 3deg,transparent 3deg 8deg)}
+.bg-prev.p-ferrofluid{background-image:
+  radial-gradient(circle at 50% 35%,rgba(255,255,255,.85) 0 1.2px,transparent 2.6px),
+  radial-gradient(circle at 50% 35%,rgba(255,255,255,.5) 0 1px,transparent 2.4px);
+  background-size:11px 14px,11px 14px;background-position:0 0,5.5px 7px}
 .bg-prev.p-stars{background-image:
   radial-gradient(1.4px 1.4px at 18% 28%,#fff 50%,transparent),radial-gradient(1px 1px at 52% 60%,#fff 50%,transparent),
   radial-gradient(1.6px 1.6px at 80% 22%,#fff 50%,transparent),radial-gradient(1px 1px at 35% 78%,#cbd5ff 50%,transparent),
@@ -13327,7 +14851,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
   Object.keys(all).forEach(function(pid){var e=all[pid],k=e&&e[PAGE];if(k&&typeof k==='object'){try{apply(pid,{cls:e.cls,theme:e.theme,css:k.css,bg:k.bg});}catch(x){}}});
 })();
 </script>
-<div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><canvas id="bgTopo" style="display:none"></canvas><div class="bgfx-layer" id="bgLayer"></div>
+<div class="bgfx" id="bgFx" aria-hidden="true"><canvas id="bgCanvas"></canvas><canvas id="bgTopo" style="display:none"></canvas><canvas id="bgRays" style="display:none"></canvas><canvas id="bgFerro" style="display:none"></canvas><div class="bgfx-layer" id="bgLayer"></div>
 <div id="fxLayer" aria-hidden="true"></div>
 <canvas id="decoCanvas" aria-hidden="true"></canvas></div>
 <div class="app">
