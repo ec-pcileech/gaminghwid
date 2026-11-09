@@ -9631,21 +9631,11 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
   transform:translate(-50%,calc(-100% - 72px));
 }
 .electric-logo{overflow:hidden}
-/* 维护页右下角 · 国旗语言切换（略抬高，避开窗口缩放手柄） */
-.mt-lang{
+/* 维护页右下角语言按钮：样式直接复用商店顶栏 .tb-btn.tb-lang，这里只负责定位 */
+#mtLang{
   position:absolute;right:18px;bottom:28px;z-index:4;
-  width:44px;height:34px;display:grid;place-items:center;padding:0;
-  border-radius:12px;border:1px solid var(--border-2);
-  background:var(--surface-2);color:var(--text-2);
-  box-shadow:var(--shadow-1);
-  transition:background var(--tr-fast),border-color var(--tr-fast),color var(--tr-fast),transform var(--tr-fast);
-  -webkit-app-region:no-drag;cursor:pointer;
+  -webkit-app-region:no-drag;
 }
-.mt-lang:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--text)}
-.mt-lang.open{background:var(--accent-soft);border-color:var(--accent);color:var(--text)}
-.mt-lang:active{transform:scale(.96)}
-.mt-lang .lg-flag{width:24px;height:18px;display:block}
-.mt-lang .lg-flag svg{display:block;width:100%;height:100%;fill:initial;stroke:none}
 </style>
 
 </head>
@@ -9856,8 +9846,8 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
     </button>
   </div>
   <div class="mt-main"><div class="mt-stage" id="mtStage"></div><div class="mt-logo" id="mtLogo" aria-hidden="true"></div></div>
-  <!-- 右下角国旗 · 点击弹出语言列表（带箭头） -->
-  <button class="mt-lang" id="mtLang" type="button" title="Language" data-ui-title="language"
+  <!-- 右下角国旗：与商店顶栏同款 tb-btn tb-lang + 共用 lgPop -->
+  <button class="tb-btn tb-lang" id="mtLang" type="button" title="Language" data-ui-title="language"
     aria-haspopup="listbox" aria-expanded="false" aria-controls="lgPop"></button>
 </div>
 __UI_MARKUP__
