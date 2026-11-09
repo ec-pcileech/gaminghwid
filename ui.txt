@@ -9324,8 +9324,15 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
   background:var(--lg-field);color:var(--lg-fg);
   font-family:var(--font);font-size:16px;letter-spacing:0;text-transform:none;outline:none;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
-  transition:background var(--tr),border-color var(--tr),box-shadow var(--tr);
+  transition:background var(--tr),border-color var(--tr),box-shadow var(--tr),filter .22s ease,letter-spacing .22s ease;
 }
+.right .key-input.pw-blur{
+  filter:blur(5.5px);
+  letter-spacing:.12em;
+  /* 保持可编辑，光标仍清晰 */
+  caret-color:var(--lg-fg);
+}
+.right .key-input.pw-blur::placeholder{filter:none;letter-spacing:0}
 .right .key-input::placeholder{color:var(--lg-fg3);font-family:var(--font);letter-spacing:0}
 .right .key-input:hover{background:var(--lg-field-hi)}
 .right .key-input:focus{background:var(--lg-field-hi);border-color:var(--lg-field-line);box-shadow:0 0 0 4px rgba(var(--lg-star),.06)}
@@ -9336,7 +9343,10 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
   position:absolute;right:10px;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
   color:var(--lg-fg3);transition:color var(--tr),background var(--tr);
 }
-.right .paste-btn svg{width:19px;height:19px}
+.right .paste-btn svg{width:19px;height:19px;display:block}
+.right .paste-btn .pw-icon-hide{display:none}
+.right .paste-btn.is-shown .pw-icon-show{display:none}
+.right .paste-btn.is-shown .pw-icon-hide{display:block}
 .right .paste-btn:hover{color:var(--lg-fg);background:var(--lg-field-hi)}
 
 .right .rem-row{
@@ -9734,12 +9744,15 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
       <div class="field-label" data-ui="accPassword">Password</div>
       <div class="field-wrap">
         <svg class="field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <input class="key-input acc-input" id="accPass" type="password" maxlength="64"
+        <input class="key-input acc-input pw-blur" id="accPass" type="text" maxlength="64"
           autocomplete="current-password" spellcheck="false" data-ui-ph="accPassword"
           placeholder="Password"
           onkeydown="if(event.key==='Enter')accSubmit()" oninput="accClearErr()">
-        <button class="paste-btn" type="button" onclick="accTogglePw()" tabindex="-1">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <button class="paste-btn" type="button" id="accPwBtn" onclick="accTogglePw()" tabindex="-1" aria-label="Toggle password">
+          <!-- 隐藏状态：显示「眼睛」图标（点击可显示） -->
+          <svg class="pw-icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <!-- 显示状态：显示「眼睛划掉」图标（点击可隐藏） -->
+          <svg class="pw-icon-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
       </div>
     </div>
@@ -12120,8 +12133,10 @@ function accSetMode(m) {
 }
 function accTogglePw() {
   var a = document.getElementById('accPass');
+  var btn = document.getElementById('accPwBtn');
   if (!a) { return; }
-  a.type = (a.type === 'password') ? 'text' : 'password';
+  var show = a.classList.toggle('pw-blur'); /* true = now blurred (hidden) */
+  if (btn) { btn.classList.toggle('is-shown', !show); }
 }
 /* 「记住我」：取消勾选立刻让宿主忘掉已保存的密码 */
 function accRememberChanged(){
