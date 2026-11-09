@@ -9558,7 +9558,7 @@ html,body{scrollbar-width:none;-ms-overflow-style:none}
 
 __UI_CSS__
 /* ═══════════════ 维护页（games.txt: #APP_STATUS maintenance）═══════════════
-   维护中：登录卡片 / 星空整个隐藏，只剩 STARLINE（左上）+ 关闭按钮（右上）+ TechText 文字 */
+   维护中：登录卡片 / 星空整个隐藏，只剩 STARLINE（左上）+ 关闭按钮（右上）+ ElectricLogo 与维护提示 */
 .mt-ovl{
   position:fixed;inset:0;z-index:500;display:none;flex-direction:column;
   color:var(--text);
@@ -9584,7 +9584,14 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
 .mt-close:active{transform:scale(.94)}
 .mt-close svg{width:17px;height:17px}
 .mt-main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 24px 56px}
-.mt-stage{width:100%;max-width:1200px;height:480px;max-height:100%;position:relative;color:var(--text)}
+.mt-stage{width:100%;max-width:1200px;height:520px;max-height:100%;position:relative;color:var(--text);display:flex;align-items:center;justify-content:center}
+.mt-content{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transform:translateY(-5%)}
+.mt-electric{width:min(230px,52vw);height:230px;max-height:36vh;position:relative;overflow:visible;filter:drop-shadow(0 0 18px rgba(173,109,255,.24))}
+.mt-electric canvas{display:block;width:100%;height:100%}
+.mt-caption{width:100%;height:115px;max-height:20vh;position:relative;color:var(--text);text-align:center}
+.mt-caption .tech-text{height:100%;width:100%}
+.mt-caption .tech-text-canvas{width:100%;height:100%}
+@media(max-width:600px){.mt-content{gap:10px}.mt-electric{width:190px;height:190px}.mt-caption{height:90px}}
 .tech-text{position:relative;width:100%;height:100%;touch-action:pan-y;user-select:none}
 .tech-text-canvas{display:block;width:100%;height:100%}
 </style>
@@ -9791,7 +9798,7 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
-  <div class="mt-main"><div class="mt-stage" id="mtStage"></div></div>
+  <div class="mt-main"><div class="mt-stage"><div class="mt-content"><div class="mt-electric" id="mtElectric" aria-hidden="true"></div><div class="mt-caption" id="mtStage"></div></div></div></div>
 </div>
 __UI_MARKUP__
 <script>
@@ -10718,27 +10725,52 @@ function TechText(container, options) {
   };
 }
 
+/* ═══════════════ ElectricLogo（React Bits JS-CSS 风格的原生 Canvas 适配）═══════════════
+   STARLINE 标志由现有登录页三段 SVG path 绘制；Canvas 电光描边/电弧动画，无 React/外部依赖。 */
+function ElectricLogo(container, options) {
+  options=options||{}; var color=options.color||'#ecc7ff',glow=options.glowColor||'#ad6dff';
+  var speed=Number(options.speed)||2.5,strands=Math.max(1,Number(options.strands)||4),crackle=Number(options.crackle)||1.5;
+  var canvas=document.createElement('canvas'),ctx=canvas.getContext('2d'),alive=true,raf=0,t=0,last=performance.now(),w=1,h=1,dpr=1;
+  canvas.setAttribute('aria-hidden','true');container.appendChild(canvas);
+  var paths=['M73.14,0.06 74.31,0.64 74.68,1.35 75.19,6.24 75.95,9.12 75.97,11.50 75.64,13.27 74.59,15.36 73.46,17.06 71.59,19.08 68.59,21.16 60.74,24.99 49.10,31.20 31.51,40.12 29.54,40.99 27.77,41.10 26.31,40.27 24.23,40.12 23.46,39.75 22.90,38.85 22.33,37.09 21.91,34.63 21.84,31.11 22.36,27.35 23.99,23.19 26.14,20.33 28.84,18.43 31.53,17.16 56.72,6.61 67.92,1.46 72.86,0.00Z','M15.02,26.12 15.52,26.18 16.27,26.70 18.07,29.90 25.01,45.33 28.04,51.23 29.47,51.12 35.46,48.79 73.19,30.76 75.79,28.90 78.02,27.84 80.71,27.33 83.26,27.33 84.88,28.84 85.78,30.65 86.41,34.43 86.29,37.60 85.82,39.58 84.30,42.16 80.61,45.60 79.44,47.00 77.51,48.28 69.54,52.57 40.33,66.81 38.03,68.20 37.07,69.14 36.96,69.85 38.03,72.43 47.13,89.70 49.53,94.82 49.68,96.49 49.40,97.39 48.83,98.14 46.93,99.23 43.52,100.00 39.33,100.00 35.21,99.37 32.65,98.61 28.91,96.79 27.35,96.37 26.24,95.58 26.11,95.29 26.30,95.12 27.50,94.95 27.46,94.01 9.45,57.94 6.70,51.99 4.42,47.80 3.60,45.76 3.07,45.02 1.05,44.88 0.54,44.21 0.14,42.60 0.00,37.85 0.45,36.04 1.67,33.76 3.40,32.11 10.42,27.40 14.82,26.13Z','M96.35,50.09 97.90,50.23 99.03,51.27 99.34,53.21 99.51,59.77 100.00,63.30 99.78,64.84 99.30,65.87 95.33,71.34 92.78,73.22 88.99,75.35 80.90,79.40 55.23,93.31 53.62,93.87 49.78,92.96 49.90,92.37 51.25,92.16 49.14,91.57 48.54,91.03 47.90,89.89 47.34,87.28 47.29,82.84 47.85,79.21 49.48,74.85 51.27,72.27 53.22,70.46 54.76,69.43 63.19,65.65 78.69,58.08 89.14,52.68 91.95,50.83 93.40,50.39 95.96,50.10Z'];
+  var svg=new Image(),svgText='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="'+color+'">'+paths.map(function(d){return '<path d="'+d+'"/>';}).join('')+'</g></svg>';
+  svg.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgText);
+  function resize(){var r=container.getBoundingClientRect();w=Math.max(1,r.width);h=Math.max(1,r.height);dpr=Math.min(2,window.devicePixelRatio||1);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
+  function frame(now){if(!alive)return;var dt=Math.min(.05,(now-last)/1000);last=now;t+=dt*speed;resize();ctx.clearRect(0,0,w,h);
+    var size=Math.min(w,h)*.82,x=(w-size)/2,y=(h-size)/2;
+    if(svg.complete&&svg.naturalWidth){ctx.save();ctx.translate(x,y);ctx.scale(size/100,size/100);ctx.shadowColor=glow;ctx.shadowBlur=12+Math.sin(t*4)*5;ctx.drawImage(svg,0,0,100,100);ctx.restore();}
+    ctx.save();ctx.translate(x,y);ctx.scale(size/100,size/100);ctx.lineCap='round';ctx.lineJoin='round';
+    for(var i=0;i<strands;i++){var phase=t*2.4+i*2.1;ctx.beginPath();ctx.strokeStyle=glow;ctx.globalAlpha=.38+Math.random()*.42;ctx.lineWidth=.35+Math.random()*.65;ctx.shadowColor=glow;ctx.shadowBlur=8;
+      var px=Math.random()*100,py=Math.random()*100;ctx.moveTo(px,py);ctx.lineTo(px+(Math.random()-.5)*18,py+(Math.random()-.5)*18);ctx.lineTo(px+(Math.random()-.5)*34,py+(Math.random()-.5)*34);ctx.stroke();}
+    if(Math.random()<.8*crackle){ctx.beginPath();ctx.globalAlpha=.65+Math.random()*.35;ctx.strokeStyle=color;ctx.lineWidth=.65;var ax=Math.random()*100,ay=Math.random()*100;ctx.moveTo(ax,ay);for(var j=0;j<3+Math.random()*4;j++)ctx.lineTo(ax+=(Math.random()-.5)*13,ay+=(Math.random()-.5)*13);ctx.stroke();}
+    ctx.restore();ctx.globalAlpha=1;raf=requestAnimationFrame(frame);
+  }
+  resize();raf=requestAnimationFrame(frame);
+  return {destroy:function(){alive=false;cancelAnimationFrame(raf);canvas.remove();},resize:resize};
+}
+
 /* ═══════════════ 维护模式（games.txt 头部 #APP_STATUS maintenance）═══════════════
    · 宿主把状态放在 UI_CFG.appStatus（启动时），之后每次变化再推 APP_STATUS:<状态>
    · maintenance：登录界面整个隐藏，换成 TechText 维护页；左上角 STARLINE，右上角关闭按钮
    · 恢复 available：自动回到登录界面 */
-var mtInst = null;
+var mtInst = null, mtElectricInst = null;
 function mtApply(status) {
   var on = String(status || '').toLowerCase() === 'maintenance';
   var root = document.documentElement;
   var ovl = document.getElementById('mtOvl');
   var stage = document.getElementById('mtStage');
   if (on) {
-    if (mtInst) { return; }
+    if (mtInst || mtElectricInst) { return; }
     root.classList.add('mt-on');
     if (ovl) { ovl.setAttribute('aria-hidden', 'false'); }
     /* 等覆盖层显示出来、有了尺寸再创建（canvas 要读容器宽高） */
     requestAnimationFrame(function () {
-      if (mtInst || !stage || !root.classList.contains('mt-on')) { return; }
+      if (mtInst || mtElectricInst || !stage || !root.classList.contains('mt-on')) { return; }
+      mtElectricInst = ElectricLogo(document.getElementById('mtElectric'), {color:'#ecc7ff',glowColor:'#ad6dff',scale:.7,strands:4,bend:.6,crackle:1.5,arcs:1,speed:2.5,interactive:true});
       mtInst = TechText(stage, {
-        text: 'The server is under maintenance',
-        fontWeight: 600,
-        fontSize: 150,
+        text: 'UNDER MAINTENANCE',
+        fontWeight: 700,
+        fontSize: 58,
         reveal: 'letter',
         dashLength: 4,
         dashGap: 2,
@@ -10750,10 +10782,11 @@ function mtApply(status) {
       });
     });
   } else {
-    if (!mtInst && !root.classList.contains('mt-on')) { return; }
+    if (!mtInst && !mtElectricInst && !root.classList.contains('mt-on')) { return; }
     root.classList.remove('mt-on');
     if (ovl) { ovl.setAttribute('aria-hidden', 'true'); }
     if (mtInst) { mtInst.destroy(); mtInst = null; }
+    if (mtElectricInst) { mtElectricInst.destroy(); mtElectricInst = null; }
     if (stage) { stage.innerHTML = ''; }
   }
 }
