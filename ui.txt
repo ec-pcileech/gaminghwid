@@ -1259,6 +1259,166 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
 .cc-btn:focus-visible{outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
 .cc-btn.primary{border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 8px 22px var(--accent-glow)}
 .cc-btn.primary:hover{filter:brightness(1.08)}
+
+/* ═══ 更新日志右侧版本导航（登录页 / 商店页共用）═══
+   以前这段只写在 LOGIN 段里，商店页拿不到样式：导航条的按钮标签没被隐藏，整串版本摘要就以纯文本的形式
+   堆在窗口底部。挪到共享 CSS 后两个页面的更新日志外观 / 行为完全一致。 */
+/* ── Update log 右侧版本导航 ───────────────────────── */
+#uiChangelogView .ui-scroll {
+  padding-right: 86px;
+}
+
+.ui-log-rail {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;                    /* 项用 padding 撑开，悬停区域连续、不会闪 */
+
+  width: 340px;              /* 宽度固定 */
+  box-sizing: border-box;
+  padding: 5px;
+  border-radius: 14px;
+
+  /* 收起状态：完全透明 + 不接收鼠标事件 → 不再拦住后面内容 */
+  pointer-events: none;
+  background: transparent;
+  border: 1px solid transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+
+  /* ── 只显示 6 条小横线，其余透过滚轮查看 ── */
+  max-height: 150px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
+
+  transition:
+    background .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease,
+    backdrop-filter .2s ease,
+    -webkit-backdrop-filter .2s ease,
+    padding .15s ease;
+}
+.ui-log-rail::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* 悬停 / 键盘聚焦时展开成图2的浮层菜单 */
+.ui-log-rail:has(.ui-log-rail-item:hover),
+.ui-log-rail:focus-within {
+  pointer-events: auto;      /* 展开时才接收鼠标事件（可滚轮滚动） */
+
+  padding: 10px;             /* 展开时内边距 10px */
+  width: 340px;              /* 宽度保持固定，不参与过渡 */
+
+  /* 用更透明的 --surface（浅色 .7 / 深色 .66）做底，blur 才透得出来；
+     再用大半径 blur 把后面的更新日志虚化——毛玻璃效果会明显很多 */
+  background: var(--surface, var(--surface-2));
+  border-color: var(--border-2, var(--border));
+  box-shadow: var(--shadow-2, 0 8px 28px rgba(0,0,0,.35));
+
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+}
+
+
+.ui-log-rail-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+
+  /* 收起时按内容宽度（≈ 小横线）收窄，只有这一小块能被悬停到，
+     不会在左边留下大片“透明但吃鼠标”的区域 */
+  width: fit-content;
+  min-width: 30px;
+  min-height: 14px;
+  padding: 0;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+
+  /* 项本身要能接收悬停，才能触发 :has() 展开 */
+  pointer-events: auto;
+
+  border: 0;
+  background: none;
+  color: var(--ui-text-dim);
+  cursor: pointer;
+  text-align: right;
+  font: inherit;
+  white-space: nowrap;
+}
+
+/* 展开后：把每项铺满整条容器，光标落在菜单里任何位置都不会闪 */
+.ui-log-rail:has(.ui-log-rail-item:hover) .ui-log-rail-item,
+.ui-log-rail:focus-within .ui-log-rail-item {
+  width: 100%;
+}
+
+/* 正常状态只显示小横线 */
+.ui-log-rail-dash {
+  width: 14px;             /* 宽度固定，选中也不会变 */
+  height: 1px;             /* 未选中：1px 细线 */
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--ui-text-mute);
+  opacity: .55;
+  transition:
+    height .2s ease,       /* 只过渡高度 */
+    background .2s ease,
+    opacity .2s ease,
+    box-shadow .2s ease;
+}
+
+.ui-log-rail-item:hover .ui-log-rail-dash {
+  background: var(--ui-text);
+  opacity: .9;
+}
+
+/* 当前项：蓝色长胶囊 */
+.ui-log-rail-item.active .ui-log-rail-dash {
+  width: 14px;             /* 宽度不变，跟未选中一样 */
+  height: 2px;             /* 选中：2px 稍粗一点 */
+  background: var(--ui-accent);
+  opacity: 1;
+  box-shadow: 0 0 10px var(--ui-accent-soft);
+}
+
+/* 默认隐藏文字，悬停整个导航时再展开 */
+.ui-log-rail-label {
+  display: none;
+  max-width: 280px;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2, var(--ui-text-dim));
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-log-rail:has(.ui-log-rail-item:hover) .ui-log-rail-label,
+.ui-log-rail:focus-within .ui-log-rail-label {
+  display: block;
+  margin-right: 10px;
+}
+
+/* 当前项 / 悬停项的文字颜色：跟随主题强调色 / 主文字色 */
+.ui-log-rail-item.active .ui-log-rail-label {
+  color: var(--accent, var(--ui-accent));
+}
+.ui-log-rail-item:hover .ui-log-rail-label {
+  color: var(--text, var(--ui-text));
+}
+
 #===MARKUP
 
 <div class="ui-view" id="uiSettingsView">
@@ -2396,7 +2556,9 @@ var UI_LAYOUT_KEY = { 'rail-l':'layoutRailL', 'rail-r':'layoutRailR',
 
 
 var UI_CHANGELOG = [
-  { v:'3.1.2', date:'2026-10-24', tag:'latest',
+  { v:'3.1.7', date:'2026-11-09', tag:'latest',
+    en:['Added, fixed, and optimized some features.'] },
+  { v:'3.1.2', date:'2026-10-24',
     en:['A lot of new things have been added.'] },
   { v:'3.1.1', date:'2026-10-08',
     en:['Fixed announcements issue.'] },
@@ -8981,7 +9143,7 @@ uiAddT({
   tcToastOff: ["Target cursor turned off", "已关闭瞄准光标", "Прицельный курсор выключен", "Zielcursor deaktiviert", "ターゲットカーソルをオフにしました", "Cursor de mira desactivado", "Hedef imleci kapatıldı", "Cursor de mira desativado"]
 });
 var UI_TC_KEY = 'starline.targetCursor.off';
-var UI_TC_SELECTOR = '.cursor-target,button:not(:disabled),a[href],[onclick],[role="button"],select,label.bg-switch,.card';
+var UI_TC_SELECTOR = '.cursor-target,button:not(:disabled),a[href],[onclick],[role="button"],select,label.bg-switch,label.rem-row,.card';
 var UI_TCURSOR = (function () {
   try { if (UI_CFG && typeof UI_CFG.targetCursor === 'boolean') { return UI_CFG.targetCursor; } } catch (e) {}
   try { return localStorage.getItem(UI_TC_KEY) !== '1'; } catch (e) { return true; }
@@ -9400,165 +9562,10 @@ input::-ms-reveal,input::-ms-clear{display:none;width:0;height:0}
 .gate-btn.ghost:hover{background:var(--surface-3);color:var(--text);transform:none}
 ::-webkit-scrollbar{width:0;height:0;display:none}
 html,body{scrollbar-width:none;-ms-overflow-style:none}
-/* ── Update log 右侧版本导航 ───────────────────────── */
-#uiChangelogView .ui-scroll {
-  padding-right: 86px;
-}
-
-.ui-log-rail {
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 30;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0;                    /* 项用 padding 撑开，悬停区域连续、不会闪 */
-
-  width: 340px;              /* 宽度固定 */
-  box-sizing: border-box;
-  padding: 5px;
-  border-radius: 14px;
-
-  /* 收起状态：完全透明 + 不接收鼠标事件 → 不再拦住后面内容 */
-  pointer-events: none;
-  background: transparent;
-  border: 1px solid transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-
-  /* ── 只显示 6 条小横线，其余透过滚轮查看 ── */
-  max-height: 150px;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  overscroll-behavior: contain;
-  scroll-snap-type: y proximity;
-  scroll-behavior: smooth;
-
-  transition:
-    background .2s ease,
-    border-color .2s ease,
-    box-shadow .2s ease,
-    backdrop-filter .2s ease,
-    -webkit-backdrop-filter .2s ease,
-    padding .15s ease;
-}
-.ui-log-rail::-webkit-scrollbar { width: 0; height: 0; display: none; }
-
-/* 悬停 / 键盘聚焦时展开成图2的浮层菜单 */
-.ui-log-rail:has(.ui-log-rail-item:hover),
-.ui-log-rail:focus-within {
-  pointer-events: auto;      /* 展开时才接收鼠标事件（可滚轮滚动） */
-
-  padding: 10px;             /* 展开时内边距 10px */
-  width: 340px;              /* 宽度保持固定，不参与过渡 */
-
-  /* 用更透明的 --surface（浅色 .7 / 深色 .66）做底，blur 才透得出来；
-     再用大半径 blur 把后面的更新日志虚化——毛玻璃效果会明显很多 */
-  background: var(--surface, var(--surface-2));
-  border-color: var(--border-2, var(--border));
-  box-shadow: var(--shadow-2, 0 8px 28px rgba(0,0,0,.35));
-
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-}
-
-
-.ui-log-rail-item {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
-
-  /* 收起时按内容宽度（≈ 小横线）收窄，只有这一小块能被悬停到，
-     不会在左边留下大片“透明但吃鼠标”的区域 */
-  width: fit-content;
-  min-width: 30px;
-  min-height: 14px;
-  padding: 0;
-  flex-shrink: 0;
-  scroll-snap-align: center;
-
-  /* 项本身要能接收悬停，才能触发 :has() 展开 */
-  pointer-events: auto;
-
-  border: 0;
-  background: none;
-  color: var(--ui-text-dim);
-  cursor: pointer;
-  text-align: right;
-  font: inherit;
-  white-space: nowrap;
-}
-
-/* 展开后：把每项铺满整条容器，光标落在菜单里任何位置都不会闪 */
-.ui-log-rail:has(.ui-log-rail-item:hover) .ui-log-rail-item,
-.ui-log-rail:focus-within .ui-log-rail-item {
-  width: 100%;
-}
-
-/* 正常状态只显示小横线 */
-.ui-log-rail-dash {
-  width: 14px;             /* 宽度固定，选中也不会变 */
-  height: 1px;             /* 未选中：1px 细线 */
-  flex-shrink: 0;
-  border-radius: 999px;
-  background: var(--ui-text-mute);
-  opacity: .55;
-  transition:
-    height .2s ease,       /* 只过渡高度 */
-    background .2s ease,
-    opacity .2s ease,
-    box-shadow .2s ease;
-}
-
-.ui-log-rail-item:hover .ui-log-rail-dash {
-  background: var(--ui-text);
-  opacity: .9;
-}
-
-/* 当前项：蓝色长胶囊 */
-.ui-log-rail-item.active .ui-log-rail-dash {
-  width: 14px;             /* 宽度不变，跟未选中一样 */
-  height: 2px;             /* 选中：2px 稍粗一点 */
-  background: var(--ui-accent);
-  opacity: 1;
-  box-shadow: 0 0 10px var(--ui-accent-soft);
-}
-
-/* 默认隐藏文字，悬停整个导航时再展开 */
-.ui-log-rail-label {
-  display: none;
-  max-width: 280px;
-  overflow: hidden;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-2, var(--ui-text-dim));
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.ui-log-rail:has(.ui-log-rail-item:hover) .ui-log-rail-label,
-.ui-log-rail:focus-within .ui-log-rail-label {
-  display: block;
-  margin-right: 10px;
-}
-
-/* 当前项 / 悬停项的文字颜色：跟随主题强调色 / 主文字色 */
-.ui-log-rail-item.active .ui-log-rail-label {
-  color: var(--accent, var(--ui-accent));
-}
-.ui-log-rail-item:hover .ui-log-rail-label {
-  color: var(--text, var(--ui-text));
-}
 
 __UI_CSS__
 /* ═══════════════ 维护页（games.txt: #APP_STATUS maintenance）═══════════════
-   维护中：登录卡片 / 星空整个隐藏，只剩 STARLINE（左上）+ 关闭按钮（右上）+ ElectricLogo 与维护提示 */
+   维护中：登录卡片 / 星空整个隐藏，只剩 STARLINE（左上）+ 关闭按钮（右上）+ TechText 文字 */
 .mt-ovl{
   position:fixed;inset:0;z-index:500;display:none;flex-direction:column;
   color:var(--text);
@@ -9584,14 +9591,7 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
 .mt-close:active{transform:scale(.94)}
 .mt-close svg{width:17px;height:17px}
 .mt-main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 24px 56px}
-.mt-stage{width:100%;max-width:1200px;height:520px;max-height:100%;position:relative;color:var(--text);display:flex;align-items:center;justify-content:center}
-.mt-content{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transform:translateY(-5%)}
-.mt-electric{width:min(230px,52vw);height:230px;max-height:36vh;position:relative;overflow:visible;filter:drop-shadow(0 0 18px rgba(173,109,255,.24))}
-.mt-electric canvas{display:block;width:100%;height:100%}.mt-electric>.electric-logo{width:100%;height:100%}
-.mt-caption{width:100%;height:115px;max-height:20vh;position:relative;color:var(--text);text-align:center}
-.mt-caption .tech-text{height:100%;width:100%}
-.mt-caption .tech-text-canvas{width:100%;height:100%}
-@media(max-width:600px){.mt-content{gap:10px}.mt-electric{width:190px;height:190px}.mt-caption{height:90px}}
+.mt-stage{width:100%;max-width:1200px;height:480px;max-height:100%;position:relative;color:var(--text)}
 .tech-text{position:relative;width:100%;height:100%;touch-action:pan-y;user-select:none}
 .tech-text-canvas{display:block;width:100%;height:100%}
 </style>
@@ -9798,7 +9798,7 @@ html.mt-on .lg-stage,html.mt-on .lg-sky,html.mt-on .bgfx,html.mt-on .drag-strip{
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
     </button>
   </div>
-  <div class="mt-main"><div class="mt-stage"><div class="mt-content"><div class="mt-electric" id="mtElectric" aria-hidden="true"></div><div class="mt-caption" id="mtStage"></div></div></div></div>
+  <div class="mt-main"><div class="mt-stage" id="mtStage"></div></div>
 </div>
 __UI_MARKUP__
 <script>
@@ -10725,113 +10725,6 @@ function TechText(container, options) {
   };
 }
 
-/* ═══════════════ React Bits 官方 ElectricLogo（JS-CSS Registry）═══════════════
-   从官方 registry 读取原始 JSX/CSS，并在 WebView2 中编译挂载；不是 Canvas 仿制版。
-   依赖通过 CDN 加载：React 18、ReactDOM 18、Babel Standalone、OGL。
-   WebView2 首次进入维护页需要联网完成加载；之后在当前页面会话中复用模块。 */
-var mtElectricInst = null;
-var mtElectricModulePromise = null;
-var STARLINE_ELECTRIC_LOGO_SRC = "data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Cg%20fill%3D%22%23fff%22%3E%3Cpath%20d%3D%22M73.14%2C0.06%2074.31%2C0.64%2074.68%2C1.35%2075.19%2C6.24%2075.95%2C9.12%2075.97%2C11.50%2075.64%2C13.27%2074.59%2C15.36%2073.46%2C17.06%2071.59%2C19.08%2068.59%2C21.16%2060.74%2C24.99%2049.10%2C31.20%2031.51%2C40.12%2029.54%2C40.99%2027.77%2C41.10%2026.31%2C40.27%2024.23%2C40.12%2023.46%2C39.75%2022.90%2C38.85%2022.33%2C37.09%2021.91%2C34.63%2021.84%2C31.11%2022.36%2C27.35%2023.99%2C23.19%2026.14%2C20.33%2028.84%2C18.43%2031.53%2C17.16%2056.72%2C6.61%2067.92%2C1.46%2072.86%2C0.00Z%22%2F%3E%3Cpath%20d%3D%22M15.02%2C26.12%2015.52%2C26.18%2016.27%2C26.70%2018.07%2C29.90%2025.01%2C45.33%2028.04%2C51.23%2029.47%2C51.12%2035.46%2C48.79%2073.19%2C30.76%2075.79%2C28.90%2078.02%2C27.84%2080.71%2C27.33%2083.26%2C27.33%2084.88%2C28.84%2085.78%2C30.65%2086.41%2C34.43%2086.29%2C37.60%2085.82%2C39.58%2084.30%2C42.16%2080.61%2C45.60%2079.44%2C47.00%2077.51%2C48.28%2069.54%2C52.57%2040.33%2C66.81%2038.03%2C68.20%2037.07%2C69.14%2036.96%2C69.85%2038.03%2C72.43%2047.13%2C89.70%2049.53%2C94.82%2049.68%2C96.49%2049.40%2C97.39%2048.83%2C98.14%2046.93%2C99.23%2043.52%2C100.00%2039.33%2C100.00%2035.21%2C99.37%2032.65%2C98.61%2028.91%2C96.79%2027.35%2C96.37%2026.24%2C95.58%2026.11%2C95.29%2026.30%2C95.12%2027.50%2C94.95%2027.46%2C94.01%209.45%2C57.94%206.70%2C51.99%204.42%2C47.80%203.60%2C45.76%203.07%2C45.02%201.05%2C44.88%200.54%2C44.21%200.14%2C42.60%200.00%2C37.85%200.45%2C36.04%201.67%2C33.76%203.40%2C32.11%2010.42%2C27.40%2014.82%2C26.13Z%22%2F%3E%3Cpath%20d%3D%22M96.35%2C50.09%2097.90%2C50.23%2099.03%2C51.27%2099.34%2C53.21%2099.51%2C59.77%20100.00%2C63.30%2099.78%2C64.84%2099.30%2C65.87%2095.33%2C71.34%2092.78%2C73.22%2088.99%2C75.35%2080.90%2C79.40%2055.23%2C93.31%2053.62%2C93.87%2049.78%2C92.96%2049.90%2C92.37%2051.25%2C92.16%2049.14%2C91.57%2048.54%2C91.03%2047.90%2C89.89%2047.34%2C87.28%2047.29%2C82.84%2047.85%2C79.21%2049.48%2C74.85%2051.27%2C72.27%2053.22%2C70.46%2054.76%2C69.43%2063.19%2C65.65%2078.69%2C58.08%2089.14%2C52.68%2091.95%2C50.83%2093.40%2C50.39%2095.96%2C50.10Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E";
-
-function mtLoadScriptOnce(id, src) {
-  if (document.getElementById(id)) {
-    return new Promise(function(resolve, reject) {
-      var el = document.getElementById(id);
-      if (el.dataset.loaded === '1') return resolve();
-      if (el.dataset.failed === '1') return reject(new Error('Failed to load ' + src));
-      el.addEventListener('load', function(){ resolve(); }, {once:true});
-      el.addEventListener('error', function(){ reject(new Error('Failed to load ' + src)); }, {once:true});
-    });
-  }
-  return new Promise(function(resolve, reject) {
-    var el = document.createElement('script');
-    el.id = id;
-    el.src = src;
-    el.async = true;
-    el.onload = function(){ el.dataset.loaded = '1'; resolve(); };
-    el.onerror = function(){ el.dataset.failed = '1'; reject(new Error('Failed to load ' + src)); };
-    document.head.appendChild(el);
-  });
-}
-
-function mtLoadOfficialElectricLogo() {
-  if (mtElectricModulePromise) return mtElectricModulePromise;
-  mtElectricModulePromise = mtLoadScriptOnce('starline-react-runtime', 'https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js')
-  .then(function(){
-    return Promise.all([
-      mtLoadScriptOnce('starline-react-dom-runtime', 'https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js'),
-      mtLoadScriptOnce('starline-babel-runtime', 'https://cdn.jsdelivr.net/npm/@babel/standalone@7.26.10/babel.min.js')
-    ]);
-  }).then(function(){
-    return Promise.all([
-      import('https://esm.sh/ogl@1.0.11'),
-      fetch('https://cdn.jsdelivr.net/gh/DavidHDev/react-bits@b0422bb475ac9ec1fe1680290970494ceff5d4eb/public/r/ElectricLogo-JS-CSS.json', {cache:'force-cache'}).then(function(response){
-        if (!response.ok) throw new Error('React Bits registry HTTP ' + response.status);
-        return response.json();
-      })
-    ]);
-  }).then(function(values){
-    var OGL = values[0], registry = values[1];
-    var file = (registry.files || []).find(function(item){ return item.path === 'ElectricLogo.jsx'; });
-    var cssFile = (registry.files || []).find(function(item){ return item.path === 'ElectricLogo.css'; });
-    if (!file || !file.content) throw new Error('ElectricLogo.jsx missing from official registry');
-    if (cssFile && cssFile.content && !document.getElementById('starline-electric-logo-css')) {
-      var style = document.createElement('style');
-      style.id = 'starline-electric-logo-css';
-      style.textContent = cssFile.content;
-      document.head.appendChild(style);
-    }
-    var source = file.content
-      .replace(/^import\s+\{[^}]+\}\s+from\s+['"]react['"];?\s*/m, '')
-      .replace(/^import\s+\{[^}]+\}\s+from\s+['"]ogl['"];?\s*/m, '')
-      .replace(/^import\s+['"][^'"]+['"];?\s*/gm, '')
-      .replace(/^export\s+default\s+ElectricLogo;?\s*$/m, '');
-    var compiled = Babel.transform(source, {presets:['react'], filename:'ElectricLogo.jsx'}).code;
-    var factory = new Function('React', 'OGL',
-      'const { useEffect, useRef } = React;\n' +
-      'const { Renderer, Program, Mesh, Triangle, Texture } = OGL;\n' +
-      compiled + '\nreturn ElectricLogo;'
-    );
-    return factory(React, OGL);
-  }).catch(function(error){
-    mtElectricModulePromise = null;
-    throw error;
-  });
-  return mtElectricModulePromise;
-}
-
-function ElectricLogo(container, options) {
-  var cancelled = false;
-  var reactRoot = null;
-  var handle = {
-    destroy: function(){
-      cancelled = true;
-      if (reactRoot) {
-        try { reactRoot.unmount(); } catch (e) {}
-        reactRoot = null;
-      }
-      if (container) container.innerHTML = '';
-    }
-  };
-  mtLoadOfficialElectricLogo().then(function(Component){
-    if (cancelled || !container || !container.isConnected || !document.documentElement.classList.contains('mt-on')) return;
-    if (!window.ReactDOM || !window.ReactDOM.createRoot) throw new Error('ReactDOM.createRoot unavailable');
-    reactRoot = window.ReactDOM.createRoot(container);
-    reactRoot.render(window.React.createElement(Component, Object.assign({
-      src: STARLINE_ELECTRIC_LOGO_SRC,
-      color: '#ecc7ff', glowColor: '#ad6dff', scale: 0.7,
-      strands: 4, bend: 0.6, crackle: 1.5, arcs: 1,
-      speed: 2.5, interactive: true
-    }, options || {})));
-  }).catch(function(error){
-    if (!cancelled) {
-      console.error('[STARLINE] Official React Bits ElectricLogo failed to load:', error);
-      container.setAttribute('data-electric-error', 'true');
-    }
-  });
-  return handle;
-}
-
 /* ═══════════════ 维护模式（games.txt 头部 #APP_STATUS maintenance）═══════════════
    · 宿主把状态放在 UI_CFG.appStatus（启动时），之后每次变化再推 APP_STATUS:<状态>
    · maintenance：登录界面整个隐藏，换成 TechText 维护页；左上角 STARLINE，右上角关闭按钮
@@ -10843,17 +10736,16 @@ function mtApply(status) {
   var ovl = document.getElementById('mtOvl');
   var stage = document.getElementById('mtStage');
   if (on) {
-    if (mtInst || mtElectricInst) { return; }
+    if (mtInst) { return; }
     root.classList.add('mt-on');
     if (ovl) { ovl.setAttribute('aria-hidden', 'false'); }
-    /* 等覆盖层显示出来、有了尺寸再挂载官方 WebGL/React 组件。 */
+    /* 等覆盖层显示出来、有了尺寸再创建（canvas 要读容器宽高） */
     requestAnimationFrame(function () {
-      if (mtInst || mtElectricInst || !stage || !root.classList.contains('mt-on')) { return; }
-      mtElectricInst = ElectricLogo(document.getElementById('mtElectric'), {src:STARLINE_ELECTRIC_LOGO_SRC,color:'#ecc7ff',glowColor:'#ad6dff',scale:.7,strands:4,bend:.6,crackle:1.5,arcs:1,speed:2.5,interactive:true});
+      if (mtInst || !stage || !root.classList.contains('mt-on')) { return; }
       mtInst = TechText(stage, {
-        text: 'UNDER MAINTENANCE',
-        fontWeight: 700,
-        fontSize: 58,
+        text: 'The server is under maintenance',
+        fontWeight: 600,
+        fontSize: 150,
         reveal: 'letter',
         dashLength: 4,
         dashGap: 2,
@@ -10865,11 +10757,10 @@ function mtApply(status) {
       });
     });
   } else {
-    if (!mtInst && !mtElectricInst && !root.classList.contains('mt-on')) { return; }
+    if (!mtInst && !root.classList.contains('mt-on')) { return; }
     root.classList.remove('mt-on');
     if (ovl) { ovl.setAttribute('aria-hidden', 'true'); }
     if (mtInst) { mtInst.destroy(); mtInst = null; }
-    if (mtElectricInst) { mtElectricInst.destroy(); mtElectricInst = null; }
     if (stage) { stage.innerHTML = ''; }
   }
 }
@@ -14978,7 +14869,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
       </div>
       <div class="sb-brand-text">
         <b>STARLINE</b>
-        <span id="sbVer">v3.1.2</span>
+        <span id="sbVer">v3.1.7</span>
       </div>
     </div>
     <nav class="sb-nav">
