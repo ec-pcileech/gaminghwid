@@ -234,22 +234,22 @@ cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/25
 cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2507950/ss_7006f261d2d50ef06293e0b29785211db687a9b1.1920x1080.jpg?t=1790238079
 cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2507950/ss_0336d3bdff28cdb9dcb2c76538af9f8a999a7a0b.1920x1080.jpg?t=1790238079
 cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2507950/ss_c6109219c92d56f09f250a3427e54408c619cf37.1920x1080.jpg?t=1790238079
-process  = DeltaForceClient-Win64-Shipping.exe
-runmode  = dll
-download = https://github.com/ec-pcileech/gaminghwid/releases/download/latest/starline_delta.zip
+process  = 0
+runmode  = 0
+download = 0
 dev      = TiMi Studio Group
 pub      = TiMi Studio Group
 rel      = 2024
 genres   = FPS, Tactical
 features = Multiplayer
 featured = true
-status   = updating
-price7   = 8.99        
-price15  = 12.99    
-price30  = 29.99
-price90  = 69.99
-priceLife= 109.99
-Announcement1 = This product is being updated. If you bought it, you can exchange it for another product of the same value.
+status   = outdated
+price7   = 0       
+price15  = 0   
+price30  = 0
+price90  = 0
+priceLife= 0
+Announcement1 = This product is being outdated. If you bought it, you can exchange it for another product of the same value.
 
 
 # ───────────────────────────────────────────────────────────────────────────
