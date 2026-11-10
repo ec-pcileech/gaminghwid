@@ -17114,8 +17114,8 @@ __UI_MARKUP__
 /* 弹窗本体：fixed 定位，JS 计算到图标正下方 */
 .ann-pop{
   position:fixed;z-index:260;
-  width:340px;max-width:calc(100vw - 32px);
-  padding:14px 14px 10px;
+  width:390px;max-width:calc(100vw - 32px);
+  padding:14px 8px 8px;
   border-radius:var(--radius-lg);
   /* 用主题里那个“不透明表面色”，浅色主题白底、深色主题深底 */
   background:var(--surface-solid,var(--surface));
@@ -17141,7 +17141,7 @@ __UI_MARKUP__
   border-top-left-radius:3px;
 }
 
-.ann-head{display:flex;align-items:center;gap:10px;padding:0 2px 10px;border-bottom:1px solid var(--border)}
+.ann-head{display:flex;align-items:center;gap:10px;padding:0 8px 10px;border-bottom:1px solid var(--border)}
 .ann-head-ico{
   width:32px;height:32px;border-radius:9px;flex-shrink:0;
   display:grid;place-items:center;
@@ -17162,7 +17162,7 @@ __UI_MARKUP__
 .ann-x svg{width:13px;height:13px;fill:none;stroke:currentColor;
   stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-.ann-list{max-height:320px;overflow-y:auto;padding:4px 0 0}
+.ann-list{padding:8px 0 0}
 .ann-list::-webkit-scrollbar{width:8px}
 .ann-list::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
 
@@ -17186,6 +17186,74 @@ __UI_MARKUP__
 }
 .ann-item-txt{margin-top:4px;font-size:12px;line-height:1.55;color:var(--text-2);word-break:break-word}
 .ann-item-date{margin-top:5px;font-size:10.5px;color:var(--text-3)}
+
+/* ═════════ AnimatedList（React Bits）—— 公告弹窗列表 ═════════
+   组件原版 CSS + 把它的调色变量映射到应用自己的主题变量（亮 / 暗主题自动跟随，选中环用主题强调色） */
+.animated-list{
+  --al-frame:var(--surface-solid);--al-frame-edge:var(--border);--al-frame-highlight:rgba(255,255,255,.06);
+  --al-frame-shadow:0 18px 40px -20px rgba(0,0,0,.7),0 6px 16px -8px rgba(0,0,0,.45);
+  --al-tile:linear-gradient(180deg,var(--surface-3) 0%,var(--surface-2) 100%);
+  --al-tile-edge:var(--border);--al-tile-highlight:rgba(255,255,255,.09);--al-tile-shadow:0 4px 10px -4px rgba(0,0,0,.55);
+  --al-well:var(--accent-soft);--al-ink:var(--text);--al-muted:var(--text-2);--al-thumb:var(--border-2);
+  --al-ring:var(--accent);--al-ring-fill:color-mix(in srgb,var(--accent) 8%,transparent);
+  --al-hover:brightness(1.1);--al-press:brightness(.85);--al-active:brightness(1.14);
+  --al-width:420px;--al-radius:14px;--al-gap:8px;--al-accent:var(--al-ink);
+}
+html[data-theme="light"] .animated-list{
+  --al-frame-highlight:rgba(255,255,255,.95);
+  --al-frame-shadow:0 22px 44px -22px rgba(24,24,27,.3),0 6px 16px -10px rgba(24,24,27,.16);
+  --al-tile:linear-gradient(180deg,#ffffff 0%,#f4f4f7 100%);--al-tile-highlight:#fff;
+  --al-tile-shadow:0 4px 10px -5px rgba(24,24,27,.22);
+  --al-hover:brightness(.97);--al-press:brightness(.92);--al-active:none;
+}
+.animated-list{position:relative;width:min(100%,var(--al-width));min-width:0;max-width:100%;box-sizing:border-box;
+  border-radius:calc(var(--al-radius) + 12px);color:var(--al-ink);-webkit-tap-highlight-color:transparent}
+.animated-list--framed{padding:6px;background:var(--al-frame);box-shadow:var(--al-frame-shadow);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);backdrop-filter:blur(20px) saturate(1.6)}
+.animated-list:has(> .animated-list__viewport:focus-visible){outline:2px solid var(--al-accent);outline-offset:3px}
+.animated-list__frame-rim{position:absolute;inset:0;z-index:3;border-radius:inherit;
+  box-shadow:inset 0 0 0 1px var(--al-frame-edge),inset 0 1px 0 var(--al-frame-highlight);pointer-events:none}
+.animated-list__viewport{--al-fade-top:0px;--al-fade-bottom:0px;position:relative;box-sizing:border-box;padding:6px;
+  overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;border-radius:calc(var(--al-radius) + 6px);outline:none;
+  scrollbar-width:thin;scrollbar-color:var(--al-thumb) transparent}
+.animated-list__viewport::-webkit-scrollbar{width:6px}
+.animated-list__viewport::-webkit-scrollbar-track{background:transparent}
+.animated-list__viewport::-webkit-scrollbar-thumb{border-radius:3px;background:var(--al-thumb)}
+.animated-list__viewport--bare{scrollbar-width:none}
+.animated-list__viewport--bare::-webkit-scrollbar{display:none}
+.animated-list__track{position:relative;display:flex;flex-direction:column;gap:var(--al-gap)}
+.animated-list__item{position:relative;display:flex;align-items:center;gap:12px;min-width:0;padding:10px 14px 10px 10px;
+  box-sizing:border-box;border-radius:var(--al-radius);background:var(--al-tile);box-shadow:var(--al-tile-shadow);
+  color:var(--al-ink);cursor:pointer;user-select:none;-webkit-user-select:none}
+.animated-list[data-animated] .animated-list__item:not([data-state]){opacity:0}
+@media (hover:hover){.animated-list__item:hover{filter:var(--al-hover)}}
+.animated-list__item[data-selected]:not(:active){filter:var(--al-active)}
+.animated-list__item:active{filter:var(--al-press)}
+.animated-list__lead{display:grid;place-items:center;flex:none;width:36px;height:36px;overflow:hidden;
+  border-radius:max(8px,calc(var(--al-radius) - 4px));background:var(--al-well);color:var(--al-ink)}
+.animated-list__lead img{display:block;width:100%;height:100%;object-fit:cover}
+.animated-list__lead svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.animated-list__text{display:flex;flex:1;flex-direction:column;gap:2px;min-width:0}
+.animated-list__title{display:flex;align-items:center;gap:6px;min-width:0;font-size:14.5px;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+.animated-list__title-text{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.animated-list__new{flex:none;font-size:9px;font-weight:800;letter-spacing:.4px;line-height:1.5;padding:1px 7px;border-radius:999px;
+  background:var(--accent-soft);color:var(--accent-2);border:1px solid var(--border)}
+/* 公告正文：默认两行省略，点击条目展开全文（原组件是单行省略，公告读不全，所以加了这个） */
+.animated-list__description{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+  font-size:13px;line-height:1.4;color:var(--al-muted);word-break:break-word;white-space:normal}
+.animated-list__item[data-open] .animated-list__description{display:block;-webkit-line-clamp:unset}
+.animated-list__item[data-open] .animated-list__title-text{overflow:visible;text-overflow:clip;white-space:normal}
+.animated-list__meta{flex:none;font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--al-muted)}
+.animated-list__rim{position:absolute;inset:0;border-radius:inherit;
+  box-shadow:inset 0 0 0 1px var(--al-tile-edge),inset 0 1px 0 var(--al-tile-highlight);pointer-events:none}
+.animated-list__indicator{position:absolute;top:0;left:0;right:0;z-index:2;height:0;opacity:0;pointer-events:none;transition:opacity .2s ease}
+.animated-list__ring{position:absolute;inset:0;border-radius:var(--al-radius);background:var(--al-ring-fill);box-shadow:inset 0 0 0 1px var(--al-ring)}
+/* 公告弹窗里的接线：多行条目图标 / 日期顶对齐；弹窗加宽放得下日期；空状态 */
+.ann-al .animated-list__item{align-items:flex-start}
+.ann-al .animated-list__meta{margin-top:2px;font-size:11.5px}
+.ann-al .animated-list__title{font-size:13.5px}
+.ann-al .animated-list__description{font-size:12.5px}
+.ann-empty{padding:22px 8px 16px;font-size:12px;color:var(--text-3);text-align:center}
 </style>
 <!-- 信息图标：我提交的游戏 + 管理员的回复 -->
 <div class="req-modal" id="inboxModal" onmousedown="if(event.target===this)closeInbox()">
@@ -19637,6 +19705,500 @@ var CardFx = {
   }
 };
 window.CardFx = CardFx;
+})();
+</script>
+<script id="animatedList">
+/* ═══════════════════════════════════════════════════════════════════════
+   AnimatedList —— React Bits <AnimatedList />（JS-CSS 版）的原生 JS 移植
+   来源：https://reactbits.dev/components/animated-list
+
+   效果：条目像弹簧一样依次弹入（animation: 'pop' | 'slide' | 'fade' | 'none'），滚动时上下边缘的条目淡出 / 淡入，
+         选中环（ring）在条目之间用弹簧物理滑动，悬停跟随，↑ ↓ Home End Enter 键盘导航，顶部 / 底部渐隐遮罩。
+   原组件依赖 React 和 hugeicons；这里没有 React，所以把组件改成纯 JS：
+     · useRef / useState / useLayoutEffect → 闭包变量 + 一个 engine（弹簧、遮罩、揭示逻辑逐行照搬）
+     · hugeicons 图标 → 由调用方传 icon（HTML 字符串）；本项目传的是公告喇叭图标
+   两个扩展（原组件没有）：
+     · expandOnSelect  —— 点击 / Enter 展开或收起这一条的全文（公告正文不能只给一行）
+     · replay()        —— 弹窗每次打开时重新播放弹入动画；newLabel —— 未读条目标题后的「NEW」标记
+   用法：var list = AnimatedList(容器元素, { items: [{ title, description, meta, icon, isNew }], animation: 'pop', ... })
+         list.update({ items }) · list.replay() · list.select(i) · list.destroy()
+   ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+var HIDDEN = {
+  pop:   { above: 'translate3d(0, -12px, 0) scale(0.8)',  below: 'translate3d(0, 12px, 0) scale(0.8)' },
+  slide: { above: 'translate3d(0, -28px, 0) scale(0.98)', below: 'translate3d(0, 28px, 0) scale(0.98)' },
+  fade:  { above: 'translate3d(0, -4px, 0)',              below: 'translate3d(0, 4px, 0)' }
+};
+var SPRING = 'linear(0, 0.0603, 0.2033, 0.3821, 0.5633, 0.7258, 0.8584, 0.9574, 1.0242, 1.0634, 1.0809, 1.0828, 1.0747, 1.0613, 1.046, 1.0313, 1.0186, 1.0085, 1.0012, 0.9965, 0.994, 0.9931, 0.9933, 0.9941, 0.9953, 0.9966, 0.9978, 0.9988, 1)';
+
+function smootherstep(t){ return t * t * t * (t * (t * 6 - 15) + 10); }
+
+var FADE_MASK = (function(){
+  var steps = [0, 0.15, 0.3, 0.45, 0.6, 0.75, 0.9, 1], top = [], bottom = [], i;
+  for (i = 0; i < steps.length; i++)
+    top.push('rgba(0, 0, 0, ' + smootherstep(steps[i]).toFixed(3) + ') calc(var(--al-fade-top) * ' + steps[i] + ')');
+  for (i = steps.length - 1; i >= 0; i--)
+    bottom.push('rgba(0, 0, 0, ' + smootherstep(steps[i]).toFixed(3) + ') calc(100% - var(--al-fade-bottom) * ' + steps[i] + ')');
+  return 'linear-gradient(to bottom, ' + top.concat(bottom).join(', ') + ')';
+})();
+
+function size(v){ return typeof v === 'number' ? v + 'px' : v; }
+var UID = 0;
+
+function AnimatedList(host, options){
+  var S = {
+    items: [], onItemSelect: null, renderItem: null,
+    selected: -1, selectOnHover: true, enableArrowNavigation: true, loop: false,
+    animation: 'pop', animateOnce: false, stagger: 0.05,
+    showGradients: true, fadeSize: 56, displayScrollbar: true, frame: true,
+    accentColor: '', radius: 14, gap: 8, width: 420, maxHeight: 440,
+    className: '', itemClassName: '',
+    expandOnSelect: false, newLabel: 'NEW'
+  };
+  var k;
+  for (k in (options || {})) S[k] = options[k];
+
+  var baseId = 'al' + (++UID);
+
+  /* ───── DOM（原组件的 JSX）───── */
+  var root = document.createElement('div');
+  var viewport = document.createElement('div');
+  var track = document.createElement('div');
+  var indicator = document.createElement('span');
+  var ring = document.createElement('span');
+  var frameRim = null;
+  var itemEls = [];
+
+  viewport.setAttribute('role', 'listbox');
+  viewport.tabIndex = 0;
+  track.className = 'animated-list__track';
+  indicator.className = 'animated-list__indicator';
+  indicator.setAttribute('aria-hidden', 'true');
+  ring.className = 'animated-list__ring';
+  indicator.appendChild(ring);
+  track.appendChild(indicator);
+  viewport.appendChild(track);
+  root.appendChild(viewport);
+  host.appendChild(root);
+
+  function paintShell(){
+    root.className = ('animated-list' + (S.frame ? ' animated-list--framed' : '') + ' ' + (S.className || '')).trim();
+    if (S.animation !== 'none') root.setAttribute('data-animated', ''); else root.removeAttribute('data-animated');
+    root.style.setProperty('--al-radius', Math.max(0, S.radius) + 'px');
+    root.style.setProperty('--al-gap', Math.max(0, S.gap) + 'px');
+    root.style.setProperty('--al-width', size(S.width));
+    root.style.setProperty('--al-accent', S.accentColor || 'var(--al-ink)');
+    if (S.accentColor){
+      root.style.setProperty('--al-ring', S.accentColor);
+      root.style.setProperty('--al-ring-fill', 'color-mix(in srgb, ' + S.accentColor + ' 8%, transparent)');
+    } else {
+      root.style.removeProperty('--al-ring');
+      root.style.removeProperty('--al-ring-fill');
+    }
+    viewport.className = 'animated-list__viewport' + (S.displayScrollbar ? '' : ' animated-list__viewport--bare');
+    viewport.style.maxHeight = size(S.maxHeight);
+    viewport.style.maskImage = viewport.style.webkitMaskImage = S.showGradients ? FADE_MASK : '';
+    if (S.frame && !frameRim){
+      frameRim = document.createElement('span');
+      frameRim.className = 'animated-list__frame-rim';
+      frameRim.setAttribute('aria-hidden', 'true');
+      root.appendChild(frameRim);
+    } else if (!S.frame && frameRim){
+      frameRim.remove(); frameRim = null;
+    }
+  }
+
+  function entryOf(item){ return (item !== null && typeof item === 'object') ? item : { title: item }; }
+
+  function fillItem(el, item, index){
+    var entry = entryOf(item);
+    el.textContent = '';
+    if (S.renderItem){
+      var r = S.renderItem(item, index, index === S.selected);
+      if (typeof r === 'string') el.innerHTML = r; else if (r && r.nodeType) el.appendChild(r);
+    } else {
+      if (entry.image || entry.icon){
+        var lead = document.createElement('span');
+        lead.className = 'animated-list__lead';
+        if (entry.image){
+          var im = document.createElement('img');
+          im.src = entry.image; im.alt = ''; im.draggable = false;
+          lead.appendChild(im);
+        } else lead.innerHTML = entry.icon;
+        el.appendChild(lead);
+      }
+      var text = document.createElement('span');
+      text.className = 'animated-list__text';
+      var title = document.createElement('span');
+      title.className = 'animated-list__title';
+      var tt = document.createElement('span');
+      tt.className = 'animated-list__title-text';
+      tt.textContent = entry.title == null ? '' : String(entry.title);
+      title.appendChild(tt);
+      if (entry.isNew){
+        var nw = document.createElement('span');
+        nw.className = 'animated-list__new';
+        nw.textContent = S.newLabel;
+        title.appendChild(nw);
+      }
+      text.appendChild(title);
+      if (entry.description){
+        var d = document.createElement('span');
+        d.className = 'animated-list__description';
+        d.textContent = String(entry.description);
+        text.appendChild(d);
+      }
+      el.appendChild(text);
+      if (entry.meta){
+        var m = document.createElement('span');
+        m.className = 'animated-list__meta';
+        m.textContent = String(entry.meta);
+        el.appendChild(m);
+      }
+    }
+    var rim = document.createElement('span');
+    rim.className = 'animated-list__rim';
+    rim.setAttribute('aria-hidden', 'true');
+    el.appendChild(rim);
+  }
+
+  function paintSelection(){
+    for (var i = 0; i < itemEls.length; i++){
+      var sel = i === S.selected;
+      itemEls[i].setAttribute('aria-selected', sel ? 'true' : 'false');
+      if (sel) itemEls[i].setAttribute('data-selected', ''); else itemEls[i].removeAttribute('data-selected');
+    }
+    if (S.selected >= 0 && S.selected < S.items.length) viewport.setAttribute('aria-activedescendant', baseId + '-' + S.selected);
+    else viewport.removeAttribute('aria-activedescendant');
+  }
+
+  function buildItems(){
+    for (var i = 0; i < itemEls.length; i++) if (itemEls[i] && itemEls[i].parentNode) itemEls[i].parentNode.removeChild(itemEls[i]);
+    itemEls = [];
+    S.items.forEach(function(item, index){
+      var el = document.createElement('div');
+      el.className = ('animated-list__item ' + (S.itemClassName || '')).trim();
+      el.id = baseId + '-' + index;
+      el.setAttribute('role', 'option');
+      el.setAttribute('data-index', String(index));
+      if (S.expandOnSelect) el.setAttribute('aria-expanded', 'false');
+      fillItem(el, item, index);
+      el.addEventListener('pointerenter', function(){ if (S.selectOnHover) hover(index); });
+      el.addEventListener('click', function(){ choose(item, index); });
+      track.insertBefore(el, indicator);
+      itemEls[index] = el;
+    });
+    paintSelection();
+  }
+
+  /* ───── engine（原组件 useLayoutEffect 里的那一大段，逐行照搬）───── */
+  var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var springEase = (window.CSS && CSS.supports && CSS.supports('transition-timing-function', 'linear(0, 1)')) ? SPRING : 'cubic-bezier(0.34, 1.4, 0.64, 1)';
+  var transition = 'transform 620ms ' + springEase + ', opacity 300ms cubic-bezier(0.22, 1, 0.36, 1), filter 200ms ease';
+  var motion = { y: 0, h: 0, vy: 0, vh: 0, ty: 0, th: 0, ready: false };
+  var fades = { top: '', bottom: '' };
+  var boxes = [];
+  var current = null;
+  var entered = false;
+  var engaged = false;
+  var pointer = [0, 0];
+  var raf = 0, last = 0, dead = false;
+  var keyboard = false, navigating = false;
+
+  function mode(){
+    var chosen = S.animation;
+    if (chosen === 'none' || !HIDDEN[chosen]) return 'none';
+    return reduced ? 'fade' : chosen;
+  }
+  function applyState(element, state){
+    element.dataset.state = state;
+    var pose = (current && current !== 'none' && state !== 'in') ? HIDDEN[current][state] : '';
+    element.style.transform = pose;
+    element.style.opacity = pose ? '0' : '';
+  }
+  function syncRing(){
+    var item = itemEls[S.selected];
+    if (!item) return;
+    var state = item.dataset.state || 'in';
+    if (state === ring.dataset.state) return;
+    ring.style.transitionDelay = item.style.transitionDelay;
+    applyState(ring, state);
+  }
+  function write(){
+    indicator.style.transform = 'translate3d(0, ' + motion.y.toFixed(2) + 'px, 0)';
+    indicator.style.height = motion.h.toFixed(2) + 'px';
+  }
+  function frame(now){
+    raf = 0;
+    if (dead) return;
+    var dt = Math.min(0.05, (now - last) / 1000 || 0);
+    last = now;
+    var omega = 30, zeta = 0.78;
+    var steps = Math.max(1, Math.ceil(dt / (1 / 240)));
+    var h = dt / steps;
+    for (var i = 0; i < steps; i++){
+      motion.vy += (omega * omega * (motion.ty - motion.y) - 2 * zeta * omega * motion.vy) * h;
+      motion.vh += (omega * omega * (motion.th - motion.h) - 2 * zeta * omega * motion.vh) * h;
+      motion.y += motion.vy * h;
+      motion.h += motion.vh * h;
+    }
+    var moving = Math.abs(motion.ty - motion.y) > 0.05 || Math.abs(motion.th - motion.h) > 0.05 ||
+      Math.abs(motion.vy) + Math.abs(motion.vh) > 0.5;
+    if (!moving){
+      motion.y = motion.ty; motion.h = motion.th; motion.vy = motion.vh = 0;
+    }
+    write();
+    if (moving) raf = requestAnimationFrame(frame);
+  }
+  function place(snap){
+    var item = itemEls[S.selected];
+    if (!item){
+      indicator.style.opacity = '0';
+      motion.ready = false;
+      return;
+    }
+    indicator.style.opacity = '1';
+    motion.ty = item.offsetTop;
+    motion.th = item.offsetHeight;
+    if (snap || reduced || !motion.ready){
+      motion.y = motion.ty; motion.h = motion.th; motion.vy = motion.vh = 0;
+      motion.ready = true;
+      write();
+      return;
+    }
+    if (!raf){
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    }
+  }
+  function updateFades(){
+    var span = Math.max(1, S.fadeSize);
+    var st = viewport.scrollTop, sh = viewport.scrollHeight, ch = viewport.clientHeight;
+    var top = S.showGradients ? Math.min(span, Math.max(0, st)) : 0;
+    var bottom = S.showGradients ? Math.min(span, Math.max(0, sh - ch - st)) : 0;
+    var nextTop = top.toFixed(1) + 'px', nextBottom = bottom.toFixed(1) + 'px';
+    if (nextTop !== fades.top){ fades.top = nextTop; viewport.style.setProperty('--al-fade-top', nextTop); }
+    if (nextBottom !== fades.bottom){ fades.bottom = nextBottom; viewport.style.setProperty('--al-fade-bottom', nextBottom); }
+  }
+  function measure(){
+    var offset = track.offsetTop;
+    boxes = itemEls.map(function(item){ return item ? [offset + item.offsetTop, item.offsetHeight] : null; });
+  }
+  function reveal(entrance){
+    if (!entered) return;
+    var top = viewport.scrollTop, view = viewport.clientHeight, order = 0;
+    itemEls.forEach(function(item, index){
+      var box = boxes[index];
+      if (!item || !box) return;
+      var start = box[0] - top;
+      var overlap = Math.min(view, start + box[1]) - Math.max(0, start);
+      /* 展开中的条目永远不隐藏（原组件条目高度固定；展开后变高、伸出视口时会被误判成「已滚出去」而淡出） */
+      var hidden = current !== 'none' && !item.hasAttribute('data-open') && overlap < Math.min(box[1], view) * 0.5 && !(S.animateOnce && item.dataset.seen);
+      var state = hidden ? ((start + box[1] / 2 < view / 2) ? 'above' : 'below') : 'in';
+      if (state === item.dataset.state) return;
+      var delay = (entrance && !hidden) ? (order++ * Math.max(0, S.stagger)).toFixed(3) : 0;
+      item.style.transitionDelay = delay ? (delay + 's, ' + delay + 's, 0s') : '';
+      if (!hidden) item.dataset.seen = 'true';
+      applyState(item, state);
+    });
+    syncRing();
+  }
+  function sync(){
+    var items = itemEls.filter(Boolean);
+    var next = mode();
+    var changed = next !== current;
+    var restyle = changed ? items : items.filter(function(item){ return !item.dataset.state; });
+    current = next;
+    if (current === 'none') entered = true;
+    if (restyle.length){
+      var elements = changed ? restyle.concat([ring]) : restyle;
+      elements.forEach(function(el){ el.style.transition = 'none'; });
+      restyle.forEach(function(item){ applyState(item, current === 'none' ? 'in' : (item.dataset.state || 'below')); });
+      if (changed) applyState(ring, (itemEls[S.selected] && itemEls[S.selected].dataset.state) || 'in');
+      void root.offsetHeight;
+      elements.forEach(function(el){ el.style.transition = transition; });
+    }
+    measure();
+    reveal(restyle.length > 0);
+  }
+
+  /* ───── 选择 / 展开 ───── */
+  function scrollToSelected(){ scrollToItem(itemEls[S.selected]); }
+  function scrollToItem(item){
+    if (!item) return;
+    var top = track.offsetTop + item.offsetTop;
+    var bottom = top + item.offsetHeight;
+    var room = Math.max(0, (viewport.clientHeight - item.offsetHeight) / 2);
+    var margin = Math.min(S.showGradients ? Math.max(12, S.fadeSize) : 12, room);
+    if (top < viewport.scrollTop + margin) viewport.scrollTo({ top: Math.max(0, top - margin), behavior: 'smooth' });
+    else if (bottom > viewport.scrollTop + viewport.clientHeight - margin)
+      viewport.scrollTo({ top: bottom - viewport.clientHeight + margin, behavior: 'smooth' });
+  }
+  function setSelected(next){
+    if (next === S.selected) return;
+    S.selected = next;
+    paintSelection();
+    place(false);
+    syncRing();
+    if (keyboard){ keyboard = false; scrollToSelected(); }
+  }
+  function hover(index){ if (!navigating) setSelected(index); }
+  function toggleOpen(index){
+    var el = itemEls[index];
+    if (!el) return;
+    var open = el.hasAttribute('data-open');
+    if (open) el.removeAttribute('data-open'); else el.setAttribute('data-open', '');
+    el.setAttribute('aria-expanded', open ? 'false' : 'true');
+    requestAnimationFrame(function(){
+      if (dead) return;
+      measure(); place(true); updateFades(); reveal(false);
+      if (!open) scrollToItem(el);                 /* 刚展开：平滑滚到整条可见 */
+    });
+  }
+  function activate(item, index){
+    if (S.expandOnSelect) toggleOpen(index);
+    if (S.onItemSelect) S.onItemSelect(item, index);
+  }
+  function choose(item, index){
+    setSelected(index);
+    activate(item, index);
+  }
+
+  /* ───── 观察器 / 事件（原组件同名逻辑）───── */
+  var gate = (typeof IntersectionObserver === 'undefined') ? null : new IntersectionObserver(function(entries, observer){
+    var any = false;
+    for (var i = 0; i < entries.length; i++) if (entries[i].isIntersecting) any = true;
+    if (!any) return;
+    observer.disconnect();
+    if (entered) return;
+    entered = true;
+    measure();
+    reveal(true);
+  }, { rootMargin: '0px 0px -10% 0px' });
+
+  var resizeObserver = new ResizeObserver(function(){
+    place(true);
+    updateFades();
+    measure();
+    reveal(false);
+  });
+
+  function onScroll(){ updateFades(); reveal(false); }
+  function onKey(event){
+    if (!S.enableArrowNavigation || event.defaultPrevented) return;
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    var active = document.activeElement;
+    var focused = active === viewport;
+    var idle = !active || active === document.body || active === document.documentElement;
+    if (!focused && !(engaged && idle)) return;
+    var count = S.items.length;
+    if (!count) return;
+    var index = S.selected, next = null;
+    if (event.key === 'ArrowDown') next = index < 0 ? 0 : index + 1;
+    else if (event.key === 'ArrowUp') next = index < 0 ? count - 1 : index - 1;
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = count - 1;
+    else if ((event.key === 'Enter' || (focused && event.key === ' ')) && index >= 0 && index < count){
+      event.preventDefault();
+      activate(S.items[index], index);
+      return;
+    }
+    if (next === null) return;
+    event.preventDefault();
+    next = S.loop ? (next + count) % count : Math.min(count - 1, Math.max(0, next));
+    keyboard = true;
+    navigating = true;
+    setSelected(next);
+  }
+  function onPointerMove(event){
+    var moved = event.clientX !== pointer[0] || event.clientY !== pointer[1];
+    pointer = [event.clientX, event.clientY];
+    if (!navigating || !moved) return;
+    navigating = false;
+    var item = event.target instanceof Element ? event.target.closest('[data-index]') : null;
+    if (item && root.contains(item) && S.selectOnHover) setSelected(Number(item.dataset.index));
+  }
+  function onEnter(){ engaged = true; }
+  function onLeave(){ engaged = false; }
+
+  viewport.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('keydown', onKey);
+  root.addEventListener('pointerenter', onEnter);
+  root.addEventListener('pointerleave', onLeave);
+  root.addEventListener('pointermove', onPointerMove);
+
+  /* ───── 初始化 ───── */
+  paintShell();
+  buildItems();
+  sync();
+  if (!entered){
+    if (gate) gate.observe(root);
+    else { entered = true; reveal(true); }
+  }
+  resizeObserver.observe(viewport);
+  resizeObserver.observe(track);
+  updateFades();
+  place(true);
+  syncRing();
+
+  return {
+    el: root,
+    /* 换条目 / 改选项（对应 React 里 items / animation 变化触发的 useLayoutEffect）*/
+    update: function(next){
+      var itemsChanged = false, key;
+      for (key in (next || {})){
+        if (key === 'items') itemsChanged = true;
+        S[key] = next[key];
+      }
+      paintShell();
+      if (itemsChanged){
+        if (S.selected >= S.items.length) S.selected = -1;
+        buildItems();
+      }
+      sync();
+      place(true);
+      updateFades();
+      syncRing();
+    },
+    /* 弹窗每次打开：所有条目回到「未进入」状态，再按顺序弹入 */
+    replay: function(){
+      if (dead) return;
+      S.selected = -1;
+      paintSelection();
+      indicator.style.opacity = '0';
+      motion.ready = false;
+      itemEls.forEach(function(el){
+        delete el.dataset.state; delete el.dataset.seen;
+        el.style.transitionDelay = '';
+        el.removeAttribute('data-open');
+        if (S.expandOnSelect) el.setAttribute('aria-expanded', 'false');
+      });
+      delete ring.dataset.state;
+      viewport.scrollTop = 0;
+      entered = true;
+      sync();
+      place(true);
+      updateFades();
+    },
+    select: function(i){ keyboard = false; setSelected(i); },
+    destroy: function(){
+      dead = true;
+      cancelAnimationFrame(raf);
+      if (gate) gate.disconnect();
+      resizeObserver.disconnect();
+      viewport.removeEventListener('scroll', onScroll);
+      window.removeEventListener('keydown', onKey);
+      root.removeEventListener('pointerenter', onEnter);
+      root.removeEventListener('pointerleave', onLeave);
+      root.removeEventListener('pointermove', onPointerMove);
+      if (root.parentNode) root.parentNode.removeChild(root);
+    }
+  };
+}
+
+window.AnimatedList = AnimatedList;
 })();
 </script>
 <script>
@@ -24177,6 +24739,24 @@ __UI_SCRIPT__
     if (btn) btn.classList.toggle('bounce', un > 0);
     if (dot) dot.hidden = !(un > 0);
   }
+  /* 公告列表：React Bits <AnimatedList />（上面 #animatedList 脚本是它的原生 JS 移植）
+     条目 = { title: 标题, description: 正文, meta: 日期, isNew: 未读 }；弹入动画 'pop'，点击条目展开全文 */
+  var ANN_AL = null, ANN_AL_SIG = '';
+  var ANN_AL_ICON = '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>';
+  function annListOptions(items){
+    return {
+      items: items,
+      animation: 'pop',
+      className: 'ann-al',
+      frame: false,                 /* 弹窗本身已经是一张卡片，再套一层毛玻璃外框会变成「卡片里的卡片」；想要原组件的外框改成 true */
+      width: '100%',
+      maxHeight: 340,
+      radius: 14,
+      gap: 8,
+      expandOnSelect: true,
+      newLabel: uiT('annNew')
+    };
+  }
   function annRenderList(){
     var box = document.getElementById('annList');
     if (!box) return;
@@ -24184,28 +24764,23 @@ __UI_SCRIPT__
       var emptyTxt = uiT('annEmpty');
       if (ANN_STATE === 'wait') { emptyTxt = 'Loading…'; }
       else if (ANN_STATE.indexOf('err:') === 0) { emptyTxt = 'Failed to load announcements (' + ANN_STATE.slice(4) + ')'; }
-      box.innerHTML = '<div class="ann-item"><div class="ann-item-body">'
-        + '<div class="ann-item-txt">' + uiEsc(emptyTxt) + '</div></div></div>';
+      if (ANN_AL) { ANN_AL.destroy(); ANN_AL = null; ANN_AL_SIG = ''; }
+      box.innerHTML = '<div class="ann-empty">' + uiEsc(emptyTxt) + '</div>';
       return;
     }
-    var html = '';
-    ANNOUNCEMENTS.forEach(function(a){
-      var isNew = annIsUnread(a);
-      html += '<div class="ann-item">'
-        +   '<div class="ann-item-ico">'
-        +     '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>'
-        +   '</div>'
-        +   '<div class="ann-item-body">'
-        +     '<div class="ann-item-top">'
-        +       '<span class="ann-item-title">' + uiEsc(a.title || '') + '</span>'
-        +       (isNew ? '<span class="ann-item-new">' + uiEsc(uiT('annNew')) + '</span>' : '')
-        +     '</div>'
-        +     '<div class="ann-item-txt">' + uiEsc(a.text || '') + '</div>'
-        +     '<div class="ann-item-date">' + uiEsc(a.date || '') + '</div>'
-        +   '</div>'
-        + '</div>';
+    var items = ANNOUNCEMENTS.map(function(a){
+      return { id: a.id, title: a.title || '', description: a.text || '', meta: a.date || '', isNew: annIsUnread(a), icon: ANN_AL_ICON };
     });
-    box.innerHTML = html;
+    /* 宿主每分钟会回一次公告：内容没变就不重建，免得打开着弹窗时条目被重新弹一遍 */
+    var sig = JSON.stringify(items.map(function(x){ return [x.id, x.title, x.description, x.meta, x.isNew]; })) + '|' + uiT('annNew');
+    if (!ANN_AL) {
+      box.innerHTML = '';
+      ANN_AL = AnimatedList(box, annListOptions(items));
+      ANN_AL_SIG = sig;
+    } else if (sig !== ANN_AL_SIG) {
+      ANN_AL_SIG = sig;
+      ANN_AL.update({ items: items, newLabel: uiT('annNew') });
+    }
   }
   /* 定位：贴在图标正下方，箭头对准图标中心 */
   function annPlace(){
@@ -24237,6 +24812,7 @@ __UI_SCRIPT__
     void pop.offsetWidth;                 /* 强制 reflow，让 transition 生效 */
     pop.classList.add('show');
     annPlace();
+    if (ANN_AL) { ANN_AL.replay(); }      /* 每次打开都重新依次弹入 */
     /* 打开即视为已读：图标停止跳动、小红点消失 */
     ANNOUNCEMENTS.forEach(function(a){ if (annIsUnread(a)) { ANN_SEEN.push(a.id); } });
     annSaveSeen();
