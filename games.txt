@@ -222,37 +222,6 @@ priceLife= 99.99
 
 
 # ───────────────────────────────────────────────────────────────────────────
-#  Delta Force
-# ───────────────────────────────────────────────────────────────────────────
-[DELTA]
-title    = Delta Force
-short    = Delta Force
-icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/09ef134458549352e5b5a06ed7f97cf00d729b62/header_alt_assets_14.jpg?t=1790238079
-cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/extras/1714c15ede69196c9325adca67d2d84d.webm?t=1790238079
-cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/extras/181965c4720d88928eb6fb1254f70a37.webm?t=1790238079
-cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2507950/6e6783dfed5715c4ac1166dfc12efdf70d6a05ad/ss_6e6783dfed5715c4ac1166dfc12efdf70d6a05ad.1920x1080.jpg?t=1790238079
-cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2507950/ss_7006f261d2d50ef06293e0b29785211db687a9b1.1920x1080.jpg?t=1790238079
-cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2507950/ss_0336d3bdff28cdb9dcb2c76538af9f8a999a7a0b.1920x1080.jpg?t=1790238079
-cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2507950/ss_c6109219c92d56f09f250a3427e54408c619cf37.1920x1080.jpg?t=1790238079
-process  = 0
-runmode  = 0
-download = 0
-dev      = TiMi Studio Group
-pub      = TiMi Studio Group
-rel      = 2024
-genres   = FPS, Tactical
-features = Multiplayer
-featured = true
-status   = outdated
-price7   = 0       
-price15  = 0   
-price30  = 0
-price90  = 0
-priceLife= 0
-Announcement1 = This product is being outdated. If you bought it, you can exchange it for another product of the same value.
-
-
-# ───────────────────────────────────────────────────────────────────────────
 #  Escape from Tarkov 
 # ───────────────────────────────────────────────────────────────────────────
 [TARKOV]
