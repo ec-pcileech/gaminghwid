@@ -130,11 +130,11 @@ rel      = TBA
 genres   = MOBA, Shooter, Third-Person
 features = Multiplayer, Early Access
 featured = true
-price7   = 120.99        
-price15  = 120.99    
-price30  = 120.99 
-price90  = 120.99 
-priceLife= 12.99
+price7   = 1200.99        
+price15  = 1200.99    
+price30  = 1200.99 
+price90  = 1200.99 
+priceLife= 120.99
 discount = 90
 
 
