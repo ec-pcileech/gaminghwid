@@ -9177,6 +9177,69 @@ function uiTargetCursorSet(on) {
 }
 uiTargetCursorApply(UI_TCURSOR);
 uiTargetCursorSync();
+
+/* ═══ 卡片特效偏好（个人资料 ▸ 偏好设置）：公共脚本在 #cardFxCards 之后才注入，所以接线放这里；登录页没有选择器，直接 return ═══ */
+var UI_FX_MODES = ['none', 'dither', 'shape', 'halftone'];
+/* ═══════════════════════════════════════════════════════════════════════
+   个人资料 ▸ 偏好设置：卡片特效（带滑动高亮的分段选择器）
+   ═══════════════════════════════════════════════════════════════════════ */
+uiAddT({
+  cardFxTitle: ['Card effect', '卡片特效', 'Эффект карточек', 'Karteneffekt', 'カードエフェクト', 'Efecto de tarjetas', 'Kart efekti', 'Efeito dos cartões'],
+  cardFxSub: ['Cover effect on game store cards you haven\'t subscribed to', '游戏商店里未订阅游戏卡片的封面特效', 'Эффект обложки для игр без подписки', 'Cover-Effekt für nicht abonnierte Spiele im Shop', '未購読ゲームのカバーエフェクト', 'Efecto de portada en juegos sin suscripción', 'Abone olmadığın oyunların kapak efekti', 'Efeito de capa nos jogos sem assinatura'],
+  cardFxNone: ['None', '无', 'Нет', 'Aus', 'なし', 'Ninguno', 'Yok', 'Nenhum']
+});
+
+function uiCardFxButtons(){ return document.querySelectorAll('#cardFxSeg .fx-seg-btn'); }
+
+/* 把滑块量好位置：用按钮的实际 offset 量，所以语言 / 字体 / 换行变化都不会错位。
+   animate=false 时（首次布局）关掉过渡，避免从 0 滑进来 */
+function uiCardFxLayout(animate){
+  var seg = document.getElementById('cardFxSeg');
+  if (!seg) return;
+  if (window.CardFx) window.CardFx.init();
+  var thumb = seg.querySelector('.fx-seg-thumb');
+  var btns = uiCardFxButtons(), active = null;
+  for (var i = 0; i < btns.length; i++){
+    var on = btns[i].getAttribute('data-fx') === (window.CardFx ? window.CardFx.mode : 'dither');
+    btns[i].classList.toggle('on', on);
+    btns[i].setAttribute('aria-checked', on ? 'true' : 'false');
+    btns[i].tabIndex = on ? 0 : -1;
+    if (on) active = btns[i];
+  }
+  if (!thumb || !active || !active.offsetWidth) return;     /* 面板还没显示（宽度为 0）：等 ResizeObserver 再量 */
+  /* 只有「第一次摆放」才关过渡（否则会从 0 滑进来）。之后任何重新布局（窗口缩放 / 字体加载 / 选中项变粗体导致总宽度微变触发的 ResizeObserver）
+     都只更新目标值，不能关过渡——否则正在滑动的高亮会被瞬间取消、直接跳到终点 */
+  var first = !thumb.classList.contains('ready');
+  if (first) thumb.style.transition = 'none';
+  thumb.style.width = active.offsetWidth + 'px';
+  thumb.style.height = active.offsetHeight + 'px';
+  thumb.style.transform = 'translate(' + active.offsetLeft + 'px,' + active.offsetTop + 'px)';
+  thumb.classList.add('ready');
+  if (first){ void thumb.offsetWidth; thumb.style.transition = ''; }
+}
+function uiCardFxSet(mode){ CardFx.set(mode); }
+window.uiCardFxSet = uiCardFxSet;
+window.uiCardFxLayout = uiCardFxLayout;
+
+(function(){
+  var seg = document.getElementById('cardFxSeg');
+  if (!seg) return;
+  seg.addEventListener('keydown', function(e){
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    var i = UI_FX_MODES.indexOf((window.CardFx ? window.CardFx.mode : 'dither'));
+    var d = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1 : -1;
+    var next = UI_FX_MODES[(i + d + UI_FX_MODES.length) % UI_FX_MODES.length];
+    e.preventDefault();
+    CardFx.set(next);
+    var b = seg.querySelector('.fx-seg-btn[data-fx="' + next + '"]');
+    if (b) b.focus();
+  });
+  if (window.ResizeObserver){ new ResizeObserver(function(){ uiCardFxLayout(false); }).observe(seg); }
+  window.addEventListener('resize', function(){ uiCardFxLayout(false); });
+  uiCardFxLayout(false);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ uiCardFxLayout(false); });
+})();
+try { if (document.getElementById('cardFxSeg') && typeof uiRenderI18n === 'function') { uiRenderI18n(); } } catch (e) {}
 #===LOGIN
 <!DOCTYPE html>
 <html lang="__UI_LANG_ATTR__" data-theme="__UI_THEME_ATTR__">
@@ -14627,6 +14690,27 @@ body.dragging .qp-drop-hint{display:block}
 .card-img .dv-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;opacity:0;transition:opacity .3s ease}
 .card-img .dv-canvas.dv-ready{opacity:1}
 .card-img.dv-on::before{z-index:1}   /* 节日主题的 ::before 叠层（飘雪等）仍显示在画布之上 */
+/* ── 卡片特效（Halftone Reveal / Shape Blur）画布：和 Dither Veil 一样叠在封面上 ── */
+.card-img .fx-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;opacity:0;transition:opacity .3s ease}
+.card-img .fx-canvas.fx-ready{opacity:1}
+.card-img.fx-on::before,.card-img.fx-sb-on::before{z-index:1}
+/* ── 偏好设置 ▸ 卡片特效：分段选择器，高亮滑块在选项之间滑动（量按钮实际位置，所以任何语言 / 字体都不会错位）── */
+.fx-seg{position:relative;display:inline-flex;flex-wrap:wrap;gap:2px;width:fit-content;max-width:100%;padding:4px;border-radius:14px;
+  background:var(--surface-2);border:1px solid var(--border);isolation:isolate}
+.fx-seg-thumb{position:absolute;left:0;top:0;z-index:0;border-radius:10px;background:var(--surface-3);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 2px 8px rgba(0,0,0,.28),0 0 0 1px rgba(255,255,255,.06);
+  opacity:0;pointer-events:none;will-change:transform,width}
+.fx-seg-thumb.ready{opacity:1;
+  transition:transform .46s cubic-bezier(.34,1.32,.5,1),width .46s cubic-bezier(.34,1.32,.5,1),height .3s ease,opacity .2s ease}
+.fx-seg-btn{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;border:0;
+  background:transparent;border-radius:10px;color:var(--text-3);font:600 13px var(--font);cursor:pointer;white-space:nowrap;
+  transition:color .28s ease}
+.fx-seg-btn svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .4s cubic-bezier(.34,1.4,.5,1)}
+.fx-seg-btn:hover{color:var(--text-2)}
+.fx-seg-btn.on{color:var(--text);font-weight:700}
+.fx-seg-btn.on svg{transform:scale(1.1)}
+.fx-seg-btn:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 .card-badge{
   position:absolute;top:12px;left:12px;z-index:2;
   font-size:10px;font-weight:700;
@@ -16365,6 +16449,35 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
             </div>
           </div>
         </div>
+
+        <div class="card-panel">
+          <div class="panel-head">
+            <div class="panel-ico">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="1.6"/><path d="M3 16l5-4 4 3 3-2 6 4"/></svg>
+            </div>
+            <div>
+              <div class="panel-title" data-ui="cardFxTitle">Card effect</div>
+              <div class="panel-sub" data-ui="cardFxSub">Cover effect on game store cards you haven't subscribed to</div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="fx-seg" id="cardFxSeg" role="radiogroup" aria-label="Card effect">
+              <span class="fx-seg-thumb" aria-hidden="true"></span>
+              <button class="fx-seg-btn" type="button" role="radio" data-fx="none" onclick="uiCardFxSet('none')">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></svg><span data-ui="cardFxNone">None</span>
+              </button>
+              <button class="fx-seg-btn" type="button" role="radio" data-fx="dither" onclick="uiCardFxSet('dither')">
+                <svg viewBox="0 0 24 24"><rect x="4" y="4" width="4.5" height="4.5" rx=".6"/><rect x="15.5" y="4" width="4.5" height="4.5" rx=".6"/><rect x="9.75" y="9.75" width="4.5" height="4.5" rx=".6"/><rect x="4" y="15.5" width="4.5" height="4.5" rx=".6"/><rect x="15.5" y="15.5" width="4.5" height="4.5" rx=".6"/></svg><span>Dither Veil</span>
+              </button>
+              <button class="fx-seg-btn" type="button" role="radio" data-fx="shape" onclick="uiCardFxSet('shape')">
+                <svg viewBox="0 0 24 24"><path d="M12 3.5l7 4v9l-7 4-7-4v-9z"/><path d="M12 8.5l3 1.7v3.6l-3 1.7-3-1.7v-3.6z"/></svg><span>Shape Blur</span>
+              </button>
+              <button class="fx-seg-btn" type="button" role="radio" data-fx="halftone" onclick="uiCardFxSet('halftone')">
+                <svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="1.4"/><circle cx="12" cy="6" r="2.2"/><circle cx="18" cy="6" r="1.4"/><circle cx="6" cy="12" r="2.2"/><circle cx="12" cy="12" r="3"/><circle cx="18" cy="12" r="2.2"/><circle cx="6" cy="18" r="1.4"/><circle cx="12" cy="18" r="2.2"/><circle cx="18" cy="18" r="1.4"/></svg><span>Halftone Reveal</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -17013,7 +17126,7 @@ __UI_MARKUP__
    · 封面图必须允许跨域读取（Access-Control-Allow-Origin）才能做 WebGL 贴图；
      不允许时这张卡静默回退成原来的普通封面，不影响其它功能
 
-   对外：window.DitherVeilCards = { sync(root), refresh(), config, supported() }
+   对外：window.DitherVeilCards = { sync(root), refresh(), setEnabled(on), config, supported() }
 ═══════════════════════════════════════════════════════════════════════ */
 (function(){
 'use strict';
@@ -17366,6 +17479,7 @@ var LIVE = [];                /* 所有存活的卡片实例 */
 var ACTIVE = [];              /* 当前需要逐帧渲染的实例 */
 var RAF = 0;
 var RO = null, IO = null;
+var ENABLED = true;           /* 卡片特效切换（个人资料 ▸ 偏好设置 ▸ 卡片特效）：不是 Dither Veil 时关掉并清空 */
 var BURST_BUF = new Float32Array(MAX_BURSTS * 4);
 var IMGS = {};                /* src -> {state:'loading'|'ok'|'fail', img, matte, plain, cbs, retried} */
 var INTRO_SEEN = {};          /* src -> true：入场动画每张封面只播一次（renderGrid 重绘不会重播） */
@@ -17838,14 +17952,1560 @@ function sync(root){
   for (var i = LIVE.length - 1; i >= 0; i--){
     if (!LIVE[i].host.isConnected) LIVE[i].dispose();
   }
-  if (!root || !initGL()) return;
+  if (!ENABLED || !root || !initGL()) return;
   var cards = root.querySelectorAll('.card[data-dv]');
   for (var j = 0; j < cards.length; j++) attach(cards[j]);
 }
 
 function refresh(){ for (var i = 0; i < LIVE.length; i++) wake(LIVE[i]); }
+function setEnabled(on){
+  on = !!on;
+  if (ENABLED === on) return;
+  ENABLED = on;
+  if (!on){ for (var i = LIVE.length - 1; i >= 0; i--) LIVE[i].dispose(); }
+}
 
-window.DitherVeilCards = { sync: sync, refresh: refresh, config: CFG, supported: function(){ return initGL(); } };
+window.DitherVeilCards = { sync: sync, refresh: refresh, setEnabled: setEnabled, config: CFG, supported: function(){ return initGL(); } };
+})();
+</script>
+<script id="cardFxCards">
+/* ═══════════════════════════════════════════════════════════════════════
+   卡片特效切换 · 游戏商店「未订阅」卡片封面
+   个人资料 ▸ 偏好设置 ▸ 卡片特效：None / Dither Veil / Shape Blur / Halftone Reveal
+
+   · Dither Veil      —— 上面 #ditherVeilCards 脚本（原有）
+   · Halftone Reveal  —— React Bits <HalftoneReveal />（JS-CSS 版）的原生 WebGL2 移植：
+                         封面变成半色调网点印刷，光标划过的地方网点膨胀回真实照片，松开后慢慢织回去，点击放一圈冲击波
+   · Shape Blur       —— React Bits <ShapeBlur />（JS-CSS 版）的原生 WebGL2 移植：
+                         一个 STARLINE logo 形状叠在封面上，像镜头一样随光标 / 自动漂移对焦与失焦（带色散）
+   两个组件原本依赖 React；这里的 shader、距离场、模糊金字塔、笔刷遮罩、弹簧 / 冲击波逻辑都逐行照搬，
+   结构沿用 Dither Veil：所有卡片共用 1 个离屏 WebGL2 上下文，每次渲染完 drawImage 到该卡自己的 2D canvas，
+   静止的卡片不占 GPU（Shape Blur 的「待机漂移」除外：它本来就是持续动画，只渲染屏幕内的卡片）。
+
+   对外：window.CardFx = { mode, set(mode), sync(root), refresh() }
+        window.HalftoneCards / window.ShapeBlurCards = { sync(root), setEnabled(on), refresh(), config }
+   只处理 renderGrid() 里带 data-dv 的卡片（= 没订阅的游戏）；已订阅的卡片保持原样。
+   ═══════════════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+var REDUCED = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+function dpr(){ return Math.min(window.devicePixelRatio || 1, 2); }
+function clamp(v, a, b){ return Math.min(b, Math.max(a, v)); }
+
+var RGB_MEMO = {};
+function hexToRgb(hex){
+  var key = String(hex || '');
+  if (RGB_MEMO[key]) return RGB_MEMO[key];
+  var h = key.replace('#', '');
+  if (h.length === 3) h = h.replace(/./g, function(c){ return c + c; });
+  var n = parseInt(h.slice(0, 6), 16);
+  var out = isNaN(n) ? [0, 0, 0] : [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+  RGB_MEMO[key] = out;
+  return out;
+}
+
+/* ───────── 公共：着色器 / 程序 / 全屏三角形 ───────── */
+var VERTEX = '#version 300 es\nin vec2 aPosition;\nvoid main() {\n  gl_Position = vec4(aPosition, 0.0, 1.0);\n}';
+
+function compileShader(gl, type, src){
+  var s = gl.createShader(type);
+  gl.shaderSource(s, src);
+  gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+    var msg = gl.getShaderInfoLog(s);
+    gl.deleteShader(s);
+    throw new Error('shader: ' + msg);
+  }
+  return s;
+}
+function linkProgram(gl, vs, fsSrc, names){
+  var fs = compileShader(gl, gl.FRAGMENT_SHADER, fsSrc);
+  var p = gl.createProgram();
+  gl.attachShader(p, vs);
+  gl.attachShader(p, fs);
+  gl.bindAttribLocation(p, 0, 'aPosition');
+  gl.linkProgram(p);
+  gl.deleteShader(fs);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)){
+    var msg = gl.getProgramInfoLog(p);
+    gl.deleteProgram(p);
+    throw new Error('link: ' + msg);
+  }
+  var u = {};
+  for (var i = 0; i < names.length; i++) u[names[i]] = gl.getUniformLocation(p, names[i]);
+  return { p: p, u: u };
+}
+function makeTriangle(gl){
+  var vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  var buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0);
+  gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+  gl.bindVertexArray(null);
+  return vao;
+}
+
+/* ───────── 公共：封面图加载（跨域模式，按 src 缓存）+ 边缘取样 ───────── */
+var SCV = null, SCTX = null;
+function sampler(){
+  if (!SCTX){ SCV = document.createElement('canvas'); SCTX = SCV.getContext('2d', { willReadFrequently: true }); }
+  return SCTX;
+}
+function measureEdge(context, image){
+  var size = 32;
+  context.canvas.width = size; context.canvas.height = size;
+  context.clearRect(0, 0, size, size);
+  context.drawImage(image, 0, 0, size, size);
+  var data = context.getImageData(0, 0, size, size).data;
+  var sum = [0, 0, 0], squares = [0, 0, 0], count = 0, clear = 0;
+  for (var y = 0; y < size; y++){
+    for (var x = 0; x < size; x++){
+      if (x > 0 && y > 0 && x < size - 1 && y < size - 1) continue;
+      var i = (y * size + x) * 4;
+      if (data[i + 3] < 250) clear++;
+      for (var c = 0; c < 3; c++){
+        var v = data[i + c] / 255;
+        sum[c] += v; squares[c] += v * v;
+      }
+      count++;
+    }
+  }
+  var matte = [sum[0] / count, sum[1] / count, sum[2] / count];
+  var spread = 0;
+  for (var k = 0; k < 3; k++) spread += Math.sqrt(Math.max(0, squares[k] / count - matte[k] * matte[k]));
+  spread /= 3;
+  return { matte: matte, plain: clear < count * 0.5 && spread < 0.06 };
+}
+var IMGS = {};
+function loadImg(src, cb){
+  var e = IMGS[src];
+  if (e){
+    if (e.state === 'ok') { cb(e); return; }
+    if (e.state === 'fail') { cb(null); return; }
+    e.cbs.push(cb);
+    return;
+  }
+  e = IMGS[src] = { state: 'loading', img: null, matte: [0, 0, 0], plain: false, cbs: [cb], retried: false };
+  function flush(){
+    var list = e.cbs; e.cbs = [];
+    for (var i = 0; i < list.length; i++) list[i](e.state === 'ok' ? e : null);
+  }
+  function fail(){ e.state = 'fail'; flush(); }
+  function attempt(url){
+    var im = new Image();
+    im.crossOrigin = 'anonymous';
+    im.decoding = 'async';
+    im.onload = function(){
+      try {
+        var ed = measureEdge(sampler(), im);
+        e.matte = ed.matte; e.plain = ed.plain;
+      } catch (err) { fail(); return; }
+      e.img = im; e.state = 'ok'; flush();
+    };
+    im.onerror = function(){
+      if (!e.retried && /^https?:/i.test(src)){
+        e.retried = true;
+        attempt(src + (src.indexOf('?') < 0 ? '?' : '&') + 'fx=1');
+      } else fail();
+    };
+    im.src = url;
+  }
+  attempt(src);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Halftone Reveal
+   ═══════════════════════════════════════════════════════════════════════ */
+var HT = (function(){
+
+/* ───────── 配置（对应 React Bits 组件的 props；数值就是你给的配置）───────── */
+var CFG = {
+  fit: 'cover',            /* 卡片封面是 object-fit:cover，这里保持一致 */
+  mode: 'mono',            /* 'mono' | 'duotone' | 'color' */
+  shape: 'dot',            /* 'dot' | 'ellipse' | 'square' | 'diamond' | 'line' | 'cross' */
+  cellSize: 7,
+  angle: 45,
+  dotScale: 1,
+  inkColor: '#f4f1ea',
+  accentColor: '#ff4f2a',
+  paperColor: '#120f17',
+  contrast: 1.1,
+  brightness: -0.08,
+  invert: false,
+  roughness: 0,
+  misregistration: 0,
+  revealRadius: 320,
+  softness: 0.6,
+  linger: 1.9,
+  reverse: false,
+  wander: false,
+  clickBurst: true,
+  intro: true,
+  radiusRefWidth: 600      /* 卡片比这个宽度窄时，笔刷半径按比例缩小（卡片只有 ~250px，半径 320 会一次烧穿整张） */
+};
+var MODES = { mono: 0, duotone: 1, color: 2 };
+var SHAPES = { dot: 0, ellipse: 1, square: 2, diamond: 3, line: 4, cross: 5 };
+var MAX_BURSTS = 4, BURST_SECONDS = 1.3, INTRO_SECONDS = 1.4, MASK_SCALE = 0.5;
+
+var MASK = `#version 300 es
+precision highp float;
+uniform sampler2D uPrevious;
+uniform vec2 uTexture;
+uniform vec2 uView;
+uniform vec2 uFrom;
+uniform vec2 uTo;
+uniform float uRadius;
+uniform float uSoftness;
+uniform float uStrength;
+uniform float uFade;
+out vec4 outColor;
+
+float segment(vec2 p, vec2 a, vec2 b) {
+  vec2 ab = b - a;
+  float h = clamp(dot(p - a, ab) / max(dot(ab, ab), 0.0001), 0.0, 1.0);
+  return length(p - a - ab * h);
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / uTexture;
+  vec2 p = vec2(uv.x, 1.0 - uv.y) * uView;
+  float trail = max(texture(uPrevious, uv).r - uFade, 0.0);
+  float band = max(uRadius * uSoftness, 1.0);
+  float brush = clamp((uRadius - segment(p, uFrom, uTo)) / band, 0.0, 1.0);
+  brush = brush * brush * (3.0 - 2.0 * brush);
+  outColor = vec4(max(trail, brush * uStrength), 0.0, 0.0, 1.0);
+}`;
+
+var VIEW = `#version 300 es
+precision highp float;
+uniform sampler2D uImage;
+uniform sampler2D uMask;
+uniform vec2 uResolution;
+uniform vec2 uView;
+uniform float uDpr;
+uniform vec4 uFrame;
+uniform float uTexels;
+uniform float uMode;
+uniform float uShape;
+uniform float uCell;
+uniform float uAngle;
+uniform float uScale;
+uniform vec3 uInk;
+uniform vec3 uAccent;
+uniform vec3 uPaper;
+uniform float uContrast;
+uniform float uBrightness;
+uniform float uInvert;
+uniform float uRough;
+uniform float uShift;
+uniform vec3 uMatte;
+uniform float uKey;
+uniform float uReverse;
+uniform float uIntro;
+uniform vec4 uBursts[4];
+uniform float uBurstWidth;
+out vec4 outColor;
+
+const vec3 LUMA = vec3(0.2126, 0.7152, 0.0722);
+const vec3 CYAN = vec3(0.0, 0.64, 0.93);
+const vec3 MAGENTA = vec3(0.92, 0.07, 0.56);
+const vec3 YELLOW = vec3(1.0, 0.91, 0.0);
+const vec3 KEY = vec3(0.11, 0.1, 0.12);
+const vec3 RED = vec3(1.0, 0.16, 0.12);
+const vec3 GREEN = vec3(0.12, 1.0, 0.3);
+const vec3 BLUE = vec3(0.16, 0.32, 1.0);
+
+mat2 rotate(float a) {
+  float c = cos(a);
+  float s = sin(a);
+  return mat2(c, -s, s, c);
+}
+
+float hash(vec2 p) {
+  p = fract(p * vec2(123.34, 456.21));
+  p += dot(p, p + 45.32);
+  return fract(p.x * p.y);
+}
+
+float noise(vec2 p) {
+  vec2 i = floor(p);
+  vec2 f = fract(p);
+  f = f * f * (3.0 - 2.0 * f);
+  float a = hash(i);
+  float b = hash(i + vec2(1.0, 0.0));
+  float c = hash(i + vec2(0.0, 1.0));
+  float d = hash(i + vec2(1.0, 1.0));
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+vec4 photo(vec2 p, float lod, float margin) {
+  vec2 uv = (p - uFrame.xy) / uFrame.zw;
+  vec4 c = textureLod(uImage, clamp(uv, 0.0, 1.0), lod);
+  vec2 slack = margin * uCell / uFrame.zw;
+  vec2 inside = step(-slack, uv) * step(uv, 1.0 + slack);
+  float keep = inside.x * inside.y * c.a;
+  keep *= mix(1.0, smoothstep(0.05, 0.2, distance(c.rgb, uMatte)), uKey);
+  return vec4(c.rgb, keep);
+}
+
+float grade(float v) {
+  v = clamp((v - 0.5) * uContrast + 0.5 + uBrightness, 0.0, 1.0);
+  return mix(v, 1.0 - v, uInvert);
+}
+
+vec3 gradeColor(vec3 c) {
+  return vec3(grade(c.r), grade(c.g), grade(c.b));
+}
+
+vec3 tone(vec3 c) {
+  return pow(max(c, 0.0), vec3(1.5));
+}
+
+float press(float t, float alpha) {
+  return (0.05 + clamp(t, 0.0, 1.0) * 0.89) * alpha;
+}
+
+float plate(float t, float alpha) {
+  return (0.02 + clamp(t, 0.0, 1.0) * 0.92) * alpha;
+}
+
+vec3 decode(vec3 c) {
+  return pow(max(c, 0.0), vec3(2.2));
+}
+
+vec4 separate(vec3 color) {
+  vec3 target = clamp(tone(gradeColor(color)) / max(tone(uPaper), vec3(0.02)), 0.0, 1.0);
+  vec3 absorbC = 1.0 - decode(CYAN);
+  vec3 absorbM = 1.0 - decode(MAGENTA);
+  vec3 absorbY = 1.0 - decode(YELLOW);
+  float bright = pow(max(max(target.r, target.g), target.b), 0.4545);
+  float key = pow(clamp(1.0 - bright / 0.62, 0.0, 1.0), 1.4) * 0.95;
+  vec3 rest = clamp(target / max(1.0 - key * (1.0 - decode(KEY)), vec3(0.03)), 0.0, 1.0);
+  vec3 a = 1.0 - rest;
+  for (int i = 0; i < 3; i++) {
+    vec3 tc = 1.0 - a.x * absorbC;
+    vec3 tm = 1.0 - a.y * absorbM;
+    vec3 ty = 1.0 - a.z * absorbY;
+    mat3 slope = mat3(-absorbC * tm * ty, -absorbM * tc * ty, -absorbY * tc * tm);
+    if (abs(determinant(slope)) < 1e-6) break;
+    a = clamp(a - inverse(slope) * (tc * tm * ty - rest), 0.0, 1.0);
+  }
+  return vec4(a, key);
+}
+
+vec3 emit(vec3 color) {
+  vec3 target = max(tone(gradeColor(color)) - tone(uPaper), 0.0);
+  mat3 lights = mat3(decode(RED), decode(GREEN), decode(BLUE));
+  return clamp(inverse(lights) * target, 0.0, 1.0);
+}
+
+float metric(vec2 f) {
+  if (uShape < 0.5) return length(f);
+  if (uShape < 1.5) return length(f * vec2(0.8, 1.15));
+  if (uShape < 2.5) return max(abs(f.x), abs(f.y));
+  if (uShape < 3.5) return abs(f.x) + abs(f.y);
+  if (uShape < 4.5) return abs(f.y);
+  return min(abs(f.x), abs(f.y));
+}
+
+float reach(float t) {
+  t = clamp(t, 0.0, 1.0);
+  if (uShape < 0.5) return t < 0.785 ? sqrt(t / 3.14159) : mix(0.5, 0.72, (t - 0.785) / 0.215);
+  if (uShape < 1.5) return t < 0.7 ? sqrt(t * 0.92 / 3.14159) : mix(0.4497, 0.72, (t - 0.7) / 0.3);
+  if (uShape < 2.5) return 0.5 * sqrt(t) + 0.02 * t;
+  if (uShape < 3.5) return t < 0.5 ? sqrt(t * 0.5) : 1.0 - sqrt((1.0 - t) * 0.5);
+  if (uShape < 4.5) return 0.52 * t;
+  return (1.0 - sqrt(1.0 - t)) * 0.5 + 0.02 * t;
+}
+
+vec2 center(vec2 p, float angle) {
+  vec2 q = rotate(angle) * p / uCell;
+  vec2 c = floor(q) + 0.5;
+  if (uShape > 3.5 && uShape < 4.5) c.x = q.x;
+  return rotate(-angle) * c * uCell;
+}
+
+float dots(vec2 p, float angle, float t, float seed, float grow) {
+  vec2 q = rotate(angle) * p / uCell;
+  float d = metric(fract(q) - 0.5);
+  d += (noise(p * 0.42 + seed * 17.0) - 0.5) * uRough * 0.18;
+  float r = reach(t) * uScale * grow;
+  float w = max(fwidth(d), 0.0001) * 0.75;
+  return smoothstep(r + w, r - w, d) * clamp(r / (w * 2.0), 0.0, 1.0);
+}
+
+float coverage(vec4 image) {
+  float shade = dot(tone(gradeColor(image.rgb)), LUMA);
+  float paper = dot(tone(uPaper), LUMA);
+  float span = dot(tone(uInk), LUMA) - paper;
+  float t = abs(span) < 0.02 ? 1.0 - shade : (shade - paper) / span;
+  return press(t, image.a);
+}
+
+float burst(vec2 p) {
+  float value = 0.0;
+  for (int i = 0; i < 4; i++) {
+    vec4 b = uBursts[i];
+    if (b.w <= 0.0) continue;
+    float offset = distance(p, b.xy) - b.z;
+    float edge = offset > 0.0 ? offset / (uBurstWidth * 0.35) : -offset / uBurstWidth;
+    value = max(value, clamp(1.0 - edge, 0.0, 1.0) * b.w);
+  }
+  return value;
+}
+
+void main() {
+  vec2 p = vec2(gl_FragCoord.x, uResolution.y - gl_FragCoord.y) / uDpr;
+  float lod = log2(max(uCell * uTexels, 1.0));
+  float base = uAngle;
+  vec2 drift = vec2(uShift, uShift * -0.6);
+
+  vec2 field = p / max(uView.x, uView.y) - uView / max(uView.x, uView.y) * 0.5;
+  float delay = length(field) * 1.15 + hash(floor(p / uCell)) * 0.06;
+  float grow = smoothstep(0.0, 1.0, clamp((uIntro * 1.7 - delay) / 0.45, 0.0, 1.0));
+
+  vec3 print = uPaper;
+  if (uMode < 0.5) {
+    float k = dots(p, base, coverage(photo(center(p, base), lod, 0.5)), 0.0, grow);
+    print = mix(uPaper, uInk, k);
+  } else if (uMode < 1.5) {
+    float second = base + 0.5236;
+    float tA = coverage(photo(center(p, base), lod, 0.5));
+    float tB = coverage(photo(center(p + drift, second) - drift, lod, 0.5));
+    float kA = dots(p, base, pow(tA, 1.9), 0.0, grow);
+    float kB = dots(p + drift, second, clamp(tB * 1.3, 0.0, 1.0) * 0.8, 1.0, grow);
+    if (dot(uPaper, LUMA) > 0.5) {
+      print = uPaper * mix(vec3(1.0), uAccent, kB) * mix(vec3(1.0), uInk, kA);
+    } else {
+      print = min(uPaper + uAccent * kB + uInk * kA, vec3(1.0));
+    }
+  } else if (dot(uPaper, LUMA) > 0.5) {
+    float ac = base - 0.5236;
+    float am = base + 0.5236;
+    float ay = base - 0.7854;
+    vec4 sc = photo(center(p + drift, ac) - drift, lod, 0.5);
+    vec4 sm = photo(center(p - drift, am) + drift, lod, 0.5);
+    vec4 sy = photo(center(p + drift.yx, ay) - drift.yx, lod, 0.5);
+    vec4 sk = photo(center(p, base), lod, 0.5);
+    float kc = sc.a > 0.0 ? dots(p + drift, ac, plate(separate(sc.rgb).x, sc.a), 1.0, grow) : 0.0;
+    float km = sm.a > 0.0 ? dots(p - drift, am, plate(separate(sm.rgb).y, sm.a), 2.0, grow) : 0.0;
+    float ky = sy.a > 0.0 ? dots(p + drift.yx, ay, plate(separate(sy.rgb).z, sy.a), 3.0, grow) : 0.0;
+    float kk = sk.a > 0.0 ? dots(p, base, plate(separate(sk.rgb).w, sk.a), 4.0, grow) : 0.0;
+    print = uPaper;
+    print *= mix(vec3(1.0), CYAN, kc);
+    print *= mix(vec3(1.0), MAGENTA, km);
+    print *= mix(vec3(1.0), YELLOW, ky);
+    print *= mix(vec3(1.0), KEY, kk);
+  } else {
+    float ar = base - 0.5236;
+    float ag = base + 0.5236;
+    vec4 sr = photo(center(p + drift, ar) - drift, lod, 0.5);
+    vec4 sg = photo(center(p - drift, ag) + drift, lod, 0.5);
+    vec4 sb = photo(center(p, base), lod, 0.5);
+    float kr = dots(p + drift, ar, plate(emit(sr.rgb).x, sr.a), 1.0, grow);
+    float kg = dots(p - drift, ag, plate(emit(sg.rgb).y, sg.a), 2.0, grow);
+    float kb = dots(p, base, plate(emit(sb.rgb).z, sb.a), 3.0, grow);
+    print = min(uPaper + RED * kr + GREEN * kg + BLUE * kb, vec3(1.0));
+  }
+
+  vec2 maskUv = vec2(p.x / uView.x, 1.0 - p.y / uView.y);
+  float shown = max(texture(uMask, maskUv).r, burst(p));
+  shown = mix(shown, 1.0 - shown, uReverse);
+  shown = shown * shown * (3.0 - 2.0 * shown);
+  vec2 q = rotate(base) * p / uCell;
+  float d = metric(fract(q) - 0.5);
+  float r = reach(1.0) * 1.08 * shown;
+  float w = max(fwidth(d), 0.0001) * 0.75;
+  float k = smoothstep(r + w, r - w, d) * clamp(r / (w * 2.0), 0.0, 1.0);
+  vec4 sharp = photo(p, 0.0, 0.0);
+  vec3 real = mix(uPaper, sharp.rgb, sharp.a);
+  outColor = vec4(mix(print, real, k), 1.0);
+}`;
+
+var MASK_UNIFORMS = ['uPrevious','uTexture','uView','uFrom','uTo','uRadius','uSoftness','uStrength','uFade'];
+var VIEW_UNIFORMS = ['uImage','uMask','uResolution','uView','uDpr','uFrame','uTexels','uMode','uShape','uCell','uAngle','uScale',
+  'uInk','uAccent','uPaper','uContrast','uBrightness','uInvert','uRough','uShift','uMatte','uKey','uReverse','uIntro','uBursts','uBurstWidth'];
+
+var G = null;                 /* {ok, lost, epoch, canvas, gl, floatMask, mask, view, vao} */
+var LIVE = [], ACTIVE = [];
+var RAF = 0, RO = null, IO = null, ENABLED = true;
+var BURST_BUF = new Float32Array(MAX_BURSTS * 4);
+var INTRO_SEEN = {};
+
+function setupGL(){
+  var gl = G.gl;
+  var vs = compileShader(gl, gl.VERTEX_SHADER, VERTEX);
+  G.mask = linkProgram(gl, vs, MASK, MASK_UNIFORMS);
+  G.view = linkProgram(gl, vs, VIEW, VIEW_UNIFORMS);
+  gl.deleteShader(vs);
+  G.vao = makeTriangle(gl);
+  G.floatMask = !!gl.getExtension('EXT_color_buffer_float');
+  G.epoch++;
+}
+function initGL(){
+  if (G) return G.ok;
+  G = { ok: false, lost: false, epoch: 0, canvas: null, gl: null };
+  try {
+    var cv = document.createElement('canvas');
+    var gl = cv.getContext('webgl2', { alpha: false, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false });
+    if (!gl) throw new Error('WebGL2 unavailable');
+    G.canvas = cv; G.gl = gl;
+    cv.addEventListener('webglcontextlost', function(e){ e.preventDefault(); G.lost = true; }, false);
+    cv.addEventListener('webglcontextrestored', function(){
+      G.lost = false;
+      try { setupGL(); } catch (err) { G.ok = false; return; }
+      for (var i = 0; i < LIVE.length; i++){ LIVE[i].res = null; wake(LIVE[i]); }
+    }, false);
+    setupGL();
+    G.ok = true;
+  } catch (err) {
+    G.ok = false;
+    try { console.warn('[HalftoneReveal] disabled:', err); } catch (_) {}
+  }
+  return G.ok;
+}
+
+function tex(gl){
+  var t = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, t);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  return t;
+}
+function createMask(gl, w, h){
+  var t = tex(gl);
+  if (G.floatMask) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+  else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  var fb = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0);
+  gl.clearColor(0, 0, 0, 1);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  return { tex: t, fb: fb, w: w, h: h };
+}
+function freeRes(r){
+  if (!r || !G || !G.gl) return;
+  var gl = G.gl;
+  try {
+    if (r.epoch !== G.epoch) return;
+    if (r.imgTex) gl.deleteTexture(r.imgTex);
+    for (var i = 0; i < r.masks.length; i++){ gl.deleteFramebuffer(r.masks[i].fb); gl.deleteTexture(r.masks[i].tex); }
+  } catch (_) {}
+}
+function ensureRes(v, mw, mh){
+  var r = v.res;
+  if (r && r.epoch === G.epoch && r.masks[0].w === mw && r.masks[0].h === mh) return r;
+  var gl = G.gl;
+  if (r){ freeRes(r); r = null; }
+  r = { epoch: G.epoch, imgTex: null, masks: [createMask(gl, mw, mh), createMask(gl, mw, mh)] };
+  var t = tex(gl);
+  gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, v.image);
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+  r.imgTex = t;
+  v.res = r;
+  return r;
+}
+
+function wanderAt(t, w, h){
+  return [
+    w * (0.5 + 0.32 * Math.sin(t * 0.53) + 0.08 * Math.sin(t * 1.31 + 0.6)),
+    h * (0.5 + 0.27 * Math.sin(t * 0.71 + 1.1) + 0.07 * Math.cos(t * 1.57))
+  ];
+}
+
+function wake(v){
+  if (v.dead || !v.visible || !v.image) return;
+  if (!v.queued){ v.queued = true; v.last = performance.now(); ACTIVE.push(v); }
+  if (!RAF) RAF = requestAnimationFrame(loop);
+}
+function loop(now){
+  RAF = 0;
+  for (var i = ACTIVE.length - 1; i >= 0; i--){
+    var v = ACTIVE[i], keep = false;
+    try { keep = v.frame(now); }
+    catch (err) { try { console.warn('[HalftoneReveal]', err); } catch (_) {} v.dispose(); keep = false; }
+    if (!keep && ACTIVE[i] === v){ ACTIVE.splice(i, 1); v.queued = false; }
+  }
+  if (ACTIVE.length) RAF = requestAnimationFrame(loop);
+}
+function ensureObservers(){
+  if (!RO){
+    RO = new ResizeObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        var v = entries[i].target.htInst;
+        if (v && !v.dead){ v.layout(); wake(v); }
+      }
+    });
+  }
+  if (!IO){
+    IO = new IntersectionObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        var v = entries[i].target.htInst;
+        if (!v || v.dead) continue;
+        v.visible = entries[i].isIntersecting;
+        if (v.visible) wake(v);
+      }
+    }, { rootMargin: '120px' });
+  }
+}
+
+function createCard(host, src){
+  var cv = document.createElement('canvas');
+  cv.className = 'fx-canvas fx-ht';
+  cv.setAttribute('aria-hidden', 'true');
+  var im0 = host.querySelector('img');
+  host.insertBefore(cv, im0 ? im0.nextSibling : host.firstChild);
+  var ctx = cv.getContext('2d', { alpha: false });
+
+  var v = {
+    host: host, cv: cv, ctx: ctx, src: src,
+    dead: false, visible: false, queued: false, ready: false,
+    res: null, image: null, matte: [0, 0, 0], key: 0,
+    w: 1, h: 1, dpr: 1,
+    introStart: 0, introDone: false,
+    last: 0, trailUntil: 0, presence: 0, drift: 0,
+    ptr: { x: 0, y: 0, inside: false, fresh: true, placed: false },
+    brush: { x: 0, y: 0, px: 0, py: 0 },
+    bursts: []
+  };
+
+  v.layout = function(){
+    var w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight), d = dpr();
+    v.w = w; v.h = h; v.dpr = d;
+    var cw = Math.max(1, Math.round(w * d)), ch = Math.max(1, Math.round(h * d));
+    if (cv.width !== cw || cv.height !== ch){ cv.width = cw; cv.height = ch; }
+    if (!v.ptr.placed){ v.ptr.x = w / 2; v.ptr.y = h / 2; }
+  };
+
+  function locate(e){
+    var r = host.getBoundingClientRect();
+    var sx = r.width > 0 ? v.w / r.width : 1, sy = r.height > 0 ? v.h / r.height : 1;   /* 卡片入场/悬停有缩放，换算回 CSS 像素 */
+    v.ptr.x = (e.clientX - r.left) * sx;
+    v.ptr.y = (e.clientY - r.top) * sy;
+    v.ptr.placed = true;
+  }
+  function onMove(e){
+    locate(e);
+    if (!v.ptr.inside){ v.ptr.inside = true; v.ptr.fresh = true; }
+    wake(v);
+  }
+  function onLeave(){ v.ptr.inside = false; wake(v); }
+  function onDown(e){
+    onMove(e);
+    if (!CFG.clickBurst || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    v.bursts.push({ x: v.ptr.x, y: v.ptr.y, start: performance.now() });
+    if (v.bursts.length > MAX_BURSTS) v.bursts.shift();
+  }
+  var pass = { passive: true };
+  host.addEventListener('pointermove', onMove, pass);
+  host.addEventListener('pointerenter', onMove, pass);
+  host.addEventListener('pointerdown', onDown, pass);
+  host.addEventListener('pointerleave', onLeave, pass);
+  host.addEventListener('pointercancel', onLeave, pass);
+
+  v.dispose = function(){
+    if (v.dead) return;
+    v.dead = true;
+    var k = ACTIVE.indexOf(v); if (k >= 0) ACTIVE.splice(k, 1);
+    v.queued = false;
+    k = LIVE.indexOf(v); if (k >= 0) LIVE.splice(k, 1);
+    if (RO) RO.unobserve(host);
+    if (IO) IO.unobserve(host);
+    host.removeEventListener('pointermove', onMove);
+    host.removeEventListener('pointerenter', onMove);
+    host.removeEventListener('pointerdown', onDown);
+    host.removeEventListener('pointerleave', onLeave);
+    host.removeEventListener('pointercancel', onLeave);
+    freeRes(v.res); v.res = null;
+    v.image = null;
+    if (host.htInst === v) host.htInst = null;
+    host.classList.remove('fx-on');
+    if (cv.parentNode) cv.parentNode.removeChild(cv);
+  };
+
+  v.frame = function(now){
+    if (v.dead || !G.ok || G.lost || !v.image) return false;
+    if (v.w < 2 || v.h < 2 || !host.isConnected) return false;
+    if (document.hidden) return false;
+
+    var s = CFG, gl = G.gl, w = v.w, h = v.h, ptr = v.ptr, brush = v.brush;
+    var dt = Math.min(0.05, Math.max(0, (now - v.last) / 1000));
+    v.last = now;
+    var rscale = Math.min(1, w / s.radiusRefWidth);
+    var radius = Math.max(24, s.revealRadius * rscale);
+
+    /* —— 光标 / 自动漫游 / 笔刷 —— */
+    var wandering = s.wander && !REDUCED, tx = ptr.x, ty = ptr.y;
+    if (!ptr.inside && wandering){
+      v.drift = Math.min(1, v.drift + dt / 1.2);
+      var wp = wanderAt(now / 1000, w, h);
+      var k0 = v.drift * v.drift * (3 - 2 * v.drift);
+      tx += (wp[0] - tx) * k0; ty += (wp[1] - ty) * k0;
+    } else v.drift = 0;
+    var engaged = ptr.inside || wandering;
+    v.presence += ((engaged ? 1 : 0) - v.presence) * (1 - Math.exp(-dt / 0.16));
+    if (ptr.fresh){
+      brush.x = brush.px = tx; brush.y = brush.py = ty; ptr.fresh = false;
+    } else {
+      var follow = 1 - Math.exp(-dt / 0.035);
+      brush.x += (tx - brush.x) * follow; brush.y += (ty - brush.y) * follow;
+    }
+
+    /* —— 冲击波 —— */
+    var bd = BURST_BUF; bd.fill(0);
+    for (var i = v.bursts.length - 1; i >= 0; i--){
+      if ((now - v.bursts[i].start) / 1000 >= BURST_SECONDS) v.bursts.splice(i, 1);
+    }
+    for (var bi = 0; bi < v.bursts.length; bi++){
+      var b = v.bursts[bi];
+      var kk = Math.max(0, (now - b.start) / 1000 / BURST_SECONDS);
+      var reach = Math.hypot(Math.max(b.x, w - b.x), Math.max(b.y, h - b.y)) + 80 * rscale;
+      bd[bi * 4] = b.x; bd[bi * 4 + 1] = b.y;
+      bd[bi * 4 + 2] = reach * Math.sin(kk * Math.PI / 2);
+      bd[bi * 4 + 3] = 1 - kk * kk * kk;
+    }
+    if (v.presence > 0.002) v.trailUntil = now + s.linger * 1000 + 200;
+
+    /* —— Pass 1：笔刷遮罩（带衰减的拖尾）—— */
+    var mw = Math.max(2, Math.round(w * MASK_SCALE)), mh = Math.max(2, Math.round(h * MASK_SCALE));
+    var r = ensureRes(v, mw, mh);
+    var M = G.mask, minFade = G.floatMask ? 0 : 1.5 / 255;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, r.masks[1].fb);
+    gl.viewport(0, 0, mw, mh);
+    gl.useProgram(M.p);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, r.masks[0].tex);
+    gl.uniform1i(M.u.uPrevious, 0);
+    gl.uniform2f(M.u.uTexture, mw, mh);
+    gl.uniform2f(M.u.uView, w, h);
+    gl.uniform2f(M.u.uFrom, brush.px, brush.py);
+    gl.uniform2f(M.u.uTo, brush.x, brush.y);
+    gl.uniform1f(M.u.uRadius, radius * (0.45 + 0.55 * v.presence));
+    gl.uniform1f(M.u.uSoftness, s.softness);
+    gl.uniform1f(M.u.uStrength, v.presence);
+    gl.uniform1f(M.u.uFade, Math.max(s.linger > 0 ? dt / s.linger : 1, minFade));
+    gl.bindVertexArray(G.vao);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    r.masks.reverse();
+    brush.px = brush.x; brush.py = brush.y;
+
+    /* —— Pass 2：半色调画到共享画布 —— */
+    var cw = cv.width, ch = cv.height;
+    var iw = v.image.naturalWidth, ih = v.image.naturalHeight;
+    var sc = (s.fit === 'cover' ? Math.max : Math.min)(w / iw, h / ih);
+    var fw = iw * sc, fh = ih * sc, fx = (w - fw) / 2, fy = (h - fh) / 2;
+    var intro = (!s.intro || REDUCED || v.introDone) ? 1 : Math.min(1, (now - v.introStart) / 1000 / INTRO_SECONDS);
+    if (intro >= 1) v.introDone = true;
+
+    if (G.canvas.width !== cw || G.canvas.height !== ch){ G.canvas.width = cw; G.canvas.height = ch; }
+    var V = G.view;
+    gl.viewport(0, 0, cw, ch);
+    gl.useProgram(V.p);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, r.imgTex);       gl.uniform1i(V.u.uImage, 0);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, r.masks[0].tex); gl.uniform1i(V.u.uMask, 1);
+    gl.uniform2f(V.u.uResolution, cw, ch);
+    gl.uniform2f(V.u.uView, w, h);
+    gl.uniform1f(V.u.uDpr, cw / w);
+    gl.uniform4f(V.u.uFrame, fx, fy, fw, fh);
+    gl.uniform1f(V.u.uTexels, iw / fw);
+    gl.uniform1f(V.u.uMode, MODES[s.mode] || 0);
+    gl.uniform1f(V.u.uShape, SHAPES[s.shape] || 0);
+    gl.uniform1f(V.u.uCell, clamp(s.cellSize, 2, 80));
+    gl.uniform1f(V.u.uAngle, (s.angle * Math.PI) / 180);
+    gl.uniform1f(V.u.uScale, clamp(s.dotScale, 0.2, 2));
+    gl.uniform3fv(V.u.uInk, hexToRgb(s.inkColor));
+    gl.uniform3fv(V.u.uAccent, hexToRgb(s.accentColor));
+    gl.uniform3fv(V.u.uPaper, hexToRgb(s.paperColor));
+    gl.uniform1f(V.u.uContrast, s.contrast);
+    gl.uniform1f(V.u.uBrightness, s.brightness);
+    gl.uniform1f(V.u.uInvert, s.invert ? 1 : 0);
+    gl.uniform1f(V.u.uRough, clamp(s.roughness, 0, 1));
+    gl.uniform1f(V.u.uShift, clamp(s.misregistration, 0, 1) * s.cellSize * 0.35);
+    gl.uniform3fv(V.u.uMatte, v.matte);
+    gl.uniform1f(V.u.uKey, v.key);
+    gl.uniform1f(V.u.uReverse, s.reverse ? 1 : 0);
+    gl.uniform1f(V.u.uIntro, 1 - (1 - intro) * (1 - intro));
+    gl.uniform4fv(V.u.uBursts, bd);
+    gl.uniform1f(V.u.uBurstWidth, Math.max(24, radius * 0.9));
+    gl.bindVertexArray(G.vao);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    gl.bindVertexArray(null);
+
+    ctx.drawImage(G.canvas, 0, 0);                         /* 同一任务内拷贝，不需要 preserveDrawingBuffer */
+    if (!v.ready){ v.ready = true; cv.classList.add('fx-ready'); host.classList.add('fx-on'); }
+
+    var busy = engaged || v.presence > 0.002 || v.bursts.length > 0 || now < v.trailUntil || intro < 1;
+    return busy && v.visible;
+  };
+
+  return v;
+}
+
+function attach(card){
+  var host = card.querySelector('.card-img');
+  if (!host || host.htInst) return;
+  var im = host.querySelector('img');
+  var src = im ? (im.getAttribute('src') || '') : '';
+  if (!src) return;
+  var cached = IMGS[src];
+  if (cached && cached.state === 'fail') return;
+  ensureObservers();
+  var v = createCard(host, src);
+  host.htInst = v;
+  LIVE.push(v);
+  loadImg(src, function(e){
+    if (v.dead) return;
+    if (!e){ v.dispose(); return; }                        /* 跨域不放行 / 加载失败 → 保持普通封面 */
+    v.image = e.img; v.matte = e.matte; v.key = e.plain ? 1 : 0;
+    v.layout();
+    v.introStart = performance.now();
+    if (INTRO_SEEN[src]) v.introDone = true; else INTRO_SEEN[src] = true;   /* 入场动画每张封面只播一次 */
+    wake(v);
+  });
+  RO.observe(host);
+  IO.observe(host);
+}
+function clear(){ for (var i = LIVE.length - 1; i >= 0; i--) LIVE[i].dispose(); }
+function sync(root){
+  for (var i = LIVE.length - 1; i >= 0; i--){
+    if (!LIVE[i].host.isConnected) LIVE[i].dispose();
+  }
+  if (!ENABLED || !root || !initGL()) return;
+  var cards = root.querySelectorAll('.card[data-dv]');
+  for (var j = 0; j < cards.length; j++) attach(cards[j]);
+}
+function setEnabled(on){ on = !!on; if (ENABLED === on) return; ENABLED = on; if (!on) clear(); }
+function refresh(){ for (var i = 0; i < LIVE.length; i++) wake(LIVE[i]); }
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) refresh(); });
+
+return { sync: sync, setEnabled: setEnabled, refresh: refresh, config: CFG, supported: function(){ return initGL(); } };
+})();
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Shape Blur
+   ═══════════════════════════════════════════════════════════════════════ */
+var SB = (function(){
+
+/* ───────── 配置（对应 React Bits 组件的 props；数值就是你给的配置）───────── */
+var CFG = {
+  shape: 'rect',           /* src 加载失败时的退路形状：'rect' | 'circle' | 'polygon' | 'star' */
+  sides: 6,
+  size: 0.6,
+  roundness: 0.2,
+  thickness: 4.5,
+  fill: true,
+  echoes: 1,
+  spacing: 12,
+  color: '#ffffff',
+  blur: 18,
+  lensSize: 1,
+  lensSoftness: 0.7,
+  focus: true,
+  chroma: 0.3,
+  rotation: 0,
+  spin: 0,
+  idle: true,
+  blurRefWidth: 600        /* 卡片比这个宽度窄时，模糊半径按比例缩小（组件的 blur=18 是按大画布调的） */
+};
+var SHAPE_NAMES = ['rect', 'circle', 'polygon', 'star'];
+var FIELD = 512, PAD = 0.35, FAR = 1e20;
+
+var SHAPE = `#version 300 es
+precision highp float;
+uniform vec2 uResolution;
+uniform float uDpr;
+uniform int uShape;
+uniform float uSides;
+uniform vec2 uHalf;
+uniform float uRadius;
+uniform float uRound;
+uniform sampler2D uFieldTexture;
+uniform vec2 uField;
+uniform float uThickness;
+uniform float uFill;
+uniform float uEchoes;
+uniform float uSpacing;
+uniform float uAngle;
+out vec4 outColor;
+
+const float PI = 3.14159265;
+
+float sdRoundBox(vec2 p, vec2 b, float r) {
+  vec2 q = abs(p) - b + r;
+  return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - r;
+}
+
+float sdPolygon(vec2 p, float r, float n) {
+  float an = PI / n;
+  vec2 acs = vec2(cos(an), sin(an));
+  float bn = mod(atan(p.x, p.y), 2.0 * an) - an;
+  p = length(p) * vec2(cos(bn), abs(sin(bn)));
+  p -= r * acs;
+  p.y += clamp(-p.y, 0.0, r * acs.y);
+  return length(p) * sign(p.x);
+}
+
+float sdStar(vec2 p, float r, float n, float m) {
+  float an = PI / n;
+  float en = PI / m;
+  vec2 acs = vec2(cos(an), sin(an));
+  vec2 ecs = vec2(cos(en), sin(en));
+  float bn = mod(atan(p.x, p.y), 2.0 * an) - an;
+  p = length(p) * vec2(cos(bn), abs(sin(bn)));
+  p -= r * acs;
+  p += ecs * clamp(-dot(p, ecs), 0.0, r * acs.y / ecs.y);
+  return length(p) * sign(p.x);
+}
+
+float shapeDistance(vec2 p) {
+  if (uShape < 0) return 1e5;
+  float c = cos(uAngle);
+  float s = sin(uAngle);
+  p = mat2(c, -s, s, c) * p;
+  if (uShape == 0) return sdRoundBox(p, uHalf, uRound);
+  if (uShape == 1) return length(p) - uRadius;
+  if (uShape == 2) return sdPolygon(p, uRadius - uRound, uSides) - uRound;
+  if (uShape == 3) return sdStar(p, uRadius - uRound, uSides, mix(2.0, uSides, 0.42)) - uRound;
+  vec2 uv = p / (2.0 * uField.x) + 0.5;
+  vec2 inside = clamp(uv, 0.0, 1.0);
+  float d = texture(uFieldTexture, vec2(inside.x, 1.0 - inside.y)).r * uField.y;
+  return d + length((uv - inside) * 2.0 * uField.x);
+}
+
+void main() {
+  vec2 p = gl_FragCoord.xy / uDpr - 0.5 * uResolution;
+  float d = shapeDistance(p);
+  float aa = 1.0 / uDpr;
+  float hw = 0.5 * uThickness;
+  float cover = uFill > 0.5 ? clamp(0.5 - d / aa, 0.0, 1.0) : 0.0;
+  for (int i = 0; i < 24; i++) {
+    if (float(i) >= uEchoes) break;
+    if (uFill > 0.5 && i == 0) continue;
+    float x = uFill > 0.5 ? d - float(i) * uSpacing : d + float(i) * uSpacing;
+    cover = max(cover, clamp((hw - abs(x)) / aa + 0.5, 0.0, 1.0));
+  }
+  outColor = vec4(cover, 0.0, 0.0, 1.0);
+}`;
+
+var BLUR = `#version 300 es
+precision highp float;
+uniform sampler2D uSource;
+uniform float uLod;
+uniform vec2 uStep;
+uniform vec2 uScale;
+out vec4 outColor;
+
+void main() {
+  vec2 size = vec2(textureSize(uSource, int(uLod)));
+  vec2 center = gl_FragCoord.xy * uScale;
+  float sum = textureLod(uSource, center / size, uLod).r * 6.0;
+  sum += textureLod(uSource, (center - uStep) / size, uLod).r * 4.0;
+  sum += textureLod(uSource, (center + uStep) / size, uLod).r * 4.0;
+  sum += textureLod(uSource, (center - 2.0 * uStep) / size, uLod).r;
+  sum += textureLod(uSource, (center + 2.0 * uStep) / size, uLod).r;
+  outColor = vec4(sum / 16.0, 0.0, 0.0, 1.0);
+}`;
+
+var COMPOSITE = `#version 300 es
+precision highp float;
+uniform sampler2D uPyramid;
+uniform float uMaxLod;
+uniform vec2 uResolution;
+uniform float uDpr;
+uniform float uThickness;
+uniform float uFill;
+uniform float uEchoes;
+uniform float uSpacing;
+uniform vec3 uColor;
+uniform float uBackdrop;
+uniform float uBlur;
+uniform vec3 uLens;
+uniform vec2 uLensShape;
+uniform float uFocus;
+uniform float uChroma;
+out vec4 outColor;
+
+float bspline(vec2 uv, float lod) {
+  vec2 size = vec2(textureSize(uPyramid, int(lod)));
+  vec2 st = uv * size - 0.5;
+  vec2 i = floor(st);
+  vec2 f = st - i;
+  vec2 f2 = f * f;
+  vec2 f3 = f2 * f;
+  vec2 w0 = (1.0 - 3.0 * f + 3.0 * f2 - f3) / 6.0;
+  vec2 w1 = (4.0 - 6.0 * f2 + 3.0 * f3) / 6.0;
+  vec2 w2 = (1.0 + 3.0 * f + 3.0 * f2 - 3.0 * f3) / 6.0;
+  vec2 w3 = f3 / 6.0;
+  vec2 g0 = w0 + w1;
+  vec2 g1 = w2 + w3;
+  vec2 p0 = (i - 0.5 + w1 / g0) / size;
+  vec2 p1 = (i + 1.5 + w3 / g1) / size;
+  float a = textureLod(uPyramid, p0, lod).r;
+  float b = textureLod(uPyramid, vec2(p1.x, p0.y), lod).r;
+  float c = textureLod(uPyramid, vec2(p0.x, p1.y), lod).r;
+  float d = textureLod(uPyramid, p1, lod).r;
+  return g0.y * (g0.x * a + g1.x * b) + g1.y * (g0.x * c + g1.x * d);
+}
+
+float blurred(vec2 uv, float sigma) {
+  if (sigma <= 0.6) return textureLod(uPyramid, uv, 0.0).r;
+  float lod = sigma < 1.7 ? (sigma - 0.6) / 1.1 : log2(sigma / 0.866);
+  lod = clamp(lod, 0.0, uMaxLod);
+  float base = floor(lod);
+  float t = lod - base;
+  float a = base < 0.5 ? textureLod(uPyramid, uv, 0.0).r : bspline(uv, base);
+  if (t < 0.001) return a;
+  return mix(a, bspline(uv, min(base + 1.0, uMaxLod)), t);
+}
+
+void main() {
+  vec2 texel = 1.0 / vec2(textureSize(uPyramid, 0));
+  vec2 uv = gl_FragCoord.xy * texel;
+  vec2 p = gl_FragCoord.xy / uDpr - 0.5 * uResolution;
+  vec2 toLens = p - uLens.xy;
+  float lensDistance = length(toLens);
+  float lens = uLens.z * (1.0 - smoothstep(uLensShape.x * (1.0 - uLensShape.y), uLensShape.x, lensDistance));
+  float amount = mix(lens, 1.0 - lens, uFocus);
+  float sigma = uBlur * amount * uDpr;
+  vec2 dir = lensDistance > 0.001 ? toLens / lensDistance : vec2(0.0);
+  vec2 split = dir * uChroma * 0.3 * sigma * texel;
+  vec3 cover = vec3(
+    blurred(uv - split, sigma * (1.0 + uChroma * 0.25)),
+    blurred(uv, sigma),
+    blurred(uv + split, sigma * (1.0 - uChroma * 0.2))
+  );
+  if (uFill < 0.5) {
+    float spread = sigma / uDpr;
+    float reach = uEchoes > 1.5 ? min(spread, uSpacing) : spread;
+    cover *= 1.0 + 0.6 * max(reach - 0.5, 0.0) / max(uThickness, 0.5);
+  }
+  cover = mix(cover, 0.85 + 0.15 * (1.0 - exp((0.85 - cover) / 0.15)), step(0.85, cover));
+  float grain = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
+  cover = clamp(cover + grain / 255.0, 0.0, 1.0);
+  float alpha = max(max(cover.r, cover.g), cover.b);
+  outColor = vec4(uColor * cover + (alpha - cover) * uBackdrop, alpha);
+}`;
+
+var SHAPE_UNIFORMS = ['uResolution','uDpr','uShape','uSides','uHalf','uRadius','uRound','uFieldTexture','uField','uThickness','uFill','uEchoes','uSpacing','uAngle'];
+var BLUR_UNIFORMS = ['uSource','uLod','uStep','uScale'];
+var COMP_UNIFORMS = ['uPyramid','uMaxLod','uResolution','uDpr','uThickness','uFill','uEchoes','uSpacing','uColor','uBackdrop','uBlur','uLens','uLensShape','uFocus','uChroma'];
+
+/* ───────── 形状：STARLINE logo → 距离场（CPU 做一次，所有卡片共用一张贴图）───────── */
+function sweep(grid, offset, stride, length, f, v, z){
+  for (var q = 0; q < length; q++) f[q] = grid[offset + q * stride];
+  var k = 0;
+  v[0] = 0; z[0] = -FAR; z[1] = FAR;
+  for (q = 1; q < length; q++){
+    var s = (f[q] + q * q - (f[v[k]] + v[k] * v[k])) / (2 * (q - v[k]));
+    while (s <= z[k]){
+      k--;
+      s = (f[q] + q * q - (f[v[k]] + v[k] * v[k])) / (2 * (q - v[k]));
+    }
+    k++;
+    v[k] = q; z[k] = s; z[k + 1] = FAR;
+  }
+  k = 0;
+  for (q = 0; q < length; q++){
+    while (z[k + 1] < q) k++;
+    var gap = q - v[k];
+    grid[offset + q * stride] = gap * gap + f[v[k]];
+  }
+}
+function distanceTransform(grid, size){
+  var f = new Float64Array(size), v = new Int32Array(size), z = new Float64Array(size + 1);
+  for (var x = 0; x < size; x++) sweep(grid, x, size, size, f, v, z);
+  for (var y = 0; y < size; y++) sweep(grid, y * size, 1, size, f, v, z);
+}
+function buildField(image){
+  var raster = document.createElement('canvas');
+  raster.width = FIELD; raster.height = FIELD;
+  var c2 = raster.getContext('2d', { willReadFrequently: true });
+  if (!c2) return null;
+  var width = image.naturalWidth || FIELD, height = image.naturalHeight || FIELD;
+  var scale = FIELD / (1 + PAD) / Math.max(width, height);
+  c2.drawImage(image, (FIELD - width * scale) / 2, (FIELD - height * scale) / 2, width * scale, height * scale);
+  var pixels = c2.getImageData(0, 0, FIELD, FIELD).data;
+  var n = FIELD * FIELD;
+  var outside = new Float64Array(n), inside = new Float64Array(n);
+  for (var i = 0; i < n; i++){
+    var alpha = pixels[i * 4 + 3] / 255;
+    var edge = 0.5 - alpha;
+    outside[i] = alpha >= 0.999 ? 0 : alpha <= 0.001 ? FAR : edge > 0 ? edge * edge : 0;
+    inside[i]  = alpha >= 0.999 ? FAR : alpha <= 0.001 ? 0 : edge < 0 ? edge * edge : 0;
+  }
+  distanceTransform(outside, FIELD);
+  distanceTransform(inside, FIELD);
+  var field = new Float32Array(n);
+  for (i = 0; i < n; i++) field[i] = Math.sqrt(outside[i]) - Math.sqrt(inside[i]);
+  return field;
+}
+
+/* 形状取自侧栏品牌 logo（和应用里的 logo 永远一致）；取不到就用圆角矩形 */
+function logoSrc(){
+  try {
+    var svg = document.querySelector('.sb-logo svg');
+    if (svg){
+      var markup = svg.outerHTML.replace(/currentColor/g, '#ffffff');
+      if (!/xmlns=/.test(markup)) markup = markup.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+      markup = markup.replace('<svg', '<svg width="256" height="256"');
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(markup);
+    }
+  } catch (_) {}
+  return '';
+}
+
+var G = null;                 /* {ok, lost, epoch, canvas, gl, progs, vao, fb, precise, fieldTex, field:{state,data}} */
+var LIVE = [], ACTIVE = [];
+var RAF = 0, RO = null, IO = null, ENABLED = true, WIN_BOUND = false;
+
+function uploadField(){
+  var gl = G.gl;
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, G.fieldTex);
+  if (G.field.state === 'ready'){
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, FIELD, FIELD, 0, gl.RED, gl.FLOAT, G.field.data);
+  } else {
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, 1, 1, 0, gl.RED, gl.FLOAT, new Float32Array([1e4]));
+  }
+}
+function setupGL(){
+  var gl = G.gl;
+  var vs = compileShader(gl, gl.VERTEX_SHADER, VERTEX);
+  G.shape = linkProgram(gl, vs, SHAPE, SHAPE_UNIFORMS);
+  G.blur = linkProgram(gl, vs, BLUR, BLUR_UNIFORMS);
+  G.comp = linkProgram(gl, vs, COMPOSITE, COMP_UNIFORMS);
+  gl.deleteShader(vs);
+  G.vao = makeTriangle(gl);
+  G.precise = !!gl.getExtension('EXT_color_buffer_float');
+  G.format = G.precise ? gl.R16F : gl.R8;
+  G.fb = gl.createFramebuffer();
+  G.fieldTex = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, G.fieldTex);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  uploadField();
+  G.epoch++;
+}
+function loadLogoField(){
+  var src = logoSrc();
+  if (!src){ G.field.state = 'failed'; return; }
+  G.field.state = 'loading';
+  var image = new Image();
+  image.crossOrigin = 'anonymous';
+  image.onload = function(){
+    var field = null;
+    try { field = buildField(image); } catch (_) { field = null; }
+    if (!field){ G.field.state = 'failed'; }
+    else { G.field.state = 'ready'; G.field.data = field; if (G.ok && !G.lost) uploadField(); }
+    refresh();
+  };
+  image.onerror = function(){ G.field.state = 'failed'; refresh(); };
+  image.src = src;
+}
+function initGL(){
+  if (G) return G.ok;
+  G = { ok: false, lost: false, epoch: 0, canvas: null, gl: null, field: { state: 'none', data: null } };
+  try {
+    var cv = document.createElement('canvas');
+    var gl = cv.getContext('webgl2', { alpha: true, premultipliedAlpha: true, antialias: false });
+    if (!gl) throw new Error('WebGL2 unavailable');
+    G.canvas = cv; G.gl = gl;
+    cv.addEventListener('webglcontextlost', function(e){ e.preventDefault(); G.lost = true; }, false);
+    cv.addEventListener('webglcontextrestored', function(){
+      G.lost = false;
+      try { setupGL(); } catch (err) { G.ok = false; return; }
+      for (var i = 0; i < LIVE.length; i++){ LIVE[i].pyr = null; wake(LIVE[i]); }
+    }, false);
+    setupGL();
+    G.ok = true;
+    loadLogoField();
+  } catch (err) {
+    G.ok = false;
+    try { console.warn('[ShapeBlur] disabled:', err); } catch (_) {}
+  }
+  return G.ok;
+}
+
+/* ───────── 每张卡的模糊金字塔（形状 → 逐级 5-tap 可分离模糊）───────── */
+function freePyr(p){
+  if (!p || !G || !G.gl || p.epoch !== G.epoch) return;
+  var gl = G.gl;
+  try {
+    if (p.texture) gl.deleteTexture(p.texture);
+    for (var i = 0; i < p.temps.length; i++) if (p.temps[i]) gl.deleteTexture(p.temps[i]);
+  } catch (_) {}
+}
+function allocPyr(v, width, height){
+  var gl = G.gl;
+  if (v.pyr) freePyr(v.pyr);
+  var p = { epoch: G.epoch, texture: null, temps: [], sizes: [], levels: 0, key: '', w: width, h: height };
+  p.levels = Math.min(10, Math.floor(Math.log2(Math.max(width, height))) + 1);
+  for (var k = 0; k < p.levels; k++) p.sizes.push([Math.max(1, width >> k), Math.max(1, height >> k)]);
+  function configure(){
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  }
+  p.texture = gl.createTexture();
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, p.texture);
+  gl.texStorage2D(gl.TEXTURE_2D, p.levels, G.format, width, height);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+  configure();
+  p.temps = [null];
+  for (k = 1; k < p.levels; k++){
+    var t = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texStorage2D(gl.TEXTURE_2D, 1, G.format, p.sizes[k][0], p.sizes[k - 1][1]);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    configure();
+    p.temps.push(t);
+  }
+  v.pyr = p;
+  return p;
+}
+
+function wake(v){
+  if (v.dead || !v.visible) return;
+  if (!v.queued){ v.queued = true; v.last = performance.now(); ACTIVE.push(v); }
+  if (!RAF) RAF = requestAnimationFrame(loop);
+}
+function loop(now){
+  RAF = 0;
+  for (var i = ACTIVE.length - 1; i >= 0; i--){
+    var v = ACTIVE[i], keep = false;
+    try { keep = v.frame(now); }
+    catch (err) { try { console.warn('[ShapeBlur]', err); } catch (_) {} v.dispose(); keep = false; }
+    if (!keep && ACTIVE[i] === v){ ACTIVE.splice(i, 1); v.queued = false; }
+  }
+  if (ACTIVE.length) RAF = requestAnimationFrame(loop);
+}
+function ensureObservers(){
+  if (!RO){
+    RO = new ResizeObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        var v = entries[i].target.sbInst;
+        if (v && !v.dead){ v.layout(); wake(v); }
+      }
+    });
+  }
+  if (!IO){
+    IO = new IntersectionObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        var v = entries[i].target.sbInst;
+        if (!v || v.dead) continue;
+        v.visible = entries[i].isIntersecting;
+        if (v.visible){ v.last = 0; wake(v); }
+      }
+    }, { rootMargin: '60px' });
+  }
+}
+/* 原组件在 window 上监听 pointermove（光标靠近卡片边缘一圈就算「在镜头范围内」）；这里整个模块只挂一个监听，循环可见卡片 */
+function onWinMove(e){
+  for (var i = 0; i < LIVE.length; i++){
+    var v = LIVE[i];
+    if (v.dead || !v.visible) continue;
+    var rect = v.host.getBoundingClientRect();
+    var margin = CFG.lensSize * Math.min(rect.width, rect.height);
+    var x = e.clientX - rect.left, y = e.clientY - rect.top;
+    v.ptr.active = x > -margin && y > -margin && x < rect.width + margin && y < rect.height + margin;
+    v.ptr.x = x - rect.width / 2;
+    v.ptr.y = rect.height / 2 - y;
+    wake(v);
+  }
+}
+function onDocLeave(){
+  for (var i = 0; i < LIVE.length; i++){ LIVE[i].ptr.active = false; wake(LIVE[i]); }
+}
+function bindWindow(){
+  if (WIN_BOUND) return;
+  WIN_BOUND = true;
+  window.addEventListener('pointermove', onWinMove, { passive: true });
+  document.documentElement.addEventListener('pointerleave', onDocLeave);
+}
+function unbindWindow(){
+  if (!WIN_BOUND) return;
+  WIN_BOUND = false;
+  window.removeEventListener('pointermove', onWinMove);
+  document.documentElement.removeEventListener('pointerleave', onDocLeave);
+}
+
+function createCard(host){
+  var cv = document.createElement('canvas');
+  cv.className = 'fx-canvas fx-sb';
+  cv.setAttribute('aria-hidden', 'true');
+  var im0 = host.querySelector('img');
+  host.insertBefore(cv, im0 ? im0.nextSibling : host.firstChild);
+  var ctx = cv.getContext('2d');
+
+  var v = {
+    host: host, cv: cv, ctx: ctx,
+    dead: false, visible: false, queued: false, ready: false,
+    pyr: null,
+    w: 1, h: 1, dpr: 1, time: Math.random() * 40, angle: 0,
+    last: 0,
+    ptr: { x: 0, y: 0, active: false },
+    lens: { x: 0, y: 0, power: 0, placed: false }
+  };
+
+  v.layout = function(){
+    var d = dpr(), w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight);
+    v.w = w; v.h = h; v.dpr = d;
+    var cw = Math.max(1, Math.round(w * d)), ch = Math.max(1, Math.round(h * d));
+    if (cv.width !== cw || cv.height !== ch){ cv.width = cw; cv.height = ch; if (v.pyr) v.pyr.key = '__resize__'; }
+  };
+
+  v.dispose = function(){
+    if (v.dead) return;
+    v.dead = true;
+    var k = ACTIVE.indexOf(v); if (k >= 0) ACTIVE.splice(k, 1);
+    v.queued = false;
+    k = LIVE.indexOf(v); if (k >= 0) LIVE.splice(k, 1);
+    if (RO) RO.unobserve(host);
+    if (IO) IO.unobserve(host);
+    freePyr(v.pyr); v.pyr = null;
+    if (host.sbInst === v) host.sbInst = null;
+    host.classList.remove('fx-sb-on');
+    if (cv.parentNode) cv.parentNode.removeChild(cv);
+    if (!LIVE.length) unbindWindow();
+  };
+
+  function wander(t){
+    var s = CFG;
+    var minHalf = Math.min(v.w, v.h) / 2;
+    var inset = (1 - s.size) * minHalf;
+    var useBox = SHAPE_NAMES.indexOf(s.shape) === 0 && G.field.state !== 'ready';
+    var reachX = useBox ? v.w / 2 - inset : s.size * minHalf;
+    var reachY = useBox ? v.h / 2 - inset : s.size * minHalf;
+    return [
+      reachX * (0.75 * Math.sin(t * 0.37) + 0.2 * Math.sin(t * 1.13 + 1.7)),
+      reachY * (0.7 * Math.sin(t * 0.53 + 0.9) + 0.2 * Math.cos(t * 0.91 + 0.4))
+    ];
+  }
+
+  function drawShape(gl, cw, ch){
+    var s = CFG, width = v.w, height = v.h;
+    var minHalf = Math.min(width, height) / 2;
+    var inset = (1 - s.size) * minHalf;
+    var halfX = Math.max(1, width / 2 - inset), halfY = Math.max(1, height / 2 - inset);
+    var radius = s.size * minHalf;
+    var fieldHalf = radius * (1 + PAD);
+    var base = Math.max(0, SHAPE_NAMES.indexOf(s.shape));
+    var shapeIndex = G.field.state === 'ready' ? 4 : G.field.state === 'loading' ? -1 : base;
+    var round = shapeIndex === 0 ? s.roundness * Math.min(halfX, halfY)
+      : s.roundness * radius * (shapeIndex === 3 ? 0.12 : 0.3);
+    var angle = ((s.rotation + v.angle) * Math.PI) / 180;
+    var P = v.pyr;
+    var key = [cw, ch, shapeIndex, s.sides, halfX, halfY, radius, round, s.thickness, s.fill, s.echoes, s.spacing, angle.toFixed(5), G.field.state].join('|');
+    if (key === P.key) return;
+    P.key = key;
+
+    var S = G.shape, B = G.blur;
+    gl.bindFramebuffer(gl.FRAMEBUFFER, G.fb);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, P.texture, 0);
+    gl.viewport(0, 0, P.sizes[0][0], P.sizes[0][1]);
+    gl.useProgram(S.p);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, G.fieldTex);
+    gl.uniform1i(S.u.uFieldTexture, 0);
+    gl.uniform2f(S.u.uResolution, width, height);
+    gl.uniform1f(S.u.uDpr, v.dpr);
+    gl.uniform1i(S.u.uShape, shapeIndex);
+    gl.uniform1f(S.u.uSides, s.sides);
+    gl.uniform2f(S.u.uHalf, halfX, halfY);
+    gl.uniform1f(S.u.uRadius, radius);
+    gl.uniform1f(S.u.uRound, round);
+    gl.uniform2f(S.u.uField, fieldHalf, (2 * fieldHalf) / FIELD);
+    gl.uniform1f(S.u.uThickness, s.thickness);
+    gl.uniform1f(S.u.uFill, s.fill ? 1 : 0);
+    gl.uniform1f(S.u.uEchoes, s.echoes);
+    gl.uniform1f(S.u.uSpacing, s.spacing);
+    gl.uniform1f(S.u.uAngle, angle);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    gl.useProgram(B.p);
+    gl.uniform1i(B.u.uSource, 0);
+    for (var k = 1; k < P.levels; k++){
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, P.temps[k], 0);
+      gl.viewport(0, 0, P.sizes[k][0], P.sizes[k - 1][1]);
+      gl.bindTexture(gl.TEXTURE_2D, P.texture);
+      gl.uniform1f(B.u.uLod, k - 1);
+      gl.uniform2f(B.u.uStep, 1, 0);
+      gl.uniform2f(B.u.uScale, 2, 1);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, P.texture, k);
+      gl.viewport(0, 0, P.sizes[k][0], P.sizes[k][1]);
+      gl.bindTexture(gl.TEXTURE_2D, P.temps[k]);
+      gl.uniform1f(B.u.uLod, 0);
+      gl.uniform2f(B.u.uStep, 0, 1);
+      gl.uniform2f(B.u.uScale, 1, 2);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  }
+
+  v.frame = function(now){
+    if (v.dead || !G.ok || G.lost) return false;
+    if (v.w < 2 || v.h < 2 || !host.isConnected) return false;
+    if (document.hidden) return false;
+    var s = CFG, gl = G.gl, lens = v.lens, ptr = v.ptr;
+    var dt = v.last ? Math.min(0.05, (now - v.last) / 1000) : 1 / 60;
+    v.last = now;
+    v.time += dt;
+    if (!REDUCED) v.angle = (v.angle + s.spin * dt) % 360;
+
+    var drifting = !ptr.active && s.idle && !REDUCED;
+    var targetX = lens.x, targetY = lens.y, targetPower = 0;
+    if (ptr.active){ targetX = ptr.x; targetY = ptr.y; targetPower = 1; }
+    else if (drifting){ var wp = wander(v.time); targetX = wp[0]; targetY = wp[1]; targetPower = 0.85; }
+    if (!lens.placed){ lens.x = targetX; lens.y = targetY; lens.placed = true; }
+    var follow = 1 - Math.exp(-dt * (ptr.active ? 10 : 3));
+    lens.x += (targetX - lens.x) * follow;
+    lens.y += (targetY - lens.y) * follow;
+    lens.power += (targetPower - lens.power) * (1 - Math.exp(-dt * 4));
+
+    var cw = cv.width, ch = cv.height;
+    if (!v.pyr || v.pyr.epoch !== G.epoch || v.pyr.w !== cw || v.pyr.h !== ch) allocPyr(v, cw, ch);
+
+    gl.bindVertexArray(G.vao);
+    gl.disable(gl.BLEND);
+    drawShape(gl, cw, ch);
+
+    if (G.canvas.width !== cw || G.canvas.height !== ch){ G.canvas.width = cw; G.canvas.height = ch; }
+    var C = G.comp, P = v.pyr;
+    var color = hexToRgb(s.color);
+    var backdrop = (0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2]) < 0.5 ? 1 : 0;
+    var bscale = Math.min(1, v.w / s.blurRefWidth);
+    gl.viewport(0, 0, cw, ch);
+    gl.useProgram(C.p);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, P.texture);
+    gl.uniform1i(C.u.uPyramid, 0);
+    gl.uniform1f(C.u.uMaxLod, P.levels - 1);
+    gl.uniform2f(C.u.uResolution, v.w, v.h);
+    gl.uniform1f(C.u.uDpr, v.dpr);
+    gl.uniform1f(C.u.uThickness, s.thickness);
+    gl.uniform1f(C.u.uFill, s.fill ? 1 : 0);
+    gl.uniform1f(C.u.uEchoes, s.echoes);
+    gl.uniform1f(C.u.uSpacing, s.spacing);
+    gl.uniform3f(C.u.uColor, color[0], color[1], color[2]);
+    gl.uniform1f(C.u.uBackdrop, backdrop);
+    gl.uniform1f(C.u.uBlur, Math.max(0, s.blur) * Math.max(0.35, bscale));
+    gl.uniform3f(C.u.uLens, lens.x, lens.y, lens.power);
+    gl.uniform2f(C.u.uLensShape, clamp(s.lensSize, 0.02, 2) * Math.min(v.w, v.h), clamp(s.lensSoftness, 0, 1));
+    gl.uniform1f(C.u.uFocus, s.focus ? 1 : 0);
+    gl.uniform1f(C.u.uChroma, clamp(s.chroma, 0, 1));
+    gl.clearColor(0, 0, 0, 0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.drawImage(G.canvas, 0, 0);
+    if (!v.ready){ v.ready = true; cv.classList.add('fx-ready'); host.classList.add('fx-sb-on'); }
+
+    var settled = Math.abs(targetX - lens.x) < 0.1 && Math.abs(targetY - lens.y) < 0.1 && Math.abs(targetPower - lens.power) < 0.002;
+    if (!settled || drifting || (s.spin && !REDUCED)) return v.visible;
+    v.last = 0;
+    return false;
+  };
+
+  return v;
+}
+
+function attach(card){
+  var host = card.querySelector('.card-img');
+  if (!host || host.sbInst) return;
+  ensureObservers();
+  var v = createCard(host);
+  host.sbInst = v;
+  LIVE.push(v);
+  bindWindow();
+  v.layout();
+  RO.observe(host);
+  IO.observe(host);
+}
+function clear(){ for (var i = LIVE.length - 1; i >= 0; i--) LIVE[i].dispose(); unbindWindow(); }
+function sync(root){
+  for (var i = LIVE.length - 1; i >= 0; i--){
+    if (!LIVE[i].host.isConnected) LIVE[i].dispose();
+  }
+  if (!ENABLED || !root || !initGL()) return;
+  var cards = root.querySelectorAll('.card[data-dv]');
+  for (var j = 0; j < cards.length; j++) attach(cards[j]);
+}
+function setEnabled(on){ on = !!on; if (ENABLED === on) return; ENABLED = on; if (!on) clear(); }
+function refresh(){ for (var i = 0; i < LIVE.length; i++) wake(LIVE[i]); }
+document.addEventListener('visibilitychange', function(){ if (!document.hidden) refresh(); });
+
+return { sync: sync, setEnabled: setEnabled, refresh: refresh, config: CFG, supported: function(){ return initGL(); } };
+})();
+
+window.HalftoneCards = HT;
+window.ShapeBlurCards = SB;
+
+/* ═══════════════════════════════════════════════════════════════════════
+   特效切换管理器
+   ═══════════════════════════════════════════════════════════════════════ */
+var FX_MODES = ['none', 'dither', 'shape', 'halftone'];
+var FX_KEY = 'starline.cardFx';
+function normMode(m){ m = String(m || '').toLowerCase(); return FX_MODES.indexOf(m) >= 0 ? m : 'dither'; }
+function initialMode(){
+  try { if (typeof UI_CFG !== 'undefined' && UI_CFG && typeof UI_CFG.cardFx === 'string') return normMode(UI_CFG.cardFx); } catch (e) {}
+  try { var s = localStorage.getItem(FX_KEY); if (s) return normMode(s); } catch (e) {}
+  return 'dither';                                   /* 默认保持原来的 Dither Veil */
+}
+
+var CardFx = {
+  mode: 'dither',
+  _ready: false,
+  /* UI_CFG（宿主保存的设置）在公共脚本里定义，晚于本脚本执行，所以不能在这里直接读：第一次用到时再读 */
+  init: function(){
+    if (CardFx._ready) return;
+    CardFx._ready = true;
+    CardFx.mode = initialMode();
+  },
+  sync: function(root){
+    CardFx.init();
+    var m = CardFx.mode, dv = window.DitherVeilCards;
+    if (dv && dv.setEnabled) dv.setEnabled(m === 'dither');
+    HT.setEnabled(m === 'halftone');
+    SB.setEnabled(m === 'shape');
+    if (dv) dv.sync(root);
+    HT.sync(root);
+    SB.sync(root);
+  },
+  refresh: function(){
+    if (window.DitherVeilCards) window.DitherVeilCards.refresh();
+    HT.refresh(); SB.refresh();
+  },
+  set: function(mode, silent){
+    CardFx.init();
+    mode = normMode(mode);
+    var changed = mode !== CardFx.mode;
+    CardFx.mode = mode;
+    if (changed && !silent){
+      try { localStorage.setItem(FX_KEY, mode); } catch (e) {}
+      try { uiSend('UI_CARDFX:' + mode); } catch (e) {}
+    }
+    if (window.uiCardFxLayout) window.uiCardFxLayout(true);        /* 先让高亮滑块动起来… */
+    var apply = function(){ var grid = document.getElementById('grid') || document.querySelector('.grid'); if (grid) CardFx.sync(grid); };
+    clearTimeout(CardFx._t);
+    if (silent) apply(); else CardFx._t = setTimeout(apply, 90);     /* …再切特效（首次编译着色器会占一下主线程，别让它卡住滑动；连点只执行最后一次） */
+  }
+};
+window.CardFx = CardFx;
 })();
 </script>
 <script>
@@ -19752,7 +21412,7 @@ __UI_SCRIPT__
         + '<span>' + uiEsc(sub) + '</span>'
         + reqBtn
         + '</div>';
-      try { if (window.DitherVeilCards) window.DitherVeilCards.sync(grid); } catch (e) {}
+      try { if (window.CardFx) window.CardFx.sync(grid); else if (window.DitherVeilCards) window.DitherVeilCards.sync(grid); } catch (e) {}
       return;
     }
 
@@ -19840,7 +21500,7 @@ __UI_SCRIPT__
     });
     grid.innerHTML = html;
     /* 未订阅的卡片（data-dv）挂上 Dither Veil 特效；失败/不支持 WebGL2 时静默跳过 */
-    try { if (window.DitherVeilCards) window.DitherVeilCards.sync(grid); } catch (e) {}
+    try { if (window.CardFx) window.CardFx.sync(grid); else if (window.DitherVeilCards) window.DitherVeilCards.sync(grid); } catch (e) {}
     /* 列表模式：左边列表 + 右边常驻详情块
        还没悬停过 → 显示列表第一个；已经悬停过 → 保持最后一次那款（还在列表里的话） */
     var wrap = document.getElementById('gridWrap');
