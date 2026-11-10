@@ -112,6 +112,37 @@ price90  = 44.99
 priceLife= 74.99
 discount = 10
 
+
+# ───────────────────────────────────────────────────────────────────────────
+#  Deadlock Octarine Crack
+# ───────────────────────────────────────────────────────────────────────────
+[DEADLOCK-OCTARINE-CRACK]
+title    = Deadlock Octarine Crack
+short    = Deadlock Octarine Crack
+icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/aa249c5e8cc8f90941bd1dbdc311773cd1afe065/header.jpg?t=1790716179
+cover1   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/fa25560cf85debe669f5d4acd76cf81b0943019b/ss_fa25560cf85debe669f5d4acd76cf81b0943019b.1920x1080.jpg?t=1790716179
+cover2   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/1a5a68e51d6aff5e2910410f84854c4c39af68cc/ss_1a5a68e51d6aff5e2910410f84854c4c39af68cc.1920x1080.jpg?t=1790716179
+cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1422450/52159118573367c304c43fc9ed85588c0c518a19/ss_52159118573367c304c43fc9ed85588c0c518a19.1920x1080.jpg?t=1790716179
+cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1422450/ac02851ede518092df55746dbc98a199c91d7411/ss_ac02851ede518092df55746dbc98a199c91d7411.1920x1080.jpg?t=1790716179
+cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1422450/caaf254176430d69244b99e565d3d56559f1743b/ss_caaf254176430d69244b99e565d3d56559f1743b.1920x1080.jpg?t=1790716179
+process  = deadlock.exe
+runmode  = dll
+download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_deadlock.zip
+dev      = Valve
+pub      = Valve
+rel      = TBA
+genres   = MOBA, Shooter, Third-Person
+features = Multiplayer, Early Access
+featured = true
+price7   = 120.99        
+price15  = 120.99    
+price30  = 120.99 
+price90  = 120.99 
+priceLife= 12.99
+discount = 90
+
+
+
 # ───────────────────────────────────────────────────────────────────────────
 #  Counter-Strike: Source
 # ───────────────────────────────────────────────────────────────────────────
