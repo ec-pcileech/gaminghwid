@@ -219,6 +219,7 @@ status   = updating
 price30  = 24.99
 price90  = 59.99
 priceLife= 99.99
+Announcement1 = The product is being updated, please wait a moment.
 
 
 # ───────────────────────────────────────────────────────────────────────────
