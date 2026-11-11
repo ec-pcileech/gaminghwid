@@ -9138,10 +9138,7 @@ function TargetCursor(options) {
      data-cursor-label="Open" 可以给目标挂一个小标签 */
 uiAddT({
   tcProfTitle: ["Target cursor", "瞄准光标", "Прицельный курсор", "Zielcursor", "ターゲットカーソル", "Cursor de mira", "Hedef imleci", "Cursor de mira"],
-  tcProfSub: ["A reticle cursor that snaps onto buttons and cards", "准星光标，悬停按钮和卡片时自动吸附", "Курсор-прицел, который привязывается к кнопкам и карточкам", "Fadenkreuz-Cursor, der an Buttons und Karten einrastet", "ボタンやカードに吸着する照準カーソル", "Cursor de mira que se ajusta a botones y tarjetas", "Düğmelere ve kartlara kilitlenen nişangâh imleci", "Cursor de mira que se prende a botões e cartões"],
-  tcProfRow: ["Enable target cursor", "启用瞄准光标", "Включить прицельный курсор", "Zielcursor aktivieren", "ターゲットカーソルを有効にする", "Activar cursor de mira", "Hedef imlecini etkinleştir", "Ativar cursor de mira"],
-  tcToastOn: ["Target cursor turned on", "已开启瞄准光标", "Прицельный курсор включён", "Zielcursor aktiviert", "ターゲットカーソルをオンにしました", "Cursor de mira activado", "Hedef imleci açıldı", "Cursor de mira ativado"],
-  tcToastOff: ["Target cursor turned off", "已关闭瞄准光标", "Прицельный курсор выключен", "Zielcursor deaktiviert", "ターゲットカーソルをオフにしました", "Cursor de mira desactivado", "Hedef imleci kapatıldı", "Cursor de mira desativado"]
+  tcProfSub: ["A reticle cursor that snaps onto buttons and cards", "准星光标，悬停按钮和卡片时自动吸附", "Курсор-прицел, который привязывается к кнопкам и карточкам", "Fadenkreuz-Cursor, der an Buttons und Karten einrastet", "ボタンやカードに吸着する照準カーソル", "Cursor de mira que se ajusta a botones y tarjetas", "Düğmelere ve kartlara kilitlenen nişangâh imleci", "Cursor de mira que se prende a botões e cartões"]
 });
 var UI_TC_KEY = 'starline.targetCursor.off';
 /* 维护页文案「Under Maintenance」：8 种内置语言；用 uiAddT 写入，所以也会自动出现在「自定义翻译」编辑器里 */
@@ -9163,17 +9160,20 @@ function uiTargetCursorApply(on) {
     uiTC = null;
   }
 }
+/* 个人资料 ▸ 偏好设置 ▸ 瞄准光标：None / Target Cursor 分段选择器（和卡片特效是同一套控件，滑动高亮由 uiSegLayout 量按钮位置） */
 function uiTargetCursorSync() {
-  var t = document.getElementById('targetCursorToggle');
-  if (t) { t.checked = !!UI_TCURSOR; }
+  uiSegLayout(document.getElementById('tcSeg'), UI_TCURSOR ? 'target' : 'none');
 }
 function uiTargetCursorSet(on) {
-  UI_TCURSOR = !!on;
-  try { if (on) { localStorage.removeItem(UI_TC_KEY); } else { localStorage.setItem(UI_TC_KEY, '1'); } } catch (e) {}
-  uiSend('UI_TCURSOR:' + (on ? '1' : '0'));
-  uiTargetCursorApply(UI_TCURSOR);
-  uiTargetCursorSync();
-  try { if (typeof uiToast === 'function') { uiToast(uiT(on ? 'tcToastOn' : 'tcToastOff'), 'ok'); } } catch (e) {}
+  on = !!on;
+  var changed = on !== UI_TCURSOR;
+  UI_TCURSOR = on;
+  if (changed) {
+    try { if (on) { localStorage.removeItem(UI_TC_KEY); } else { localStorage.setItem(UI_TC_KEY, '1'); } } catch (e) {}
+    uiSend('UI_TCURSOR:' + (on ? '1' : '0'));
+  }
+  uiSegLayout(document.getElementById('tcSeg'), on ? 'target' : 'none');   /* 先让高亮滑块动起来… */
+  setTimeout(function () { uiTargetCursorApply(UI_TCURSOR); }, 90);        /* …再创建 / 销毁光标，别抢滑动的帧 */
 }
 uiTargetCursorApply(UI_TCURSOR);
 uiTargetCursorSync();
@@ -9189,26 +9189,23 @@ uiAddT({
   cardFxNone: ['None', '无', 'Нет', 'Aus', 'なし', 'Ninguno', 'Yok', 'Nenhum']
 });
 
-function uiCardFxButtons(){ return document.querySelectorAll('#cardFxSeg .fx-seg-btn'); }
-
-/* 把滑块量好位置：用按钮的实际 offset 量，所以语言 / 字体 / 换行变化都不会错位。
-   animate=false 时（首次布局）关掉过渡，避免从 0 滑进来 */
-function uiCardFxLayout(animate){
-  var seg = document.getElementById('cardFxSeg');
+/* ───── 通用分段选择器（卡片特效 / 瞄准光标共用）─────
+   结构：.fx-seg > .fx-seg-thumb + 若干 .fx-seg-btn[data-fx=值]。
+   uiSegLayout：把选中项标出来，并把滑块量到该按钮的实际 offset（所以语言 / 字体 / 换行变化都不会错位）。
+   只有「第一次摆放」才关过渡（否则会从 0 滑进来）。之后任何重新布局（窗口缩放 / 字体加载 / 选中项变粗体导致总宽度微变触发的 ResizeObserver）
+   都只更新目标值，不能关过渡——否则正在滑动的高亮会被瞬间取消、直接跳到终点。 */
+function uiSegLayout(seg, value){
   if (!seg) return;
-  if (window.CardFx) window.CardFx.init();
   var thumb = seg.querySelector('.fx-seg-thumb');
-  var btns = uiCardFxButtons(), active = null;
+  var btns = seg.querySelectorAll('.fx-seg-btn'), active = null;
   for (var i = 0; i < btns.length; i++){
-    var on = btns[i].getAttribute('data-fx') === (window.CardFx ? window.CardFx.mode : 'dither');
+    var on = btns[i].getAttribute('data-fx') === value;
     btns[i].classList.toggle('on', on);
     btns[i].setAttribute('aria-checked', on ? 'true' : 'false');
     btns[i].tabIndex = on ? 0 : -1;
     if (on) active = btns[i];
   }
   if (!thumb || !active || !active.offsetWidth) return;     /* 面板还没显示（宽度为 0）：等 ResizeObserver 再量 */
-  /* 只有「第一次摆放」才关过渡（否则会从 0 滑进来）。之后任何重新布局（窗口缩放 / 字体加载 / 选中项变粗体导致总宽度微变触发的 ResizeObserver）
-     都只更新目标值，不能关过渡——否则正在滑动的高亮会被瞬间取消、直接跳到终点 */
   var first = !thumb.classList.contains('ready');
   if (first) thumb.style.transition = 'none';
   thumb.style.width = active.offsetWidth + 'px';
@@ -9217,29 +9214,52 @@ function uiCardFxLayout(animate){
   thumb.classList.add('ready');
   if (first){ void thumb.offsetWidth; thumb.style.transition = ''; }
 }
-function uiCardFxSet(mode){ CardFx.set(mode); }
-window.uiCardFxSet = uiCardFxSet;
-window.uiCardFxLayout = uiCardFxLayout;
-
-(function(){
-  var seg = document.getElementById('cardFxSeg');
-  if (!seg) return;
+/* 方向键在选项之间切换（radiogroup 的标准行为） */
+function uiSegKeys(seg, values, getValue, setValue){
   seg.addEventListener('keydown', function(e){
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
-    var i = UI_FX_MODES.indexOf((window.CardFx ? window.CardFx.mode : 'dither'));
+    var i = values.indexOf(getValue());
     var d = (e.key === 'ArrowRight' || e.key === 'ArrowDown') ? 1 : -1;
-    var next = UI_FX_MODES[(i + d + UI_FX_MODES.length) % UI_FX_MODES.length];
+    var next = values[(i + d + values.length) % values.length];
     e.preventDefault();
-    CardFx.set(next);
+    setValue(next);
     var b = seg.querySelector('.fx-seg-btn[data-fx="' + next + '"]');
     if (b) b.focus();
   });
-  if (window.ResizeObserver){ new ResizeObserver(function(){ uiCardFxLayout(false); }).observe(seg); }
-  window.addEventListener('resize', function(){ uiCardFxLayout(false); });
-  uiCardFxLayout(false);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ uiCardFxLayout(false); });
+}
+/* 面板从隐藏变成可见 / 窗口缩放 / 字体加载完：重新量一次滑块 */
+function uiSegWatch(seg, relayout){
+  if (window.ResizeObserver){ new ResizeObserver(function(){ relayout(); }).observe(seg); }
+  window.addEventListener('resize', function(){ relayout(); });
+  relayout();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ relayout(); });
+}
+
+/* 卡片特效 */
+function uiCardFxLayout(){
+  var seg = document.getElementById('cardFxSeg');
+  if (!seg) return;
+  if (window.CardFx) window.CardFx.init();
+  uiSegLayout(seg, window.CardFx ? window.CardFx.mode : 'dither');
+}
+function uiCardFxSet(mode){ CardFx.set(mode); }
+window.uiCardFxSet = uiCardFxSet;
+window.uiCardFxLayout = uiCardFxLayout;
+(function(){
+  var seg = document.getElementById('cardFxSeg');
+  if (!seg) return;
+  uiSegKeys(seg, UI_FX_MODES, function(){ return window.CardFx ? window.CardFx.mode : 'dither'; }, function(m){ CardFx.set(m); });
+  uiSegWatch(seg, uiCardFxLayout);
 })();
-try { if (document.getElementById('cardFxSeg') && typeof uiRenderI18n === 'function') { uiRenderI18n(); } } catch (e) {}
+
+/* 瞄准光标 */
+(function(){
+  var seg = document.getElementById('tcSeg');
+  if (!seg) return;
+  uiSegKeys(seg, ['none', 'target'], function(){ return UI_TCURSOR ? 'target' : 'none'; }, function(v){ uiTargetCursorSet(v === 'target'); });
+  uiSegWatch(seg, uiTargetCursorSync);
+})();
+try { if ((document.getElementById('cardFxSeg') || document.getElementById('tcSeg')) && typeof uiRenderI18n === 'function') { uiRenderI18n(); } } catch (e) {}
 #===LOGIN
 <!DOCTYPE html>
 <html lang="__UI_LANG_ATTR__" data-theme="__UI_THEME_ATTR__">
@@ -16532,9 +16552,14 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
             </div>
           </div>
           <div class="field">
-            <div class="bg-row">
-              <b data-ui="tcProfRow">Enable target cursor</b>
-              <label class="bg-switch"><input type="checkbox" id="targetCursorToggle" checked onchange="uiTargetCursorSet(this.checked)"><span></span></label>
+            <div class="fx-seg" id="tcSeg" role="radiogroup" aria-label="Target cursor">
+              <span class="fx-seg-thumb" aria-hidden="true"></span>
+              <button class="fx-seg-btn" type="button" role="radio" data-fx="none" onclick="uiTargetCursorSet(false)">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></svg><span data-ui="cardFxNone">None</span>
+              </button>
+              <button class="fx-seg-btn" type="button" role="radio" data-fx="target" onclick="uiTargetCursorSet(true)">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg><span>Target Cursor</span>
+              </button>
             </div>
           </div>
         </div>
