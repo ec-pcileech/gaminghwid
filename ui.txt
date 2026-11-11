@@ -17196,6 +17196,22 @@ html[data-theme="light"] .animated-list{
 .ann-al--detail .animated-list__lead{width:38px;height:38px}
 .ann-al--detail .animated-list__title{font-size:14px}
 .ann-al--detail .animated-list__description{-webkit-line-clamp:3;font-size:13.5px;line-height:1.55}
+/* 点击关闭模式：点击不再用来展开，所以正文直接显示全文 */
+.ann-al--dismiss .animated-list__description,.ann-al--dismiss.ann-al--detail .animated-list__description{display:block;-webkit-line-clamp:unset}
+.animated-list__x{flex:none;display:grid;place-items:center;width:20px;height:20px;margin:0 -4px 0 2px;border-radius:50%;
+  color:var(--al-muted);opacity:0;transform:scale(.6) rotate(-45deg);
+  transition:opacity .18s ease,transform .3s cubic-bezier(.34,1.56,.64,1),color .18s ease,background .18s ease}
+.animated-list__x svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.animated-list__item:hover .animated-list__x,.animated-list__item[data-selected] .animated-list__x{opacity:.95;transform:none}
+.animated-list__item:hover .animated-list__x{color:var(--err);background:rgba(239,68,68,.14)}
+/* 「显示已关闭的 N 条」：关掉之后还能找回来 */
+@keyframes annRestoreIn{from{opacity:0;max-height:0;margin-top:0;margin-bottom:0;padding-top:0;padding-bottom:0;border-width:0}}
+.ann-restore{display:block;align-self:flex-start;margin:10px 0 2px 6px;padding:5px 12px;border-radius:999px;border:1px solid var(--border);
+  max-height:44px;overflow:hidden;animation:annRestoreIn .42s cubic-bezier(.4,0,.2,1) .14s both;   /* 和条目收拢同延迟、同时长、同曲线：两者位移相互抵消，内容单调平滑上移 */
+  background:transparent;color:var(--text-3);font:600 11px var(--font);cursor:pointer;
+  transition:color var(--tr-fast),border-color var(--tr-fast),background var(--tr-fast)}
+.ann-restore:hover{color:var(--accent-2);border-color:var(--accent);background:var(--accent-soft)}
+#annList .ann-restore{margin:10px auto 4px}
 </style>
 <!-- 信息图标：我提交的游戏 + 管理员的回复 -->
 <div class="req-modal" id="inboxModal" onmousedown="if(event.target===this)closeInbox()">
@@ -19697,7 +19713,8 @@ function AnimatedList(host, options){
     showGradients: true, fadeSize: 56, displayScrollbar: true, frame: true,
     accentColor: '', radius: 14, gap: 8, width: 420, maxHeight: 440,
     className: '', itemClassName: '',
-    expandOnSelect: false, newLabel: 'NEW'
+    expandOnSelect: false, newLabel: 'NEW',
+    dismissOnSelect: false, onDismissStart: null, onDismiss: null      /* 点击条目：滑出消失，其余条目平滑补位（原组件没有）；Start = 动画开始时，onDismiss = 真正移除后 */
   };
   var k;
   for (k in (options || {})) S[k] = options[k];
@@ -19799,6 +19816,13 @@ function AnimatedList(host, options){
         m.textContent = String(entry.meta);
         el.appendChild(m);
       }
+      if (S.dismissOnSelect){                       /* 悬停 / 选中时在右侧浮出一个 ×，提示「点一下就关掉」 */
+        var x = document.createElement('span');
+        x.className = 'animated-list__x';
+        x.setAttribute('aria-hidden', 'true');
+        x.innerHTML = '<svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>';
+        el.appendChild(x);
+      }
     }
     var rim = document.createElement('span');
     rim.className = 'animated-list__rim';
@@ -19827,8 +19851,12 @@ function AnimatedList(host, options){
       el.setAttribute('data-index', String(index));
       if (S.expandOnSelect) el.setAttribute('aria-expanded', 'false');
       fillItem(el, item, index);
-      el.addEventListener('pointerenter', function(){ if (S.selectOnHover) hover(index); });
-      el.addEventListener('click', function(){ choose(item, index); });
+      el.addEventListener('pointerenter', function(){ if (S.selectOnHover && !el.dataset.leaving) hover(Number(el.dataset.index)); });
+      el.addEventListener('click', function(){
+        if (el.dataset.leaving) return;
+        var i = Number(el.dataset.index);
+        choose(S.items[i], i);
+      });
       track.insertBefore(el, indicator);
       itemEls[index] = el;
     });
@@ -19999,7 +20027,62 @@ function AnimatedList(host, options){
       if (!open) scrollToItem(el);                 /* 刚展开：平滑滚到整条可见 */
     });
   }
-  function activate(item, index){
+  /* ───── 点击关闭 ─────
+     两段动画同时跑：① 条目向右滑出并淡掉（300ms）；② 稍晚一点（140ms 后）高度 + 内边距 + 间距收成 0（420ms）——
+     它下面（或上面）的条目因为是真实布局，所以会跟着平滑地移动补位，不是瞬移。
+     动画结束才真正从 DOM 和 items 里移除，然后重排序号、重新量尺寸。 */
+  function dismiss(index, viaKey){
+    var el = itemEls[index];
+    if (!el || el.dataset.leaving) return;
+    var item = S.items[index];
+    el.dataset.leaving = '1';
+    el.style.pointerEvents = 'none';
+    if (S.onDismissStart) S.onDismissStart(item, index);
+    S.selected = -1;                                 /* 选中环先退场 */
+    paintSelection();
+    place(false);
+
+    var finished = false;
+    function finish(){
+      if (finished || dead) return;
+      finished = true;
+      var at = itemEls.indexOf(el);
+      if (at < 0) return;
+      if (el.parentNode) el.parentNode.removeChild(el);
+      itemEls.splice(at, 1);
+      S.items.splice(at, 1);
+      for (var i = 0; i < itemEls.length; i++){
+        itemEls[i].dataset.index = String(i);
+        itemEls[i].id = baseId + '-' + i;
+      }
+      if (viaKey && itemEls.length) S.selected = Math.min(at, itemEls.length - 1);   /* 键盘关闭：选中环落到顶上来的那一条 */
+      paintSelection();
+      measure(); place(true); updateFades(); reveal(false);
+      if (S.onDismiss) S.onDismiss(item, at);
+    }
+    if (reduced || typeof el.animate !== 'function'){ finish(); return; }
+
+    var cs = getComputedStyle(el);
+    var h = el.offsetHeight, gap = Math.max(0, S.gap);
+    var pt = cs.paddingTop, pb = cs.paddingBottom;
+    /* 非首条：抵消它上面那条 gap；首条：抵消下面那条 gap；唯一一条：没有 gap */
+    var mProp = itemEls.length > 1 ? (index > 0 ? 'marginTop' : 'marginBottom') : null;
+    var from = { height: h + 'px', paddingTop: pt, paddingBottom: pb };
+    var to = { height: '0px', paddingTop: '0px', paddingBottom: '0px' };
+    if (mProp){ from[mProp] = '0px'; to[mProp] = (-gap) + 'px'; }
+    el.style.overflow = 'hidden';
+    el.style.minHeight = '0';
+    el.animate(
+      [{ opacity: 1, transform: 'translate3d(0, 0, 0) scale(1)' }, { opacity: 0, transform: 'translate3d(64px, 0, 0) scale(0.96)' }],
+      { duration: 300, easing: 'cubic-bezier(0.5, 0, 0.9, 0.5)', fill: 'forwards' }
+    );
+    var collapse = el.animate([from, to], { duration: 420, delay: 140, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' });
+    collapse.onfinish = finish;
+    collapse.oncancel = finish;
+    setTimeout(finish, 900);                          /* 兜底：页面被挂起 / 动画被系统取消时也一定会移除 */
+  }
+  function activate(item, index, viaKey){
+    if (S.dismissOnSelect){ dismiss(index, viaKey); return; }
     if (S.expandOnSelect) toggleOpen(index);
     if (S.onItemSelect) S.onItemSelect(item, index);
   }
@@ -20044,7 +20127,7 @@ function AnimatedList(host, options){
     else if (event.key === 'End') next = count - 1;
     else if ((event.key === 'Enter' || (focused && event.key === ' ')) && index >= 0 && index < count){
       event.preventDefault();
-      activate(S.items[index], index);
+      activate(S.items[index], index, true);
       return;
     }
     if (next === null) return;
@@ -20123,59 +20206,6 @@ function AnimatedList(host, options){
       sync();
       place(true);
       updateFades();
-    },
-    /* FLIP 删除：先让目标条目横向淡出并收高；重建列表后对其余条目执行 First/Last/Inver​​t/Play，补位平滑移动 */
-    remove: function(index){
-      if (dead || index < 0 || index >= S.items.length) return false;
-      var target = itemEls[index];
-      if (!target || target.dataset.removing) return false;
-      target.dataset.removing = 'true';
-      target.style.pointerEvents = 'none';
-      target.style.transition = 'opacity 180ms ease, transform 220ms cubic-bezier(.22,.8,.3,1), height 240ms cubic-bezier(.22,.8,.3,1), padding 240ms ease';
-      target.style.height = target.getBoundingClientRect().height + 'px';
-      target.style.overflow = 'hidden';
-      target.style.willChange = 'height,opacity,transform';
-      void target.offsetHeight;
-      requestAnimationFrame(function(){
-        if (dead || !target.parentNode) return;
-        target.style.opacity = '0';
-        target.style.transform = 'translate3d(28px,0,0) scale(.98)';
-        target.style.height = '0px';
-        target.style.paddingTop = '0px';
-        target.style.paddingBottom = '0px';
-      });
-      window.setTimeout(function(){
-        if (dead) return;
-        var oldRects = [];
-        itemEls.forEach(function(el, i){ if (i !== index && el && el.isConnected) oldRects.push({item:S.items[i], rect:el.getBoundingClientRect()}); });
-        S.items.splice(index, 1);
-        if (S.selected === index) S.selected = -1;
-        else if (S.selected > index) S.selected--;
-        buildItems();
-        /* Last + Invert：先将新列表中的每项放回删除前的位置 */
-        oldRects.forEach(function(old){
-          var nextIndex = S.items.indexOf(old.item), el = itemEls[nextIndex];
-          if (nextIndex < 0 || !el) return;
-          var r = el.getBoundingClientRect(), dx = old.rect.left - r.left, dy = old.rect.top - r.top;
-          if (!dx && !dy) return;
-          el.style.transition = 'none';
-          el.style.transform = 'translate3d(' + dx + 'px,' + dy + 'px,0)';
-          el.style.willChange = 'transform';
-        });
-        void track.offsetHeight;
-        /* Play：解除反向位移，让条目以弹簧曲线滑到最终位置 */
-        requestAnimationFrame(function(){
-          itemEls.forEach(function(el){
-            if (!el) return;
-            el.style.transition = 'transform 420ms cubic-bezier(.22,1,.36,1)';
-            el.style.transform = '';
-            el.style.willChange = '';
-          });
-          setTimeout(function(){ itemEls.forEach(function(el){ if(el) el.style.transition=''; }); }, 450);
-        });
-        sync(); place(false); updateFades(); syncRing();
-      }, 245);
-      return true;
     },
     select: function(i){ keyboard = false; setSelected(i); },
     destroy: function(){
@@ -22603,48 +22633,113 @@ __UI_SCRIPT__
   var ANN_ICON = '<svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/>'
                + '<path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
   /* 详情页公告：和商店顶栏的 Announcements 弹窗是同一套 React Bits <AnimatedList />（#animatedList 脚本）
-     条目 = { title: 「Announcement N」, description: games.txt 里的正文, icon: 喇叭 }；点击条目展开全文 */
-  var DETAIL_AL = null;
+     条目 = { title: 「Announcement N」, description: games.txt 里的正文, icon: 喇叭 }；点一下就关掉（滑出 + 其余条目补位），
+     关掉的记在 localStorage（按「游戏 + 正文」），正文改了就当新公告；底部「显示已关闭」可以找回 */
+  var DETAIL_AL = null, DETAIL_AL_GAME = '';
+  var GANN_KEY = 'starline.gann.dismissed';
+  var GANN_DISMISSED = (function(){
+    try { var raw = localStorage.getItem(GANN_KEY); var arr = raw ? JSON.parse(raw) : []; return Array.isArray(arr) ? arr : []; }
+    catch (e) { return []; }
+  })();
+  function gannHash(s){
+    var h = 5381;
+    for (var i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; }
+    return (h >>> 0).toString(36) + s.length;
+  }
+  function gannKey(g, text){ return g + '\u0001' + gannHash(text); }
+  function gannSave(){
+    try {
+      if (GANN_DISMISSED.length > 300) { GANN_DISMISSED = GANN_DISMISSED.slice(-300); }
+      localStorage.setItem(GANN_KEY, JSON.stringify(GANN_DISMISSED));
+    } catch (e) {}
+  }
+  function gannState(g){
+    var all = detailAnnouncements(GAMES[g]);
+    var label = uiT('announcement');
+    var list = all.filter(function(t){ return GANN_DISMISSED.indexOf(gannKey(g, t)) < 0; });
+    var items = list.map(function(text){
+      return { id: gannKey(g, text), title: label + (all.length > 1 ? ' ' + (all.indexOf(text) + 1) : ''), description: text, icon: ANN_ICON };
+    });
+    return { all: all, items: items, dismissed: all.length - items.length,
+             sig: g + '\u0001' + label + '\u0001' + list.join('\u0001') + '\u0001' + (all.length - items.length) };
+  }
+  function gannSyncRestore(box, n){
+    var btn = box.querySelector('.ann-restore');
+    if (n <= 0) { if (btn) { btn.parentNode.removeChild(btn); } return; }
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ann-restore';
+      btn.addEventListener('click', function(){
+        var g = DETAIL_AL_GAME;
+        var keys = detailAnnouncements(GAMES[g]).map(function(t){ return gannKey(g, t); });
+        GANN_DISMISSED = GANN_DISMISSED.filter(function(k){ return keys.indexOf(k) < 0; });
+        gannSave();
+        box.removeAttribute('data-sig');
+        renderDetailAnn(g);
+        if (DETAIL_AL) { DETAIL_AL.replay(); }
+      });
+      box.appendChild(btn);
+    } else if (box.lastElementChild !== btn) {
+      box.appendChild(btn);                              /* 保持在列表后面 */
+    }
+    btn.textContent = uiT('annRestore').replace('{n}', n);
+  }
+  function gannClearBox(box){                            /* 清空列表区，但保留「显示已关闭」按钮 */
+    var kids = Array.prototype.slice.call(box.children);
+    for (var i = 0; i < kids.length; i++) { if (!kids[i].classList.contains('ann-restore')) { box.removeChild(kids[i]); } }
+  }
+  /* 关闭动画「开始」时就记账 + 展开「显示已关闭」：和条目收拢同时进行，页面内容连续位移，不会在动画结束时突然跳一下 */
+  function gannOnDismissStart(item){
+    if (GANN_DISMISSED.indexOf(item.id) < 0) { GANN_DISMISSED.push(item.id); }
+    gannSave();
+    var box = document.getElementById('detailAnn');
+    if (!box) return;
+    var st = gannState(DETAIL_AL_GAME);
+    box.setAttribute('data-sig', st.sig);                /* 列表由组件自己动画移除这一条；同步签名，免得下次渲染又整体重建 */
+    gannSyncRestore(box, st.dismissed);
+  }
+  function gannOnDismiss(){                              /* 条目已经真正移除：全关完了就销毁列表，只留「显示已关闭」 */
+    if (!DETAIL_AL) return;
+    if (!gannState(DETAIL_AL_GAME).items.length) { DETAIL_AL.destroy(); DETAIL_AL = null; }
+  }
   function renderDetailAnn(g){
     var box = document.getElementById('detailAnn');
     if (!box) return;
-    var list = detailAnnouncements(GAMES[g]);
-    if (!list.length) {
+    var st = gannState(g);
+    if (!st.all.length) {
       if (DETAIL_AL) { DETAIL_AL.destroy(); DETAIL_AL = null; }
       box.hidden = true;
       box.innerHTML = '';
       box.removeAttribute('data-sig');
       return;
     }
-    var label = uiT('announcement');
-    var sig = g + '\u0001' + label + '\u0001' + list.join('\u0001');
-    if (!box.hidden && DETAIL_AL && box.getAttribute('data-sig') === sig) return;   /* 没变就不重建，避免重复播动画 */
-    var items = list.map(function(text, i){
-      return { id: i, title: label + (list.length > 1 ? ' ' + (i + 1) : ''), description: text, icon: ANN_ICON };
-    });
+    DETAIL_AL_GAME = g;
+    if (!box.hidden && box.getAttribute('data-sig') === st.sig && (DETAIL_AL || !st.items.length)) return;   /* 没变就不重建，避免重复播动画 */
     box.hidden = false;                                  /* 先显示出来再建，组件要量尺寸 */
-    if (!DETAIL_AL) {
-      box.innerHTML = '';
+    if (!st.items.length) {
+      if (DETAIL_AL) { DETAIL_AL.destroy(); DETAIL_AL = null; }
+      gannClearBox(box);
+    } else if (!DETAIL_AL) {
+      gannClearBox(box);
       DETAIL_AL = AnimatedList(box, {
-        items: items,
+        items: st.items,
         animation: 'pop',
-        className: 'ann-al ann-al--detail',
+        className: 'ann-al ann-al--dismiss ann-al--detail',
         frame: false,
         width: '100%',
         maxHeight: 400,
         radius: 14,
         gap: 8,
-        expandOnSelect: false,
-        onItemSelect: function(item, index){ DETAIL_AL.remove(index); }
+        dismissOnSelect: true,
+        onDismissStart: gannOnDismissStart,
+        onDismiss: gannOnDismiss
       });
     } else {
-      DETAIL_AL.update({
-        items: items,
-        expandOnSelect: false,
-        onItemSelect: function(item, index){ DETAIL_AL.remove(index); }
-      });
+      DETAIL_AL.update({ items: st.items });
     }
-    box.setAttribute('data-sig', sig);
+    box.setAttribute('data-sig', st.sig);
+    gannSyncRestore(box, st.dismissed);
   }
   /* 每次打开详情页都重新依次弹入（同一个游戏再次打开时内容没变，不会重建，所以单独重播） */
   function detailAnnReplay(){
@@ -24743,8 +24838,8 @@ __UI_SCRIPT__
     if (ANN_TIMER) { clearTimeout(ANN_TIMER); ANN_TIMER = null; }
   }
   function annUnreadCount(){
-    var n = 0;
-    for (var i = 0; i < ANNOUNCEMENTS.length; i++) { if (annIsUnread(ANNOUNCEMENTS[i])) { n++; } }
+    var n = 0, list = annVisible();                 /* 已关闭的公告不算未读 */
+    for (var i = 0; i < list.length; i++) { if (annIsUnread(list[i])) { n++; } }
     return n;
   }
   function annSaveSeen(){
@@ -24759,52 +24854,119 @@ __UI_SCRIPT__
   }
   /* 公告列表：React Bits <AnimatedList />（上面 #animatedList 脚本是它的原生 JS 移植）
      条目 = { title: 标题, description: 正文, meta: 日期, isNew: 未读 }；弹入动画 'pop'，点击条目展开全文 */
-  var ANN_AL = null, ANN_AL_SIG = '', ANN_DISMISSED = [];
+  var ANN_AL = null, ANN_AL_SIG = '';
   var ANN_AL_ICON = '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>';
+  uiAddT({
+    annRestore: ['Show {n} dismissed', '显示已关闭的公告（{n}）', 'Показать скрытые ({n})', '{n} ausgeblendete anzeigen',
+                 '非表示にした{n}件を表示', 'Mostrar {n} descartados', 'Kapatılan {n} duyuruyu göster', 'Mostrar {n} dispensados']
+  });
+  /* 点一下公告就关掉：已关闭的 id 记在 localStorage，之后每分钟刷新、重新打开弹窗都不会再出现；「显示已关闭」可以找回 */
+  var ANN_DISMISS_KEY = 'starline.ann.dismissed';
+  var ANN_DISMISSED = (function(){
+    try { var raw = localStorage.getItem(ANN_DISMISS_KEY); var arr = raw ? JSON.parse(raw) : []; return Array.isArray(arr) ? arr : []; }
+    catch (e) { return []; }
+  })();
+  function annKey(a){ return a.id || ((a.title || '') + '\u0001' + (a.date || '')); }
+  function annSaveDismissed(){
+    try {
+      if (ANN_DISMISSED.length > 300) { ANN_DISMISSED = ANN_DISMISSED.slice(-300); }
+      localStorage.setItem(ANN_DISMISS_KEY, JSON.stringify(ANN_DISMISSED));
+    } catch (e) {}
+  }
+  function annVisible(){ return ANNOUNCEMENTS.filter(function(a){ return ANN_DISMISSED.indexOf(annKey(a)) < 0; }); }
+  function annDismissedCount(){ return ANNOUNCEMENTS.length - annVisible().length; }
+  function annItems(){
+    return annVisible().map(function(a){
+      return { id: annKey(a), title: a.title || '', description: a.text || '', meta: a.date || '', isNew: annIsUnread(a), icon: ANN_AL_ICON };
+    });
+  }
+  function annSigOf(items){
+    return JSON.stringify(items.map(function(x){ return [x.id, x.title, x.description, x.meta, x.isNew]; })) + '|' + uiT('annNew');
+  }
   function annListOptions(items){
     return {
       items: items,
       animation: 'pop',
-      className: 'ann-al',
+      className: 'ann-al ann-al--dismiss',
       frame: false,                 /* 弹窗本身已经是一张卡片，再套一层毛玻璃外框会变成「卡片里的卡片」；想要原组件的外框改成 true */
       width: '100%',
       maxHeight: 340,
       radius: 14,
       gap: 8,
-      expandOnSelect: false,
-      onItemSelect: function(item, index){
-        var id = item && item.id != null ? String(item.id) : '';
-        if (id && ANN_DISMISSED.indexOf(id) < 0) ANN_DISMISSED.push(id);
-        if (ANN_AL) ANN_AL.remove(index);
-        ANN_AL_SIG = ''; /* 下一次宿主数据刷新时按已关闭条目过滤 */
-      },
+      dismissOnSelect: true,        /* 点击 / Enter：条目滑出消失，其余条目平滑补位 */
+      onDismissStart: annOnDismissStart,
+      onDismiss: annOnDismiss,
       newLabel: uiT('annNew')
     };
+  }
+  /* 列表底部的「显示已关闭的 N 条」：保持在最后；已存在就只更新文字（不重建，免得展开动画重播） */
+  function annSyncRestore(box){
+    var n = annDismissedCount();
+    var btn = box.querySelector('.ann-restore');
+    if (n <= 0) { if (btn) { btn.parentNode.removeChild(btn); } return; }
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'ann-restore';
+      btn.addEventListener('click', annRestoreAll);
+      box.appendChild(btn);
+    } else if (box.lastElementChild !== btn) {
+      box.appendChild(btn);
+    }
+    btn.textContent = uiT('annRestore').replace('{n}', n);
+  }
+  function annClearBox(box){                              /* 清空列表区，但保留「显示已关闭」按钮 */
+    var kids = Array.prototype.slice.call(box.children);
+    for (var i = 0; i < kids.length; i++) { if (!kids[i].classList.contains('ann-restore')) { box.removeChild(kids[i]); } }
+  }
+  function annRestoreAll(){
+    var keys = ANNOUNCEMENTS.map(annKey);
+    ANN_DISMISSED = ANN_DISMISSED.filter(function(k){ return keys.indexOf(k) < 0; });
+    annSaveDismissed();
+    annPaintBadge();
+    annRenderList();
+    if (ANN_AL) { ANN_AL.replay(); }
+  }
+  /* 关闭动画「开始」时就记账、同步签名、展开「显示已关闭」——和条目的收拢同时进行，页面内容是连续位移，不会在动画结束时突然跳一下 */
+  function annOnDismissStart(item){
+    if (ANN_DISMISSED.indexOf(item.id) < 0) { ANN_DISMISSED.push(item.id); }
+    annSaveDismissed();
+    annPaintBadge();
+    var items = annItems();
+    if (items.length) { ANN_AL_SIG = annSigOf(items); }   /* 列表由组件自己动画移除这一条，同步签名，免得下次渲染又整体重建 */
+    var box = document.getElementById('annList');
+    if (box) { annSyncRestore(box); }
+  }
+  function annOnDismiss(){                                /* 条目已经真正移除：全关完了就换成空状态 */
+    if (!annItems().length) { annRenderList(); }
   }
   function annRenderList(){
     var box = document.getElementById('annList');
     if (!box) return;
-    if (!ANNOUNCEMENTS.length) {
+    var items = annItems();
+    if (!items.length) {
       var emptyTxt = uiT('annEmpty');
-      if (ANN_STATE === 'wait') { emptyTxt = 'Loading…'; }
-      else if (ANN_STATE.indexOf('err:') === 0) { emptyTxt = 'Failed to load announcements (' + ANN_STATE.slice(4) + ')'; }
+      if (!ANNOUNCEMENTS.length) {
+        if (ANN_STATE === 'wait') { emptyTxt = 'Loading…'; }
+        else if (ANN_STATE.indexOf('err:') === 0) { emptyTxt = 'Failed to load announcements (' + ANN_STATE.slice(4) + ')'; }
+      }
       if (ANN_AL) { ANN_AL.destroy(); ANN_AL = null; ANN_AL_SIG = ''; }
-      box.innerHTML = '<div class="ann-empty">' + uiEsc(emptyTxt) + '</div>';
+      annClearBox(box);
+      box.insertAdjacentHTML('afterbegin', '<div class="ann-empty">' + uiEsc(emptyTxt) + '</div>');
+      annSyncRestore(box);
       return;
     }
-    var items = ANNOUNCEMENTS.filter(function(a){ return ANN_DISMISSED.indexOf(String(a.id)) < 0; }).map(function(a){
-      return { id: a.id, title: a.title || '', description: a.text || '', meta: a.date || '', isNew: annIsUnread(a), icon: ANN_AL_ICON };
-    });
     /* 宿主每分钟会回一次公告：内容没变就不重建，免得打开着弹窗时条目被重新弹一遍 */
-    var sig = JSON.stringify(items.map(function(x){ return [x.id, x.title, x.description, x.meta, x.isNew]; })) + '|' + uiT('annNew');
+    var sig = annSigOf(items);
     if (!ANN_AL) {
-      box.innerHTML = '';
+      annClearBox(box);
       ANN_AL = AnimatedList(box, annListOptions(items));
       ANN_AL_SIG = sig;
     } else if (sig !== ANN_AL_SIG) {
       ANN_AL_SIG = sig;
       ANN_AL.update({ items: items, newLabel: uiT('annNew') });
     }
+    annSyncRestore(box);
   }
   /* 定位：贴在图标正下方，箭头对准图标中心 */
   function annPlace(){
