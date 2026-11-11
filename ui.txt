@@ -17164,6 +17164,13 @@ html[data-theme="light"] .animated-list{
   box-sizing:border-box;border-radius:var(--al-radius);background:var(--al-tile);box-shadow:var(--al-tile-shadow);
   color:var(--al-ink);cursor:pointer;user-select:none;-webkit-user-select:none}
 .animated-list[data-animated] .animated-list__item:not([data-state]){opacity:0}
+/* 点击移除（FLIP）：条目 absolute 脱离流后淡出上移；其余条目由 JS 做 First→Last→Invert→Play */
+.animated-list__item.is-leaving{
+  pointer-events:none !important;
+  margin:0 !important;
+  box-shadow:none !important;
+  transition:opacity 280ms ease,transform 320ms cubic-bezier(.32,.72,0,1),filter 240ms ease !important;
+}
 @media (hover:hover){.animated-list__item:hover{filter:var(--al-hover)}}
 .animated-list__item[data-selected]:not(:active){filter:var(--al-active)}
 .animated-list__item:active{filter:var(--al-press)}
@@ -20085,6 +20092,96 @@ function AnimatedList(host, options){
   place(true);
   syncRing();
 
+  /* 带动画移除一条 —— 标准 FLIP
+     1) First：记下其余条目当前视口位置
+     2) 被点条目改为 absolute 脱离文档流（其余立刻补位 = Last）
+     3) Invert：其余条目用 transform 拉回 First 位置
+     4) Play：弹簧清掉 transform；同时被点条目淡出上移 */
+  function removeAt(index, doneCb){
+    if (dead || index < 0 || index >= itemEls.length) return;
+    var el = itemEls[index];
+    if (!el || el.classList.contains('is-leaving')) return;
+
+    /* First：其余条目当前位置 */
+    var first = [];
+    for (var i = 0; i < itemEls.length; i++){
+      if (i === index || !itemEls[i] || itemEls[i].classList.contains('is-leaving')) continue;
+      first.push({ el: itemEls[i], top: itemEls[i].getBoundingClientRect().top });
+    }
+
+    /* 被点条目钉在原位、脱离文档流 → 其余条目立刻落到新位置（Last） */
+    var rect = el.getBoundingClientRect();
+    var trackRect = track.getBoundingClientRect();
+    var leaveTop = rect.top - trackRect.top + track.scrollTop;
+    var leaveLeft = rect.left - trackRect.left;
+    el.style.position = 'absolute';
+    el.style.left = leaveLeft + 'px';
+    el.style.top = leaveTop + 'px';
+    el.style.width = rect.width + 'px';
+    el.style.height = rect.height + 'px';
+    el.style.zIndex = '5';
+    el.style.margin = '0';
+    el.classList.add('is-leaving');
+    el.removeAttribute('data-selected');
+    el.setAttribute('aria-hidden', 'true');
+    el.style.pointerEvents = 'none';
+
+    /* 强制 reflow，读出 Last 位置 */
+    void track.offsetHeight;
+
+    /* Invert → Play：其余条目从 First 弹到 Last */
+    first.forEach(function(a){
+      var lastTop = a.el.getBoundingClientRect().top;
+      var dy = a.top - lastTop;
+      if (Math.abs(dy) < 0.5) return;
+      a.el.style.transition = 'none';
+      a.el.style.transform = 'translate3d(0,' + dy + 'px,0)';
+    });
+    void track.offsetHeight;
+    first.forEach(function(a){
+      a.el.style.transition = transition;
+      a.el.style.transform = '';
+    });
+
+    /* 被点条目自身：淡出 + 上移缩小 */
+    void el.offsetHeight;
+    el.style.opacity = '0';
+    el.style.transform = 'translate3d(0,-14px,0) scale(0.94)';
+    el.style.filter = 'blur(2px)';
+
+    var finished = false;
+    function finish(){
+      if (finished || dead) return;
+      finished = true;
+      el.removeEventListener('transitionend', onEnd);
+      S.items.splice(index, 1);
+      if (el.parentNode) el.parentNode.removeChild(el);
+      itemEls.splice(index, 1);
+      for (var j = 0; j < itemEls.length; j++){
+        itemEls[j].setAttribute('data-index', String(j));
+        itemEls[j].id = baseId + '-' + j;
+        itemEls[j].style.transform = '';
+        itemEls[j].style.transition = '';
+      }
+      if (S.selected === index) S.selected = -1;
+      else if (S.selected > index) S.selected -= 1;
+      paintSelection();
+      measure();
+      place(true);
+      updateFades();
+      reveal(false);
+      syncRing();
+      if (typeof doneCb === 'function') doneCb();
+    }
+    function onEnd(e){
+      if (e.target !== el) return;
+      if (e.propertyName !== 'opacity' && e.propertyName !== 'transform') return;
+      finish();
+    }
+    el.addEventListener('transitionend', onEnd);
+    setTimeout(finish, 400);
+  }
+
   return {
     el: root,
     /* 换条目 / 改选项（对应 React 里 items / animation 变化触发的 useLayoutEffect）*/
@@ -20125,6 +20222,8 @@ function AnimatedList(host, options){
       updateFades();
     },
     select: function(i){ keyboard = false; setSelected(i); },
+    /* 带动画移除指定下标的条目（公告点击消失用） */
+    removeAt: removeAt,
     destroy: function(){
       dead = true;
       cancelAnimationFrame(raf);
@@ -24666,13 +24765,27 @@ __UI_SCRIPT__
   var ANN_STATE = 'wait';   /* wait = 还没收到宿主回复；ok；err:<代码> */
   var ANN_TIMER = null;
   var ANN_SEEN_KEY = 'starline.ann.seen';
+  var ANN_DISMISS_KEY = 'starline.ann.dismissed';
+  var ANN_DISMISSED = (function(){
+    try {
+      var raw = localStorage.getItem(ANN_DISMISS_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  })();
+  function annIsDismissed(a){ return !a || !a.id || ANN_DISMISSED.indexOf(a.id) >= 0; }
+  function annDismiss(id){
+    if (!id || ANN_DISMISSED.indexOf(id) >= 0) return;
+    ANN_DISMISSED.push(id);
+    try { localStorage.setItem(ANN_DISMISS_KEY, JSON.stringify(ANN_DISMISSED)); } catch (e) {}
+  }
   var ANN_SEEN = (function(){
     try {
       var raw = localStorage.getItem(ANN_SEEN_KEY);
       return raw ? JSON.parse(raw) : [];
     } catch (e) { return []; }
   })();
-  function annIsUnread(a){ return ANN_SEEN.indexOf(a.id) < 0; }
+  function annIsUnread(a){ return a && a.id && ANN_SEEN.indexOf(a.id) < 0 && !annIsDismissed(a); }
   /* 等宿主回包：8 秒没动静就把状态从 wait 改成 err:TIMEOUT（避免界面一直显示 Loading…） */
   function annWait(){
     ANN_STATE = 'wait';
@@ -24686,7 +24799,9 @@ __UI_SCRIPT__
   }
   function annUnreadCount(){
     var n = 0;
-    for (var i = 0; i < ANNOUNCEMENTS.length; i++) { if (annIsUnread(ANNOUNCEMENTS[i])) { n++; } }
+    for (var i = 0; i < ANNOUNCEMENTS.length; i++) {
+      if (!annIsDismissed(ANNOUNCEMENTS[i]) && annIsUnread(ANNOUNCEMENTS[i])) n++;
+    }
     return n;
   }
   function annSaveSeen(){
@@ -24700,7 +24815,7 @@ __UI_SCRIPT__
     if (dot) dot.hidden = !(un > 0);
   }
   /* 公告列表：React Bits <AnimatedList />（上面 #animatedList 脚本是它的原生 JS 移植）
-     条目 = { title: 标题, description: 正文, meta: 日期, isNew: 未读 }；弹入动画 'pop'，点击条目展开全文 */
+     条目 = { title, description, meta, isNew }；弹入动画 'pop'；点击整条 → 动画消失并记住已清除 */
   var ANN_AL = null, ANN_AL_SIG = '';
   var ANN_AL_ICON = '<svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>';
   function annListOptions(items){
@@ -24713,22 +24828,39 @@ __UI_SCRIPT__
       maxHeight: 340,
       radius: 14,
       gap: 8,
-      expandOnSelect: true,
-      newLabel: uiT('annNew')
+      expandOnSelect: false,        /* 顶栏公告：点击整条消失（带动画），不再展开正文 */
+      newLabel: uiT('annNew'),
+      onItemSelect: function(item, index){
+        if (item && item.id) annDismiss(item.id);
+        if (ANN_AL) {
+          ANN_AL.removeAt(index, function(){
+            /* 最后一条消完后显示空状态 */
+            if (!ANN_AL || !ANN_AL.el) return;
+            var left = (ANN_AL.el.querySelectorAll && ANN_AL.el.querySelectorAll('.animated-list__item:not(.is-leaving)')) || [];
+            if (left.length === 0) {
+              var box = document.getElementById('annList');
+              if (ANN_AL) { ANN_AL.destroy(); ANN_AL = null; ANN_AL_SIG = ''; }
+              if (box) box.innerHTML = '<div class="ann-empty">' + uiEsc(uiT('annEmpty')) + '</div>';
+            }
+          });
+        }
+        annPaintBadge();
+      }
     };
   }
   function annRenderList(){
     var box = document.getElementById('annList');
     if (!box) return;
-    if (!ANNOUNCEMENTS.length) {
+    var visible = ANNOUNCEMENTS.filter(function(a){ return !annIsDismissed(a); });
+    if (!visible.length) {
       var emptyTxt = uiT('annEmpty');
-      if (ANN_STATE === 'wait') { emptyTxt = 'Loading…'; }
+      if (ANN_STATE === 'wait' && ANNOUNCEMENTS.length === 0) { emptyTxt = 'Loading…'; }
       else if (ANN_STATE.indexOf('err:') === 0) { emptyTxt = 'Failed to load announcements (' + ANN_STATE.slice(4) + ')'; }
       if (ANN_AL) { ANN_AL.destroy(); ANN_AL = null; ANN_AL_SIG = ''; }
       box.innerHTML = '<div class="ann-empty">' + uiEsc(emptyTxt) + '</div>';
       return;
     }
-    var items = ANNOUNCEMENTS.map(function(a){
+    var items = visible.map(function(a){
       return { id: a.id, title: a.title || '', description: a.text || '', meta: a.date || '', isNew: annIsUnread(a), icon: ANN_AL_ICON };
     });
     /* 宿主每分钟会回一次公告：内容没变就不重建，免得打开着弹窗时条目被重新弹一遍 */
