@@ -15423,48 +15423,6 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
    颜色全部取主题变量（--surface / --border / --text / --accent…），浅色 / 深色 / 自定义主题都会自动跟随 */
 .detail-ann{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
 .detail-ann[hidden]{display:none}
-.ann-item{
-  position:relative;display:flex;align-items:flex-start;gap:14px;
-  padding:14px 20px 14px 22px;overflow:hidden;
-  border-radius:var(--radius-lg);
-  background:var(--surface);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--border);
-  box-shadow:var(--shadow-1);
-  animation:annIn .45s cubic-bezier(.4,0,.2,1) both;
-}
-/* 左侧强调条 + 轻微强调色渐变底，和 .section h2 的竖条同一语言 */
-.ann-item::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
-  background:linear-gradient(180deg,var(--accent),var(--accent-3));
-  box-shadow:0 0 10px var(--accent-glow);
-}
-.ann-item::after{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(90deg,var(--accent-soft),transparent 60%);
-}
-.ann-ico,.ann-body{position:relative;z-index:1}
-.ann-ico{
-  width:34px;height:34px;flex-shrink:0;border-radius:var(--radius-sm);
-  display:grid;place-items:center;
-  color:var(--accent);background:var(--accent-soft);
-  border:1px solid var(--accent-glow);
-}
-.ann-ico svg{width:18px;height:18px;fill:none;stroke:currentColor;
-  stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round}
-.ann-body{flex:1;min-width:0}
-.ann-tag{
-  font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
-  color:var(--accent);margin-bottom:3px;
-}
-.ann-text{
-  font-size:13.5px;line-height:1.65;color:var(--text);
-  white-space:pre-wrap;overflow-wrap:anywhere;
-}
-@keyframes annIn{
-  from{opacity:0;transform:translateY(-6px)}
-  to{opacity:1;transform:none}
-}
 .section{margin-bottom:36px}
 .section h2{
   font-size:18px;font-weight:800;letter-spacing:-.4px;
@@ -17166,26 +17124,6 @@ __UI_MARKUP__
 .ann-list::-webkit-scrollbar{width:8px}
 .ann-list::-webkit-scrollbar-thumb{background:var(--border-2);border-radius:4px}
 
-.ann-item{display:flex;gap:11px;padding:11px 4px;border-bottom:1px solid var(--border)}
-.ann-item:last-child{border-bottom:0}
-.ann-item-ico{
-  width:26px;height:26px;flex-shrink:0;border-radius:8px;
-  display:grid;place-items:center;
-  background:var(--accent-soft);color:var(--accent-2);
-}
-.ann-item-ico svg{width:13px;height:13px;fill:none;stroke:currentColor;
-  stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ann-item-body{flex:1;min-width:0}
-.ann-item-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.ann-item-title{font-size:12.5px;font-weight:700;color:var(--text)}
-.ann-item-new{
-  font-size:9px;font-weight:800;letter-spacing:.4px;
-  padding:1px 7px;border-radius:999px;
-  background:var(--accent-soft);color:var(--accent-2);
-  border:1px solid var(--border);
-}
-.ann-item-txt{margin-top:4px;font-size:12px;line-height:1.55;color:var(--text-2);word-break:break-word}
-.ann-item-date{margin-top:5px;font-size:10.5px;color:var(--text-3)}
 
 /* ═════════ AnimatedList（React Bits）—— 公告弹窗列表 ═════════
    组件原版 CSS + 把它的调色变量映射到应用自己的主题变量（亮 / 暗主题自动跟随，选中环用主题强调色） */
@@ -17240,7 +17178,7 @@ html[data-theme="light"] .animated-list{
   background:var(--accent-soft);color:var(--accent-2);border:1px solid var(--border)}
 /* 公告正文：默认两行省略，点击条目展开全文（原组件是单行省略，公告读不全，所以加了这个） */
 .animated-list__description{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
-  font-size:13px;line-height:1.4;color:var(--al-muted);word-break:break-word;white-space:normal}
+  font-size:13px;line-height:1.4;color:var(--al-muted);word-break:break-word;white-space:pre-line}
 .animated-list__item[data-open] .animated-list__description{display:block;-webkit-line-clamp:unset}
 .animated-list__item[data-open] .animated-list__title-text{overflow:visible;text-overflow:clip;white-space:normal}
 .animated-list__meta{flex:none;font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--al-muted)}
@@ -17254,6 +17192,10 @@ html[data-theme="light"] .animated-list{
 .ann-al .animated-list__title{font-size:13.5px}
 .ann-al .animated-list__description{font-size:12.5px}
 .ann-empty{padding:22px 8px 16px;font-size:12px;color:var(--text-3);text-align:center}
+/* 游戏详情页的公告（games.txt 的 Announcement1/2/…）：同一套 AnimatedList，容器是整行宽，所以正文默认三行、字号略大 */
+.ann-al--detail .animated-list__lead{width:38px;height:38px}
+.ann-al--detail .animated-list__title{font-size:14px}
+.ann-al--detail .animated-list__description{-webkit-line-clamp:3;font-size:13.5px;line-height:1.55}
 </style>
 <!-- 信息图标：我提交的游戏 + 管理员的回复 -->
 <div class="req-modal" id="inboxModal" onmousedown="if(event.target===this)closeInbox()">
@@ -22607,11 +22549,15 @@ __UI_SCRIPT__
   }
   var ANN_ICON = '<svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/>'
                + '<path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+  /* 详情页公告：和商店顶栏的 Announcements 弹窗是同一套 React Bits <AnimatedList />（#animatedList 脚本）
+     条目 = { title: 「Announcement N」, description: games.txt 里的正文, icon: 喇叭 }；点击条目展开全文 */
+  var DETAIL_AL = null;
   function renderDetailAnn(g){
     var box = document.getElementById('detailAnn');
     if (!box) return;
     var list = detailAnnouncements(GAMES[g]);
     if (!list.length) {
+      if (DETAIL_AL) { DETAIL_AL.destroy(); DETAIL_AL = null; }
       box.hidden = true;
       box.innerHTML = '';
       box.removeAttribute('data-sig');
@@ -22619,20 +22565,33 @@ __UI_SCRIPT__
     }
     var label = uiT('announcement');
     var sig = g + '\u0001' + label + '\u0001' + list.join('\u0001');
-    if (!box.hidden && box.getAttribute('data-sig') === sig) return;   /* 没变就不重建，避免重复播动画 */
-    var html = '';
-    for (var i = 0; i < list.length; i++) {
-      html += '<div class="ann-item">'
-            +   '<div class="ann-ico">' + ANN_ICON + '</div>'
-            +   '<div class="ann-body">'
-            +     '<div class="ann-tag">' + uiEsc(label + (list.length > 1 ? ' ' + (i + 1) : '')) + '</div>'
-            +     '<div class="ann-text">' + uiEsc(list[i]) + '</div>'
-            +   '</div>'
-            + '</div>';
+    if (!box.hidden && DETAIL_AL && box.getAttribute('data-sig') === sig) return;   /* 没变就不重建，避免重复播动画 */
+    var items = list.map(function(text, i){
+      return { id: i, title: label + (list.length > 1 ? ' ' + (i + 1) : ''), description: text, icon: ANN_ICON };
+    });
+    box.hidden = false;                                  /* 先显示出来再建，组件要量尺寸 */
+    if (!DETAIL_AL) {
+      box.innerHTML = '';
+      DETAIL_AL = AnimatedList(box, {
+        items: items,
+        animation: 'pop',
+        className: 'ann-al ann-al--detail',
+        frame: false,
+        width: '100%',
+        maxHeight: 400,
+        radius: 14,
+        gap: 8,
+        expandOnSelect: true
+      });
+    } else {
+      DETAIL_AL.update({ items: items });
     }
-    box.innerHTML = html;
     box.setAttribute('data-sig', sig);
-    box.hidden = false;
+  }
+  /* 每次打开详情页都重新依次弹入（同一个游戏再次打开时内容没变，不会重建，所以单独重播） */
+  function detailAnnReplay(){
+    var box = document.getElementById('detailAnn');
+    if (DETAIL_AL && box && !box.hidden) { DETAIL_AL.replay(); }
   }
 
   function renderDetailTexts(g){
@@ -23087,6 +23046,7 @@ __UI_SCRIPT__
     DETAIL_TK++;
     document.getElementById('detail').classList.remove('closing');
     document.getElementById('detail').classList.add('open');
+    detailAnnReplay();      /* 游戏公告每次打开都重新依次弹入 */
     /* 清掉可能残留的退场动画，避免下一次返回时页面错过这拍 */
     document.getElementById('storePage').classList.remove('page-back');
     document.getElementById('profilePage').classList.remove('page-back');
