@@ -22634,10 +22634,15 @@ __UI_SCRIPT__
         maxHeight: 400,
         radius: 14,
         gap: 8,
-        expandOnSelect: true
+        expandOnSelect: false,
+        onItemSelect: function(item, index){ DETAIL_AL.remove(index); }
       });
     } else {
-      DETAIL_AL.update({ items: items });
+      DETAIL_AL.update({
+        items: items,
+        expandOnSelect: false,
+        onItemSelect: function(item, index){ DETAIL_AL.remove(index); }
+      });
     }
     box.setAttribute('data-sig', sig);
   }
