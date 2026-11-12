@@ -2556,7 +2556,9 @@ var UI_LAYOUT_KEY = { 'rail-l':'layoutRailL', 'rail-r':'layoutRailR',
 
 
 var UI_CHANGELOG = [
-  { v:'3.1.7', date:'2026-11-09', tag:'latest',
+  { v:'3.1.8', date:'2026-11-12', tag:'latest',
+    en:['Optimized some features.'] },
+  { v:'3.1.7', date:'2026-11-09',
     en:['Added, fixed, and optimized some features.'] },
   { v:'3.1.2', date:'2026-10-24',
     en:['A lot of new things have been added.'] },
@@ -16242,7 +16244,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
       </div>
       <div class="sb-brand-text">
         <b>STARLINE</b>
-        <span id="sbVer">v3.1.7</span>
+        <span id="sbVer">v3.1.8</span>
       </div>
     </div>
     <nav class="sb-nav">
