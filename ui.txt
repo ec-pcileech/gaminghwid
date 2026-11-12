@@ -9143,6 +9143,27 @@ uiAddT({
 var UI_TC_KEY = 'starline.targetCursor.off';
 /* 维护页文案「Under Maintenance」：8 种内置语言；用 uiAddT 写入，所以也会自动出现在「自定义翻译」编辑器里 */
 uiAddT({ mtUnderMaintenance: ['Under Maintenance', '维护中', 'Технические работы', 'Wartungsarbeiten', 'メンテナンス中', 'En mantenimiento', 'Bakımda', 'Em manutenção'] });
+/* 游戏状态：可用 / 更新中 / 过时（卡片角标、「状态与订阅」弹窗、详情页）+ 两条「无法启动」提示。
+   以前只有 en + zh，其他 6 种语言都回退英文。en / zh 传 '' = 保持原值不动；这些词条在 UI_T.en 里，所以也会自动出现在「自定义翻译」编辑器中。 */
+uiAddT({
+  statusAvailable: ['', '', 'Доступно', 'Verfügbar', '利用可能', 'Disponible', 'Kullanılabilir', 'Disponível'],
+  statusUpdating: ['', '', 'Обновляется', 'Update läuft', '更新中', 'Actualizando', 'Güncelleniyor', 'Atualizando'],
+  statusOutdated: ['', '', 'Устарело', 'Veraltet', '旧バージョン', 'Obsoleto', 'Güncel değil', 'Desatualizado'],
+  gameUpdatingCannotLaunch: ['', '',
+    'Игра сейчас обновляется — запуск пока невозможен.',
+    'Das Spiel wird gerade aktualisiert und kann nicht gestartet werden.',
+    'このゲームは現在更新中のため、起動できません。',
+    'Este juego se está actualizando y no se puede iniciar.',
+    'Bu oyun şu anda güncelleniyor ve başlatılamıyor.',
+    'Este jogo está sendo atualizado e não pode ser iniciado.'],
+  gameOutdatedCannotLaunch: ['', '',
+    'Версия игры устарела, запуск невозможен. Дождитесь выхода новой версии.',
+    'Diese Spielversion ist veraltet und kann nicht gestartet werden. Bitte auf die neueste Version warten.',
+    'このゲームのバージョンは古いため、起動できません。最新バージョンの公開までお待ちください。',
+    'La versión de este juego está obsoleta y no se puede iniciar. Espera a la versión más reciente.',
+    'Bu oyun sürümü güncel değil ve başlatılamıyor. Lütfen en son sürümü bekleyin.',
+    'A versão deste jogo está desatualizada e não pode ser iniciada. Aguarde a versão mais recente.']
+});
 var UI_TC_SELECTOR = '.cursor-target,button:not(:disabled),a[href],[onclick],[role="button"],select,label.bg-switch,label.rem-row,.card';
 var UI_TCURSOR = (function () {
   try { if (UI_CFG && typeof UI_CFG.targetCursor === 'boolean') { return UI_CFG.targetCursor; } } catch (e) {}
@@ -9205,7 +9226,12 @@ function uiSegLayout(seg, value){
     btns[i].tabIndex = on ? 0 : -1;
     if (on) active = btns[i];
   }
-  if (!thumb || !active || !active.offsetWidth) return;     /* 面板还没显示（宽度为 0）：等 ResizeObserver 再量 */
+  uiSegPlace(thumb, active);
+}
+/* 把滑块摆到 active 按钮上（卡片特效 / 瞄准光标 / 商店的「卡片·列表」与「全部·已拥有·未拥有·收藏」共用，所以移动效果完全一致）。
+   面板还没显示（宽度为 0）时什么都不做并返回 false：等 ResizeObserver 再量 */
+function uiSegPlace(thumb, active){
+  if (!thumb || !active || !active.offsetWidth) return false;
   var first = !thumb.classList.contains('ready');
   if (first) thumb.style.transition = 'none';
   thumb.style.width = active.offsetWidth + 'px';
@@ -9213,6 +9239,7 @@ function uiSegLayout(seg, value){
   thumb.style.transform = 'translate(' + active.offsetLeft + 'px,' + active.offsetTop + 'px)';
   thumb.classList.add('ready');
   if (first){ void thumb.offsetWidth; thumb.style.transition = ''; }
+  return true;
 }
 /* 方向键在选项之间切换（radiogroup 的标准行为） */
 function uiSegKeys(seg, values, getValue, setValue){
@@ -9245,6 +9272,31 @@ function uiCardFxLayout(){
 function uiCardFxSet(mode){ CardFx.set(mode); }
 window.uiCardFxSet = uiCardFxSet;
 window.uiCardFxLayout = uiCardFxLayout;
+
+/* 商店：「卡片 / 列表」切换 + 「全部 / 已拥有 / 未拥有 / 收藏」筛选的滑动高亮。
+   摆放用上面共用的 uiSegPlace、重新量用 uiSegWatch，所以和「个人偏好 ▸ 卡片特效」的移动效果完全一致。
+   滑块在第一次调用时才创建：选中态由 JS 决定的初始值（例如存下来的「列表」视图）不会在启动时滑一下。
+   滑块量不出来（面板还没显示）时没有 .thumb-on，按钮自己的渐变选中态照常显示，不会出现没有高亮的空窗。 */
+function uiStoreSegLayout(box){
+  if (!box) return;
+  var thumb = null, active = null, i, c;
+  for (i = 0; i < box.children.length; i++){
+    c = box.children[i];
+    if (c.classList.contains('sl-seg-thumb')) thumb = c;
+    else if (c.tagName === 'BUTTON' && c.classList.contains('active')) active = c;
+  }
+  if (!thumb){
+    thumb = document.createElement('span');
+    thumb.className = 'sl-seg-thumb';
+    thumb.setAttribute('aria-hidden', 'true');
+    box.insertBefore(thumb, box.firstChild);
+    box.classList.add('sl-seg');
+    uiSegWatch(box, function(){ uiStoreSegLayout(box); });
+    return;                                         /* uiSegWatch 会立刻调一次 relayout，那一次就是首次摆放 */
+  }
+  if (uiSegPlace(thumb, active)) box.classList.add('thumb-on');
+}
+window.uiStoreSegLayout = uiStoreSegLayout;
 (function(){
   var seg = document.getElementById('cardFxSeg');
   if (!seg) return;
@@ -14488,6 +14540,20 @@ body.dragging .qp-drop-hint{display:block}
 .store-view-btn:hover{color:var(--text);background:var(--surface-2);transform:translateY(-1px)}
 .store-view-btn.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2));border-color:transparent;box-shadow:0 3px 10px var(--accent-glow)}
 .store-view-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* ── 商店：「卡片 / 列表」切换 + 「全部 / 已拥有 / 未拥有 / 收藏」筛选：滑动高亮 ──
+   和「偏好设置 ▸ 卡片特效」（.fx-seg）同一套手法、同一条弹性曲线（width / transform .46s cubic-bezier(.34,1.32,.5,1)，带轻微回弹）。
+   滑块就是原来的渐变选中态本身，所以外观不变、只是会动了：滑块就位后（.thumb-on）按钮自己的渐变选中态让位给滑块；
+   滑块量不出来（面板还没显示）时没有 .thumb-on，按钮自己的渐变选中态照常显示。 */
+.sl-seg{position:relative;isolation:isolate}
+.sl-seg>button{position:relative;z-index:1}
+.sl-seg-thumb{position:absolute;left:0;top:0;z-index:0;border-radius:var(--radius-full);
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 4px 14px var(--accent-glow);
+  opacity:0;pointer-events:none;will-change:transform,width}
+.store-view-switch .sl-seg-thumb{box-shadow:0 3px 10px var(--accent-glow)}
+.sl-seg-thumb.ready{opacity:1;
+  transition:transform .46s cubic-bezier(.34,1.32,.5,1),width .46s cubic-bezier(.34,1.32,.5,1),height .3s ease,opacity .2s ease}
+.sl-seg.thumb-on>button.active,.sl-seg.thumb-on>button.active:hover{background:transparent;box-shadow:none;border-color:transparent;transform:none}
+@media (prefers-reduced-motion:reduce){.sl-seg-thumb.ready{transition:none}}
 @media(max-width:760px){.sec-tools{width:100%;justify-content:flex-start}.store-view-switch{order:0}.genre-wrap{order:1}.sec-filter{order:2;max-width:100%;overflow-x:auto}.sec-filter button{padding:6px 10px;white-space:nowrap}}
 /* ── 类型筛选：单图标圆形按钮；弹出菜单带指向按钮的箭头 ── */
 .genre-wrap{position:relative;display:flex;align-items:center}
@@ -21202,6 +21268,7 @@ __UI_SCRIPT__
     document.querySelectorAll('#secFilter button').forEach(function(b){
       b.classList.toggle('active', b.getAttribute('data-filter') === f);
     });
+    uiStoreSegLayout(document.getElementById('secFilter'));     /* 高亮滑块滑到新的选中项（先于 renderGrid，让动画尽早开始）*/
     renderGrid();
   }
 
@@ -21364,6 +21431,7 @@ __UI_SCRIPT__
       b.title = uiT(key);
       b.setAttribute('aria-label', uiT(key));
     });
+    uiStoreSegLayout(document.getElementById('storeViewSwitch'));   /* 高亮滑块滑到新的选中项 */
     renderColsOpts();
   }
   function setLayout(mode){
@@ -24410,6 +24478,7 @@ __UI_SCRIPT__
     if (!btn) return;
     setFilter(btn.getAttribute('data-filter'));
   });
+  uiStoreSegLayout(document.getElementById('secFilter'));         /* 初次摆放高亮滑块（此时选中项是标记里的「全部」）*/
 
   function onHeroBuy(){
     if (hasLic(HERO_GAME)) {
@@ -25355,15 +25424,22 @@ __UI_SCRIPT__
 <script>
 /* ═══════ 搜索栏 Ctrl+K：主题切换 / 消息树 / FAQ / 全部游戏；消息点开后在右侧弹出带箭头的内容框 ═══════ */
 (function(){
+  /* ru de ja es tr pt：以前只有 4 条，其余（筛选 / 操作 / 最近搜索 / 清除）都回退英文，现已补齐 */
   var T={
     en:{skAll:'All',skScopeGames:'Games',skScopeFaq:'FAQ',skScopeMsgs:'Messages',skScopeActions:'Actions',skActions:'Actions',skRecent:'Recent searches',skClear:'Clear',skActSettings:'Settings',skActLog:'Update log',skActLang:'Language',skActStatus:'Status & subscriptions',skActWorld:'World online map',skActKeys:'Keyboard shortcuts',skActRenew:'Renew a subscription',skActProfile:'Profile',skGames:'All games',skNoMatch:'No matching games',skTip:'to close',skBtnTitle:'Messages, FAQ & games (Ctrl+K)'},
     zh:{skAll:'全部',skScopeGames:'游戏',skScopeFaq:'FAQ',skScopeMsgs:'消息',skScopeActions:'操作',skActions:'操作',skRecent:'最近搜索',skClear:'清除',skActSettings:'设置',skActLog:'更新日志',skActLang:'语言',skActStatus:'状态与订阅',skActWorld:'世界在线地图',skActKeys:'键盘快捷键',skActRenew:'续费订阅',skActProfile:'个人资料',skGames:'全部游戏',skNoMatch:'没有匹配的游戏',skTip:'关闭',skBtnTitle:'消息、FAQ 与全部游戏（Ctrl+K）'},
-    ru:{skGames:'Все игры',skNoMatch:'Игры не найдены',skTip:'закрыть',skBtnTitle:'Сообщения, FAQ и игры (Ctrl+K)'},
-    de:{skGames:'Alle Spiele',skNoMatch:'Keine passenden Spiele',skTip:'schließen',skBtnTitle:'Nachrichten, FAQ & Spiele (Ctrl+K)'},
-    ja:{skGames:'すべてのゲーム',skNoMatch:'一致するゲームがありません',skTip:'閉じる',skBtnTitle:'メッセージ・FAQ・ゲーム（Ctrl+K）'},
-    es:{skGames:'Todos los juegos',skNoMatch:'No hay juegos coincidentes',skTip:'cerrar',skBtnTitle:'Mensajes, FAQ y juegos (Ctrl+K)'},
-    tr:{skGames:'Tüm oyunlar',skNoMatch:'Eşleşen oyun yok',skTip:'kapat',skBtnTitle:'Mesajlar, SSS ve oyunlar (Ctrl+K)'},
-    pt:{skGames:'Todos os jogos',skNoMatch:'Nenhum jogo encontrado',skTip:'fechar',skBtnTitle:'Mensagens, FAQ e jogos (Ctrl+K)'}
+    ru:{skGames:'Все игры',skNoMatch:'Игры не найдены',skTip:'закрыть',skBtnTitle:'Сообщения, FAQ и игры (Ctrl+K)',
+      skAll:'Все',skScopeGames:'Игры',skScopeFaq:'FAQ',skScopeMsgs:'Сообщения',skScopeActions:'Действия',skActions:'Действия',skRecent:'Недавние запросы',skClear:'Очистить',skActSettings:'Настройки',skActLog:'Журнал обновлений',skActLang:'Язык',skActStatus:'Статус и подписки',skActWorld:'Карта игроков онлайн',skActKeys:'Горячие клавиши',skActRenew:'Продлить подписку',skActProfile:'Профиль'},
+    de:{skGames:'Alle Spiele',skNoMatch:'Keine passenden Spiele',skTip:'schließen',skBtnTitle:'Nachrichten, FAQ & Spiele (Ctrl+K)',
+      skAll:'Alle',skScopeGames:'Spiele',skScopeFaq:'FAQ',skScopeMsgs:'Nachrichten',skScopeActions:'Aktionen',skActions:'Aktionen',skRecent:'Letzte Suchen',skClear:'Löschen',skActSettings:'Einstellungen',skActLog:'Änderungsprotokoll',skActLang:'Sprache',skActStatus:'Status & Abos',skActWorld:'Weltkarte der Online-Spieler',skActKeys:'Tastenkürzel',skActRenew:'Abo verlängern',skActProfile:'Profil'},
+    ja:{skGames:'すべてのゲーム',skNoMatch:'一致するゲームがありません',skTip:'閉じる',skBtnTitle:'メッセージ・FAQ・ゲーム（Ctrl+K）',
+      skAll:'すべて',skScopeGames:'ゲーム',skScopeFaq:'FAQ',skScopeMsgs:'メッセージ',skScopeActions:'アクション',skActions:'アクション',skRecent:'最近の検索',skClear:'クリア',skActSettings:'設定',skActLog:'更新履歴',skActLang:'言語',skActStatus:'ステータスとサブスク',skActWorld:'オンライン世界マップ',skActKeys:'キーボードショートカット',skActRenew:'サブスクを更新',skActProfile:'プロフィール'},
+    es:{skGames:'Todos los juegos',skNoMatch:'No hay juegos coincidentes',skTip:'cerrar',skBtnTitle:'Mensajes, FAQ y juegos (Ctrl+K)',
+      skAll:'Todos',skScopeGames:'Juegos',skScopeFaq:'FAQ',skScopeMsgs:'Mensajes',skScopeActions:'Acciones',skActions:'Acciones',skRecent:'Búsquedas recientes',skClear:'Borrar',skActSettings:'Ajustes',skActLog:'Registro de cambios',skActLang:'Idioma',skActStatus:'Estado y suscripciones',skActWorld:'Mapa mundial en línea',skActKeys:'Atajos de teclado',skActRenew:'Renovar suscripción',skActProfile:'Perfil'},
+    tr:{skGames:'Tüm oyunlar',skNoMatch:'Eşleşen oyun yok',skTip:'kapat',skBtnTitle:'Mesajlar, SSS ve oyunlar (Ctrl+K)',
+      skAll:'Tümü',skScopeGames:'Oyunlar',skScopeFaq:'SSS',skScopeMsgs:'Mesajlar',skScopeActions:'Eylemler',skActions:'Eylemler',skRecent:'Son aramalar',skClear:'Temizle',skActSettings:'Ayarlar',skActLog:'Güncelleme günlüğü',skActLang:'Dil',skActStatus:'Durum ve abonelikler',skActWorld:'Dünya çevrimiçi haritası',skActKeys:'Klavye kısayolları',skActRenew:'Aboneliği yenile',skActProfile:'Profil'},
+    pt:{skGames:'Todos os jogos',skNoMatch:'Nenhum jogo encontrado',skTip:'fechar',skBtnTitle:'Mensagens, FAQ e jogos (Ctrl+K)',
+      skAll:'Todos',skScopeGames:'Jogos',skScopeFaq:'FAQ',skScopeMsgs:'Mensagens',skScopeActions:'Ações',skActions:'Ações',skRecent:'Buscas recentes',skClear:'Limpar',skActSettings:'Configurações',skActLog:'Histórico de atualizações',skActLang:'Idioma',skActStatus:'Status e assinaturas',skActWorld:'Mapa mundial online',skActKeys:'Atalhos de teclado',skActRenew:'Renovar assinatura',skActProfile:'Perfil'}
   };
   for(var c in UI_T){var e=T[c]||T.en;for(var k in e)UI_T[c][k]=e[k];}
 
