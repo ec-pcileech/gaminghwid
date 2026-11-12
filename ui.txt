@@ -2556,7 +2556,7 @@ var UI_LAYOUT_KEY = { 'rail-l':'layoutRailL', 'rail-r':'layoutRailR',
 
 
 var UI_CHANGELOG = [
-  { v:'3.1.7', date:'2026-11-09', tag:'latest'
+  { v:'3.1.7', date:'2026-11-09', tag:'latest',
     en:['Added, fixed, and optimized some features.'] },
   { v:'3.1.2', date:'2026-10-24',
     en:['A lot of new things have been added.'] },
@@ -14543,7 +14543,9 @@ body.dragging .qp-drop-hint{display:block}
 /* ── 商店：「卡片 / 列表」切换 + 「全部 / 已拥有 / 未拥有 / 收藏」筛选：滑动高亮 ──
    和「偏好设置 ▸ 卡片特效」（.fx-seg）同一套手法、同一条弹性曲线（width / transform .46s cubic-bezier(.34,1.32,.5,1)，带轻微回弹）。
    滑块就是原来的渐变选中态本身，所以外观不变、只是会动了：滑块就位后（.thumb-on）按钮自己的渐变选中态让位给滑块；
-   滑块量不出来（面板还没显示）时没有 .thumb-on，按钮自己的渐变选中态照常显示。 */
+   滑块量不出来（面板还没显示）时没有 .thumb-on，按钮自己的渐变选中态照常显示。
+   注意：这里刻意没有 prefers-reduced-motion 开关——「卡片特效」的 .fx-seg 没有，而用户要的就是和它一样的移动效果；
+   关了 Windows「显示动画」的机器上 WebView2 会报 reduced-motion，加了开关会让这些按钮瞬间到位、完全没有移动。 */
 .sl-seg{position:relative;isolation:isolate}
 .sl-seg>button{position:relative;z-index:1}
 .sl-seg-thumb{position:absolute;left:0;top:0;z-index:0;border-radius:var(--radius-full);
@@ -14553,7 +14555,6 @@ body.dragging .qp-drop-hint{display:block}
 .sl-seg-thumb.ready{opacity:1;
   transition:transform .46s cubic-bezier(.34,1.32,.5,1),width .46s cubic-bezier(.34,1.32,.5,1),height .3s ease,opacity .2s ease}
 .sl-seg.thumb-on>button.active,.sl-seg.thumb-on>button.active:hover{background:transparent;box-shadow:none;border-color:transparent;transform:none}
-@media (prefers-reduced-motion:reduce){.sl-seg-thumb.ready{transition:none}}
 @media(max-width:760px){.sec-tools{width:100%;justify-content:flex-start}.store-view-switch{order:0}.genre-wrap{order:1}.sec-filter{order:2;max-width:100%;overflow-x:auto}.sec-filter button{padding:6px 10px;white-space:nowrap}}
 /* ── 类型筛选：单图标圆形按钮；弹出菜单带指向按钮的箭头 ── */
 .genre-wrap{position:relative;display:flex;align-items:center}
@@ -16392,10 +16393,10 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
         <div class="sec-spacer"></div>
         <div class="sec-tools">
           <div class="store-view-switch" id="storeViewSwitch" role="group" aria-label="Game display mode">
-            <button class="store-view-btn" type="button" data-store-layout="grid" data-ui-title="layoutGrid" title="Cards" aria-label="Cards" aria-pressed="true" onclick="setLayout('grid')">
+            <button class="store-view-btn" type="button" data-store-layout="grid" data-ui-title="layoutGrid" title="Cards" aria-label="Cards" aria-pressed="true" onclick="setLayout('grid',true)">
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></svg>
           </button>
-          <button class="store-view-btn" type="button" data-store-layout="list" data-ui-title="layoutList" title="List" aria-label="List" aria-pressed="false" onclick="setLayout('list')">
+          <button class="store-view-btn" type="button" data-store-layout="list" data-ui-title="layoutList" title="List" aria-label="List" aria-pressed="false" onclick="setLayout('list',true)">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><rect x="3" y="4" width="3.5" height="4" rx=".7"/><rect x="3" y="10" width="3.5" height="4" rx=".7"/><rect x="3" y="16" width="3.5" height="4" rx=".7"/></svg>
           </button>
           </div>
@@ -21263,13 +21264,24 @@ __UI_SCRIPT__
   function saveGridOrder(){ wv('UI_GORDER:' + GRID_ORDER.join(',')); }
 
 
-  function setFilter(f){
+  /* 工具栏（全部 / 已拥有 / 未拥有 / 收藏、卡片 / 列表）的点击：先让高亮滑块滑起来，再做 renderGrid。
+     renderGrid 会同步重建整个网格（innerHTML）并让 CardFx 建画布 / 传纹理，要占住主线程一阵子；
+     如果和滑块动画同时开始，滑块的 width 过渡（主线程动画）就会「卡一下，然后一阵就过去」。
+     延迟 GRID_DEFER_MS：此时滑块已经基本到位（弹性曲线大约走到 35% 就到达目标），只剩回弹的尾巴；
+     连点几个时只渲染最后一次；别处直接调 renderGrid（含 setFilter / setLayout 不带 smooth）会取消还没执行的延迟渲染。 */
+  var GRID_DEFER = 0;
+  var GRID_DEFER_MS = 180;
+  function deferGridRender(){
+    clearTimeout(GRID_DEFER);
+    GRID_DEFER = setTimeout(function(){ GRID_DEFER = 0; renderGrid(); }, GRID_DEFER_MS);
+  }
+  function setFilter(f, smooth){
     FILTER = f;
     document.querySelectorAll('#secFilter button').forEach(function(b){
       b.classList.toggle('active', b.getAttribute('data-filter') === f);
     });
     uiStoreSegLayout(document.getElementById('secFilter'));     /* 高亮滑块滑到新的选中项（先于 renderGrid，让动画尽早开始）*/
-    renderGrid();
+    if (smooth) deferGridRender(); else renderGrid();
   }
 
   /* ── 按 Genres 筛选 ───────────────────────────────────────────────────
@@ -21434,13 +21446,13 @@ __UI_SCRIPT__
     uiStoreSegLayout(document.getElementById('storeViewSwitch'));   /* 高亮滑块滑到新的选中项 */
     renderColsOpts();
   }
-  function setLayout(mode){
+  function setLayout(mode, smooth){
     mode = (mode === 'list') ? 'list' : 'grid';
     if (mode === LAYOUT) { renderLayoutOpts(); return; }
     LAYOUT = mode;
     wv('UI_LAYOUT:' + LAYOUT);
     renderLayoutOpts();
-    renderGrid();
+    if (smooth) deferGridRender(); else renderGrid();
   }
 
 
@@ -22172,6 +22184,7 @@ __UI_SCRIPT__
   }
 
   function renderGrid(){
+    if (GRID_DEFER) { clearTimeout(GRID_DEFER); GRID_DEFER = 0; }   /* 已经在渲染了：取消还没执行的延迟渲染 */
     var grid = document.getElementById('grid');
     grid.className = 'grid' + (LAYOUT === 'list' ? ' list' : '');
     applyGridCols();
@@ -24476,7 +24489,7 @@ __UI_SCRIPT__
   document.getElementById('secFilter').addEventListener('click', function(e){
     var btn = e.target.closest('button');
     if (!btn) return;
-    setFilter(btn.getAttribute('data-filter'));
+    setFilter(btn.getAttribute('data-filter'), true);
   });
   uiStoreSegLayout(document.getElementById('secFilter'));         /* 初次摆放高亮滑块（此时选中项是标记里的「全部」）*/
 
