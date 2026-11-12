@@ -2556,7 +2556,9 @@ var UI_LAYOUT_KEY = { 'rail-l':'layoutRailL', 'rail-r':'layoutRailR',
 
 
 var UI_CHANGELOG = [
-  { v:'3.1.7', date:'2026-11-09', tag:'latest',
+  { v:'3.1.8', date:'2026-11-12', tag:'latest',
+    en:['Added and optimized some features.'] },
+  { v:'3.1.7', date:'2026-11-09',
     en:['Added, fixed, and optimized some features.'] },
   { v:'3.1.2', date:'2026-10-24',
     en:['A lot of new things have been added.'] },
@@ -9165,38 +9167,460 @@ uiAddT({
     'A versão deste jogo está desatualizada e não pode ser iniciada. Aguarde a versão mais recente.']
 });
 var UI_TC_SELECTOR = '.cursor-target,button:not(:disabled),a[href],[onclick],[role="button"],select,label.bg-switch,label.rem-row,.card';
-var UI_TCURSOR = (function () {
-  try { if (UI_CFG && typeof UI_CFG.targetCursor === 'boolean') { return UI_CFG.targetCursor; } } catch (e) {}
-  try { return localStorage.getItem(UI_TC_KEY) !== '1'; } catch (e) { return true; }
-})();
-var uiTC = null;
-function uiTargetCursorApply(on) {
-  if (on) {
-    if (!uiTC) {
-      try { uiTC = TargetCursor({ targetSelector: UI_TC_SELECTOR, spinDuration: 2, hideDefaultCursor: true, parallaxOn: true }); }
-      catch (e) { uiTC = null; }
+/* ═══════════════════════════════════════════════════════════════════════
+   Crosshair —— React Bits <Crosshair />（JS-CSS 版）的原生 JS 移植
+   来源：https://reactbits.dev/animations/crosshair
+
+   效果：整屏十字线跟着光标走（中间留出 gap 的空隙、边缘按 fade 淡出），线头带实时坐标标签；
+         光标移到按钮 / 链接 / 卡片上时十字线淡出，换成包住目标的「瞄准框」四角括号并标出目标尺寸（targetEffect: 'lock'）；
+         点击时扩散一圈脉冲。
+   原组件依赖 React；这里没有 React，所以 useRef / useEffect 换成闭包变量，canvas 绘制、弹簧跟随、吸附、脉冲、glitch 逐行照搬。
+   Crosshair(options) -> { update(opts), destroy() }
+   颜色：本项目里由调用方按 APP 的深色 / 亮色主题传入（深色 #ffffff，亮色深灰），主题切换时用 update({ color }) 实时换色。
+   额外：只在有鼠标 / 触控板（hover + fine）的设备上挂载，触屏设备不创建画布。
+   ═══════════════════════════════════════════════════════════════════════ */
+function Crosshair(options) {
+  var LINE_STYLES = ['solid', 'dashed', 'dotted'];
+  var EFFECTS = ['lock', 'glitch', 'none'];
+  var FONT = '500 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+  var HIDDEN = 'crosshair-cursor-hidden';
+
+  var clamp = function (value, min, max) { return Math.min(max, Math.max(min, value)); };
+  var toRgb = function (ctx, color) {
+    ctx.fillStyle = '#000';
+    ctx.fillStyle = color;
+    var value = String(ctx.fillStyle);
+    if (value.indexOf('#') === 0) {
+      var hex = parseInt(value.slice(1, 7), 16);
+      return { r: (hex >> 16) & 255, g: (hex >> 8) & 255, b: hex & 255, a: 1 };
     }
-  } else if (uiTC) {
-    uiTC.destroy();
-    uiTC = null;
+    var m = value.match(/[\d.]+/g);
+    var parts = m ? m.map(Number) : [255, 255, 255, 1];
+    return { r: parts[0], g: parts[1], b: parts[2], a: parts[3] == null ? 1 : parts[3] };
+  };
+
+  var DEF = {
+    color: '#ffffff', thickness: 1, opacity: 0.85, lineStyle: 'solid', gap: 0, fade: 0, smoothing: 0.35,
+    showCoordinates: true, targetEffect: 'lock', targetSelector: 'a, button, [data-crosshair-target]',
+    clickPulse: true, hideCursor: false, blendMode: 'normal', zIndex: 2147483646
+  };
+  var raw = Object.assign({}, DEF, options || {});
+  var norm = function (o) {
+    return {
+      color: o.color,
+      thickness: clamp(o.thickness, 0.5, 8),
+      opacity: clamp(o.opacity, 0, 1),
+      lineStyle: LINE_STYLES.indexOf(o.lineStyle) >= 0 ? o.lineStyle : 'solid',
+      gap: Math.max(0, o.gap),
+      fade: clamp(o.fade, 0, 1),
+      smoothing: clamp(o.smoothing, 0, 1),
+      showCoordinates: o.showCoordinates,
+      targetEffect: EFFECTS.indexOf(o.targetEffect) >= 0 ? o.targetEffect : 'lock',
+      targetSelector: o.targetSelector,
+      clickPulse: o.clickPulse,
+      hideCursor: o.hideCursor
+    };
+  };
+  var S = norm(raw);
+
+  /* 触屏设备没有「光标」，不挂载 */
+  if (window.matchMedia && !window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    return { update: function () {}, destroy: function () {} };
+  }
+
+  /* 原组件里 <style>{`.crosshair-cursor-hidden, .crosshair-cursor-hidden * { cursor: none !important; }`}</style> */
+  if (!document.getElementById('crosshairCss')) {
+    var st = document.createElement('style');
+    st.id = 'crosshairCss';
+    st.textContent = '.' + HIDDEN + ', .' + HIDDEN + ' * { cursor: none !important; }';
+    (document.head || document.documentElement).appendChild(st);
+  }
+
+  var canvas = document.createElement('canvas');
+  canvas.className = 'crosshair-canvas';
+  canvas.setAttribute('aria-hidden', 'true');
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:' + raw.zIndex + ';mix-blend-mode:' + raw.blendMode;
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+  if (!ctx) { canvas.remove(); return { update: function () {}, destroy: function () {} }; }
+
+  var cursorOwner = document.documentElement;
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var state = {
+    x: 0, y: 0, tx: 0, ty: 0, clientX: 0, clientY: 0,
+    inside: false, seen: false, presence: 0, glitch: 0, target: null,
+    lock: { x: 0, y: 0, w: 0, h: 0, alpha: 0 },
+    pulses: []
+  };
+  var size = { w: 0, h: 0, dpr: 1 };
+  var ink = toRgb(ctx, S.color);
+  var inkSource = S.color;
+  var raf = 0, last = 0, alive = true, resizePending = false;
+
+  function applyResize() {
+    var rect = canvas.getBoundingClientRect();
+    size.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    size.w = rect.width;
+    size.h = rect.height;
+    canvas.width = Math.max(1, Math.round(rect.width * size.dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * size.dpr));
+  }
+  function resize() { resizePending = true; wake(); }
+
+  var rgba = function (alpha) { return 'rgba(' + ink.r + ', ' + ink.g + ', ' + ink.b + ', ' + clamp(alpha * ink.a, 0, 1) + ')'; };
+  var crisp = function (value, width) {
+    var device = Math.round(width * size.dpr);
+    return (Math.round(value * size.dpr) + (device % 2 ? 0.5 : 0)) / size.dpr;
+  };
+
+  /* 坐标 / 尺寸标签：线头上的小胶囊，文字颜色按线条亮度自动取黑或白 */
+  function tag(text, x, y, align) {
+    ctx.font = FONT;
+    var width = ctx.measureText(text).width + 10;
+    var height = 16;
+    var left = align === 'center' ? x - width / 2 : x;
+    var top = align === 'middle' ? y - height / 2 : y;
+    left = clamp(left, 4, size.w - width - 4);
+    top = clamp(top, 4, size.h - height - 4);
+    var light = ink.r * 0.2126 + ink.g * 0.7152 + ink.b * 0.0722 > 150;
+    ctx.fillStyle = rgba(1);
+    ctx.beginPath();
+    ctx.roundRect(left, top, width, height, 3);
+    ctx.fill();
+    ctx.fillStyle = light ? '#0a0a0a' : '#ffffff';
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, left + width / 2, top + height / 2 + 0.5);
+  }
+
+  function segment(x1, y1, x2, y2, horizontal, s) {
+    var length = horizontal ? x2 - x1 : y2 - y1;
+    if (length <= 0) return;
+    if (s.fade > 0) {
+      var gradient = horizontal ? ctx.createLinearGradient(0, 0, size.w, 0) : ctx.createLinearGradient(0, 0, 0, size.h);
+      var at = clamp(horizontal ? state.x / size.w : state.y / size.h, 0.001, 0.999);
+      gradient.addColorStop(0, rgba(1 - s.fade));
+      gradient.addColorStop(at, rgba(1));
+      gradient.addColorStop(1, rgba(1 - s.fade));
+      ctx.strokeStyle = gradient;
+    } else {
+      ctx.strokeStyle = rgba(1);
+    }
+    ctx.beginPath();
+    if (state.glitch > 0.01) {
+      var pieces = Math.max(4, Math.round(length / 28));
+      for (var i = 0; i < pieces; i++) {
+        var jitter = (Math.random() - 0.5) * 14 * state.glitch;
+        var from = i / pieces, to = (i + 1) / pieces;
+        if (horizontal) {
+          ctx.moveTo(x1 + length * from, y1 + jitter);
+          ctx.lineTo(x1 + length * to, y1 + jitter);
+        } else {
+          ctx.moveTo(x1 + jitter, y1 + length * from);
+          ctx.lineTo(x1 + jitter, y1 + length * to);
+        }
+      }
+    } else {
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+    }
+    ctx.stroke();
+  }
+
+  /* 瞄准框：四个角的方括号 */
+  function brackets(x, y, w, h, alpha) {
+    var arm = Math.min(14, w / 3, h / 3);
+    ctx.strokeStyle = rgba(alpha);
+    ctx.lineWidth = Math.max(1.5, S.thickness);
+    ctx.setLineDash([]);
+    ctx.lineCap = 'square';
+    ctx.beginPath();
+    ctx.moveTo(x, y + arm); ctx.lineTo(x, y); ctx.lineTo(x + arm, y);
+    ctx.moveTo(x + w - arm, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + arm);
+    ctx.moveTo(x + w, y + h - arm); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w - arm, y + h);
+    ctx.moveTo(x + arm, y + h); ctx.lineTo(x, y + h); ctx.lineTo(x, y + h - arm);
+    ctx.stroke();
+  }
+
+  function draw() {
+    var s = S;
+    ctx.setTransform(size.dpr, 0, 0, size.dpr, 0, 0);
+    ctx.clearRect(0, 0, size.w, size.h);
+    if (state.presence > 0.001) {
+      ctx.globalAlpha = state.presence * s.opacity * (1 - 0.6 * state.lock.alpha);
+      ctx.lineWidth = s.thickness;
+      ctx.lineCap = s.lineStyle === 'dotted' ? 'round' : 'butt';
+      if (s.lineStyle === 'dashed') ctx.setLineDash([s.thickness * 6, s.thickness * 5]);
+      else if (s.lineStyle === 'dotted') ctx.setLineDash([0, s.thickness * 4]);
+      else ctx.setLineDash([]);
+      var x = crisp(state.x, s.thickness);
+      var y = crisp(state.y, s.thickness);
+      segment(0, y, x - s.gap, y, true, s);
+      segment(x + s.gap, y, size.w, y, true, s);
+      segment(x, 0, x, y - s.gap, false, s);
+      segment(x, y + s.gap, x, size.h, false, s);
+      if (s.hideCursor) {                        /* 系统光标隐藏后，中心补一个小圆点 */
+        ctx.fillStyle = rgba(1);
+        ctx.beginPath();
+        ctx.arc(state.x, state.y, Math.max(1.5, s.thickness * 1.5), 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (s.showCoordinates && state.lock.alpha < 0.999) {
+        ctx.globalAlpha = state.presence * s.opacity * (1 - state.lock.alpha);
+        tag(String(Math.round(state.x)), state.x, 8, 'center');
+        tag(String(Math.round(state.y)), 8, state.y, 'middle');
+      }
+    }
+    if (state.lock.alpha > 0.001) {
+      var L = state.lock;
+      ctx.globalAlpha = L.alpha * s.opacity;
+      brackets(L.x, L.y, L.w, L.h, 1);
+      if (s.showCoordinates && state.target) {
+        var box = state.target.getBoundingClientRect();
+        tag(Math.round(box.width) + ' \u00d7 ' + Math.round(box.height), L.x + L.w / 2, L.y + L.h + 8, 'center');
+      }
+    }
+    state.pulses.forEach(function (pulse) {
+      var t = pulse.age / 0.55;
+      var eased = 1 - Math.pow(1 - t, 3);
+      ctx.globalAlpha = Math.pow(1 - t, 2) * s.opacity;
+      ctx.strokeStyle = rgba(1);
+      ctx.lineWidth = Math.max(1, s.thickness);
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.arc(pulse.x, pulse.y, 3 + 30 * eased, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  function relative() {
+    var rect = canvas.getBoundingClientRect();
+    state.tx = state.clientX - rect.left;
+    state.ty = state.clientY - rect.top;
+    return rect;
+  }
+
+  function tick(now) {
+    raf = 0;
+    if (resizePending) { resizePending = false; applyResize(); }
+    if (!alive) return;
+    var s = S;
+    var dt = Math.min(0.05, Math.max(0.001, (now - last) / 1000));
+    last = now;
+    if (s.color !== inkSource) { inkSource = s.color; ink = toRgb(ctx, s.color); }
+    var rect = relative();
+    var follow = (reduce || s.smoothing === 0) ? 1 : 1 - Math.exp(-dt / (0.008 + s.smoothing * 0.16));
+    state.x += (state.tx - state.x) * follow;
+    state.y += (state.ty - state.y) * follow;
+    var wanted = state.inside ? 1 : 0;
+    state.presence += (wanted - state.presence) * (reduce ? 1 : 1 - Math.exp(-dt / (wanted ? 0.12 : 0.25)));
+    if (Math.abs(wanted - state.presence) < 0.002) state.presence = wanted;
+    var lock = state.lock;
+    var locked = (s.targetEffect === 'lock' && state.inside) ? state.target : null;
+    var goal;
+    if (locked) {
+      var box = locked.getBoundingClientRect();
+      goal = { x: box.left - rect.left - 6, y: box.top - rect.top - 6, w: box.width + 12, h: box.height + 12 };
+    } else {
+      goal = { x: state.x - 10, y: state.y - 10, w: 20, h: 20 };
+    }
+    var snap = reduce ? 1 : 1 - Math.exp(-dt / 0.085);
+    lock.x += (goal.x - lock.x) * snap;
+    lock.y += (goal.y - lock.y) * snap;
+    lock.w += (goal.w - lock.w) * snap;
+    lock.h += (goal.h - lock.h) * snap;
+    var shown = locked ? 1 : 0;
+    lock.alpha += (shown - lock.alpha) * (reduce ? 1 : 1 - Math.exp(-dt / (shown ? 0.08 : 0.14)));
+    if (Math.abs(shown - lock.alpha) < 0.002) lock.alpha = shown;
+    state.glitch = reduce ? 0 : Math.max(0, state.glitch - dt / 0.5);
+    state.pulses = state.pulses.filter(function (pulse) { return (pulse.age += dt) < 0.55; });
+    draw();
+    var settling =
+      Math.abs(state.tx - state.x) > 0.05 || Math.abs(state.ty - state.y) > 0.05 ||
+      state.presence !== wanted || lock.alpha !== shown ||
+      (locked && Math.abs(goal.w - lock.w) + Math.abs(goal.x - lock.x) + Math.abs(goal.y - lock.y) > 0.1) ||
+      state.glitch > 0 || state.pulses.length > 0;
+    if (settling) raf = requestAnimationFrame(tick);
+  }
+  function wake() {
+    if (raf || !alive) return;
+    last = performance.now();
+    raf = requestAnimationFrame(tick);
+  }
+
+  function setCursorHidden(hidden) { cursorOwner.classList.toggle(HIDDEN, hidden); }
+
+  function pick(element) {
+    if (S.targetEffect === 'none' || !(element instanceof Element)) return null;
+    var found = null;
+    try { found = element.closest(S.targetSelector); } catch (e) { found = null; }
+    return found;
+  }
+  function retarget(element) {
+    var next = pick(element);
+    if (next === state.target) return;
+    state.target = next;
+    if (next && S.targetEffect === 'glitch') state.glitch = 1;
+  }
+  function enter() {
+    if (!state.seen) {
+      state.seen = true;
+      relative();
+      state.x = state.tx; state.y = state.ty;
+      state.lock.x = state.x - 10; state.lock.y = state.y - 10;
+      state.lock.w = 20; state.lock.h = 20;
+    }
+    state.inside = true;
+    setCursorHidden(S.hideCursor);
+  }
+  function leave() {
+    state.inside = false;
+    state.target = null;
+    setCursorHidden(false);
+    wake();
+  }
+  function onMove(event) {
+    state.clientX = event.clientX;
+    state.clientY = event.clientY;
+    if (event.pointerType === 'touch' && event.buttons === 0) return;
+    enter();
+    retarget(event.target);
+    wake();
+  }
+  function onDown(event) {
+    onMove(event);
+    if (!S.clickPulse || reduce) return;
+    relative();
+    state.pulses.push({ x: state.tx, y: state.ty, age: 0 });
+    wake();
+  }
+  function onUp(event) { if (event.pointerType !== 'mouse') leave(); }
+  function onWindowOut(event) { if (!event.relatedTarget) leave(); }
+  function onScroll() {
+    if (!state.inside) return;
+    retarget(document.elementFromPoint(state.clientX, state.clientY));
+    wake();
+  }
+
+  var observer = new ResizeObserver(resize);
+  observer.observe(canvas);
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerdown', onDown);
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onUp);
+  window.addEventListener('scroll', onScroll, { capture: true, passive: true });
+  document.addEventListener('pointerout', onWindowOut);
+  resize();
+
+  return {
+    update: function (next) {
+      raw = Object.assign(raw, next || {});
+      S = norm(raw);
+      setCursorHidden(state.inside && S.hideCursor);
+      wake();
+    },
+    destroy: function () {
+      alive = false;
+      cancelAnimationFrame(raf);
+      observer.disconnect();
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      window.removeEventListener('scroll', onScroll, { capture: true });
+      document.removeEventListener('pointerout', onWindowOut);
+      setCursorHidden(false);
+      if (canvas.parentNode) canvas.parentNode.removeChild(canvas);
+    }
+  };
+}
+
+/* APP 主题 → 十字线颜色：深色主题 #ffffff（你给的配置），亮色主题换成深灰；自定义主题按背景色亮度判断 */
+function uiAppIsLight() {
+  var root = document.documentElement;
+  var t = root.getAttribute('data-theme');
+  if (t === 'light') { return true; }
+  if (t === 'dark') { return false; }
+  try {
+    var c = getComputedStyle(root).getPropertyValue('--bg').trim() || getComputedStyle(document.body).backgroundColor;
+    var cx = document.createElement('canvas').getContext('2d');
+    cx.fillStyle = '#000';
+    cx.fillStyle = c;
+    var v = String(cx.fillStyle), r, g, b;
+    if (v.indexOf('#') === 0) { var n = parseInt(v.slice(1, 7), 16); r = (n >> 16) & 255; g = (n >> 8) & 255; b = n & 255; }
+    else { var p = v.match(/[\d.]+/g) || [0, 0, 0]; r = +p[0]; g = +p[1]; b = +p[2]; }
+    return (r * 0.2126 + g * 0.7152 + b * 0.0722) / 255 > 0.55;
+  } catch (e) { return false; }
+}
+function uiCrosshairColor() { return uiAppIsLight() ? '#18181b' : '#ffffff'; }
+
+/* ═══ 瞄准光标：三选一 —— none / target（Target Cursor）/ crosshair（Crosshair）═══
+   · 宿主保存（.ui 文件的 CURSORMODE=，UI_CFG.cursorMode 带回）；旧宿主只有布尔的 UI_CFG.targetCursor：true → target，false → none
+   · 默认仍然是 target（和以前一样） */
+var UI_CURSOR_MODES = ['none', 'target', 'crosshair'];
+var UI_CURSOR_KEY = 'starline.cursorMode';
+function uiCursorNorm(m) { return UI_CURSOR_MODES.indexOf(m) >= 0 ? m : 'target'; }
+var UI_CURSOR = (function () {
+  try { if (UI_CFG && typeof UI_CFG.cursorMode === 'string') { return uiCursorNorm(UI_CFG.cursorMode); } } catch (e) {}
+  try { if (UI_CFG && typeof UI_CFG.targetCursor === 'boolean') { return UI_CFG.targetCursor ? 'target' : 'none'; } } catch (e) {}
+  try {
+    var saved = localStorage.getItem(UI_CURSOR_KEY);
+    if (saved) { return uiCursorNorm(saved); }
+    if (localStorage.getItem(UI_TC_KEY) === '1') { return 'none'; }      /* 旧版本的「已关闭」标记 */
+  } catch (e) {}
+  return 'target';
+})();
+var UI_TCURSOR = UI_CURSOR === 'target';                                  /* 兼容旧名字 */
+var uiTC = null, uiCH = null, uiCHObs = null;
+function uiCursorApply(mode) {
+  if (mode !== 'target' && uiTC) { uiTC.destroy(); uiTC = null; }
+  if (mode !== 'crosshair' && uiCH) {
+    uiCH.destroy(); uiCH = null;
+    if (uiCHObs) { uiCHObs.disconnect(); uiCHObs = null; }
+  }
+  if (mode === 'target' && !uiTC) {
+    try { uiTC = TargetCursor({ targetSelector: UI_TC_SELECTOR, spinDuration: 2, hideDefaultCursor: true, parallaxOn: true }); }
+    catch (e) { uiTC = null; }
+  }
+  if (mode === 'crosshair' && !uiCH) {
+    try {
+      uiCH = Crosshair({
+        color: uiCrosshairColor(),         /* 深色主题 #ffffff；亮色主题换成深灰（下面的观察器在主题切换时实时换色） */
+        targetEffect: 'lock',
+        thickness: 1,
+        opacity: 0.85,
+        smoothing: 0.7,
+        showCoordinates: true,
+        gap: 35,
+        fade: 1,
+        hideCursor: true,
+        targetSelector: UI_TC_SELECTOR + ', [data-crosshair-target]'     /* 和 Target Cursor 吸附同一批元素 */
+      });
+      uiCHObs = new MutationObserver(function () { if (uiCH) { uiCH.update({ color: uiCrosshairColor() }); } });
+      uiCHObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class', 'style'] });
+    } catch (e) { uiCH = null; }
   }
 }
-/* 个人资料 ▸ 偏好设置 ▸ 瞄准光标：None / Target Cursor 分段选择器（和卡片特效是同一套控件，滑动高亮由 uiSegLayout 量按钮位置） */
+function uiTargetCursorApply(on) { uiCursorApply(on ? 'target' : 'none'); }      /* 兼容旧名字 */
+/* 个人资料 ▸ 偏好设置 ▸ 瞄准光标：None / Target Cursor / Crosshair 分段选择器（和卡片特效是同一套控件，滑动高亮由 uiSegLayout 量按钮位置） */
 function uiTargetCursorSync() {
-  uiSegLayout(document.getElementById('tcSeg'), UI_TCURSOR ? 'target' : 'none');
+  uiSegLayout(document.getElementById('tcSeg'), UI_CURSOR);
 }
-function uiTargetCursorSet(on) {
-  on = !!on;
-  var changed = on !== UI_TCURSOR;
-  UI_TCURSOR = on;
+function uiCursorSet(mode) {
+  mode = uiCursorNorm(mode);
+  var changed = mode !== UI_CURSOR;
+  UI_CURSOR = mode;
+  UI_TCURSOR = mode === 'target';
   if (changed) {
-    try { if (on) { localStorage.removeItem(UI_TC_KEY); } else { localStorage.setItem(UI_TC_KEY, '1'); } } catch (e) {}
-    uiSend('UI_TCURSOR:' + (on ? '1' : '0'));
+    try { localStorage.setItem(UI_CURSOR_KEY, mode); } catch (e) {}
+    uiSend('UI_CURSOR:' + mode);
   }
-  uiSegLayout(document.getElementById('tcSeg'), on ? 'target' : 'none');   /* 先让高亮滑块动起来… */
-  setTimeout(function () { uiTargetCursorApply(UI_TCURSOR); }, 90);        /* …再创建 / 销毁光标，别抢滑动的帧 */
+  uiSegLayout(document.getElementById('tcSeg'), mode);                  /* 先让高亮滑块动起来… */
+  setTimeout(function () { uiCursorApply(UI_CURSOR); }, 90);            /* …再创建 / 销毁光标，别抢滑动的帧 */
 }
-uiTargetCursorApply(UI_TCURSOR);
+function uiTargetCursorSet(on) { uiCursorSet(on ? 'target' : 'none'); }  /* 兼容旧名字 */
+uiCursorApply(UI_CURSOR);
 uiTargetCursorSync();
 
 /* ═══ 卡片特效偏好（个人资料 ▸ 偏好设置）：公共脚本在 #cardFxCards 之后才注入，所以接线放这里；登录页没有选择器，直接 return ═══ */
@@ -9308,7 +9732,7 @@ window.uiStoreSegLayout = uiStoreSegLayout;
 (function(){
   var seg = document.getElementById('tcSeg');
   if (!seg) return;
-  uiSegKeys(seg, ['none', 'target'], function(){ return UI_TCURSOR ? 'target' : 'none'; }, function(v){ uiTargetCursorSet(v === 'target'); });
+  uiSegKeys(seg, UI_CURSOR_MODES, function(){ return UI_CURSOR; }, function(v){ uiCursorSet(v); });
   uiSegWatch(seg, uiTargetCursorSync);
 })();
 try { if ((document.getElementById('cardFxSeg') || document.getElementById('tcSeg')) && typeof uiRenderI18n === 'function') { uiRenderI18n(); } } catch (e) {}
@@ -14543,9 +14967,7 @@ body.dragging .qp-drop-hint{display:block}
 /* ── 商店：「卡片 / 列表」切换 + 「全部 / 已拥有 / 未拥有 / 收藏」筛选：滑动高亮 ──
    和「偏好设置 ▸ 卡片特效」（.fx-seg）同一套手法、同一条弹性曲线（width / transform .46s cubic-bezier(.34,1.32,.5,1)，带轻微回弹）。
    滑块就是原来的渐变选中态本身，所以外观不变、只是会动了：滑块就位后（.thumb-on）按钮自己的渐变选中态让位给滑块；
-   滑块量不出来（面板还没显示）时没有 .thumb-on，按钮自己的渐变选中态照常显示。
-   注意：这里刻意没有 prefers-reduced-motion 开关——「卡片特效」的 .fx-seg 没有，而用户要的就是和它一样的移动效果；
-   关了 Windows「显示动画」的机器上 WebView2 会报 reduced-motion，加了开关会让这些按钮瞬间到位、完全没有移动。 */
+   滑块量不出来（面板还没显示）时没有 .thumb-on，按钮自己的渐变选中态照常显示。 */
 .sl-seg{position:relative;isolation:isolate}
 .sl-seg>button{position:relative;z-index:1}
 .sl-seg-thumb{position:absolute;left:0;top:0;z-index:0;border-radius:var(--radius-full);
@@ -14555,6 +14977,7 @@ body.dragging .qp-drop-hint{display:block}
 .sl-seg-thumb.ready{opacity:1;
   transition:transform .46s cubic-bezier(.34,1.32,.5,1),width .46s cubic-bezier(.34,1.32,.5,1),height .3s ease,opacity .2s ease}
 .sl-seg.thumb-on>button.active,.sl-seg.thumb-on>button.active:hover{background:transparent;box-shadow:none;border-color:transparent;transform:none}
+@media (prefers-reduced-motion:reduce){.sl-seg-thumb.ready{transition:none}}
 @media(max-width:760px){.sec-tools{width:100%;justify-content:flex-start}.store-view-switch{order:0}.genre-wrap{order:1}.sec-filter{order:2;max-width:100%;overflow-x:auto}.sec-filter button{padding:6px 10px;white-space:nowrap}}
 /* ── 类型筛选：单图标圆形按钮；弹出菜单带指向按钮的箭头 ── */
 .genre-wrap{position:relative;display:flex;align-items:center}
@@ -16393,10 +16816,10 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
         <div class="sec-spacer"></div>
         <div class="sec-tools">
           <div class="store-view-switch" id="storeViewSwitch" role="group" aria-label="Game display mode">
-            <button class="store-view-btn" type="button" data-store-layout="grid" data-ui-title="layoutGrid" title="Cards" aria-label="Cards" aria-pressed="true" onclick="setLayout('grid',true)">
+            <button class="store-view-btn" type="button" data-store-layout="grid" data-ui-title="layoutGrid" title="Cards" aria-label="Cards" aria-pressed="true" onclick="setLayout('grid')">
               <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></svg>
           </button>
-          <button class="store-view-btn" type="button" data-store-layout="list" data-ui-title="layoutList" title="List" aria-label="List" aria-pressed="false" onclick="setLayout('list',true)">
+          <button class="store-view-btn" type="button" data-store-layout="list" data-ui-title="layoutList" title="List" aria-label="List" aria-pressed="false" onclick="setLayout('list')">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><rect x="3" y="4" width="3.5" height="4" rx=".7"/><rect x="3" y="10" width="3.5" height="4" rx=".7"/><rect x="3" y="16" width="3.5" height="4" rx=".7"/></svg>
           </button>
           </div>
@@ -16621,11 +17044,14 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
           <div class="field">
             <div class="fx-seg" id="tcSeg" role="radiogroup" aria-label="Target cursor">
               <span class="fx-seg-thumb" aria-hidden="true"></span>
-              <button class="fx-seg-btn" type="button" role="radio" data-fx="none" onclick="uiTargetCursorSet(false)">
+              <button class="fx-seg-btn" type="button" role="radio" data-fx="none" onclick="uiCursorSet('none')">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M6 6l12 12"/></svg><span data-ui="cardFxNone">None</span>
               </button>
-              <button class="fx-seg-btn" type="button" role="radio" data-fx="target" onclick="uiTargetCursorSet(true)">
+              <button class="fx-seg-btn" type="button" role="radio" data-fx="target" onclick="uiCursorSet('target')">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg><span>Target Cursor</span>
+              </button>
+              <button class="fx-seg-btn" type="button" role="radio" data-fx="crosshair" onclick="uiCursorSet('crosshair')">
+                <svg viewBox="0 0 24 24"><path d="M12 2.5v6.5M12 15v6.5M2.5 12H9M15 12h6.5"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg><span>Crosshair</span>
               </button>
             </div>
           </div>
@@ -21264,24 +21690,13 @@ __UI_SCRIPT__
   function saveGridOrder(){ wv('UI_GORDER:' + GRID_ORDER.join(',')); }
 
 
-  /* 工具栏（全部 / 已拥有 / 未拥有 / 收藏、卡片 / 列表）的点击：先让高亮滑块滑起来，再做 renderGrid。
-     renderGrid 会同步重建整个网格（innerHTML）并让 CardFx 建画布 / 传纹理，要占住主线程一阵子；
-     如果和滑块动画同时开始，滑块的 width 过渡（主线程动画）就会「卡一下，然后一阵就过去」。
-     延迟 GRID_DEFER_MS：此时滑块已经基本到位（弹性曲线大约走到 35% 就到达目标），只剩回弹的尾巴；
-     连点几个时只渲染最后一次；别处直接调 renderGrid（含 setFilter / setLayout 不带 smooth）会取消还没执行的延迟渲染。 */
-  var GRID_DEFER = 0;
-  var GRID_DEFER_MS = 180;
-  function deferGridRender(){
-    clearTimeout(GRID_DEFER);
-    GRID_DEFER = setTimeout(function(){ GRID_DEFER = 0; renderGrid(); }, GRID_DEFER_MS);
-  }
-  function setFilter(f, smooth){
+  function setFilter(f){
     FILTER = f;
     document.querySelectorAll('#secFilter button').forEach(function(b){
       b.classList.toggle('active', b.getAttribute('data-filter') === f);
     });
     uiStoreSegLayout(document.getElementById('secFilter'));     /* 高亮滑块滑到新的选中项（先于 renderGrid，让动画尽早开始）*/
-    if (smooth) deferGridRender(); else renderGrid();
+    renderGrid();
   }
 
   /* ── 按 Genres 筛选 ───────────────────────────────────────────────────
@@ -21446,13 +21861,13 @@ __UI_SCRIPT__
     uiStoreSegLayout(document.getElementById('storeViewSwitch'));   /* 高亮滑块滑到新的选中项 */
     renderColsOpts();
   }
-  function setLayout(mode, smooth){
+  function setLayout(mode){
     mode = (mode === 'list') ? 'list' : 'grid';
     if (mode === LAYOUT) { renderLayoutOpts(); return; }
     LAYOUT = mode;
     wv('UI_LAYOUT:' + LAYOUT);
     renderLayoutOpts();
-    if (smooth) deferGridRender(); else renderGrid();
+    renderGrid();
   }
 
 
@@ -22184,7 +22599,6 @@ __UI_SCRIPT__
   }
 
   function renderGrid(){
-    if (GRID_DEFER) { clearTimeout(GRID_DEFER); GRID_DEFER = 0; }   /* 已经在渲染了：取消还没执行的延迟渲染 */
     var grid = document.getElementById('grid');
     grid.className = 'grid' + (LAYOUT === 'list' ? ' list' : '');
     applyGridCols();
@@ -24489,7 +24903,7 @@ __UI_SCRIPT__
   document.getElementById('secFilter').addEventListener('click', function(e){
     var btn = e.target.closest('button');
     if (!btn) return;
-    setFilter(btn.getAttribute('data-filter'), true);
+    setFilter(btn.getAttribute('data-filter'));
   });
   uiStoreSegLayout(document.getElementById('secFilter'));         /* 初次摆放高亮滑块（此时选中项是标记里的「全部」）*/
 
