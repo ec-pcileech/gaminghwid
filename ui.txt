@@ -14974,6 +14974,51 @@ body.dragging .qp-drop-hint{display:block}
   animation:shim 1.6s linear infinite;
 }
 @keyframes shim{0%{background-position:180% 0}100%{background-position:-80% 0}}
+/* ── 封面没加载出来时：整张卡片是骨架，加载完其余 UI 依次弹入 ──
+   骨架直接画在真实元素上（文字透明 + 子元素隐藏 + 流光背景），所以尺寸和最终布局完全一致，显示出来时不会跳动。
+   流光复用全局的 slSkel 动画（和图片骨架同一套外观，随主题变色）。 */
+.card.is-loading .card-img{
+  background:
+    linear-gradient(100deg,transparent 25%,color-mix(in srgb,var(--text,#fff) 13%,transparent) 50%,transparent 75%),
+    color-mix(in srgb,var(--text,#fff) 7%,var(--surface-2,#1a1a1f));
+  background-size:60% 100%,100% 100%;background-repeat:no-repeat;
+  animation:slSkel 1.5s linear infinite;
+}
+.card.is-loading .card-img.loading::before,.card.is-loading .card-img::after{opacity:0}
+.card .card-img::after{transition:opacity .6s ease}
+.card.is-loading .card-badges,.card.is-loading .card-wish,.card.is-loading .card-sublen{opacity:0;pointer-events:none}
+.card.is-loading .card-title,.card.is-loading .card-sub,.card.is-loading .card-price,.card.is-loading .card-cta{
+  color:transparent !important;-webkit-text-fill-color:transparent;border-radius:8px;border-color:transparent;box-shadow:none;
+  background:
+    linear-gradient(100deg,transparent 25%,color-mix(in srgb,var(--text,#fff) 13%,transparent) 50%,transparent 75%),
+    color-mix(in srgb,var(--text,#fff) 7%,var(--surface-2,#1a1a1f));
+  background-size:60% 100%,100% 100%;background-repeat:no-repeat;
+  animation:slSkel 1.5s linear infinite;
+  text-shadow:none;
+}
+.card.is-loading .card-title > *,.card.is-loading .card-sub > *,.card.is-loading .card-price > *,.card.is-loading .card-cta > *{visibility:hidden}
+.card.is-loading .card-title{width:64%;max-width:100%}
+.card.is-loading .card-sub{width:42%;max-width:100%}
+.card.is-loading .card-price{min-width:54px;border-radius:6px}
+.card.is-loading .card-cta{pointer-events:none}
+.card.is-loading .card-sub::before,.card.is-loading .card-sub::after,.card.is-loading .card-title::before,.card.is-loading .card-title::after{opacity:0}
+@keyframes cardUiIn{
+  from{opacity:0;transform:translateY(9px) scale(.95);filter:blur(3px)}
+  to{opacity:1;transform:none;filter:blur(0)}
+}
+/* backwards：只在延迟期间和动画中套用起始帧，结束后回到元素自己的样式（悬停等效果不受影响） */
+.card.is-reveal .card-badges{animation:cardUiIn .5s cubic-bezier(.2,.8,.2,1) .02s backwards}
+.card.is-reveal .card-wish{animation:cardUiIn .5s cubic-bezier(.2,.8,.2,1) .08s backwards}
+.card.is-reveal .card-sublen{animation:cardUiIn .5s cubic-bezier(.2,.8,.2,1) .12s backwards}
+.card.is-reveal .card-title{animation:cardUiIn .5s cubic-bezier(.2,.8,.2,1) .02s backwards}
+.card.is-reveal .card-sub{animation:cardUiIn .5s cubic-bezier(.2,.8,.2,1) .08s backwards}
+.card.is-reveal .card-price{animation:cardUiIn .5s cubic-bezier(.2,.8,.2,1) .14s backwards}
+.card.is-reveal .card-cta{animation:cardUiIn .5s cubic-bezier(.2,.8,.2,1) .2s backwards}
+@media (prefers-reduced-motion:reduce){
+  .card.is-loading .card-img,.card.is-loading .card-title,.card.is-loading .card-sub,.card.is-loading .card-price,.card.is-loading .card-cta{animation:none}
+  .card.is-reveal .card-badges,.card.is-reveal .card-wish,.card.is-reveal .card-sublen,.card.is-reveal .card-title,
+  .card.is-reveal .card-sub,.card.is-reveal .card-price,.card.is-reveal .card-cta{animation:none}
+}
 /* ── Dither Veil：未订阅游戏的封面特效画布（由 DitherVeilCards 注入，见下方 #ditherVeilCards 脚本）──
    画布盖在 <img> 之上、徽章/收藏/渐变遮罩之下；第一帧渲染好才淡入，失败时原封面照常显示 */
 .card-img .dv-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;opacity:0;transition:opacity .3s ease}
@@ -22254,6 +22299,40 @@ __UI_SCRIPT__
          + uiEsc(gameStatusText(st)) + '</span>';
   }
 
+  /* ── 卡片封面加载状态 ──
+     card.is-loading：封面没加载出来，卡片 UI 全部是骨架；封面 load / error 之后 cardReveal() 摘掉它并挂上 .is-reveal，
+     CSS 里 .is-reveal 会让徽章 / 心形 / 标题 / 副标题 / 价格 / 按钮按顺序错开弹入。 */
+  var CARD_IMG_OK = {};                    /* 封面地址 → 1 加载成功 / 2 加载失败（本次会话里；有结果就不再显示骨架） */
+  var CARD_IMG_T0 = {};                    /* 封面地址 → 第一次开始等待的时间（超时按这个算，反复重新渲染不会把兜底一直往后推） */
+  var CARD_LOAD_TIMEOUT = 15000;           /* 请求迟迟不返回时，最多显示这么久的骨架，然后照常显示 UI */
+  function cardReveal(card){
+    if (!card || !card.classList.contains('is-loading')) { return; }
+    card.classList.remove('is-loading');
+    card.classList.add('is-reveal');
+    setTimeout(function(){ card.classList.remove('is-reveal'); }, 1500);
+  }
+  function cardImgDone(img, failed){
+    var box = img.parentNode;
+    var card = (box && box.closest) ? box.closest('.card') : null;
+    var src = img.getAttribute('src');
+    if (failed) { img.remove(); CARD_IMG_OK[src] = 2; }     /* 图挂了：去掉破图，封面区显示底色；UI 照常显示 */
+    else { img.classList.add('loaded'); CARD_IMG_OK[src] = 1; }
+    if (box) { box.classList.remove('loading'); }
+    cardReveal(card);
+  }
+  function cardLoadGuard(grid){
+    var cards = grid.querySelectorAll('.card.is-loading');
+    for (var i = 0; i < cards.length; i++) {
+      (function(card){
+        var img = card.querySelector('.card-img img');
+        if (!img) { cardReveal(card); return; }
+        if (img.complete) { cardImgDone(img, img.naturalWidth === 0); return; }     /* 缓存命中 / 已经失败：不用等事件 */
+        var src = img.getAttribute('src');
+        var t0 = CARD_IMG_T0[src] || (CARD_IMG_T0[src] = Date.now());
+        setTimeout(function(){ if (card.isConnected) { cardReveal(card); } }, Math.max(0, CARD_LOAD_TIMEOUT - (Date.now() - t0)));
+      })(cards[i]);
+    }
+  }
   function renderGrid(){
     if (GRID_DEFER) { clearTimeout(GRID_DEFER); GRID_DEFER = 0; }   /* 已经在渲染了：取消还没执行的延迟渲染 */
     var grid = document.getElementById('grid');
@@ -22341,11 +22420,15 @@ __UI_SCRIPT__
       }
 
 
-      html += '<div class="card" data-game="' + g + '"' + (owned ? '' : ' data-dv="1"') + ' onclick="openDetail(\'' + g + '\')">';
-      html += '<div class="card-img loading">';
-      html += '<img src="' + meta.img + '" alt="" ';
-      html += 'onload="this.classList.add(\'loaded\');this.parentNode.classList.remove(\'loading\')" ';
-      html += 'onerror="var p=this.parentNode;this.remove();if(p)p.classList.remove(\'loading\')">';
+      /* 封面还没加载出来（本次会话里没成功加载过这个地址）：整张卡片的 UI（文字 / 价格 / 按钮 / 徽章）都先显示成流光骨架，
+         封面加载完才依次弹入；加载过的封面重新渲染（筛选 / 搜索 / 切换布局）时直接显示，不再闪骨架 */
+      var imgKnown = !!CARD_IMG_OK[meta.img];                 /* 已经有结果（成功或失败）：不再显示骨架 */
+      var imgReady = CARD_IMG_OK[meta.img] === 1;             /* 成功加载过：直接显示，不再重新淡入 */
+      html += '<div class="card' + (imgKnown ? '' : ' is-loading') + '" data-game="' + g + '"' + (owned ? '' : ' data-dv="1"') + ' onclick="openDetail(\'' + g + '\')">';
+      html += '<div class="card-img' + (imgKnown ? '' : ' loading') + '">';
+      html += '<img src="' + meta.img + '" alt="" class="' + (imgReady ? 'loaded' : '') + '" ';
+      html += 'onload="cardImgDone(this)" ';
+      html += 'onerror="cardImgDone(this,true)">';
       html += '<div class="card-badges">';
       if (owned) html += '<span class="card-badge owned">' + uiEsc(uiT('badgeOwned')) + '</span>';
       else       html += '<span class="card-badge">' + uiEsc(uiT('badgeNew')) + '</span>';
@@ -22394,6 +22477,7 @@ __UI_SCRIPT__
       html += '</div></div></div>';
     });
     grid.innerHTML = html;
+    cardLoadGuard(grid);       /* 缓存里已经有的封面立刻显示；加载失败 / 迟迟不回应的也不会一直停在骨架上 */
     /* 未订阅的卡片（data-dv）挂上 Dither Veil 特效；失败/不支持 WebGL2 时静默跳过 */
     try { if (window.CardFx) window.CardFx.sync(grid); else if (window.DitherVeilCards) window.DitherVeilCards.sync(grid); } catch (e) {}
     /* 列表模式：左边列表 + 右边常驻详情块
