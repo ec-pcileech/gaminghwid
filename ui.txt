@@ -701,23 +701,23 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
 
 /* ── Renew 视图 ───────────────────────────────────────────────── */
 /* B 方案：左边是当前游戏面板（跟着密钥前缀变），右边是密钥 + 套餐 */
-.renew-wrap{display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;max-width:1020px;margin:0 auto;align-items:start}
-@media (max-width:900px){.renew-wrap{grid-template-columns:1fr}.renew-side{position:static}}
+.renew-wrap{display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;max-width:1020px;margin:0 auto;align-items:stretch}
+@media (max-width:900px){.renew-wrap{grid-template-columns:1fr}}
 .renew-side{
-  position:sticky;top:0;overflow:hidden;color:#fff;
+  position:relative;display:flex;flex-direction:column;overflow:hidden;color:#fff;      /* 高度拉伸到和右边卡片一样高 */
   border-radius:var(--ui-radius-lg);border:1px solid var(--ui-border);
   background:
     radial-gradient(420px 220px at 10% -8%, var(--accent-glow,rgba(59,130,246,.38)), transparent 62%),
     linear-gradient(160deg, rgba(18,22,36,.96), rgba(12,14,22,.96));
 }
 .renew-game-cover{
-  position:relative;height:190px;overflow:hidden;will-change:transform,opacity;
+  position:relative;flex:none;height:190px;overflow:hidden;will-change:transform,opacity;
   background-size:cover;background-position:center;background-color:#1a2032;
 }
 .renew-game-cover::before{content:'';position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(10,12,20,.6));pointer-events:none;z-index:1}
 .renew-game-cover.empty{background-image:linear-gradient(135deg,#2f3a57,#161b2a)}
 .renew-game-cover.empty::after{content:attr(data-code);position:absolute;inset:0;display:grid;place-items:center;font:700 22px var(--ui-mono);color:#8b97b5;letter-spacing:.5px}
-.renew-side-body{padding:18px 20px 20px}
+.renew-side-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:18px 20px 20px}
 .renew-game-name{font-size:20px;font-weight:800;letter-spacing:-.3px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .renew-game-code{margin-top:3px;font:600 12px/1.6 var(--ui-mono);color:#9ba6c2;letter-spacing:.4px}
 .renew-game-left{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}
@@ -725,17 +725,45 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
 .renew-game-left-val{font:700 13px/1.4 var(--ui-mono);color:#fff;text-align:right}
 .renew-game-left-val.on{color:#5fd29b}
 .renew-game-left-val.off{color:#9ba6c2;font-weight:600;font-size:12px}
-.renew-side-label{margin-top:18px;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9ba6c2}
-/* 全部游戏前缀；密钥里的前缀对上哪个，哪个就亮起来 */
-.renew-hero-meta{position:relative;display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;max-height:128px;overflow-y:auto;scrollbar-width:thin}
+.renew-side-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+.renew-side-label{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9ba6c2}
+/* 排序图标 */
+.renew-sort{display:flex;gap:2px;padding:2px;border-radius:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
+.renew-sort-btn{
+  display:grid;place-items:center;width:27px;height:24px;padding:0;border:0;border-radius:7px;background:transparent;color:#9ba6c2;cursor:pointer;
+  transition:background .25s,color .25s,transform .35s cubic-bezier(.34,1.5,.5,1);
+}
+.renew-sort-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.renew-sort-btn:hover{color:#fff}
+.renew-sort-btn:active{transform:scale(.9)}
+.renew-sort-btn.on{background:var(--ui-accent);color:#fff}
+.renew-sort-btn:focus-visible,.renew-chip:focus-visible{outline:2px solid #fff;outline-offset:1px}
+/* 前缀标签区：占满左面板剩下的高度；自己不参与撑高（绝对定位），所以游戏再多也不会把整页撑高 */
+.renew-chips-wrap{position:relative;flex:1 1 0px;min-height:84px;margin-top:9px}
+@property --rfade-t{syntax:'<length>';inherits:false;initial-value:0px}
+@property --rfade-b{syntax:'<length>';inherits:false;initial-value:0px}
+.renew-hero-meta{
+  position:absolute;inset:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:7px;
+  overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
+  --rfade-t:0px;--rfade-b:0px;transition:--rfade-t .25s ease,--rfade-b .25s ease;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--rfade-t),#000 calc(100% - var(--rfade-b)),transparent 100%);
+          mask-image:linear-gradient(to bottom,transparent 0,#000 var(--rfade-t),#000 calc(100% - var(--rfade-b)),transparent 100%);
+}
+.renew-hero-meta::-webkit-scrollbar{display:none}
+.renew-hero-meta.more{--rfade-b:40px}      /* 下面还有：底部渐隐，提示可以用鼠标滚轮继续往下滑 */
+.renew-hero-meta.past{--rfade-t:26px}       /* 已经往下滑过：顶部也渐隐 */
 .renew-chip{
-  display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;
-  font:600 11px/1.5 var(--ui-mono);color:rgba(255,255,255,.85);
+  display:inline-flex;align-items:center;flex:none;height:26px;padding:0 10px;border-radius:999px;cursor:pointer;
+  font:600 11px/1 var(--ui-mono);color:rgba(255,255,255,.85);
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
-  transition:background .3s,border-color .3s,color .3s,transform .45s cubic-bezier(.34,1.5,.5,1);
+  transition:background .25s,border-color .25s,color .25s,transform .4s cubic-bezier(.34,1.5,.5,1);
 }
 .renew-chip b{color:inherit;font-weight:600}
-.renew-chip.on{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff;transform:scale(1.08)}
+.renew-chip:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.28);color:#fff}
+.renew-chip:active{transform:scale(.94)}
+.renew-chip.has-sub::before{content:'';width:6px;height:6px;margin-right:6px;border-radius:50%;background:#5fd29b;flex:none}   /* 已订阅的游戏前面带一个绿点 */
+.renew-chip.on{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff;transform:scale(1.06)}
+@media (max-width:900px){.renew-chips-wrap{flex:none;height:132px}}      /* 上下排列时左面板高度由内容决定，标签区给个固定高度 */
 .renew-card{
   background:var(--ui-surface);
   border:1px solid var(--ui-border);
@@ -1560,8 +1588,26 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
           <div class="renew-game-left-label" data-ui="remaining">Remaining</div>
           <div class="renew-game-left-val" id="renewGameLeft">—</div>
         </div>
-        <div class="renew-side-label" data-ui="renewGames">Games</div>
-        <div class="renew-hero-meta" id="renewChips"></div>
+        <div class="renew-side-head">
+          <div class="renew-side-label" data-ui="renewGames">Games</div>
+          <!-- 排序：默认顺序 / 名称 A→Z / 名称 Z→A / 已订阅优先 -->
+          <div class="renew-sort" id="renewSort" role="group">
+            <button class="renew-sort-btn on" type="button" data-sort="default" data-ui-title="renewSortDefault" onclick="uiRenewSort('default')">
+              <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </button>
+            <button class="renew-sort-btn" type="button" data-sort="az" data-ui-title="renewSortAz" onclick="uiRenewSort('az')">
+              <svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="M20 8h-5"/><path d="M15 10V6.5a2.5 2.5 0 0 1 5 0V10"/><path d="M15 14h5l-5 6h5"/></svg>
+            </button>
+            <button class="renew-sort-btn" type="button" data-sort="za" data-ui-title="renewSortZa" onclick="uiRenewSort('za')">
+              <svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 4v16"/><path d="M15 4h5l-5 6h5"/><path d="M15 20v-3.5a2.5 2.5 0 0 1 5 0V20"/><path d="M20 18h-5"/></svg>
+            </button>
+            <button class="renew-sort-btn" type="button" data-sort="owned" data-ui-title="renewSortOwned" onclick="uiRenewSort('owned')">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </button>
+          </div>
+        </div>
+        <!-- 前缀标签：点一下就选这个游戏；滚动条隐藏，底部（滚动后顶部）渐隐提示可以用滚轮继续滑 -->
+        <div class="renew-chips-wrap"><div class="renew-hero-meta" id="renewChips"></div></div>
       </div>
     </aside>
     <!-- 右：密钥 + 套餐 + 合计 + 操作 -->
@@ -4065,13 +4111,64 @@ function uiErrText(reason){
 
 
 /* ── Renew 视图逻辑 ──────────────────────────────────────────── */
+/* 前缀标签的排序：default 商店顺序 / az 名称 A→Z / za 名称 Z→A / owned 已订阅优先（按剩余时间从短到长，快到期的在最前面）。选择记在 localStorage */
+var UI_RENEW_SORT_KEY = 'starline.renewSort';
+function uiRenewSortMode(){
+  var m = uiState.renewSort;
+  if (!m) {
+    try { m = localStorage.getItem(UI_RENEW_SORT_KEY); } catch (e) { m = ''; }
+    if (['default', 'az', 'za', 'owned'].indexOf(m) < 0) { m = 'default'; }
+    uiState.renewSort = m;
+  }
+  return m;
+}
+function uiRenewSortedGames(){
+  var games = ((UI_CFG && UI_CFG.gameCodes) || []).slice();
+  var mode = uiRenewSortMode();
+  var order = {};
+  games.forEach(function(g, i){ order[g] = i; });
+  var lic = (typeof LICENSES !== 'undefined' && LICENSES && LICENSES.games) || {};
+  var cmp = function(a, b){ return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }); };
+  if (mode === 'az') { games.sort(cmp); }
+  else if (mode === 'za') { games.sort(function(a, b){ return cmp(b, a); }); }
+  else if (mode === 'owned') {
+    games.sort(function(a, b){
+      var la = lic[a], lb = lic[b];
+      if (!!la !== !!lb) { return la ? -1 : 1; }
+      if (la && lb) { return (la.seconds || 0) - (lb.seconds || 0); }
+      return order[a] - order[b];
+    });
+  }
+  return games;
+}
+function uiRenewPaintSort(){
+  var box = document.getElementById('renewSort');
+  if (!box) { return; }
+  var mode = uiRenewSortMode();
+  var btns = box.querySelectorAll('.renew-sort-btn');
+  for (var i = 0; i < btns.length; i++) {
+    var on = btns[i].getAttribute('data-sort') === mode;
+    btns[i].classList.toggle('on', on);
+    btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    var t = btns[i].getAttribute('title') || btns[i].getAttribute('data-tip');      /* 悬停后应用的 tooltip 系统会把 title 搬到 data-tip */
+    if (t) { btns[i].setAttribute('aria-label', t); }
+  }
+}
+/* 底部 / 顶部渐隐：只有真的还能滚的时候才出现 */
+function uiRenewChipsFade(){
+  var box = document.getElementById('renewChips');
+  if (!box) { return; }
+  box.classList.toggle('more', box.scrollHeight - box.scrollTop - box.clientHeight > 2);
+  box.classList.toggle('past', box.scrollTop > 2);
+}
 function uiRenderRenewChips(){
   var box = document.getElementById('renewChips');
   var games = (UI_CFG && UI_CFG.gameCodes) || [];
   if (box) {
+    var lic = (typeof LICENSES !== 'undefined' && LICENSES && LICENSES.games) || {};
     var html = '';
-    games.forEach(function(g){
-      html += '<span class="renew-chip" data-code="' + uiEsc(g) + '"><b>' + uiEsc(g) + '</b></span>';
+    uiRenewSortedGames().forEach(function(g){
+      html += '<button type="button" class="renew-chip' + (lic[g] ? ' has-sub' : '') + '" data-code="' + uiEsc(g) + '"><b>' + uiEsc(g) + '</b></button>';
     });
     box.innerHTML = html;
     box.scrollTop = 0;
@@ -4083,7 +4180,60 @@ function uiRenderRenewChips(){
     games.forEach(function(g){ lh += '<span>' + uiEsc(g) + '</span>'; });
     list.innerHTML = lh;
   }
+  uiRenewPaintSort();
   uiRenewMarkChip(uiRenewGameCode());
+  uiRenewChipsFade();
+}
+/* 点排序图标：已有的标签按新顺序重新排列，并用 FLIP 动画从旧位置滑到新位置 */
+function uiRenewSort(mode){
+  if (['default', 'az', 'za', 'owned'].indexOf(mode) < 0) { mode = 'default'; }
+  if (mode === uiRenewSortMode()) { return; }
+  uiState.renewSort = mode;
+  try { localStorage.setItem(UI_RENEW_SORT_KEY, mode); } catch (e) {}
+  uiRenewPaintSort();
+  var box = document.getElementById('renewChips');
+  if (!box) { return; }
+  var chips = {}, before = {};
+  Array.prototype.forEach.call(box.querySelectorAll('.renew-chip'), function(c){
+    var code = c.getAttribute('data-code');
+    chips[code] = c;
+    var r = c.getBoundingClientRect();
+    before[code] = [r.left, r.top];
+  });
+  uiRenewSortedGames().forEach(function(g){ if (chips[g]) { box.appendChild(chips[g]); } });
+  box.scrollTop = 0;
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (!reduce) {
+    Object.keys(chips).forEach(function(code, i){
+      var c = chips[code];
+      var r = c.getBoundingClientRect();
+      var dx = before[code][0] - r.left, dy = before[code][1] - r.top;
+      if (!c.animate || (Math.abs(dx) < 1 && Math.abs(dy) < 1)) { return; }
+      c.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }],
+                { duration: 560, easing: 'cubic-bezier(.34,1.2,.5,1)' });
+    });
+  }
+  uiRenewChipsFade();
+}
+/* 点前缀标签 = 选这个游戏：左面板用动画换成它；钥匙框里已经有前缀就只换前缀（后面的内容保留），
+   清空钥匙 / 前缀无效时回到的也是这个游戏 */
+function uiRenewPickGame(code){
+  if (!code) { return; }
+  uiState.renewGameOrig = code;
+  var inp = document.getElementById('renewKeyInput');
+  if (inp) {
+    var raw = inp.value;
+    var info = uiRenewParseKey(raw);
+    if (info.game && info.game !== code) {
+      inp.value = code + raw.slice(String(info.game).length);
+      inp.dispatchEvent(new Event('input', { bubbles: true }));      /* 走原来的 input 流程：清除按钮、错误提示、联动 */
+    } else {
+      uiRenewSyncFromKey();
+    }
+    try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
+  } else {
+    uiRenewSyncFromKey();
+  }
 }
 /* ── 密钥前缀联动 ──────────────────────────────────────────────
    密钥格式：<游戏前缀>-<档位>-XXXX-XXXX-XXXX-XXXX。输入 / 粘贴时实时读取：
@@ -4093,7 +4243,11 @@ function uiRenderRenewChips(){
 uiAddT({
   renewPlanLabel: ['Plan', '套餐', 'Тариф', 'Tarif', 'プラン', 'Plan', 'Plan', 'Plano'],
   renewGames:     ['Games', '游戏', 'Игры', 'Spiele', 'ゲーム', 'Juegos', 'Oyunlar', 'Jogos'],
-  renewTotal:     ['Total', '合计', 'Итого', 'Gesamt', '合計', 'Total', 'Toplam', 'Total']
+  renewTotal:     ['Total', '合计', 'Итого', 'Gesamt', '合計', 'Total', 'Toplam', 'Total'],
+  renewSortDefault: ['Default order', '默认顺序', 'По умолчанию', 'Standardreihenfolge', 'デフォルト順', 'Orden predeterminado', 'Varsayılan sıra', 'Ordem padrão'],
+  renewSortAz:      ['Name A \u2192 Z', '名称 A \u2192 Z', 'Название A \u2192 Z', 'Name A \u2192 Z', '名前 A \u2192 Z', 'Nombre A \u2192 Z', 'Ad A \u2192 Z', 'Nome A \u2192 Z'],
+  renewSortZa:      ['Name Z \u2192 A', '名称 Z \u2192 A', 'Название Z \u2192 A', 'Name Z \u2192 A', '名前 Z \u2192 A', 'Nombre Z \u2192 A', 'Ad Z \u2192 A', 'Nome Z \u2192 A'],
+  renewSortOwned:   ['Subscribed first', '已订阅优先', 'Сначала с подпиской', 'Abonnierte zuerst', '購読中を先頭に', 'Suscritos primero', 'Aboneler önce', 'Assinados primeiro']
 });
 function uiRenewParseKey(raw){
   var key = String(raw || '').trim().toUpperCase();
@@ -4128,6 +4282,7 @@ function uiRenewMarkChip(code){
   for (var i = 0; i < chips.length; i++) {
     var on = !!code && chips[i].getAttribute('data-code') === code;
     chips[i].classList.toggle('on', on);
+    chips[i].setAttribute('aria-pressed', on ? 'true' : 'false');
     if (on) { hit = chips[i]; }
   }
   if (hit && box.scrollHeight > box.clientHeight) { box.scrollTo({ top: Math.max(0, hit.offsetTop - 8), behavior: 'smooth' }); }
@@ -4171,7 +4326,7 @@ function uiRenewSyncFromKey(){
   var info = uiRenewParseKey(inp.value);
   var target = info.game || uiState.renewGameOrig || '';
   if (target !== uiRenewGameCode()) { uiRenewSwapGame(target); }
-  uiRenewMarkChip(info.game || '');
+  uiRenewMarkChip(target);
   if (info.plan && info.plan !== (uiState.renewPlan || '90D')) { uiRenewPickPlan(info.plan); }
 }
 /* 套餐的选中高亮块：量选中那一行的实际位置，用 transform 弹簧过渡滑过去。
@@ -4196,6 +4351,16 @@ function uiRenewThumbReset(){
   requestAnimationFrame(uiRenewPlanThumb);
 }
 function uiRenewInitThumb(){
+  var cb = document.getElementById('renewChips');
+  if (cb && !cb.getAttribute('data-wired')) {
+    cb.setAttribute('data-wired', '1');
+    cb.addEventListener('click', function(e){
+      var c = (e.target && e.target.closest) ? e.target.closest('.renew-chip') : null;
+      if (c) { uiRenewPickGame(c.getAttribute('data-code')); }
+    });
+    cb.addEventListener('scroll', uiRenewChipsFade, { passive: true });
+    if (window.ResizeObserver) { new ResizeObserver(uiRenewChipsFade).observe(cb); }
+  }
   var box = document.getElementById('renewPlans');
   if (box && window.ResizeObserver && !box.getAttribute('data-ro')) {
     box.setAttribute('data-ro', '1');
