@@ -180,7 +180,7 @@ cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/42
 cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/58c183d67d59bf7cfd5ab0554b452d4e4e371102/ss_58c183d67d59bf7cfd5ab0554b452d4e4e371102.1920x1080.jpg?t=1793811654
 cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/e16f10d92eeb37401f77be4fdee0d7cab70d4b6a/ss_e16f10d92eeb37401f77be4fdee0d7cab70d4b6a.1920x1080.jpg?t=1793811654
 process  = ROB RUN.exe
-runmode  = exe
+runmode  = dll
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_robrun.zip
 dev      = Kefir
 pub      = Kefir
