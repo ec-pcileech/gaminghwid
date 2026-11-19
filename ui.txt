@@ -754,15 +754,14 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
 .renew-hero-meta.past{--rfade-t:26px}       /* 已经往下滑过：顶部也渐隐 */
 .renew-chip{
   display:inline-flex;align-items:center;flex:none;height:26px;padding:0 10px;border-radius:999px;cursor:pointer;
-  font:600 11px/1 var(--ui-mono);color:rgba(255,255,255,.85);
+  max-width:100%;font:600 11.5px/1 var(--font);color:rgba(255,255,255,.85);
   background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
-  transition:background .25s,border-color .25s,color .25s,transform .4s cubic-bezier(.34,1.5,.5,1);
+  transition:background .25s,border-color .25s,color .25s;      /* 只过渡颜色：选中 / 悬停 / 按下都不改大小 */
 }
-.renew-chip b{color:inherit;font-weight:600}
+.renew-chip b{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:inherit;font-weight:600}
 .renew-chip:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.28);color:#fff}
-.renew-chip:active{transform:scale(.94)}
 .renew-chip.has-sub::before{content:'';width:6px;height:6px;margin-right:6px;border-radius:50%;background:#5fd29b;flex:none}   /* 已订阅的游戏前面带一个绿点 */
-.renew-chip.on{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff;transform:scale(1.06)}
+.renew-chip.on{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
 @media (max-width:900px){.renew-chips-wrap{flex:none;height:132px}}      /* 上下排列时左面板高度由内容决定，标签区给个固定高度 */
 .renew-card{
   background:var(--ui-surface);
@@ -937,17 +936,6 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
 }
 
 
-.renew-status{
-  display:none;margin-top:14px;padding:11px 14px;
-  border-radius:10px;font-size:12.5px;font-weight:600;
-  text-align:center;
-  border:1px solid transparent;
-}
-.renew-status.show{display:block;animation:renewStatusIn .22s ease}
-@keyframes renewStatusIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-.renew-status.err{background:var(--ui-danger-soft);color:var(--ui-danger);border-color:rgba(229,121,111,.32)}
-.renew-status.ok {background:rgba(63,157,111,.16);color:#3f9d6f;border-color:rgba(63,157,111,.32)}
-.renew-status.ld {background:var(--ui-accent-soft);color:var(--ui-accent);border-color:var(--ui-border)}
 
 /* license key 行最右边的问号：只有鼠标悬停（或键盘聚焦）时才弹出游戏前缀格式 */
 .renew-key-help{position:relative;flex-shrink:0;display:inline-flex}
@@ -1689,7 +1677,6 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
         </button>
         <button class="renew-cancel" type="button" onclick="uiCloseView()" data-ui="cancel">Cancel</button>
       </div>
-      <div class="renew-status" id="renewStatus"></div>
       <div class="renew-free-hint" id="renewFreeHint" hidden data-ui="renewFreeHint">This plan is free — click Subscribe, no key needed</div>
     </section>
   </div></div>
@@ -4122,13 +4109,18 @@ function uiRenewSortMode(){
   }
   return m;
 }
+/* 标签上显示的名称：游戏完整名称（没有就退回前缀） */
+function uiRenewGameLabel(code){
+  var m = (typeof GAMES !== 'undefined' && GAMES) ? GAMES[code] : null;
+  return (m && m.title) ? String(m.title) : String(code);
+}
 function uiRenewSortedGames(){
   var games = ((UI_CFG && UI_CFG.gameCodes) || []).slice();
   var mode = uiRenewSortMode();
   var order = {};
   games.forEach(function(g, i){ order[g] = i; });
   var lic = (typeof LICENSES !== 'undefined' && LICENSES && LICENSES.games) || {};
-  var cmp = function(a, b){ return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' }); };
+  var cmp = function(a, b){ return uiRenewGameLabel(a).localeCompare(uiRenewGameLabel(b), undefined, { numeric: true, sensitivity: 'base' }); };      /* 按显示的名称排 */
   if (mode === 'az') { games.sort(cmp); }
   else if (mode === 'za') { games.sort(function(a, b){ return cmp(b, a); }); }
   else if (mode === 'owned') {
@@ -4168,7 +4160,7 @@ function uiRenderRenewChips(){
     var lic = (typeof LICENSES !== 'undefined' && LICENSES && LICENSES.games) || {};
     var html = '';
     uiRenewSortedGames().forEach(function(g){
-      html += '<button type="button" class="renew-chip' + (lic[g] ? ' has-sub' : '') + '" data-code="' + uiEsc(g) + '"><b>' + uiEsc(g) + '</b></button>';
+      html += '<button type="button" class="renew-chip' + (lic[g] ? ' has-sub' : '') + '" data-code="' + uiEsc(g) + '" title="' + uiEsc(g) + '"><b>' + uiEsc(uiRenewGameLabel(g)) + '</b></button>';      /* 悬停显示密钥前缀 */
     });
     box.innerHTML = html;
     box.scrollTop = 0;
@@ -4559,16 +4551,21 @@ function uiRenewPickPlan(plan){
   uiRenewPaintPrices();       /* 价钱/按钮文案/输入框前缀都跟着方案走 */
 }
 function uiRenewClearErr(){
-  var st = document.getElementById('renewStatus');
-  if (st) st.className = 'renew-status';
   var wrap = document.getElementById('renewKeyWrap');
   if (wrap) wrap.classList.remove('is-err','is-ok');
 }
+/* 续费页的提示（请输入授权密钥 / 格式不对 / 已使用 / 网络错误 / 成功…）统一用右下角的 notify（toast），
+   和游戏卡片收藏 / 取消收藏是同一个。type：ok 成功；warn 输入有误；err 服务器 / 网络错误；ld 验证中 → 不弹（提交按钮自己在转圈） */
+var uiRenewLastToast = { msg: '', at: 0 };
 function uiRenewStatus(type, msg){
-  var st = document.getElementById('renewStatus');
-  if (!st) { return; }
-  st.className = 'renew-status ' + type + ' show';
-  st.textContent = msg;
+  if (type === 'ld' || !msg) { return; }
+  var now = Date.now();
+  if (uiRenewLastToast.msg === msg && now - uiRenewLastToast.at < 1500) { return; }      /* 连点按钮不会叠一堆一样的提示 */
+  uiRenewLastToast = { msg: msg, at: now };
+  if (typeof toast !== 'function') { return; }
+  if (type === 'ok') { toast(msg, 'ok', 2400); }
+  else if (type === 'warn') { toast(msg, 'warn', 3600); }
+  else { toast(msg, 'err', 4200); }
 }
 /* 密钥格式由远端游戏列表动态生成：<code>-(7D|15D|30D|90D|LIFETIME)-(XXXX){4,5} */
 function uiRenewKeyRegex(){
@@ -4596,12 +4593,12 @@ function uiRenewSubmit(){
     return;
   }
   if (!key) {
-    uiRenewStatus('err', uiT('renewEmpty'));
+    uiRenewStatus('warn', uiT('renewEmpty'));
     if (wrap) wrap.classList.add('is-err');
     return;
   }
   if (!uiRenewKeyRegex().test(key)) {
-    uiRenewStatus('err', uiT('renewFmt'));
+    uiRenewStatus('warn', uiT('renewFmt'));
     if (wrap) wrap.classList.add('is-err');
     return;
   }
