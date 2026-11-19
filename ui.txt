@@ -700,62 +700,69 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
 
 
 /* ── Renew 视图 ───────────────────────────────────────────────── */
-.renew-wrap{max-width:720px;margin:0 auto}
-.renew-hero{
-  position:relative;overflow:hidden;
-  border-radius:var(--ui-radius-lg);
-  padding:26px 26px 22px;
-  margin-bottom:18px;
+/* B 方案：左边是当前游戏面板（跟着密钥前缀变），右边是密钥 + 套餐 */
+.renew-wrap{display:grid;grid-template-columns:340px minmax(0,1fr);gap:20px;max-width:1020px;margin:0 auto;align-items:stretch}
+@media (max-width:900px){.renew-wrap{grid-template-columns:1fr}}
+.renew-side{
+  position:relative;display:flex;flex-direction:column;overflow:hidden;color:#fff;      /* 高度拉伸到和右边卡片一样高 */
+  border-radius:var(--ui-radius-lg);border:1px solid var(--ui-border);
   background:
-    radial-gradient(520px 260px at 12% -10%, var(--accent-glow,rgba(59,130,246,.38)), transparent 62%),
-    radial-gradient(520px 260px at 100% 110%, var(--ui-accent-soft), transparent 60%),
-    linear-gradient(135deg, rgba(16,16,20,.88), rgba(24,24,30,.88));
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--ui-border);
-  color:#fff;
+    radial-gradient(420px 220px at 10% -8%, var(--accent-glow,rgba(59,130,246,.38)), transparent 62%),
+    linear-gradient(160deg, rgba(18,22,36,.96), rgba(12,14,22,.96));
 }
-.renew-hero::after{
-  content:'';position:absolute;inset:0;pointer-events:none;
-  background:
-    linear-gradient(120deg,transparent 40%,rgba(255,255,255,.08) 50%,transparent 60%);
-  background-size:220% 100%;
-  animation:renewShim 4.5s linear infinite;
+.renew-game-cover{
+  position:relative;flex:none;height:190px;overflow:hidden;will-change:transform,opacity;
+  background-size:cover;background-position:center;background-color:#1a2032;
 }
-@keyframes renewShim{0%{background-position:200% 0}100%{background-position:-60% 0}}
-.renew-hero-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;position:relative;z-index:1}
-.renew-hero-ico{
-  width:44px;height:44px;border-radius:12px;flex-shrink:0;
-  display:grid;place-items:center;color:#fff;
-  background:linear-gradient(135deg,var(--ui-accent),var(--ui-accent-hi));
-  box-shadow:0 8px 24px var(--ui-accent-soft);
+.renew-game-cover::before{content:'';position:absolute;inset:0;background:linear-gradient(transparent 55%,rgba(10,12,20,.6));pointer-events:none;z-index:1}
+.renew-game-cover.empty{background-image:linear-gradient(135deg,#2f3a57,#161b2a)}
+.renew-game-cover.empty::after{content:attr(data-code);position:absolute;inset:0;display:grid;place-items:center;font:700 22px var(--ui-mono);color:#8b97b5;letter-spacing:.5px}
+.renew-side-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;padding:18px 20px 20px}
+.renew-game-name{font-size:20px;font-weight:800;letter-spacing:-.3px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.renew-game-code{margin-top:3px;font:600 12px/1.6 var(--ui-mono);color:#9ba6c2;letter-spacing:.4px}
+.renew-game-left{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12)}
+.renew-game-left-label{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9ba6c2}
+.renew-game-left-val{font:700 13px/1.4 var(--ui-mono);color:#fff;text-align:right}
+.renew-game-left-val.on{color:#5fd29b}
+.renew-game-left-val.off{color:#9ba6c2;font-weight:600;font-size:12px}
+.renew-side-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}
+.renew-side-label{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#9ba6c2}
+/* 排序图标 */
+.renew-sort{display:flex;gap:2px;padding:2px;border-radius:9px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1)}
+.renew-sort-btn{
+  display:grid;place-items:center;width:27px;height:24px;padding:0;border:0;border-radius:7px;background:transparent;color:#9ba6c2;cursor:pointer;
+  transition:background .25s,color .25s,transform .35s cubic-bezier(.34,1.5,.5,1);
 }
-.renew-hero-ico svg{width:20px;height:20px}
-.renew-hero-title{font-size:18px;font-weight:800;letter-spacing:-.3px}
-.renew-hero-sub{font-size:12px;color:rgba(255,255,255,.65);margin-top:1px}
-/* 游戏前缀：全部排在同一行，条目多了就用鼠标左右拖着看（不再换行把面板撑高） */
+.renew-sort-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.renew-sort-btn:hover{color:#fff}
+.renew-sort-btn:active{transform:scale(.9)}
+.renew-sort-btn.on{background:var(--ui-accent);color:#fff}
+.renew-sort-btn:focus-visible,.renew-chip:focus-visible{outline:2px solid #fff;outline-offset:1px}
+/* 前缀标签区：占满左面板剩下的高度；自己不参与撑高（绝对定位），所以游戏再多也不会把整页撑高 */
+.renew-chips-wrap{position:relative;flex:1 1 0px;min-height:84px;margin-top:9px}
+@property --rfade-t{syntax:'<length>';inherits:false;initial-value:0px}
+@property --rfade-b{syntax:'<length>';inherits:false;initial-value:0px}
 .renew-hero-meta{
-  display:flex;gap:10px;flex-wrap:nowrap;position:relative;z-index:2;
-  overflow-x:auto;overflow-y:hidden;
-  padding-bottom:2px;
-  cursor:grab;
-  user-select:none;-webkit-user-select:none;
-  scrollbar-width:none;-ms-overflow-style:none;
-  overscroll-behavior-x:contain;
+  position:absolute;inset:0;display:flex;flex-wrap:wrap;align-content:flex-start;gap:7px;
+  overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;
+  --rfade-t:0px;--rfade-b:0px;transition:--rfade-t .25s ease,--rfade-b .25s ease;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 var(--rfade-t),#000 calc(100% - var(--rfade-b)),transparent 100%);
+          mask-image:linear-gradient(to bottom,transparent 0,#000 var(--rfade-t),#000 calc(100% - var(--rfade-b)),transparent 100%);
 }
-.renew-hero-meta::-webkit-scrollbar{height:0;display:none}
-.renew-hero-meta.dragging{cursor:grabbing}
-.renew-hero-meta.dragging .renew-chip{pointer-events:none}
+.renew-hero-meta::-webkit-scrollbar{display:none}
+.renew-hero-meta.more{--rfade-b:40px}      /* 下面还有：底部渐隐，提示可以用鼠标滚轮继续往下滑 */
+.renew-hero-meta.past{--rfade-t:26px}       /* 已经往下滑过：顶部也渐隐 */
 .renew-chip{
-  display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;
-  padding:5px 11px;border-radius:999px;
-  font-size:11.5px;font-weight:600;
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.14);
-  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  color:rgba(255,255,255,.85);
-  font-family:var(--ui-mono);
+  display:inline-flex;align-items:center;flex:none;height:26px;padding:0 10px;border-radius:999px;cursor:pointer;
+  max-width:100%;font:600 11.5px/1 var(--font);color:rgba(255,255,255,.85);
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+  transition:background .25s,border-color .25s,color .25s;      /* 只过渡颜色：选中 / 悬停 / 按下都不改大小 */
 }
-.renew-chip b{color:#fff}
+.renew-chip b{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:inherit;font-weight:600}
+.renew-chip:hover{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.28);color:#fff}
+.renew-chip.has-sub::before{content:'';width:6px;height:6px;margin-right:6px;border-radius:50%;background:#5fd29b;flex:none}   /* 已订阅的游戏前面带一个绿点 */
+.renew-chip.on{background:var(--ui-accent);border-color:var(--ui-accent);color:#fff}
+@media (max-width:900px){.renew-chips-wrap{flex:none;height:132px}}      /* 上下排列时左面板高度由内容决定，标签区给个固定高度 */
 .renew-card{
   background:var(--ui-surface);
   border:1px solid var(--ui-border);
@@ -839,49 +846,53 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
 }
 .renew-key-paste svg{width:12px;height:12px}
 
-.renew-plans{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:10px;
-  margin-top:16px;
-}
+.renew-main{margin-bottom:0}
+.renew-key-wrap{margin:0 0 18px}
+.renew-plan-label{margin:4px 0 8px;font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ui-text-mute)}
+/* 套餐：竖排单选列表；选中的高亮块（thumb）用弹簧动画在行与行之间滑动 */
+.renew-plans{position:relative;display:flex;flex-direction:column;gap:7px}
 .renew-plan{
-  position:relative;
-  padding:14px 12px;
-  border:1.5px solid var(--ui-border);
-  border-radius:var(--ui-radius);
-  background:var(--ui-surface-2);
-  text-align:left;cursor:pointer;
-  transition:all .18s;
+  display:flex;align-items:center;gap:12px;min-height:44px;padding:5px 16px;
+  border:1px solid var(--ui-border);border-radius:13px;background:var(--ui-surface-2);
+  color:var(--ui-text);text-align:left;cursor:pointer;transition:border-color .2s;
 }
-.renew-plan:hover{
-  border-color:var(--ui-border-strong);
-  transform:translateY(-2px);
-  box-shadow:0 8px 22px rgba(0,0,0,.28);
+.renew-plan:hover{border-color:var(--ui-border-strong)}
+.renew-radio{
+  flex:none;width:18px;height:18px;box-sizing:border-box;border-radius:50%;
+  border:2px solid var(--ui-border-strong);
+  transition:border-color .3s,border-width .35s cubic-bezier(.34,1.5,.5,1);
 }
-.renew-plan.active{
-  border-color:var(--ui-accent);
-  background:var(--ui-accent-soft);
-  box-shadow:0 0 0 3px var(--ui-accent-soft);
-}
+.renew-plan.active .renew-radio{border:5px solid var(--ui-accent)}
+.renew-plan.is-free.active .renew-radio{border-color:#3f9d6f}
+.renew-plan-name{flex:none;width:86px;font-size:13px;font-weight:700}
+.renew-plan-desc{display:flex;align-items:center;flex:1;min-width:0;font-size:13px;color:var(--ui-text-dim)}
 .renew-plan-tag{
-  position:absolute;top:-9px;right:10px;
-  font-size:9.5px;font-weight:800;letter-spacing:.4px;
-  padding:2px 8px;border-radius:999px;
-  background:linear-gradient(135deg,var(--ui-accent),var(--ui-accent-hi));
-  color:#fff;
-  box-shadow:0 4px 12px var(--ui-accent-soft);
+  margin-left:8px;font-size:9.5px;font-weight:800;letter-spacing:.4px;padding:2px 8px;border-radius:999px;
+  background:linear-gradient(135deg,var(--ui-accent),var(--ui-accent-hi));color:#fff;
 }
-.renew-plan-name{
-  font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
-  color:var(--ui-text-mute);margin-bottom:5px;
-}
-.renew-plan-price{
-  font:18px/1.1 var(--ui-mono);font-weight:800;
-  color:var(--ui-text);margin-bottom:3px;
-}
-.renew-plan-desc{font-size:11px;color:var(--ui-text-mute)}
-.renew-old{display:block;font-size:11px;font-weight:600;color:var(--ui-text-mute);text-decoration:line-through;margin-bottom:2px}
+.renew-plan-price{flex:none;margin:0;text-align:right;font:700 16px/1.1 var(--ui-mono);color:var(--ui-text)}
+.renew-old{display:inline-block;margin:0 6px 0 0;font-size:11px;font-weight:600;color:var(--ui-text-mute);text-decoration:line-through}
 .renew-off{display:inline-block;margin-left:6px;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;
   background:var(--ui-accent,#3b82f6);color:#fff;vertical-align:middle;font-family:inherit;letter-spacing:0}
+.renew-plan-thumb{
+  position:absolute;z-index:2;left:0;right:0;top:0;height:44px;box-sizing:border-box;border-radius:13px;
+  border:1.5px solid var(--ui-accent);background:var(--ui-accent-soft);box-shadow:0 0 0 3px var(--ui-accent-soft);
+  pointer-events:none;opacity:0;will-change:transform;
+}
+.renew-plan-thumb.ready{
+  opacity:1;
+  transition:transform .52s cubic-bezier(.34,1.32,.5,1),height .3s ease,opacity .2s ease,border-color .3s,background .3s,box-shadow .3s;
+}
+.renew-plan-thumb.is-free{border-color:#3f9d6f;background:rgba(63,157,111,.12);box-shadow:0 0 0 3px rgba(63,157,111,.16)}
+/* 合计 */
+.renew-total{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:14px 0 12px;padding-top:13px;border-top:1px dashed var(--ui-border-strong)}
+.renew-total-label{font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--ui-text-mute)}
+.renew-total-plan{margin-top:3px;font-size:13px;color:var(--ui-text-dim)}
+.renew-total-price{font:800 26px/1.1 var(--ui-mono);color:var(--ui-text);text-align:right}
+.renew-total-price.free{color:#3f9d6f}
+.renew-total-price.pop{animation:renewPop .5s cubic-bezier(.2,.8,.2,1)}
+@keyframes renewPop{from{opacity:0;transform:translateY(8px) scale(.94);filter:blur(3px)}to{opacity:1;transform:none;filter:blur(0)}}
+.renew-actions{margin-top:0}
 
 
 .renew-actions{
@@ -925,17 +936,6 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
 }
 
 
-.renew-status{
-  display:none;margin-top:14px;padding:11px 14px;
-  border-radius:10px;font-size:12.5px;font-weight:600;
-  text-align:center;
-  border:1px solid transparent;
-}
-.renew-status.show{display:block;animation:renewStatusIn .22s ease}
-@keyframes renewStatusIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-.renew-status.err{background:var(--ui-danger-soft);color:var(--ui-danger);border-color:rgba(229,121,111,.32)}
-.renew-status.ok {background:rgba(63,157,111,.16);color:#3f9d6f;border-color:rgba(63,157,111,.32)}
-.renew-status.ld {background:var(--ui-accent-soft);color:var(--ui-accent);border-color:var(--ui-border)}
 
 /* license key 行最右边的问号：只有鼠标悬停（或键盘聚焦）时才弹出游戏前缀格式 */
 .renew-key-help{position:relative;flex-shrink:0;display:inline-flex}
@@ -992,44 +992,11 @@ html[data-layout="rail-r"] #uiThemeList,html[data-layout="rail-r"] #uiPresetRow{
 }
 .renew-free-hint[hidden]{display:none}
 .renew-plan-price.free{color:#3f9d6f;font-weight:800;letter-spacing:.4px}
-.renew-plan.is-free.active{
-  border-color:#3f9d6f;
-  background:rgba(63,157,111,.12);
-  box-shadow:0 0 0 3px rgba(63,157,111,.16);
-}
 .renew-submit.is-free{
   background:linear-gradient(135deg,#2f9e63,#3fbd7a);
   box-shadow:0 10px 26px rgba(47,158,99,.32);
 }
 
-/* 当前游戏卡片：左边封面、中间名称代号、右边订阅剩余时间 */
-.renew-game{display:flex;align-items:center;gap:16px}
-.renew-game-cover{
-  width:132px;height:74px;flex-shrink:0;border-radius:10px;
-  background-size:cover;background-position:center;background-color:var(--ui-surface-3);
-  border:1px solid var(--ui-border);
-}
-.renew-game-cover.empty{background-image:none}
-.renew-game-info{min-width:0;flex:1}
-.renew-game-name{
-  font-size:15px;font-weight:800;color:var(--ui-text);letter-spacing:-.2px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.renew-game-code{
-  margin-top:3px;font:600 11.5px/1.6 var(--ui-mono);
-  color:var(--ui-text-mute);letter-spacing:.4px;
-}
-.renew-game-left{flex-shrink:0;text-align:right}
-.renew-game-left-label{
-  font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
-  color:var(--ui-text-mute);
-}
-.renew-game-left-val{
-  margin-top:5px;font:700 13px/1.4 var(--ui-mono);color:var(--ui-text);
-}
-.renew-game-left-val.on{color:#3f9d6f}
-.renew-game-left-val.off{color:var(--ui-text-mute);font-weight:600;font-size:12px}
-.renew-key-wrap{margin-top:12px}
 
 /* ── image skeleton ── */
 @keyframes slSkel{0%{background-position:220% 0,0 0}100%{background-position:-220% 0,0 0}}
@@ -1597,20 +1564,44 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
     </button>
   </div>
   <div class="ui-scroll"><div class="renew-wrap">
-    <div class="renew-hero">
-      <div class="renew-hero-top">
-        <div class="renew-hero-ico">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+    <!-- 左：当前游戏（跟着密钥前缀变）：封面 + 名称 + 订阅剩余 + 全部游戏前缀 -->
+    <aside class="renew-side" id="renewSide">
+      <div class="renew-game-cover" id="renewGameCover" data-swap="cover"></div>
+      <div class="renew-side-body">
+        <div data-swap>
+          <div class="renew-game-name" id="renewGameName">—</div>
+          <div class="renew-game-code" id="renewGameCode"></div>
         </div>
-        <div>
-          <div class="renew-hero-title" data-ui="renewTitle">Renew</div>
-          <div class="renew-hero-sub" data-ui="renewSub">Enter a new key to activate or extend a game.</div>
+        <div class="renew-game-left" data-swap>
+          <div class="renew-game-left-label" data-ui="remaining">Remaining</div>
+          <div class="renew-game-left-val" id="renewGameLeft">—</div>
         </div>
+        <div class="renew-side-head">
+          <div class="renew-side-label" data-ui="renewGames">Games</div>
+          <!-- 排序：默认顺序 / 名称 A→Z / 名称 Z→A / 已订阅优先 -->
+          <div class="renew-sort" id="renewSort" role="group">
+            <button class="renew-sort-btn on" type="button" data-sort="default" data-ui-title="renewSortDefault" onclick="uiRenewSort('default')">
+              <svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg>
+            </button>
+            <button class="renew-sort-btn" type="button" data-sort="az" data-ui-title="renewSortAz" onclick="uiRenewSort('az')">
+              <svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="M20 8h-5"/><path d="M15 10V6.5a2.5 2.5 0 0 1 5 0V10"/><path d="M15 14h5l-5 6h5"/></svg>
+            </button>
+            <button class="renew-sort-btn" type="button" data-sort="za" data-ui-title="renewSortZa" onclick="uiRenewSort('za')">
+              <svg viewBox="0 0 24 24"><path d="m3 16 4 4 4-4"/><path d="M7 4v16"/><path d="M15 4h5l-5 6h5"/><path d="M15 20v-3.5a2.5 2.5 0 0 1 5 0V20"/><path d="M20 18h-5"/></svg>
+            </button>
+            <button class="renew-sort-btn" type="button" data-sort="owned" data-ui-title="renewSortOwned" onclick="uiRenewSort('owned')">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </button>
+          </div>
+        </div>
+        <!-- 前缀标签：点一下就选这个游戏；滚动条隐藏，底部（滚动后顶部）渐隐提示可以用滚轮继续滑 -->
+        <div class="renew-chips-wrap"><div class="renew-hero-meta" id="renewChips"></div></div>
       </div>
-      <div class="renew-hero-meta" id="renewChips"></div>
-    </div>
-    <div class="renew-card">
+    </aside>
+    <!-- 右：密钥 + 套餐 + 合计 + 操作 -->
+    <section class="renew-card renew-main">
       <div class="renew-card-title" data-ui="renewKeyLabel">License key</div>
+      <div class="renew-card-sub" data-ui="renewSub">Enter a new key to activate or extend a game.</div>
       <div class="renew-key-wrap" id="renewKeyWrap">
         <span class="renew-key-ico">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
@@ -1619,7 +1610,7 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
                placeholder="CS2-30D-XXXX-XXXX-XXXX-XXXX"
                autocomplete="off" spellcheck="false"
                onkeydown="if(event.key==='Enter')uiRenewSubmit()"
-               oninput="uiRenewClearErr()">
+               oninput="uiRenewClearErr();uiRenewSyncFromKey()">
         <button class="renew-key-clear" id="renewKeyClear" type="button"
                 onclick="uiRenewClear()" title="Clear">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -1638,33 +1629,46 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
         </span>
       </div>
       <div class="renew-fest" id="renewFest" hidden></div>
+      <div class="renew-plan-label" data-ui="renewPlanLabel">Plan</div>
       <div class="renew-plans" id="renewPlans">
+        <span class="renew-plan-thumb" id="renewPlanThumb" aria-hidden="true"></span>
         <button class="renew-plan" type="button" data-plan="7D" onclick="uiRenewPickPlan('7D')">
-          <div class="renew-plan-name" data-ui="plan7Name">7 Days</div>
-          <div class="renew-plan-price" id="renewPrice7">—</div>
-          <div class="renew-plan-desc" data-ui="plan7Desc">Weekly access</div>
+          <i class="renew-radio"></i>
+          <span class="renew-plan-name" data-ui="plan7Name">7 Days</span>
+          <span class="renew-plan-desc" data-ui="plan7Desc">Weekly access</span>
+          <span class="renew-plan-price" id="renewPrice7">—</span>
         </button>
         <button class="renew-plan" type="button" data-plan="15D" onclick="uiRenewPickPlan('15D')">
-          <div class="renew-plan-name" data-ui="plan15Name">15 Days</div>
-          <div class="renew-plan-price" id="renewPrice15">—</div>
-          <div class="renew-plan-desc" data-ui="plan15Desc">Half-month access</div>
+          <i class="renew-radio"></i>
+          <span class="renew-plan-name" data-ui="plan15Name">15 Days</span>
+          <span class="renew-plan-desc" data-ui="plan15Desc">Half-month access</span>
+          <span class="renew-plan-price" id="renewPrice15">—</span>
         </button>
         <button class="renew-plan" type="button" data-plan="30D" onclick="uiRenewPickPlan('30D')">
-          <div class="renew-plan-name" data-ui="plan30Name">30 Days</div>
-          <div class="renew-plan-price" id="renewPrice30">—</div>
-          <div class="renew-plan-desc" data-ui="plan30Desc">Monthly access</div>
+          <i class="renew-radio"></i>
+          <span class="renew-plan-name" data-ui="plan30Name">30 Days</span>
+          <span class="renew-plan-desc" data-ui="plan30Desc">Monthly access</span>
+          <span class="renew-plan-price" id="renewPrice30">—</span>
         </button>
         <button class="renew-plan active" type="button" data-plan="90D" onclick="uiRenewPickPlan('90D')">
-          <span class="renew-plan-tag" data-ui="planBest">Best</span>
-          <div class="renew-plan-name" data-ui="plan90Name">90 Days</div>
-          <div class="renew-plan-price" id="renewPrice90">—</div>
-          <div class="renew-plan-desc" data-ui="plan90Desc">Season pass</div>
+          <i class="renew-radio"></i>
+          <span class="renew-plan-name" data-ui="plan90Name">90 Days</span>
+          <span class="renew-plan-desc"><span data-ui="plan90Desc">Season pass</span><span class="renew-plan-tag" data-ui="planBest">Best</span></span>
+          <span class="renew-plan-price" id="renewPrice90">—</span>
         </button>
         <button class="renew-plan" type="button" data-plan="LIFETIME" onclick="uiRenewPickPlan('LIFETIME')">
-          <div class="renew-plan-name" data-ui="planLtName">Lifetime</div>
-          <div class="renew-plan-price" id="renewPriceLt">—</div>
-          <div class="renew-plan-desc" data-ui="planLtDesc">Forever access</div>
+          <i class="renew-radio"></i>
+          <span class="renew-plan-name" data-ui="planLtName">Lifetime</span>
+          <span class="renew-plan-desc" data-ui="planLtDesc">Forever access</span>
+          <span class="renew-plan-price" id="renewPriceLt">—</span>
         </button>
+      </div>
+      <div class="renew-total">
+        <div>
+          <div class="renew-total-label" data-ui="renewTotal">Total</div>
+          <div class="renew-total-plan" id="renewTotalPlan">—</div>
+        </div>
+        <div class="renew-total-price" id="renewTotalPrice">—</div>
       </div>
       <div class="renew-actions">
         <button class="renew-submit" id="renewSubmitBtn" type="button" onclick="uiRenewSubmit()">
@@ -1673,23 +1677,8 @@ body.logo-intro .logo3d{animation:none;transform:rotateX(7deg) rotateY(-8deg) sc
         </button>
         <button class="renew-cancel" type="button" onclick="uiCloseView()" data-ui="cancel">Cancel</button>
       </div>
-      <div class="renew-status" id="renewStatus"></div>
       <div class="renew-free-hint" id="renewFreeHint" hidden data-ui="renewFreeHint">This plan is free — click Subscribe, no key needed</div>
-    </div>
-    <!-- 当前游戏：封面 + 名称 + 右侧订阅剩余时间 -->
-    <div class="renew-card renew-game-card">
-      <div class="renew-game">
-        <div class="renew-game-cover" id="renewGameCover"></div>
-        <div class="renew-game-info">
-          <div class="renew-game-name" id="renewGameName">—</div>
-          <div class="renew-game-code" id="renewGameCode"></div>
-        </div>
-        <div class="renew-game-left">
-          <div class="renew-game-left-label" data-ui="remaining">Remaining</div>
-          <div class="renew-game-left-val" id="renewGameLeft">—</div>
-        </div>
-      </div>
-    </div>
+    </section>
   </div></div>
 </div>
 
@@ -4109,17 +4098,72 @@ function uiErrText(reason){
 
 
 /* ── Renew 视图逻辑 ──────────────────────────────────────────── */
+/* 前缀标签的排序：default 商店顺序 / az 名称 A→Z / za 名称 Z→A / owned 已订阅优先（按剩余时间从短到长，快到期的在最前面）。选择记在 localStorage */
+var UI_RENEW_SORT_KEY = 'starline.renewSort';
+function uiRenewSortMode(){
+  var m = uiState.renewSort;
+  if (!m) {
+    try { m = localStorage.getItem(UI_RENEW_SORT_KEY); } catch (e) { m = ''; }
+    if (['default', 'az', 'za', 'owned'].indexOf(m) < 0) { m = 'default'; }
+    uiState.renewSort = m;
+  }
+  return m;
+}
+/* 标签上显示的名称：游戏完整名称（没有就退回前缀） */
+function uiRenewGameLabel(code){
+  var m = (typeof GAMES !== 'undefined' && GAMES) ? GAMES[code] : null;
+  return (m && m.title) ? String(m.title) : String(code);
+}
+function uiRenewSortedGames(){
+  var games = ((UI_CFG && UI_CFG.gameCodes) || []).slice();
+  var mode = uiRenewSortMode();
+  var order = {};
+  games.forEach(function(g, i){ order[g] = i; });
+  var lic = (typeof LICENSES !== 'undefined' && LICENSES && LICENSES.games) || {};
+  var cmp = function(a, b){ return uiRenewGameLabel(a).localeCompare(uiRenewGameLabel(b), undefined, { numeric: true, sensitivity: 'base' }); };      /* 按显示的名称排 */
+  if (mode === 'az') { games.sort(cmp); }
+  else if (mode === 'za') { games.sort(function(a, b){ return cmp(b, a); }); }
+  else if (mode === 'owned') {
+    games.sort(function(a, b){
+      var la = lic[a], lb = lic[b];
+      if (!!la !== !!lb) { return la ? -1 : 1; }
+      if (la && lb) { return (la.seconds || 0) - (lb.seconds || 0); }
+      return order[a] - order[b];
+    });
+  }
+  return games;
+}
+function uiRenewPaintSort(){
+  var box = document.getElementById('renewSort');
+  if (!box) { return; }
+  var mode = uiRenewSortMode();
+  var btns = box.querySelectorAll('.renew-sort-btn');
+  for (var i = 0; i < btns.length; i++) {
+    var on = btns[i].getAttribute('data-sort') === mode;
+    btns[i].classList.toggle('on', on);
+    btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    var t = btns[i].getAttribute('title') || btns[i].getAttribute('data-tip');      /* 悬停后应用的 tooltip 系统会把 title 搬到 data-tip */
+    if (t) { btns[i].setAttribute('aria-label', t); }
+  }
+}
+/* 底部 / 顶部渐隐：只有真的还能滚的时候才出现 */
+function uiRenewChipsFade(){
+  var box = document.getElementById('renewChips');
+  if (!box) { return; }
+  box.classList.toggle('more', box.scrollHeight - box.scrollTop - box.clientHeight > 2);
+  box.classList.toggle('past', box.scrollTop > 2);
+}
 function uiRenderRenewChips(){
   var box = document.getElementById('renewChips');
   var games = (UI_CFG && UI_CFG.gameCodes) || [];
   if (box) {
+    var lic = (typeof LICENSES !== 'undefined' && LICENSES && LICENSES.games) || {};
     var html = '';
-    games.forEach(function(g){
-      html += '<span class="renew-chip"><b>' + uiEsc(g) + '</b></span>';
+    uiRenewSortedGames().forEach(function(g){
+      html += '<button type="button" class="renew-chip' + (lic[g] ? ' has-sub' : '') + '" data-code="' + uiEsc(g) + '" title="' + uiEsc(g) + '"><b>' + uiEsc(uiRenewGameLabel(g)) + '</b></button>';      /* 悬停显示密钥前缀 */
     });
     box.innerHTML = html;
-    box.classList.remove('dragging');
-    box.scrollLeft = 0;
+    box.scrollTop = 0;
   }
   /* 同一份前缀列表也喂给 license key 右边问号的弹层 */
   var list = document.getElementById('renewKeyHelpList');
@@ -4128,42 +4172,192 @@ function uiRenderRenewChips(){
     games.forEach(function(g){ lh += '<span>' + uiEsc(g) + '</span>'; });
     list.innerHTML = lh;
   }
+  uiRenewPaintSort();
+  uiRenewMarkChip(uiRenewGameCode());
+  uiRenewChipsFade();
 }
-/* 前缀太多时：按住鼠标左右拖动横向滚动（不再换行/撑高面板） */
-function uiRenewChipsDrag(){
+/* 点排序图标：已有的标签按新顺序重新排列，并用 FLIP 动画从旧位置滑到新位置 */
+function uiRenewSort(mode){
+  if (['default', 'az', 'za', 'owned'].indexOf(mode) < 0) { mode = 'default'; }
+  if (mode === uiRenewSortMode()) { return; }
+  uiState.renewSort = mode;
+  try { localStorage.setItem(UI_RENEW_SORT_KEY, mode); } catch (e) {}
+  uiRenewPaintSort();
   var box = document.getElementById('renewChips');
-  if (!box || box.getAttribute('data-drag') === '1') return;
-  box.setAttribute('data-drag', '1');
-  var down = false, startX = 0, startLeft = 0, moved = false;
-  box.addEventListener('pointerdown', function(e){
-    if (e.button) return;
-    down = true; moved = false;
-    startX = e.clientX; startLeft = box.scrollLeft;
-    box.classList.add('dragging');
-    try { box.setPointerCapture(e.pointerId); } catch (err) {}
+  if (!box) { return; }
+  var chips = {}, before = {};
+  Array.prototype.forEach.call(box.querySelectorAll('.renew-chip'), function(c){
+    var code = c.getAttribute('data-code');
+    chips[code] = c;
+    var r = c.getBoundingClientRect();
+    before[code] = [r.left, r.top];
   });
-  box.addEventListener('pointermove', function(e){
-    if (!down) return;
-    var dx = e.clientX - startX;
-    if (Math.abs(dx) > 3) moved = true;
-    box.scrollLeft = startLeft - dx;
-  });
-  function release(){
-    if (!down) return;
-    down = false;
-    box.classList.remove('dragging');
+  uiRenewSortedGames().forEach(function(g){ if (chips[g]) { box.appendChild(chips[g]); } });
+  box.scrollTop = 0;
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (!reduce) {
+    Object.keys(chips).forEach(function(code, i){
+      var c = chips[code];
+      var r = c.getBoundingClientRect();
+      var dx = before[code][0] - r.left, dy = before[code][1] - r.top;
+      if (!c.animate || (Math.abs(dx) < 1 && Math.abs(dy) < 1)) { return; }
+      c.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }],
+                { duration: 560, easing: 'cubic-bezier(.34,1.2,.5,1)' });
+    });
   }
-  box.addEventListener('pointerup', release);
-  box.addEventListener('pointercancel', release);
-  box.addEventListener('click', function(e){
-    if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; }
-  }, true);
-  /* 顺带支持一下滚轮（没有横向滚轮时用竖直滚轮推） */
-  box.addEventListener('wheel', function(e){
-    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-    box.scrollLeft += e.deltaY;
-    e.preventDefault();
-  }, { passive: false });
+  uiRenewChipsFade();
+}
+/* 点前缀标签 = 选这个游戏：左面板用动画换成它；钥匙框里已经有前缀就只换前缀（后面的内容保留），
+   清空钥匙 / 前缀无效时回到的也是这个游戏 */
+function uiRenewPickGame(code){
+  if (!code) { return; }
+  uiState.renewGameOrig = code;
+  var inp = document.getElementById('renewKeyInput');
+  if (inp) {
+    var raw = inp.value;
+    var info = uiRenewParseKey(raw);
+    if (info.game && info.game !== code) {
+      inp.value = code + raw.slice(String(info.game).length);
+      inp.dispatchEvent(new Event('input', { bubbles: true }));      /* 走原来的 input 流程：清除按钮、错误提示、联动 */
+    } else {
+      uiRenewSyncFromKey();
+    }
+    try { inp.focus({ preventScroll: true }); } catch (e) { inp.focus(); }
+  } else {
+    uiRenewSyncFromKey();
+  }
+}
+/* ── 密钥前缀联动 ──────────────────────────────────────────────
+   密钥格式：<游戏前缀>-<档位>-XXXX-XXXX-XXXX-XXXX。输入 / 粘贴时实时读取：
+   · 前缀对上某个游戏 → 左边游戏面板用动画换成这个游戏（封面 / 名称 / 订阅剩余 / 价格 / 折扣都跟着变）；
+     前缀不对或被删掉 → 回到打开页面时的那个游戏
+   · 档位（7D / 15D / 30D / 90D / LIFETIME）→ 右边套餐的选中高亮用弹簧动画滑到对应的一行 */
+uiAddT({
+  renewPlanLabel: ['Plan', '套餐', 'Тариф', 'Tarif', 'プラン', 'Plan', 'Plan', 'Plano'],
+  renewGames:     ['Games', '游戏', 'Игры', 'Spiele', 'ゲーム', 'Juegos', 'Oyunlar', 'Jogos'],
+  renewTotal:     ['Total', '合计', 'Итого', 'Gesamt', '合計', 'Total', 'Toplam', 'Total'],
+  renewSortDefault: ['Default order', '默认顺序', 'По умолчанию', 'Standardreihenfolge', 'デフォルト順', 'Orden predeterminado', 'Varsayılan sıra', 'Ordem padrão'],
+  renewSortAz:      ['Name A \u2192 Z', '名称 A \u2192 Z', 'Название A \u2192 Z', 'Name A \u2192 Z', '名前 A \u2192 Z', 'Nombre A \u2192 Z', 'Ad A \u2192 Z', 'Nome A \u2192 Z'],
+  renewSortZa:      ['Name Z \u2192 A', '名称 Z \u2192 A', 'Название Z \u2192 A', 'Name Z \u2192 A', '名前 Z \u2192 A', 'Nombre Z \u2192 A', 'Ad Z \u2192 A', 'Nome Z \u2192 A'],
+  renewSortOwned:   ['Subscribed first', '已订阅优先', 'Сначала с подпиской', 'Abonnierte zuerst', '購読中を先頭に', 'Suscritos primero', 'Aboneler önce', 'Assinados primeiro']
+});
+function uiRenewParseKey(raw){
+  var key = String(raw || '').trim().toUpperCase();
+  var out = { game: '', plan: '' };
+  if (!key) { return out; }
+  /* 长的前缀先试：DEADLOCKOCTARINECRACK 要排在 DEADLOCK 前面；前缀里本身带「-」也能正确切开 */
+  var codes = ((UI_CFG && UI_CFG.gameCodes) || []).slice().sort(function(a, b){ return String(b).length - String(a).length; });
+  var rest = '';
+  for (var i = 0; i < codes.length; i++) {
+    var c = String(codes[i]).toUpperCase();
+    if (key.indexOf(c + '-') === 0) { out.game = codes[i]; rest = key.slice(c.length + 1); break; }
+  }
+  if (!out.game) {
+    /* 还没打「-」：整串恰好是某个前缀、并且没有别的前缀以它开头（不会歧义）时，提前识别 */
+    var exact = '', ambiguous = false;
+    for (var j = 0; j < codes.length; j++) {
+      var cc = String(codes[j]).toUpperCase();
+      if (cc === key) { exact = codes[j]; }
+      else if (cc.indexOf(key) === 0) { ambiguous = true; }
+    }
+    if (exact && !ambiguous) { out.game = exact; }
+    return out;
+  }
+  var m = /^(7D|15D|30D|90D|LIFETIME)(?:-|$)/.exec(rest);
+  if (m) { out.plan = m[1]; }
+  return out;
+}
+function uiRenewMarkChip(code){
+  var box = document.getElementById('renewChips');
+  if (!box) { return; }
+  var chips = box.querySelectorAll('.renew-chip'), hit = null;
+  for (var i = 0; i < chips.length; i++) {
+    var on = !!code && chips[i].getAttribute('data-code') === code;
+    chips[i].classList.toggle('on', on);
+    chips[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (on) { hit = chips[i]; }
+  }
+  if (hit && box.scrollHeight > box.clientHeight) { box.scrollTo({ top: Math.max(0, hit.offsetTop - 8), behavior: 'smooth' }); }
+}
+var uiRenewSwapSeq = 0;
+/* 换游戏：旧内容向上淡出（带模糊）→ 换成新游戏 → 封面放大着落下、文字依次上浮弹入 */
+function uiRenewSwapGame(code){
+  var seq = ++uiRenewSwapSeq;
+  uiState.renewGame = code;
+  var side = document.getElementById('renewSide');
+  var parts = side ? Array.prototype.slice.call(side.querySelectorAll('[data-swap]')) : [];
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (!side || !side.offsetParent || reduce || !parts.length || !parts[0].animate) {
+    uiRenewRenderGame(); uiRenewPaintPrices(); return;
+  }
+  var outs = parts.map(function(p){
+    p.getAnimations().forEach(function(a){ a.cancel(); });
+    return p.animate(
+      [{ opacity: 1, transform: 'none', filter: 'blur(0px)' }, { opacity: 0, transform: 'translateY(-10px)', filter: 'blur(4px)' }],
+      { duration: 140, easing: 'ease-in', fill: 'forwards' }
+    ).finished.catch(function(){});
+  });
+  Promise.all(outs).then(function(){
+    if (seq !== uiRenewSwapSeq) { return; }               /* 连续输入：只播最后一次 */
+    uiRenewRenderGame();
+    uiRenewPaintPrices();
+    parts.forEach(function(p, i){
+      p.getAnimations().forEach(function(a){ a.cancel(); });
+      var cover = p.getAttribute('data-swap') === 'cover';
+      p.animate(
+        [{ opacity: 0, transform: cover ? 'scale(1.14)' : 'translateY(14px) scale(.97)', filter: 'blur(8px)' },
+         { opacity: 1, transform: 'none', filter: 'blur(0px)' }],
+        { duration: cover ? 560 : 480, delay: cover ? 0 : 60 + i * 50, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'backwards' }
+      );
+    });
+  });
+}
+function uiRenewSyncFromKey(){
+  var inp = document.getElementById('renewKeyInput');
+  if (!inp) { return; }
+  var info = uiRenewParseKey(inp.value);
+  var target = info.game || uiState.renewGameOrig || '';
+  if (target !== uiRenewGameCode()) { uiRenewSwapGame(target); }
+  uiRenewMarkChip(target);
+  if (info.plan && info.plan !== (uiState.renewPlan || '90D')) { uiRenewPickPlan(info.plan); }
+}
+/* 套餐的选中高亮块：量选中那一行的实际位置，用 transform 弹簧过渡滑过去。
+   第一次摆放（或每次重新打开页面）不带过渡，避免从 0 滑进来 */
+function uiRenewPlanThumb(){
+  var box = document.getElementById('renewPlans');
+  var th = document.getElementById('renewPlanThumb');
+  if (!box || !th) { return; }
+  var act = box.querySelector('.renew-plan.active');
+  if (!act || !act.offsetHeight) { return; }
+  var first = !th.classList.contains('ready');
+  if (first) { th.style.transition = 'none'; }
+  th.style.height = act.offsetHeight + 'px';
+  th.style.transform = 'translateY(' + act.offsetTop + 'px)';
+  th.classList.toggle('is-free', act.classList.contains('is-free'));
+  th.classList.add('ready');
+  if (first) { void th.offsetWidth; th.style.transition = ''; }
+}
+function uiRenewThumbReset(){
+  var th = document.getElementById('renewPlanThumb');
+  if (th) { th.classList.remove('ready'); }
+  requestAnimationFrame(uiRenewPlanThumb);
+}
+function uiRenewInitThumb(){
+  var cb = document.getElementById('renewChips');
+  if (cb && !cb.getAttribute('data-wired')) {
+    cb.setAttribute('data-wired', '1');
+    cb.addEventListener('click', function(e){
+      var c = (e.target && e.target.closest) ? e.target.closest('.renew-chip') : null;
+      if (c) { uiRenewPickGame(c.getAttribute('data-code')); }
+    });
+    cb.addEventListener('scroll', uiRenewChipsFade, { passive: true });
+    if (window.ResizeObserver) { new ResizeObserver(uiRenewChipsFade).observe(cb); }
+  }
+  var box = document.getElementById('renewPlans');
+  if (box && window.ResizeObserver && !box.getAttribute('data-ro')) {
+    box.setAttribute('data-ro', '1');
+    new ResizeObserver(function(){ uiRenewPlanThumb(); }).observe(box);
+  }
 }
 function uiRenewGameCode(){
   return String(uiState.renewGame || '').trim();
@@ -4196,7 +4390,21 @@ function uiRenewPlanKeys(plan){
   if (plan === 'LIFETIME') return { free: 'freeLife', price: 'priceLife', global: 'life' };
   return { free: 'free90', price: 'price90', global: 'd90' };
 }
-/* 把价钱刷到五张套餐卡上（跟着当前游戏走），并同步按钮文案/免费提示/输入框前缀 */
+/* 把一个价钱对象画进元素：原价划线 + 现价 + 折扣角标；免费显示绿色 */
+function uiRenewFillPrice(el, p){
+  el.textContent = '';
+  if (p.off) {
+    var so = document.createElement('span'); so.className = 'renew-old'; so.textContent = p.old;
+    el.appendChild(so);
+  }
+  el.appendChild(document.createTextNode(p.text));
+  if (p.off) {
+    var sf = document.createElement('span'); sf.className = 'renew-off'; sf.textContent = '-' + p.off + '%';
+    el.appendChild(sf);
+  }
+  el.classList.toggle('free', !!p.free);
+}
+/* 把价钱刷到五行套餐上（跟着当前游戏走），并同步合计 / 按钮文案 / 免费提示 / 输入框前缀 */
 function uiRenewPaintPrices(){
   var slots = [['renewPrice7', '7D'], ['renewPrice15', '15D'], ['renewPrice30', '30D'],
                ['renewPrice90', '90D'], ['renewPriceLt', 'LIFETIME']];
@@ -4204,17 +4412,7 @@ function uiRenewPaintPrices(){
     var el = document.getElementById(slots[i][0]);
     if (!el) continue;
     var p = uiRenewPlanPrice(slots[i][1]);
-    el.textContent = '';
-    if (p.off) {
-      var so = document.createElement('span'); so.className = 'renew-old'; so.textContent = p.old;
-      el.appendChild(so);
-    }
-    el.appendChild(document.createTextNode(p.text));
-    if (p.off) {
-      var sf = document.createElement('span'); sf.className = 'renew-off'; sf.textContent = '-' + p.off + '%';
-      el.appendChild(sf);
-    }
-    el.classList.toggle('free', !!p.free);
+    uiRenewFillPrice(el, p);
     var card = el.closest ? el.closest('.renew-plan') : null;
     if (card) card.classList.toggle('is-free', !!p.free);
   }
@@ -4232,6 +4430,22 @@ function uiRenewPaintPrices(){
     var code = uiRenewGameCode();
     inp.placeholder = (code || 'KEY') + '-' + plan + '-XXXX-XXXX-XXXX-XXXX';
   }
+  /* 合计：当前选中的套餐 + 价钱（价钱变了就弹一下） */
+  var tp = document.getElementById('renewTotalPrice'), tn = document.getElementById('renewTotalPlan');
+  var row = document.querySelector('.renew-plan[data-plan="' + plan + '"]');
+  if (tn && row) {
+    var nn = row.querySelector('.renew-plan-name'), dd = row.querySelector('.renew-plan-desc');
+    var dtxt = dd ? (dd.querySelector('[data-ui]') || dd).textContent : '';
+    tn.textContent = (dtxt ? dtxt + ' \u00b7 ' : '') + (nn ? nn.textContent : '');
+  }
+  if (tp) {
+    var before = tp.textContent;
+    uiRenewFillPrice(tp, cur);
+    if (before !== tp.textContent && before !== '\u2014' && before !== '') {
+      tp.classList.remove('pop'); void tp.offsetWidth; tp.classList.add('pop');
+    }
+  }
+  uiRenewPlanThumb();
 }
 function uiRenewFmtLeft(sec){
   if (typeof sec !== 'number' || !isFinite(sec)) return '';
@@ -4252,6 +4466,7 @@ function uiRenewRenderGame(){
   var sub   = document.getElementById('renewGameCode');
   var left  = document.getElementById('renewGameLeft');
   var img = m ? String(m.poster || m.img || '') : '';
+  if (cover) { cover.setAttribute('data-code', code || ''); }
   if (cover) {
     if (img) { cover.style.backgroundImage = "url('" + img + "')"; cover.classList.remove('empty'); }
     else { cover.style.backgroundImage = ''; cover.classList.add('empty'); }
@@ -4278,6 +4493,7 @@ function uiOpenRenew(gameCode){
   var l = document.getElementById('uiChangelogView');
   if (l) l.classList.remove('open');
   if (typeof gameCode === 'string' && gameCode) uiState.renewGame = gameCode;
+  uiState.renewGameOrig = uiState.renewGame || '';      /* 密钥前缀识别不出来 / 被删掉时回到这个游戏 */
   var r = document.getElementById('uiRenewView');
   uiShow(r);
   uiRenewReset();
@@ -4285,6 +4501,7 @@ function uiOpenRenew(gameCode){
   uiRenewRenderGame();
   uiPaintPrices();
   uiRenderRenewChips();
+  uiRenewThumbReset();
   uiLockBackground();
   if (typeof onUiViewOpened === 'function') { onUiViewOpened('renew'); }
 }
@@ -4307,6 +4524,7 @@ function uiRenewClear(){
   var clr = document.getElementById('renewKeyClear');
   if (clr) clr.classList.remove('show');
   uiRenewClearErr();
+  uiRenewSyncFromKey();
 }
 function uiRenewPaste(){
   try {
@@ -4317,6 +4535,7 @@ function uiRenewPaste(){
         var clr = document.getElementById('renewKeyClear');
         if (clr && inp && inp.value.length > 0) clr.classList.add('show');
         uiRenewClearErr();
+        uiRenewSyncFromKey();
       }).catch(function(){});
     }
   } catch (e) {}
@@ -4332,16 +4551,21 @@ function uiRenewPickPlan(plan){
   uiRenewPaintPrices();       /* 价钱/按钮文案/输入框前缀都跟着方案走 */
 }
 function uiRenewClearErr(){
-  var st = document.getElementById('renewStatus');
-  if (st) st.className = 'renew-status';
   var wrap = document.getElementById('renewKeyWrap');
   if (wrap) wrap.classList.remove('is-err','is-ok');
 }
+/* 续费页的提示（请输入授权密钥 / 格式不对 / 已使用 / 网络错误 / 成功…）统一用右下角的 notify（toast），
+   和游戏卡片收藏 / 取消收藏是同一个。type：ok 成功；warn 输入有误；err 服务器 / 网络错误；ld 验证中 → 不弹（提交按钮自己在转圈） */
+var uiRenewLastToast = { msg: '', at: 0 };
 function uiRenewStatus(type, msg){
-  var st = document.getElementById('renewStatus');
-  if (!st) { return; }
-  st.className = 'renew-status ' + type + ' show';
-  st.textContent = msg;
+  if (type === 'ld' || !msg) { return; }
+  var now = Date.now();
+  if (uiRenewLastToast.msg === msg && now - uiRenewLastToast.at < 1500) { return; }      /* 连点按钮不会叠一堆一样的提示 */
+  uiRenewLastToast = { msg: msg, at: now };
+  if (typeof toast !== 'function') { return; }
+  if (type === 'ok') { toast(msg, 'ok', 2400); }
+  else if (type === 'warn') { toast(msg, 'warn', 3600); }
+  else { toast(msg, 'err', 4200); }
 }
 /* 密钥格式由远端游戏列表动态生成：<code>-(7D|15D|30D|90D|LIFETIME)-(XXXX){4,5} */
 function uiRenewKeyRegex(){
@@ -4369,12 +4593,12 @@ function uiRenewSubmit(){
     return;
   }
   if (!key) {
-    uiRenewStatus('err', uiT('renewEmpty'));
+    uiRenewStatus('warn', uiT('renewEmpty'));
     if (wrap) wrap.classList.add('is-err');
     return;
   }
   if (!uiRenewKeyRegex().test(key)) {
-    uiRenewStatus('err', uiT('renewFmt'));
+    uiRenewStatus('warn', uiT('renewFmt'));
     if (wrap) wrap.classList.add('is-err');
     return;
   }
@@ -4433,7 +4657,7 @@ function uiInit(){
   uiApplyLangUi();
   uiPaintPrices();
   uiRenderRenewChips();
-  uiRenewChipsDrag();
+  uiRenewInitThumb();
   uiListenHost();
 
   var sv = document.getElementById('sbVer');
@@ -9143,11 +9367,6 @@ uiAddT({
 var UI_TC_KEY = 'starline.targetCursor.off';
 /* 维护页文案「Under Maintenance」：8 种内置语言；用 uiAddT 写入，所以也会自动出现在「自定义翻译」编辑器里 */
 uiAddT({ mtUnderMaintenance: ['Under Maintenance', '维护中', 'Технические работы', 'Wartungsarbeiten', 'メンテナンス中', 'En mantenimiento', 'Bakımda', 'Em manutenção'] });
-/* 详情页新加的大号 Download 按钮（文案固定，不随拥有/未拥有变化）+ 信息卡①里给「价格」用的小标签 */
-uiAddT({
-  heroDownload: ['Download', '下载', 'Скачать', 'Herunterladen', 'ダウンロード', 'Descargar', 'İndir', 'Baixar'],
-  detailPrice: ['Price', '价格', 'Цена', 'Preis', '価格', 'Precio', 'Fiyat', 'Preço']
-});
 /* 游戏状态：可用 / 更新中 / 过时（卡片角标、「状态与订阅」弹窗、详情页）+ 两条「无法启动」提示。
    以前只有 en + zh，其他 6 种语言都回退英文。en / zh 传 '' = 保持原值不动；这些词条在 UI_T.en 里，所以也会自动出现在「自定义翻译」编辑器中。 */
 uiAddT({
@@ -15435,130 +15654,120 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
    只有当前展示的 cover 是视频时（JS 给 .detail-hero 加 has-video），
    鼠标移入画面才从上方浮出这条玻璃控制条：
    播放/暂停 · 音量（点图标静音，悬停展开竖向音量条）· 进度条 · 时间 */
-/* ════════ 视频悬浮控件：右下角，和下方 3 张信息卡同一基线 ════════
-   .detail-vhot 是真正的鼠标感应区（铺在 hero 右侧偏中的一大片），.detail-vui 是看到的那张小卡片，
-   是 .detail-vhot 的子元素而不是兄弟元素——这样鼠标从热区移到卡片本身也还在热区范围内，不会闪烁消失。
-   整块不描边，只用阴影 + 毛玻璃模糊（用户明确要求：不要描边，用淡淡的阴影和 blur）。 */
-.detail-vhot{
-  position:absolute;right:0;top:12%;bottom:0;width:46%;z-index:4;
-  pointer-events:none;
-}
-.detail-hero.has-video .detail-vhot{pointer-events:auto}
 .detail-vui{
-  position:absolute;right:24px;bottom:24px;z-index:1;width:272px;
-  display:flex;flex-direction:column;gap:10px;
-  padding:14px 15px 13px;border-radius:var(--radius-lg);
-  background:rgba(10,11,16,.5);
-  backdrop-filter:blur(28px) saturate(170%);
-  -webkit-backdrop-filter:blur(28px) saturate(170%);
-  box-shadow:0 22px 54px rgba(0,0,0,.42),0 2px 10px rgba(0,0,0,.3);
+  position:absolute;left:22px;right:22px;top:18px;z-index:4;
+  display:flex;align-items:center;gap:12px;
+  padding:9px 14px;border-radius:var(--radius-lg);
+  background:rgba(10,11,16,.52);
+  backdrop-filter:blur(26px) saturate(170%);
+  -webkit-backdrop-filter:blur(26px) saturate(170%);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 20px 50px rgba(0,0,0,.45);
   color:#fff;-webkit-app-region:no-drag;
-  opacity:0;transform:translateY(10px) scale(.98);pointer-events:none;
-  transition:opacity .26s ease,transform .32s cubic-bezier(.34,.9,.3,1);
+  opacity:0;transform:translateY(-14px);pointer-events:none;
+  transition:opacity .28s ease,transform .34s cubic-bezier(.34,.9,.3,1);
 }
-.detail-vhot:hover .detail-vui,
+.detail-hero.has-video:hover .detail-vui,
 .detail-vui.pinned{opacity:1;transform:none;pointer-events:auto}
-.detail-vui-top{display:flex;align-items:center;justify-content:flex-end;gap:4px;margin:-4px -4px 0 0}
 .detail-vui-btn{
-  width:28px;height:28px;flex-shrink:0;border-radius:50%;
+  width:32px;height:32px;flex-shrink:0;border-radius:50%;
   display:grid;place-items:center;cursor:pointer;
-  background:transparent;color:#fff;
-  transition:background var(--tr),transform var(--tr);
+  background:transparent;border:1px solid transparent;color:#fff;
+  transition:background var(--tr),transform var(--tr),border-color var(--tr);
 }
-.detail-vui-btn:hover{background:rgba(255,255,255,.16);transform:scale(1.07)}
+.detail-vui-btn:hover{
+  background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.18);
+  transform:scale(1.07);
+}
 .detail-vui-btn:active{transform:scale(.94)}
-.detail-vui-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;
+.detail-vui-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;
   stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .detail-vui-btn svg.fill{fill:currentColor;stroke:none}
+/* 进度条：默认细线，悬停变粗并冒出手柄 */
 .detail-vui-seek{
-  position:relative;width:100%;height:22px;
+  position:relative;flex:1;min-width:70px;height:32px;
   display:flex;align-items:center;cursor:pointer;touch-action:none;
 }
 .detail-vui-track{
-  position:relative;width:100%;height:16px;border-radius:4px;overflow:hidden;
-  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.3) 0 2px,transparent 2px 5px);
-  background-position:center;
+  position:relative;width:100%;height:4px;border-radius:var(--radius-full);
+  background:rgba(255,255,255,.24);overflow:hidden;
+  transition:height var(--tr);
 }
-.detail-vui-wave{
-  position:absolute;inset:0;
-  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 2px,transparent 2px 5px);
-  mask-image:linear-gradient(90deg,#000 0 30%,rgba(0,0,0,.4) 60%,#000 100%);
-  -webkit-mask-image:linear-gradient(90deg,#000 0 30%,rgba(0,0,0,.4) 60%,#000 100%);
-}
+.detail-vui-seek:hover .detail-vui-track{height:6px}
 .detail-vui-fill{
   position:absolute;left:0;top:0;bottom:0;width:0;border-radius:inherit;
   background:linear-gradient(90deg,var(--accent),var(--accent-3));
-  box-shadow:0 0 12px var(--accent-glow);opacity:.9;
+  box-shadow:0 0 12px var(--accent-glow);
 }
 .detail-vui-knob{
-  position:absolute;top:50%;left:0;width:10px;height:10px;margin-left:-5px;
+  position:absolute;top:50%;left:0;width:11px;height:11px;margin-left:-5.5px;
   border-radius:50%;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.55);
   transform:translateY(-50%) scale(0);transition:transform var(--tr);
 }
 .detail-vui-seek:hover .detail-vui-knob,
 .detail-vui-seek.dragging .detail-vui-knob{transform:translateY(-50%) scale(1)}
 .detail-vui-time{
-  align-self:center;font-size:11.5px;font-weight:600;letter-spacing:.2px;
-  color:rgba(255,255,255,.72);font-variant-numeric:tabular-nums;margin-top:-4px;
+  flex-shrink:0;font-size:12px;font-weight:600;letter-spacing:.2px;
+  color:rgba(255,255,255,.86);font-variant-numeric:tabular-nums;white-space:nowrap;
 }
+/* 音量：点图标切换静音，鼠标停在图标上才展开音量条 */
 .detail-vol{position:relative;flex-shrink:0}
 .detail-vol-pop{
-  position:absolute;right:0;top:100%;padding-top:10px;
-  opacity:0;pointer-events:none;transform:translateY(6px);
+  position:absolute;left:50%;top:100%;padding-top:10px;
+  transform:translateX(-50%) translateY(6px);
+  opacity:0;pointer-events:none;
   transition:opacity .2s ease,transform .24s cubic-bezier(.34,.9,.3,1);
 }
-.detail-vol:hover .detail-vol-pop{opacity:1;transform:none;pointer-events:auto}
+.detail-vol:hover .detail-vol-pop{
+  opacity:1;transform:translateX(-50%);pointer-events:auto;
+}
 .detail-vol-panel{
-  width:34px;height:112px;border-radius:var(--radius-full);
+  width:36px;height:124px;border-radius:var(--radius-full);
   display:grid;place-items:center;
   background:rgba(10,11,16,.66);
   backdrop-filter:blur(24px) saturate(170%);
   -webkit-backdrop-filter:blur(24px) saturate(170%);
+  border:1px solid rgba(255,255,255,.14);
   box-shadow:0 18px 46px rgba(0,0,0,.5);
 }
 .detail-vol-rail{
-  position:relative;width:5px;height:80px;border-radius:var(--radius-full);
+  position:relative;width:5px;height:88px;border-radius:var(--radius-full);
   background:rgba(255,255,255,.22);cursor:pointer;touch-action:none;
 }
-.detail-vol-rail::before{content:'';position:absolute;left:-15px;right:-15px;top:-10px;bottom:-10px}
+/* 轨道很细，靠伪元素把可点区域撑宽，拖动手感才不飘 */
+.detail-vol-rail::before{
+  content:'';position:absolute;left:-15px;right:-15px;top:-10px;bottom:-10px;
+}
 .detail-vol-fill{
   position:absolute;left:0;right:0;bottom:0;height:70%;border-radius:inherit;
-  background:linear-gradient(0deg,var(--accent),var(--accent-3));box-shadow:0 0 12px var(--accent-glow);
+  background:linear-gradient(0deg,var(--accent),var(--accent-3));
+  box-shadow:0 0 12px var(--accent-glow);
 }
 .detail-vol-knob{
   position:absolute;left:50%;bottom:70%;width:12px;height:12px;
   transform:translate(-50%,50%);border-radius:50%;background:#fff;
   box-shadow:0 2px 10px rgba(0,0,0,.55);pointer-events:none;
 }
+/* 提示胶囊：默认静音时的“点喇叭开声音” / 视频本身没有音轨时的说明 */
 .detail-vui-pill{
-  flex-shrink:0;display:inline-flex;align-items:center;gap:5px;
-  height:24px;padding:0 10px;border-radius:var(--radius-full);
-  font-size:11px;font-weight:600;letter-spacing:.2px;white-space:nowrap;
-  background:rgba(255,255,255,.12);color:rgba(255,255,255,.92);cursor:pointer;
+  flex-shrink:0;display:inline-flex;align-items:center;gap:6px;
+  height:26px;padding:0 11px;border-radius:var(--radius-full);
+  font-size:11.5px;font-weight:600;letter-spacing:.2px;white-space:nowrap;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);
+  color:rgba(255,255,255,.92);cursor:pointer;
   animation:vuiPulse 2.6s ease-in-out infinite;
 }
 .detail-vui-pill[hidden]{display:none}
 .detail-vui-pill.static{cursor:default;animation:none;opacity:.85}
 .detail-vui-pill:hover{background:rgba(255,255,255,.2)}
 .detail-vui-pill.static:hover{background:rgba(255,255,255,.12)}
-.detail-vui-pill svg{width:12px;height:12px;fill:none;stroke:currentColor;
+.detail-vui-pill svg{width:13px;height:13px;fill:none;stroke:currentColor;
   stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-@keyframes vuiPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 0 5px rgba(255,255,255,.09)}}
-.detail-vui-transport{display:flex;align-items:center;justify-content:center;gap:6px}
-.detail-vui-tbtn{
-  position:relative;width:34px;height:34px;flex-shrink:0;border-radius:50%;
-  display:grid;place-items:center;cursor:pointer;background:rgba(255,255,255,.1);color:#fff;
-  transition:background var(--tr),transform var(--tr);
+@keyframes vuiPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}
+  50%{box-shadow:0 0 0 5px rgba(255,255,255,.09)}
 }
-.detail-vui-tbtn:hover{background:rgba(255,255,255,.2);transform:scale(1.06)}
-.detail-vui-tbtn:active{transform:scale(.92)}
-.detail-vui-tbtn svg{width:15px;height:15px;fill:none;stroke:currentColor;
-  stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.detail-vui-tbtn b{position:absolute;bottom:-1px;right:-1px;font-size:8px;font-weight:800;
-  font-style:normal;background:rgba(10,11,16,.85);border-radius:5px;padding:0 2px;line-height:1.3}
-.detail-vui-tbtn.play{width:46px;height:46px;background:#fff;color:#0a0b10}
-.detail-vui-tbtn.play:hover{background:#fff;transform:scale(1.06);filter:brightness(1.08)}
-.detail-vui-tbtn.play svg{width:19px;height:19px}
+/* 全屏：优先走 Fullscreen API；宿主没接管时靠 .dv-fs 自己铺满窗口 */
 .detail-hero.dv-fs,
 .detail-hero:fullscreen{
   position:fixed;inset:0;z-index:9998;height:100%;width:100%;
@@ -15577,20 +15786,18 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
 .detail-hero::after{
   content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
   background:
-    linear-gradient(to top,var(--overlay) 0%,transparent 60%),
-    linear-gradient(to right,var(--overlay) 0%,transparent 48%);
+    linear-gradient(to top,var(--overlay) 0%,transparent 55%),
+    linear-gradient(to right,var(--overlay) 0%,transparent 45%);
 }
-/* ════════ 左上文字块：标题 → 元信息 → 大号「Download」按钮 → 封面圆点，从上往下排 ════════
-   以前这块贴着 hero 底部（标题/元信息在左，按钮在右）；现在从顶部往下排、只占左边，
-   和参考图的构图一致，也给右下角视频卡片、底部信息卡留出位置。 */
 .detail-hero-body{
-  position:absolute;left:40px;right:40px;top:30px;z-index:2;
+  position:absolute;left:40px;right:40px;bottom:80px;z-index:2;
+  display:flex;align-items:flex-end;justify-content:space-between;gap:24px;
   pointer-events:none;
 }
 .detail-hero-body > *{pointer-events:auto}
-.detail-hero-info{max-width:50%;min-width:0;display:flex;flex-direction:column}
+.detail-hero-info{max-width:55%;min-width:0}
 .detail-hero-title{
-  font-size:40px;font-weight:900;letter-spacing:-1.6px;line-height:1.08;
+  font-size:46px;font-weight:900;letter-spacing:-1.8px;line-height:1.05;
   color:#fff;margin-bottom:10px;
   text-shadow:0 4px 40px rgba(0,0,0,.7);
   overflow:hidden;text-overflow:ellipsis;
@@ -15598,29 +15805,16 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
 .detail-hero-meta{
   display:flex;align-items:center;gap:12px;
   font-size:13px;font-weight:500;
-  color:rgba(255,255,255,.75);margin-bottom:22px;
+  color:rgba(255,255,255,.75);
 }
 .detail-hero-meta .sep{width:4px;height:4px;border-radius:50%;
   background:rgba(255,255,255,.4)}
-.detail-hero-btns{display:flex;flex-direction:column;align-items:flex-start;gap:16px}
-.hero-dl{
-  position:relative;overflow:hidden;min-width:200px;height:48px;padding:0 30px;
-  border-radius:var(--radius-full);border:0;cursor:pointer;
-  background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;
-  font-size:14.5px;font-weight:800;letter-spacing:.4px;
-  box-shadow:0 10px 28px var(--accent-glow);
-  transition:transform var(--tr),box-shadow var(--tr),opacity var(--tr);
+.detail-hero-btns{display:flex;gap:10px;flex-shrink:0}
+.detail-nav{
+  position:absolute;left:40px;bottom:30px;z-index:3;
+  display:flex;align-items:center;gap:6px;
+  pointer-events:auto;
 }
-.hero-dl:hover{transform:translateY(-1px);box-shadow:0 14px 34px var(--accent-glow)}
-.hero-dl:active{transform:translateY(0) scale(.98)}
-.hero-dl:disabled{cursor:not-allowed;opacity:.55;box-shadow:none;transform:none}
-.hero-dl-fill{position:absolute;inset:0;width:0;background:rgba(255,255,255,.3);transition:width .15s linear;z-index:0}
-.hero-dl-body{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:10px;height:100%}
-.hero-dl-pct{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;opacity:0;max-width:0;overflow:hidden;transition:.2s}
-.hero-dl.going{background:color-mix(in srgb,var(--accent) 42%,#10131c);box-shadow:none}
-.hero-dl.going .hero-dl-fill{background:linear-gradient(135deg,var(--accent),var(--accent-2));opacity:.9}
-.hero-dl.going .hero-dl-pct{opacity:1;max-width:40px}
-.detail-nav{display:flex;align-items:center;gap:6px}
 .detail-dot{
   width:8px;height:8px;border-radius:50%;
   background:rgba(255,255,255,.35);
@@ -15632,39 +15826,6 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
   width:26px;border-radius:var(--radius-full);
   background:linear-gradient(90deg,var(--accent),var(--accent-3));
   box-shadow:0 0 12px var(--accent-glow);
-}
-/* ════════ 底部 3 张信息卡：订阅/价格 · 收藏 · 玩家评分，和右下角视频卡片同一基线 ════════ */
-.detail-info-row{
-  position:absolute;left:40px;right:306px;bottom:24px;z-index:2;
-  display:flex;gap:12px;pointer-events:none;
-}
-.detail-info-card{
-  pointer-events:auto;flex:1 1 0;min-width:0;max-width:200px;
-  padding:13px 15px;border-radius:var(--radius-lg);cursor:pointer;
-  background:rgba(14,16,24,.46);
-  backdrop-filter:blur(22px) saturate(160%);-webkit-backdrop-filter:blur(22px) saturate(160%);
-  box-shadow:0 14px 34px rgba(0,0,0,.32);color:#fff;
-  transition:transform var(--tr),background var(--tr);
-}
-.detail-info-card:hover{background:rgba(22,25,36,.56);transform:translateY(-2px)}
-.detail-info-card .dic-label{font-size:10.5px;font-weight:700;letter-spacing:.3px;
-  color:rgba(255,255,255,.62);text-transform:uppercase;margin-bottom:4px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.detail-info-card .dic-value{font-size:14px;font-weight:700;letter-spacing:-.1px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:9px}
-.detail-info-card .dic-action{
-  display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 11px;
-  border-radius:var(--radius-full);background:#fff;color:#0a0b10;
-  font-size:11px;font-weight:700;border:0;cursor:pointer;
-}
-.detail-info-card .dic-action:hover{background:rgba(255,255,255,.88)}
-.detail-info-card .dic-action svg{width:11px;height:11px;fill:none;stroke:currentColor;
-  stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.detail-info-card.wished .dic-action svg{fill:currentColor;stroke:none}
-@media (max-width:980px){
-  .detail-hero-info{max-width:62%}
-  .detail-info-row{right:40px}
-  .detail-vhot{display:none}
 }
 .detail-ctrl{
   position:absolute;top:50%;transform:translateY(-50%);
@@ -16851,7 +17012,7 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
           <span>STARLINE</span>
         </div>
         <div style="margin-left:auto;-webkit-app-region:no-drag">
-          <button class="tb-btn close" onclick="closeDetail()" title="Back" data-ui-title="back">
+          <button class="tb-btn close" onclick="uiRequestClose()">
             <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
           </button>
         </div>
@@ -16862,54 +17023,33 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
         <div class="detail-hero">
           <!-- 图集槽位由 JS 按 games.txt 的 cover 数量生成 -->
           <div class="detail-slides" id="detailSlides"></div>
-          <!-- 视频悬浮控件：移到右下角，和下面的 3 张信息卡同一基线；鼠标移到这片右侧区域（.detail-vhot）才浮出来，
-               不再是整张图随便一碰就出现 —— 视频区域本身就在这片热区里，所以手不会移出去，不会出现“刚碰到就消失”。
-               内部照参考截图的样式重排：上面一条像素化波形进度条 + 两端时间，下面一排 上一张 / 快退10s / 大播放键 / 快进10s / 下一张；
-               音量 / 全屏 / 无声提示挪到右上角一个紧凑的小图标条。整块不描边，只用阴影 + 毛玻璃模糊。 -->
-          <div class="detail-vhot" id="detailVhot">
-            <div class="detail-vui" id="detailVui">
-              <div class="detail-vui-top">
-                <button class="detail-vui-btn" id="dvMute" type="button" onclick="dvToggleMute(event)" title="Unmute">
-                  <svg viewBox="0 0 24 24"><path d="M11 5 6.5 9H3v6h3.5L11 19z"/><path d="M16.5 9.5l5 5m0-5l-5 5"/></svg>
-                </button>
-                <div class="detail-vol" id="dvVolWrap">
-                  <div class="detail-vol-pop">
-                    <div class="detail-vol-panel">
-                      <div class="detail-vol-rail" id="dvVolRail">
-                        <div class="detail-vol-fill" id="dvVolFill"></div>
-                        <div class="detail-vol-knob" id="dvVolKnob"></div>
-                      </div>
-                    </div>
+          <!-- 视频悬浮控件：当前展示的是视频时，鼠标移入画面才浮出来 -->
+          <div class="detail-vui" id="detailVui">
+            <button class="detail-vui-btn" id="dvPlay" type="button" onclick="dvTogglePlay(event)" title="Pause">
+              <svg class="fill" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4.2" height="15" rx="1.4"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.4"/></svg>
+            </button>
+            <div class="detail-vol" id="dvVolWrap">
+              <button class="detail-vui-btn" id="dvMute" type="button" onclick="dvToggleMute(event)" title="Unmute">
+                <svg viewBox="0 0 24 24"><path d="M11 5 6.5 9H3v6h3.5L11 19z"/><path d="M16.5 9.5l5 5m0-5l-5 5"/></svg>
+              </button>
+              <div class="detail-vol-pop">
+                <div class="detail-vol-panel">
+                  <div class="detail-vol-rail" id="dvVolRail">
+                    <div class="detail-vol-fill" id="dvVolFill"></div>
+                    <div class="detail-vol-knob" id="dvVolKnob"></div>
                   </div>
                 </div>
-                <button class="detail-vui-pill" id="dvPill" type="button" onclick="dvPillTap(event)" hidden></button>
-                <button class="detail-vui-btn" id="dvFull" type="button" onclick="dvToggleFull(event)" title="Fullscreen">
-                  <svg viewBox="0 0 24 24"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
-                </button>
-              </div>
-              <div class="detail-vui-seek" id="dvSeek">
-                <div class="detail-vui-track"><div class="detail-vui-wave"></div><div class="detail-vui-fill" id="dvFill"></div></div>
-                <div class="detail-vui-knob" id="dvKnob"></div>
-              </div>
-              <span class="detail-vui-time" id="dvTime">0:00 / 0:00</span>
-              <div class="detail-vui-transport">
-                <button class="detail-vui-tbtn" onclick="detailPrev(event)" title="Previous" data-ui-title="prevImage">
-                  <svg viewBox="0 0 24 24"><polygon points="18 18 9 12 18 6 18 18"/><line x1="6" y1="5" x2="6" y2="19"/></svg>
-                </button>
-                <button class="detail-vui-tbtn skip" onclick="dvSkip(event,-10)" title="-10s">
-                  <svg viewBox="0 0 24 24"><path d="M3 11a9 9 0 1 1 2.6 6.4"/><polyline points="3 5 3 11 9 11"/></svg><b>10</b>
-                </button>
-                <button class="detail-vui-tbtn play" id="dvPlay" type="button" onclick="dvTogglePlay(event)" title="Pause">
-                  <svg class="fill" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4.2" height="15" rx="1.4"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.4"/></svg>
-                </button>
-                <button class="detail-vui-tbtn skip" onclick="dvSkip(event,10)" title="+10s">
-                  <svg viewBox="0 0 24 24"><path d="M21 11a9 9 0 1 0-2.6 6.4"/><polyline points="21 5 21 11 15 11"/></svg><b>10</b>
-                </button>
-                <button class="detail-vui-tbtn" onclick="detailNext(event)" title="Next" data-ui-title="nextImage">
-                  <svg viewBox="0 0 24 24"><polygon points="6 18 15 12 6 6 6 18"/><line x1="18" y1="5" x2="18" y2="19"/></svg>
-                </button>
               </div>
             </div>
+            <div class="detail-vui-seek" id="dvSeek">
+              <div class="detail-vui-track"><div class="detail-vui-fill" id="dvFill"></div></div>
+              <div class="detail-vui-knob" id="dvKnob"></div>
+            </div>
+            <span class="detail-vui-time" id="dvTime">0:00 / 0:00</span>
+            <button class="detail-vui-pill" id="dvPill" type="button" onclick="dvPillTap(event)" hidden></button>
+            <button class="detail-vui-btn" id="dvFull" type="button" onclick="dvToggleFull(event)" title="Fullscreen">
+              <svg viewBox="0 0 24 24"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+            </button>
           </div>
           <button class="detail-ctrl prev" onclick="detailPrev(event)" title="Previous image" data-ui-title="prevImage">
             <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
@@ -16927,15 +17067,15 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
                 <span class="sep"></span>
                 <span class="card-status available" id="detailStatus">-</span>
               </div>
-              <!-- 主操作：拥有就是「启动」，没拥有就是「购买/续订」——两种情况文案都固定是 Download；
-                   点了拥有的会原地变成进度条（文案还在），不拥有的会跳到续费页，没有进度可言 -->
-              <div class="detail-hero-btns" id="detailHeroBtns"></div>
-              <!-- 封面小圆点：和商店首页顶部大图的圆点（.hero-dot）用的是同一套样式，挪到按钮正下方 -->
-              <div class="detail-nav" id="detailNav"></div>
+            </div>
+            <div class="detail-hero-btns" id="detailHeroBtns">
+              <button class="btn btn-secondary" id="detailWish" onclick="toggleWish(event,CURRENT_GAME)">
+                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                <span id="detailWishText">Wishlist</span>
+              </button>
             </div>
           </div>
-          <!-- 底部 3 张信息卡：和右下角的视频控件同一基线。订阅状态/价格、收藏、玩家评分 — 点了都能跳到对应的详细区块 -->
-          <div class="detail-info-row" id="detailInfoRow"></div>
+          <div class="detail-nav" id="detailNav"></div>
         </div>
 
 
@@ -21754,7 +21894,6 @@ __UI_SCRIPT__
       box.innerHTML = '';
       if (more) more.hidden = true;
       if (empty) { empty.textContent = uiT('reviewEmpty'); empty.hidden = false; }
-      if (CURRENT_GAME) renderDetailInfoCards(CURRENT_GAME);     /* 信息卡③的评分用这份数据，一起刷新 */
       return;
     }
     if (empty) empty.hidden = true;
@@ -21784,7 +21923,6 @@ __UI_SCRIPT__
     }
     box.innerHTML = html;
     if (more) more.hidden = (list.length <= n);      /* 全显示完了就收起按钮 */
-    if (CURRENT_GAME) renderDetailInfoCards(CURRENT_GAME);
   }
 
   /* 加载更多：一次多两行（6 条），加载完还想看就再点一次 */
@@ -22867,124 +23005,37 @@ __UI_SCRIPT__
   function renderDetailHeroButtons(g){
     var box = document.getElementById('detailHeroBtns');
     if (!box) return;
-    var meta = GAMES[g] || {};
     var owned = hasLic(g);
-    /* 正在下载/启动中：这个按钮不重建（会把正在走的进度条炸没），等 doInject 自己的流程走完再说 */
-    if (!LAUNCHING[g]) {
-      var statusKey = gameStatusKey(meta);
-      var statusLocked = owned && statusKey !== 'available';
-      var launchLocked = owned && launchLockedByPause(g);
-      var attrs = '';
-      if (statusLocked) {
-        attrs = ' disabled title="' + uiEsc(uiT(statusKey === 'outdated' ? 'gameOutdatedCannotLaunch' : 'gameUpdatingCannotLaunch')) + '"';
-      } else if (launchLocked) {
-        attrs = ' disabled title="' + uiEsc(uiT('resumeFirst')) + '"';
-      }
-      box.innerHTML =
-        '<button type="button" class="hero-dl" id="heroDl" onclick="heroDownloadClick(event)"' + attrs + '>'
-        + '<i class="hero-dl-fill" id="heroDlFill"></i>'
-        + '<span class="hero-dl-body"><span>' + uiEsc(uiT('heroDownload')) + '</span><b class="hero-dl-pct" id="heroDlPct">0%</b></span>'
-        + '</button>';
-    }
-    renderDetailInfoCards(g);
-  }
-
-  /* 底部 3 张信息卡：① 订阅剩余/价格（拥有=暂停或继续；没拥有=购买/续订）② 收藏 ③ 玩家评分（点开评价区）。
-     onclick 一律用 CURRENT_GAME，和原来 wishBtn/mainBtn/pauseBtn 的写法保持一致。 */
-  function renderDetailInfoCards(g){
-    var row = document.getElementById('detailInfoRow');
-    if (!row) return;
-    var owned = hasLic(g);
-    var html = '';
-
-    /* 卡 1：订阅状态 / 价格 —— 暂停按钮的禁用逻辑原样照抄自旧的 pauseBtn（PAUSE_PENDING / pauseLockedByLaunch） */
-    if (owned) {
-      var lic = licOf(g);
-      var canPause = licPausable(g);
-      var timeTxt = (document.getElementById('subTime') || {}).textContent || '';
-      var actionHtml;
-      if (canPause) {
-        var pz = !!(lic && lic.paused);
-        var pzLocked = (!pz && pauseLockedByLaunch(g)) || !!PAUSE_PENDING[g];
-        actionHtml = '<button type="button" class="dic-action" onclick="event.stopPropagation();togglePause(event,CURRENT_GAME)"'
-          + (pzLocked ? ' disabled title="' + uiEsc(uiT('pauseBlocked')) + '"' : '') + '>'
-          + uiEsc(uiT(pz ? 'resumeTime' : 'pauseTime')) + '</button>';
-      } else {
-        actionHtml = '<button type="button" class="dic-action" onclick="event.stopPropagation();renewGame(event,CURRENT_GAME)">' + uiEsc(uiT('renew')) + '</button>';
-      }
-      html += '<div class="detail-info-card" onclick="renewGame(event,CURRENT_GAME)">'
-        + '<div class="dic-label">' + uiEsc(uiT('subscription')) + '</div>'
-        + '<div class="dic-value">' + uiEsc(timeTxt || '-') + '</div>'
-        + actionHtml + '</div>';
-    } else {
-      html += '<div class="detail-info-card" onclick="renewGame(event,CURRENT_GAME)">'
-        + '<div class="dic-label">' + uiEsc(uiT('detailPrice')) + '</div>'
-        + '<div class="dic-value">' + uiEsc(fmtPrice(g)) + '</div>'
-        + '<button type="button" class="dic-action" onclick="event.stopPropagation();renewGame(event,CURRENT_GAME)">' + uiEsc(uiT('buyNow')) + '</button>'
-        + '</div>';
-    }
-
-    /* 卡 2：收藏 —— id 原样沿用（detailWish / detailWishText），renderDetailWish() 不用改一个字 */
     var wished = isWished(g);
-    html += '<div class="detail-info-card' + (wished ? ' wished' : '') + '" onclick="toggleWish(event,CURRENT_GAME)">'
-      + '<div class="dic-label">' + uiEsc(uiT('wishlist')) + '</div>'
-      + '<div class="dic-value" id="detailWishText">' + uiEsc(wished ? uiT('wishlisted') : uiT('wishlist')) + '</div>'
-      + '<button type="button" class="dic-action" id="detailWish" onclick="event.stopPropagation();toggleWish(event,CURRENT_GAME)">'
-      +   '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
-      + '</button></div>';
 
-    /* 卡 3：玩家评分（没有评价就是“写第一条评价”的入口），点卡片滚到 What players say，点小按钮直接开写评价 */
-    var avg = avgRating();
-    var revTxt = avg ? (avg.toFixed(1) + ' / 5') : uiT('reviewEmpty');
-    html += '<div class="detail-info-card" onclick="document.getElementById(\'reviewsSection\').scrollIntoView({behavior:\'smooth\',block:\'start\'})">'
-      + '<div class="dic-label">' + uiEsc(uiT('reviewsTitle')) + '</div>'
-      + '<div class="dic-value">' + uiEsc(revTxt) + '</div>'
-      + '<button type="button" class="dic-action" onclick="event.stopPropagation();openReviewModal();">'
-      +   '<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>'
-      + '</button></div>';
+    var wishBtn = '<button class="btn btn-secondary' + (wished ? ' wished' : '') + '" '
+                + 'id="detailWish" onclick="toggleWish(event,CURRENT_GAME)">'
+                + '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
+                + '<span id="detailWishText">' + (wished ? uiT('wishlisted') : uiT('wishlist')) + '</span>'
+                + '</button>';
 
-    row.innerHTML = html;
-  }
-
-  /* 平均分：拿已经拉到的 REVIEWS 现算，没有评价就是 null（不是 0——0 分会被误当成“只有差评”） */
-  function avgRating(){
-    var list = REVIEWS || [];
-    if (!list.length) return null;
-    var sum = 0, n = 0;
-    for (var i = 0; i < list.length; i++){
-      var r = parseInt(list[i] && list[i].rating, 10);
-      if (isFinite(r) && r >= 1) { sum += Math.min(5, r); n++; }
+    var mainBtn;
+    if (owned) {
+      var launchLocked = launchLockedByPause(g);
+      mainBtn = '<button class="btn btn-primary" onclick="jumpToInject()"'
+              + (launchLocked ? ' disabled title="' + uiEsc(uiT('resumeFirst')) + '"' : '') + '>'
+              + '<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>'
+              + '<span>' + uiEsc(uiT(launchLocked ? 'resumeFirst' : 'launch')) + '</span></button>';
+    } else {
+      mainBtn = '<button class="btn btn-primary" onclick="renewGame(event,CURRENT_GAME)">'
+              + '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
+              + '<span>' + uiEsc(uiT('buyNow')) + '</span></button>';
     }
-    return n ? (sum / n) : null;
-  }
-
-  /* 大号 Download 按钮：拥有就直接走现有的启动/注入流程（doInject 自己管暂停中/更新中/过时的拦截），
-     没拥有就跳续费/购买页——两边都是复用原来挂在小按钮上的同一套函数，没有新发明任何东西。 */
-  function heroDownloadClick(ev){
-    if (ev) ev.stopPropagation();
-    var g = CURRENT_GAME;
-    if (!g) return;
-    if (hasLic(g)) { doInject(); } else { renewGame(ev, g); }
-  }
-  /* 进度镜像：把 injectProg 的百分比同时画到 hero 按钮上，和登录页/商店别处的进度填充样式一致 */
-  function heroDlProgress(pct){
-    var btn = document.getElementById('heroDl');
-    if (!btn) return;
-    btn.classList.add('going');
-    var fill = document.getElementById('heroDlFill');
-    var pc = document.getElementById('heroDlPct');
-    var p = Math.max(0, Math.min(100, pct));
-    if (fill) fill.style.width = p + '%';
-    if (pc) pc.textContent = Math.round(p) + '%';
-  }
-  function heroDlReset(){
-    var btn = document.getElementById('heroDl');
-    if (!btn) return;
-    btn.classList.remove('going');
-    var fill = document.getElementById('heroDlFill');
-    var pc = document.getElementById('heroDlPct');
-    if (fill) fill.style.width = '0%';
-    if (pc) pc.textContent = '0%';
+    var pauseBtn = '';
+    if (owned && licPausable(g)) {
+      var pz = !!licOf(g).paused;
+      var pzLocked = (!pz && pauseLockedByLaunch(g)) || !!PAUSE_PENDING[g];
+      pauseBtn = '<button class="btn btn-secondary" onclick="togglePause(event,CURRENT_GAME)"'
+               + (pzLocked ? ' disabled title="' + uiEsc(uiT('pauseBlocked')) + '"' : '') + '>'
+               + pauseIcon(pz)
+               + '<span>' + uiEsc(uiT(pz ? 'resumeTime' : 'pauseTime')) + '</span></button>';
+    }
+    box.innerHTML = wishBtn + pauseBtn + mainBtn;
   }
 
 
@@ -23359,15 +23410,6 @@ __UI_SCRIPT__
       if (pr && pr.catch) pr.catch(function(){});
     }
     dvPaint();
-  }
-
-  /* 快退 / 快进 10 秒：用在右下角播放器新加的两个按钮上；复用 DV.video，交给已有的 timeupdate 监听自己去刷新进度条和时间 */
-  function dvSkip(ev, sec){
-    if (ev) ev.stopPropagation();
-    var v = DV.video;
-    if (!v) return;
-    var dur = isFinite(v.duration) && v.duration > 0 ? v.duration : 1e9;
-    v.currentTime = Math.max(0, Math.min(dur, (v.currentTime || 0) + sec));
   }
   document.addEventListener('fullscreenchange', function(){
     var hero = dvHeroEl();
@@ -23849,7 +23891,6 @@ __UI_SCRIPT__
     panel.classList.add('active');
     stat.textContent = uiT('injecting');
     fill.style.width = '0%';
-    heroDlProgress(0);     /* 同步到 hero 大按钮：从 0% 开始 */
 
     injectGame = CURRENT_GAME;
     injectPct = 0;
@@ -23873,7 +23914,6 @@ __UI_SCRIPT__
       var p = Math.max(0, Math.min(100, injectPct));
       fill.style.width = p + '%';
       sbTaskProgress(p);
-      heroDlProgress(p);     /* 同步到 hero 大按钮 */
     }, 110);
 
 
@@ -23909,7 +23949,6 @@ __UI_SCRIPT__
     var start = document.getElementById('injectStart');
     var panel = document.getElementById('injectPanel');
     if (fill) fill.style.width = '100%';
-    heroDlProgress(100);     /* 同步到 hero 大按钮：完成 */
     if (stat) stat.textContent = uiT('injected');
     sbTaskFinish('done', uiT('injected'), 4500);
     setTimeout(function(){
@@ -23918,7 +23957,6 @@ __UI_SCRIPT__
       if (fill) fill.style.width = '0%';
       if (stat) stat.textContent = uiT('readyInject');
       if (panel) panel.classList.remove('active');
-      heroDlReset();     /* hero 大按钮也一起恢复成普通的 Download */
     }, 1600);
   }
 
@@ -23933,7 +23971,6 @@ __UI_SCRIPT__
     document.getElementById('injectProg').style.width = '0%';
     document.getElementById('injectStatus').textContent = uiT('readyInject');
     document.getElementById('injectPanel').classList.remove('active');
-    heroDlReset();     /* 取消也要把 hero 大按钮恢复成普通的 Download */
     sbTaskHide();
   }
 
