@@ -51,6 +51,7 @@
 #                          priceLife = price_life = pricelt = life = price
 #       Announcement1 = 公告,Announcement的数量取决与Announcement【1】后面数字
 #       status   = 游戏状态，共三种状态：available / updating / outdated 
+#       hide = false 正常显示游戏文件夹
 #
 #   · 新增游戏：复制一节，改代号和字段即可，无需重新编译
 # ═══════════════════════════════════════════════════════════════════════════
