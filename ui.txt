@@ -16025,6 +16025,125 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
    颜色全部取主题变量（--surface / --border / --text / --accent…），浅色 / 深色 / 自定义主题都会自动跟随 */
 .detail-ann{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
 .detail-ann[hidden]{display:none}
+
+/* ═══════════ 详情页重做：背景轮播 + 顶部三个胶囊 + 居中标题区 + 底部条 + About 弹窗 ═══════════ */
+
+/* 背景：images.txt 的 cover1/2/…，铺满整个详情页（含顶部条和底部条下面），carMake/carStart 驱动
+   （图片 5 秒切一张，视频播完自动切下一张；详情页本身的 blur 已经够暗，这里再叠一层渐变保证文字够清楚） */
+.detail-bg{position:absolute;inset:0;z-index:0;overflow:hidden;background:var(--bg,#0a0a0c)}
+.detail-bg-shot{position:absolute;inset:0;background-size:cover;background-position:center;
+  opacity:0;transition:opacity .9s ease}
+.detail-bg-shot.on{opacity:1}
+.detail-bg-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;pointer-events:none;transition:opacity .9s ease}
+.detail-bg-video.on{opacity:1}
+.detail-bg::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(to top,rgba(var(--bg-rgb),.96) 0%,rgba(var(--bg-rgb),.55) 38%,rgba(var(--bg-rgb),.25) 62%,rgba(var(--bg-rgb),.55) 100%),
+    linear-gradient(to right,rgba(var(--bg-rgb),.85) 0%,transparent 48%);
+}
+.detail-top,.detail-scroll,.detail-bottombar{position:relative;z-index:1}
+.detail-scroll{background:transparent}
+
+/* 三个胶囊（公告 / 下载通知 / 游戏图标+名称+订阅时间）共用的外壳 */
+.detail-pill{
+  display:inline-flex;align-items:center;gap:10px;height:46px;padding:0 14px;
+  border-radius:var(--radius-full);background:rgba(var(--bg-rgb),.5);
+  border:1px solid var(--border-2);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  color:var(--text);cursor:default;-webkit-app-region:no-drag;transition:border-color var(--tr),background var(--tr);
+}
+button.detail-pill{cursor:pointer}
+button.detail-pill:hover{border-color:var(--border-3,var(--accent-2));background:rgba(var(--bg-rgb),.68)}
+.detail-pill-ico{display:grid;place-items:center;width:22px;height:22px;flex-shrink:0;color:var(--accent-2)}
+.detail-pill-ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.detail-pill-txt{display:flex;flex-direction:column;gap:1px;min-width:0;line-height:1.25;text-align:left}
+.detail-pill-txt b{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.detail-pill-txt small{font-size:11px;color:var(--text-3);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.detail-pill-icon-img{width:28px;height:28px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--surface-2)}
+
+/* 公告胶囊：有未读才描边变大变小（颜色很淡，看得到就行，不抢视线） */
+.detail-ann-pill.unread{animation:detailAnnPulse 2.2s ease-in-out infinite}
+@keyframes detailAnnPulse{
+  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent);transform:scale(1)}
+  50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 28%,transparent);transform:scale(1.035)}
+}
+
+/* 下载/启动通知：居中出现在顶部，复用 toast / toast-ring 的视觉（圆形进度条） */
+.detail-dl-slot{flex:1;min-width:0;display:flex;justify-content:center;-webkit-app-region:no-drag}
+.detail-dl-slot .toast{min-width:240px;cursor:default}
+.detail-dl-slot .toast-ring .bar{animation:none !important;transition:stroke-dashoffset .18s linear}
+.detail-dl-slot .toast-cancel{
+  flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  color:var(--text-3);cursor:pointer;transition:color var(--tr),background var(--tr);
+}
+.detail-dl-slot .toast-cancel:hover{color:var(--err);background:rgba(239,68,68,.14)}
+.detail-dl-slot .toast-cancel svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+
+/* 标题区：状态（原返回按钮）+ 大标题 + 简介 + 操作行，纵向大致居中在背景上 */
+.detail-head{
+  position:relative;min-height:calc(100vh - 260px);
+  display:flex;flex-direction:column;justify-content:center;gap:16px;
+  max-width:640px;padding:24px 0 40px;
+}
+.detail-status-pill{height:34px;padding:0 14px 0 10px;gap:6px;align-self:flex-start}
+.detail-status-pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;color:var(--text-2)}
+.detail-status-pill .card-status{background:transparent;border:none;padding:0;font-size:11px}
+.detail-head .detail-hero-title{
+  font-size:52px;font-weight:900;letter-spacing:-2px;line-height:1.02;
+  color:#fff;text-shadow:0 4px 40px rgba(0,0,0,.7);
+  overflow-wrap:break-word;
+}
+.detail-desc{
+  font-size:13.5px;line-height:1.65;color:rgba(255,255,255,.72);
+  max-width:560px;text-shadow:0 2px 16px rgba(0,0,0,.6);
+}
+.detail-desc[hidden]{display:none}
+.detail-actions{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:4px}
+.detail-actions .btn-primary{min-width:150px}
+.detail-icon-btn{
+  width:44px;height:44px;border-radius:50%;flex-shrink:0;
+  display:grid;place-items:center;cursor:pointer;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:#fff;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  transition:all var(--tr);
+}
+.detail-icon-btn:hover{background:rgba(255,255,255,.2);transform:translateY(-2px)}
+.detail-icon-btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.detail-icon-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.detail-icon-btn.wished{color:#ff8ba0;border-color:rgba(244,63,94,.55);background:rgba(244,63,94,.22)}
+.detail-icon-btn.wished svg{fill:currentColor}
+.detail-method-row{display:flex;gap:4px;padding:3px;border-radius:999px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
+.detail-method-row .inject-method-btn{
+  width:34px;height:34px;border-radius:999px;display:grid;place-items:center;
+  color:rgba(255,255,255,.6);cursor:pointer;transition:all var(--tr);background:transparent;border:none;
+}
+.detail-method-row .inject-method-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.detail-method-row .inject-method-btn.active{background:#fff;color:#111}
+
+/* 底部条：原「СПИСОК МОДОВ」→ What players say 展开按钮；原「НАШ САЙТ」→ Write a review；VK 去掉 */
+.detail-bottombar{
+  position:absolute;left:26px;right:26px;bottom:24px;z-index:1;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;pointer-events:none;
+}
+.detail-bottombar .detail-pill{pointer-events:auto}
+.detail-reviews-pill svg,.detail-write-pill svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.detail-reviews-pill.open{border-color:var(--accent-2);color:var(--accent-2)}
+
+/* What players say：从底部条展开，不再默认常驻显示 */
+#reviewsSection{animation:heroIn .35s cubic-bezier(.4,0,.2,1)}
+
+/* About 弹窗：复用现成的 .overlay/.modal，只加一点内边距 */
+.about-modal{max-width:460px}
+.about-meta-grid{padding:20px 26px 26px}
+
+@media(max-width:860px){
+  .detail-pill-txt b,.detail-pill-txt small{max-width:120px}
+  .detail-head{max-width:100%;padding-right:26px}
+  .detail-head .detail-hero-title{font-size:36px}
+  .detail-bottombar{left:16px;right:16px;bottom:16px}
+}
 .section{margin-bottom:36px}
 .section h2{
   font-size:18px;font-weight:800;letter-spacing:-.4px;
@@ -17178,13 +17297,32 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
     </div>
 
     <div class="detail" id="detail">
+      <!-- 背景：games.txt 的 cover1/2/…（图片 / 视频）轮播，铺满整个详情页；图片 5 秒切换一次，
+           视频播完自动切下一张（用的是 gpop 悬停预览同一套 carMake/carStart 引擎，见 SCRIPT） -->
+      <div class="detail-bg">
+        <div class="detail-bg-shot" id="detailBgShot"></div>
+        <video class="detail-bg-video" id="detailBgVideo" muted playsinline preload="none" disablePictureInPicture></video>
+      </div>
       <div class="detail-top" onmousedown="uiDrag(event)">
-        <button class="detail-back" onclick="closeDetail()">
-          <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        <!-- 左：游戏公告（games.txt 的 Announcement1/2/…）。有未读才会跳动+描边变大变小提示 -->
+        <button class="detail-pill detail-ann-pill" id="detailAnnBtn" type="button" onclick="toggleDetailAnnPop(event)" data-ui-title="annTitle" title="Announcements">
+          <span class="detail-pill-ico">
+            <svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          </span>
+          <span class="detail-pill-txt">
+            <b data-ui="announcement">Announcement</b>
+            <small id="detailAnnCount">0</small>
+          </span>
         </button>
-        <div class="detail-crumb">
-          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-          <span>STARLINE</span>
+        <!-- 中：下载/启动通知（圆形进度），doInject() 开始时才出现，和现有 toast UI 同一套视觉 -->
+        <div class="detail-dl-slot" id="detailDlSlot"></div>
+        <!-- 右：游戏图标 + 名称 + 当前订阅剩余时间（没有订阅就显示价格） -->
+        <div class="detail-pill detail-game-pill">
+          <img class="detail-pill-icon-img" id="detailIcon" src="" alt="">
+          <span class="detail-pill-txt">
+            <b id="detailPillTitle">-</b>
+            <small id="subTime">-</small>
+          </span>
         </div>
         <div style="margin-left:auto;-webkit-app-region:no-drag">
           <button class="tb-btn close" onclick="uiRequestClose()">
@@ -17192,135 +17330,42 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
           </button>
         </div>
       </div>
-      <div class="detail-scroll">
-        <!-- 游戏公告：games.txt 的 Announcement1/2/…，没有就隐藏；位于图集上方 -->
+      <!-- Announcements 弹窗：挂在 .detail 下面（不挂在 .detail-top 里），避免 .detail-top 自己的
+           backdrop-filter 把 position:fixed 的定位基准改掉；定位到 Announcement 胶囊正下方，JS: detailAnnPlace -->
+      <div class="ann-pop detail-ann-pop" id="detailAnnPop" hidden role="dialog" aria-modal="false">
+        <div class="ann-arrow" id="detailAnnArrow"></div>
+        <div class="ann-head">
+          <div class="ann-head-ico">
+            <svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>
+          </div>
+          <div class="ann-head-txt">
+            <div class="ann-title" data-ui="annTitle">Announcements</div>
+          </div>
+          <button class="ann-x" type="button" onclick="closeDetailAnnPop(event)" aria-label="Close">
+            <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+          </button>
+        </div>
+        <!-- 游戏公告：games.txt 的 Announcement1/2/…，没有就隐藏 -->
         <div class="detail-ann" id="detailAnn" hidden></div>
-        <div class="detail-hero">
-          <!-- 图集槽位由 JS 按 games.txt 的 cover 数量生成 -->
-          <div class="detail-slides" id="detailSlides"></div>
-          <!-- 视频悬浮控件：当前展示的是视频时，鼠标移入画面才浮出来 -->
-          <div class="detail-vui" id="detailVui">
-            <button class="detail-vui-btn" id="dvPlay" type="button" onclick="dvTogglePlay(event)" title="Pause">
-              <svg class="fill" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4.2" height="15" rx="1.4"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.4"/></svg>
-            </button>
-            <div class="detail-vol" id="dvVolWrap">
-              <button class="detail-vui-btn" id="dvMute" type="button" onclick="dvToggleMute(event)" title="Unmute">
-                <svg viewBox="0 0 24 24"><path d="M11 5 6.5 9H3v6h3.5L11 19z"/><path d="M16.5 9.5l5 5m0-5l-5 5"/></svg>
-              </button>
-              <div class="detail-vol-pop">
-                <div class="detail-vol-panel">
-                  <div class="detail-vol-rail" id="dvVolRail">
-                    <div class="detail-vol-fill" id="dvVolFill"></div>
-                    <div class="detail-vol-knob" id="dvVolKnob"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="detail-vui-seek" id="dvSeek">
-              <div class="detail-vui-track"><div class="detail-vui-fill" id="dvFill"></div></div>
-              <div class="detail-vui-knob" id="dvKnob"></div>
-            </div>
-            <span class="detail-vui-time" id="dvTime">0:00 / 0:00</span>
-            <button class="detail-vui-pill" id="dvPill" type="button" onclick="dvPillTap(event)" hidden></button>
-            <button class="detail-vui-btn" id="dvFull" type="button" onclick="dvToggleFull(event)" title="Fullscreen">
-              <svg viewBox="0 0 24 24"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
-            </button>
-          </div>
-          <button class="detail-ctrl prev" onclick="detailPrev(event)" title="Previous image" data-ui-title="prevImage">
-            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </div>
+      <div class="detail-scroll">
+        <div class="detail-head">
+          <!-- 原「返回」按钮：现在显示当前游戏的状态（可用/更新中/过时），点击照旧返回商店 -->
+          <button class="detail-pill detail-status-pill" onclick="closeDetail()" title="Back">
+            <svg viewBox="0 0 24 24"><polyline points="11 17 6 12 11 7"/></svg>
+            <span class="card-status available" id="detailStatus">-</span>
           </button>
-          <button class="detail-ctrl next" onclick="detailNext(event)" title="Next image" data-ui-title="nextImage">
-            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-          </button>
-          <div class="detail-hero-body">
-            <div class="detail-hero-info">
-              <div class="detail-hero-title" id="detailTitle">-</div>
-              <div class="detail-hero-meta">
-                <span id="detailDev">-</span>
-                <span class="sep"></span>
-                <span id="detailRel">-</span>
-                <span class="sep"></span>
-                <span class="card-status available" id="detailStatus">-</span>
-              </div>
-            </div>
-            <div class="detail-hero-btns" id="detailHeroBtns">
-              <button class="btn btn-secondary" id="detailWish" onclick="toggleWish(event,CURRENT_GAME)">
-                <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                <span id="detailWishText">Wishlist</span>
-              </button>
-            </div>
-          </div>
-          <div class="detail-nav" id="detailNav"></div>
+          <div class="detail-hero-title" id="detailTitle">-</div>
+          <p class="detail-desc" id="detailDesc" hidden></p>
+          <div class="detail-actions" id="detailHeroBtns"></div>
         </div>
 
+        <!-- 隐藏字段，仅供 updateSubDisplay() 内部读写；可暂停订阅的「方案 · 到期」说明现在不单独展示 -->
+        <div class="sub-meta" id="subMeta" hidden>-</div>
 
-        <div class="section" id="subSection" hidden>
-          <h2 data-ui="subscription">Subscription</h2>
-          <div class="sub-bar">
-            <div class="sub-icon">
-              <svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-            </div>
-            <div class="sub-info">
-              <div class="sub-label" data-ui="remaining">Remaining</div>
-              <div class="sub-time" id="subTime">-</div>
-              <div class="sub-meta" id="subMeta">-</div>
-            </div>
-            <div class="sub-actions">
-              <button class="btn btn-ghost" id="subPauseBtn" onclick="togglePause(event,CURRENT_GAME)" hidden>
-                <span id="subPauseIco" class="btn-ico"></span>
-                <span id="subPauseTxt">Pause time</span>
-              </button>
-              <button class="btn btn-ghost" onclick="renewGame(event,CURRENT_GAME)">
-                <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                <span data-ui="renew">Renew</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="section" id="injectSection" hidden>
-          <h2 data-ui="launch">Launch</h2>
-          <div class="inject-panel" id="injectPanel">
-            <div class="inject-thumb"><img id="injectThumb" src="" alt=""></div>
-            <div class="inject-info">
-              <div class="inject-title" id="injectTitle">-</div>
-              <div class="inject-status" id="injectStatus">Ready to launch</div>
-              <div class="progress"><div class="progress-fill" id="injectProg"></div></div>
-            </div>
-            <div class="inject-method" id="injectMethod" role="group" data-ui-title="injectMethod" title="Injection method">
-              <button type="button" class="inject-method-btn active" data-method="loadlibrary" data-ui-title="injectMethodLL" title="LoadLibrary — standard DLL injection" aria-label="LoadLibrary">
-                <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-              </button>
-              <button type="button" class="inject-method-btn" data-method="manualmap" data-ui-title="injectMethodMM" title="Manual Map — stealthier, no LoadLibrary call" aria-label="Manual Map">
-                <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
-              </button>
-            </div>
-            <div class="inject-actions">
-              <button class="btn btn-ghost" id="injectCancel" hidden onclick="cancelInject()" data-ui="cancel">Cancel</button>
-              <button class="btn btn-primary" id="injectStart" onclick="doInject()">
-                <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                <span data-ui="launch">Launch</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-
-        <div class="section">
-          <h2 data-ui="aboutTitle">About</h2>
-          <div class="meta-grid">
-            <div class="meta-row"><span class="meta-k" data-ui="developer">Developer</span><span class="meta-v" id="dDev">-</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="publisher">Publisher</span><span class="meta-v" id="dPub">-</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="release">Release</span><span class="meta-v" id="dRel">-</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="platform">Platform</span><span class="meta-v" id="dPlat">Windows</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="genres">Genres</span><span class="meta-v" id="dGen">-</span></div>
-            <div class="meta-row"><span class="meta-k" data-ui="features">Features</span><span class="meta-v" id="dFeat">-</span></div>
-          </div>
-        </div>
-
-        <!-- What players say：网站后台已审核的评价（宿主从 /api/testimonials.php 拉） -->
-        <div class="section" id="reviewsSection">
+        <!-- What players say：网站后台已审核的评价（宿主从 /api/testimonials.php 拉）
+             默认折叠，点下面那个"What players say"按钮才展开+加载 -->
+        <div class="section" id="reviewsSection" hidden>
           <div class="sec-row">
             <h2 data-ui="reviewsTitle">What players say</h2>
             <button class="btn btn-ghost" type="button" onclick="openReviewModal()">
@@ -17335,6 +17380,37 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
               <span data-ui="reviewMore">Load more</span>
               <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 底部条：左边原「СПИСОК МОДОВ」→ 展开/收起 What players say；右边原「НАШ САЙТ」→ Write a review；VK 图标去掉 -->
+      <div class="detail-bottombar">
+        <button class="detail-pill detail-reviews-pill" id="detailReviewsBtn" type="button" onclick="toggleReviewsPanel(event)">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span data-ui="reviewsTitle">What players say</span>
+        </button>
+        <button class="detail-pill detail-write-pill" type="button" onclick="openReviewModal()">
+          <span data-ui="reviewWrite">Write a review</span>
+        </button>
+      </div>
+
+      <!-- About：开发商/发行商/发售日/平台/类型/特性（原「НАСТРОИТЬ」现在打开这个居中弹窗，复用现成的 .overlay/.modal） -->
+      <div class="overlay about-overlay" id="aboutOverlay" onmousedown="if(event.target===this)closeAboutPop()">
+        <div class="modal about-modal" role="dialog" aria-modal="true">
+          <div class="modal-head">
+            <div class="modal-title" data-ui="aboutTitle">About</div>
+            <button class="modal-close" type="button" onclick="closeAboutPop()" aria-label="Close">
+              <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+            </button>
+          </div>
+          <div class="meta-grid about-meta-grid">
+            <div class="meta-row"><span class="meta-k" data-ui="developer">Developer</span><span class="meta-v" id="dDev">-</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="publisher">Publisher</span><span class="meta-v" id="dPub">-</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="release">Release</span><span class="meta-v" id="dRel">-</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="platform">Platform</span><span class="meta-v" id="dPlat">Windows</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="genres">Genres</span><span class="meta-v" id="dGen">-</span></div>
+            <div class="meta-row"><span class="meta-k" data-ui="features">Features</span><span class="meta-v" id="dFeat">-</span></div>
           </div>
         </div>
       </div>
@@ -20954,8 +21030,8 @@ __UI_SCRIPT__
 
   /* ── 媒体轮播（网格浮层 + 列表右侧详情块共用一套逻辑）──────────────────
      图片每 3 秒自动换一张；视频不受 3 秒管，播完（或出错）再换；不能手动切。 */
-  function carMake(shotId, videoId, dotsId){
-    var ctx = { shot:shotId, video:videoId, dots:dotsId, code:'', items:[], idx:0, timer:0, on:false };
+  function carMake(shotId, videoId, dotsId, imgMs){
+    var ctx = { shot:shotId, video:videoId, dots:dotsId, code:'', items:[], idx:0, timer:0, on:false, imgMs:imgMs||3000 };
     var vid = document.getElementById(videoId);
     if (vid) {
       vid.addEventListener('ended', function(){ if (ctx.on) carNext(ctx); });
@@ -21034,7 +21110,7 @@ __UI_SCRIPT__
           pre.src = u;
         })(img, ibox, url, token);
       }
-      if (ctx.items.length > 1) ctx.timer = setTimeout(function(){ carNext(ctx); }, 3000);
+      if (ctx.items.length > 1) ctx.timer = setTimeout(function(){ carNext(ctx); }, ctx.imgMs || 3000);
     }
   }
   function carStart(ctx, code, items){
@@ -23182,18 +23258,14 @@ __UI_SCRIPT__
     if (!box) return;
     var owned = hasLic(g);
     var wished = isWished(g);
-
-    var wishBtn = '<button class="btn btn-secondary' + (wished ? ' wished' : '') + '" '
-                + 'id="detailWish" onclick="toggleWish(event,CURRENT_GAME)">'
-                + '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
-                + '<span id="detailWishText">' + (wished ? uiT('wishlisted') : uiT('wishlist')) + '</span>'
-                + '</button>';
+    var launching = !!LAUNCHING[g];
 
     var mainBtn;
     if (owned) {
       var launchLocked = launchLockedByPause(g);
-      mainBtn = '<button class="btn btn-primary" onclick="jumpToInject()"'
-              + (launchLocked ? ' disabled title="' + uiEsc(uiT('resumeFirst')) + '"' : '') + '>'
+      mainBtn = '<button class="btn btn-primary" onclick="doInject()"'
+              + (launchLocked || launching ? ' disabled' : '')
+              + (launchLocked ? ' title="' + uiEsc(uiT('resumeFirst')) + '"' : '') + '>'
               + '<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>'
               + '<span>' + uiEsc(uiT(launchLocked ? 'resumeFirst' : 'launch')) + '</span></button>';
     } else {
@@ -23201,16 +23273,43 @@ __UI_SCRIPT__
               + '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
               + '<span>' + uiEsc(uiT('buyNow')) + '</span></button>';
     }
+
+    /* 原「НАСТРОИТЬ」：现在打开居中的 About 弹窗（开发商/发行商/发售日/平台/类型/特性） */
+    var aboutBtn = '<button class="btn btn-secondary" type="button" onclick="toggleAboutPop()">'
+                 + '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11.4v5.1"/><circle cx="12" cy="7.9" r="1.15" fill="currentColor" stroke="none"/></svg>'
+                 + '<span>' + uiEsc(uiT('aboutTitle')) + '</span></button>';
+
+    var wishBtn = '<button class="detail-icon-btn' + (wished ? ' wished' : '') + '" '
+                + 'id="detailWish" type="button" onclick="toggleWish(event,CURRENT_GAME)" title="' + uiEsc(uiT(wished ? 'wishlisted' : 'wishlist')) + '">'
+                + '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>'
+                + '<span id="detailWishText" style="display:none">' + (wished ? uiT('wishlisted') : uiT('wishlist')) + '</span>'
+                + '</button>';
+
     var pauseBtn = '';
     if (owned && licPausable(g)) {
       var pz = !!licOf(g).paused;
       var pzLocked = (!pz && pauseLockedByLaunch(g)) || !!PAUSE_PENDING[g];
-      pauseBtn = '<button class="btn btn-secondary" onclick="togglePause(event,CURRENT_GAME)"'
-               + (pzLocked ? ' disabled title="' + uiEsc(uiT('pauseBlocked')) + '"' : '') + '>'
-               + pauseIcon(pz)
-               + '<span>' + uiEsc(uiT(pz ? 'resumeTime' : 'pauseTime')) + '</span></button>';
+      pauseBtn = '<button class="detail-icon-btn" id="subPauseBtn" type="button" onclick="togglePause(event,CURRENT_GAME)"'
+               + (pzLocked ? ' disabled title="' + uiEsc(uiT('pauseBlocked')) + '"' : ' title="' + uiEsc(uiT(pz ? 'resumeTime' : 'pauseTime')) + '"') + '>'
+               + '<span id="subPauseIco" class="btn-ico">' + pauseIcon(pz) + '</span>'
+               + '<span id="subPauseTxt" style="display:none">' + uiEsc(uiT(pz ? 'resumeTime' : 'pauseTime')) + '</span>'
+               + '</button>';
     }
-    box.innerHTML = wishBtn + pauseBtn + mainBtn;
+
+    /* 注入方式（LoadLibrary / Manual Map）：只在拥有且能启动时才有意义 */
+    var methodRow = '';
+    if (owned) {
+      methodRow = '<div class="detail-method-row" id="injectMethod" role="group" data-ui-title="injectMethod" title="Injection method">'
+                + '<button type="button" class="inject-method-btn' + (INJECT_METHOD === 'loadlibrary' ? ' active' : '') + '" data-method="loadlibrary" data-ui-title="injectMethodLL" title="LoadLibrary — standard DLL injection" aria-label="LoadLibrary">'
+                + '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>'
+                + '</button>'
+                + '<button type="button" class="inject-method-btn' + (INJECT_METHOD === 'manualmap' ? ' active' : '') + '" data-method="manualmap" data-ui-title="injectMethodMM" title="Manual Map — stealthier, no LoadLibrary call" aria-label="Manual Map">'
+                + '<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>'
+                + '</button></div>';
+    }
+
+    box.innerHTML = mainBtn + aboutBtn + wishBtn + pauseBtn + methodRow;
+    initInjectMethod();        /* 每次重建这个区域都要重新接一遍点击事件 */
   }
 
 
@@ -23224,7 +23323,9 @@ __UI_SCRIPT__
   /* ── 注入方式选择：LoadLibrary / Manual Map，纯 UI（不涉及实际注入逻辑），
      选中状态存在 INJECT_METHOD，供以后 doInject() 读取并传给宿主 ── */
   var INJECT_METHOD = 'loadlibrary';
-  (function initInjectMethod(){
+  /* 方法选择条每次随 renderDetailHeroButtons() 一起重建，所以这里不再是一次性 IIFE，
+     而是一个普通函数：每次重建完都重新调用一遍，把点击事件接上 */
+  function initInjectMethod(){
     var box = document.getElementById('injectMethod');
     if (!box) return;
     var btns = box.querySelectorAll('.inject-method-btn');
@@ -23236,7 +23337,7 @@ __UI_SCRIPT__
         INJECT_METHOD = btn.getAttribute('data-method') || 'loadlibrary';
       });
     });
-  })();
+  }
 
   function tagT(x){
     var k = 't' + String(x).replace(/[^A-Za-z]/g, '');
@@ -23367,6 +23468,12 @@ __UI_SCRIPT__
     var box = document.getElementById('detailAnn');
     if (!box) return;
     var st = gannState(g);
+    /* 顶部那个 Announcement 胶囊：下面的数字 = 这个游戏一共有多少条公告；
+       有没读过的（st.items）就描边跳动提醒一下，颜色很淡，看见就行 */
+    var annBtn = document.getElementById('detailAnnBtn');
+    var annCnt = document.getElementById('detailAnnCount');
+    if (annCnt) annCnt.textContent = st.all.length;
+    if (annBtn) annBtn.classList.toggle('unread', st.items.length > 0);
     if (!st.all.length) {
       if (DETAIL_AL) { DETAIL_AL.destroy(); DETAIL_AL = null; }
       box.hidden = true;
@@ -23411,7 +23518,6 @@ __UI_SCRIPT__
     var meta = GAMES[g];
     if (!meta) return;
     var rel = relT(meta.rel || 'TBA');
-    document.getElementById('detailRel').textContent = rel;
     document.getElementById('dRel').textContent = rel;
     var genHtml = '';
     (meta.gen || []).forEach(function(x){ genHtml += '<span class="tag">' + uiEsc(tagT(x)) + '</span>'; });
@@ -23812,22 +23918,21 @@ __UI_SCRIPT__
   function openDetail(g){
     if (typeof storeRecentRemember === 'function') storeRecentRemember(g);
     CURRENT_GAME = g;
-    DETAIL_IDX = 0;
     var meta = GAMES[g];
     if (!meta) return;
 
-    /* 图集来自 games.txt 的 cover，有几张就生成几个槽位 */
-    DETAIL_COVERS = detailCovers(g);
-    var fallback = meta.poster || meta.img || '';
-    var slides = detailEnsureSlides(DETAIL_COVERS.length);
-    for (var i = 0; i < slides.length; i++) {
-      buildSlide(slides[i], DETAIL_COVERS[i] || '', fallback);
-      slides[i].classList.toggle('active', i === 0);
-    }
-
+    /* 背景：games.txt 的 cover1/2/…轮播（图片 5 秒一张，视频播完自动切下一张） */
+    if (!DETAIL_BG) DETAIL_BG = carMake('detailBgShot', 'detailBgVideo', null, 5000);
+    carStop(DETAIL_BG);
+    carStart(DETAIL_BG, g, mediaItems(g));
 
     document.getElementById('detailTitle').textContent = meta.title || g;
-    document.getElementById('detailDev').textContent = meta.dev || '';
+    document.getElementById('detailPillTitle').textContent = meta.title || g;
+    document.getElementById('detailIcon').src = meta.img || meta.poster || '';
+    var descEl = document.getElementById('detailDesc');
+    var descTxt = String(meta.desc || meta.description || '').trim();
+    descEl.textContent = descTxt;
+    descEl.hidden = !descTxt;
     var dst = document.getElementById('detailStatus');
     if (dst) { var dsk = gameStatusKey(meta); dst.className = 'card-status ' + dsk; dst.textContent = gameStatusText(dsk); }
     document.getElementById('dDev').textContent = meta.dev || '';
@@ -23836,25 +23941,18 @@ __UI_SCRIPT__
     renderDetailTexts(g);
 
     var owned = hasLic(g);
-    document.getElementById('subSection').hidden = !owned;
-    document.getElementById('injectSection').hidden = !owned;
-
+    var subTimeEl = document.getElementById('subTime');
     if (owned) {
-      var lic = licOf(g);
-      updateSubDisplay(lic);
-      document.getElementById('injectThumb').src = meta.img;
-      uiImgWatch(document.querySelector('.inject-thumb'), meta.img);
-      document.getElementById('injectTitle').textContent = meta.title || g;
-      document.getElementById('injectStatus').textContent = uiT('readyInject');
-      document.getElementById('injectProg').style.width = '0%';
-      document.getElementById('injectStart').hidden = false;
-      document.getElementById('injectCancel').hidden = true;
-      document.getElementById('injectPanel').classList.remove('active');
+      updateSubDisplay(licOf(g));
+    } else if (subTimeEl) {
+      subTimeEl.className = 'sub-time';
+      subTimeEl.textContent = fmtPrice(g);
     }
 
-
     renderDetailHeroButtons(g);
-    loadReviews();          /* What players say：每次打开详情页都刷一次 */
+    REVIEWS_OPEN = false;
+    document.getElementById('reviewsSection').hidden = true;
+    document.getElementById('detailReviewsBtn').classList.remove('open');
 
     DETAIL_TK++;
     document.getElementById('detail').classList.remove('closing');
@@ -23864,18 +23962,6 @@ __UI_SCRIPT__
     document.getElementById('storePage').classList.remove('page-back');
     document.getElementById('profilePage').classList.remove('page-back');
     document.querySelector('.detail-scroll').scrollTop = 0;
-    syncDetailVideos();
-
-    var nav = document.getElementById('detailNav');
-    var navHtml = '';
-    for (var j = 0; j < DETAIL_COVERS.length; j++) {
-      navHtml += '<button class="detail-dot' + (j === 0 ? ' active' : '') + '"'
-              + ' onclick="detailGo(' + j + ')"></button>';
-    }
-    nav.innerHTML = navHtml;
-    nav.hidden = DETAIL_COVERS.length < 2;        /* 只有一张图就不显示圆点 */
-    var hero = document.querySelector('.detail-hero');
-    if (hero) hero.classList.toggle('single', DETAIL_COVERS.length < 2);  /* 也藏掉左右箭头 */
   }
 
   function detailGo(i){
@@ -23896,6 +23982,8 @@ __UI_SCRIPT__
   function detailNext(ev){ if (ev) ev.stopPropagation(); detailGo(DETAIL_IDX + 1); }
 
   var DETAIL_TK = 0;
+  var DETAIL_BG = null;
+  var REVIEWS_OPEN = false;
   function closeDetail(){
     var d = document.getElementById('detail');
     CURRENT_GAME = '';
@@ -23916,6 +24004,9 @@ __UI_SCRIPT__
       d.classList.remove('closing');
       if (page) { page.classList.remove('page-back'); }
       stopDetailVideos();
+      if (DETAIL_BG) carStop(DETAIL_BG);
+      closeDetailAnnPop();
+      closeAboutPop();
     }, 320);
   }
 
@@ -24037,6 +24128,59 @@ __UI_SCRIPT__
     sbTaskTimer = setTimeout(sbTaskHide, delay || 5000);
   }
 
+  /* ── 顶部居中的下载/启动通知：复用 toast 的视觉（圆形进度条），挂在 #detailDlSlot 里 ──
+     和普通 toast 不一样：这个不是倒计时自动消失，而是手动把环从 0% 画到 100%（真实下载进度） */
+  var DL_TOAST_EL = null;
+  function dlRingOffset(pct){ return (88 * (1 - Math.max(0, Math.min(100, pct)) / 100)).toFixed(1); }
+  function dlNotifyStart(code){
+    var slot = document.getElementById('detailDlSlot');
+    if (!slot) return;
+    var meta = GAMES[code] || {};
+    var t = document.createElement('div');
+    t.className = 'toast info dlprog';
+    t.setAttribute('role', 'status');
+    t.innerHTML = '<span class="toast-ico">'
+      + '<svg class="toast-ring" viewBox="0 0 34 34"><circle class="tk" cx="17" cy="17" r="14"/>'
+      + '<circle class="bar" cx="17" cy="17" r="14" style="stroke-dashoffset:88"/></svg>'
+      + '<svg class="ic" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>'
+      + '</span><span class="toast-txt"></span>'
+      + '<span class="toast-cancel" title="' + uiEsc(uiT('cancel')) + '">'
+      + '<svg viewBox="0 0 24 24"><line x1="5" y1="5" x2="19" y2="19"/><line x1="19" y1="5" x2="5" y2="19"/></svg></span>';
+    t.querySelector('.toast-txt').textContent = (meta.title || meta.short || code || '') + ' \u00B7 ' + uiT('injecting');
+    t.querySelector('.toast-cancel').addEventListener('click', function(e){ e.stopPropagation(); cancelInject(); });
+    slot.innerHTML = '';
+    slot.appendChild(t);
+    DL_TOAST_EL = t;
+  }
+  function dlNotifyProgress(pct){
+    if (!DL_TOAST_EL) return;
+    var bar = DL_TOAST_EL.querySelector('.toast-ring .bar');
+    if (bar) bar.style.strokeDashoffset = dlRingOffset(pct);
+  }
+  function dlNotifyDone(ok){
+    if (!DL_TOAST_EL) return;
+    var t = DL_TOAST_EL;
+    DL_TOAST_EL = null;
+    t.classList.remove('info'); t.classList.add(ok ? 'ok' : 'err');
+    var bar = t.querySelector('.toast-ring .bar');
+    if (bar) bar.style.strokeDashoffset = ok ? '0' : dlRingOffset(0);
+    var ic = t.querySelector('.toast-ico .ic');
+    if (ic) ic.innerHTML = TOAST_ICONS[ok ? 'ok' : 'err'];
+    var cancelBtn = t.querySelector('.toast-cancel');
+    if (cancelBtn) cancelBtn.remove();
+    var txt = t.querySelector('.toast-txt');
+    if (txt) txt.textContent = txt.textContent.split(' \u00B7 ')[0] + ' \u00B7 ' + uiT(ok ? 'injected' : 'readyInject');
+    setTimeout(function(){
+      t.classList.add('out');
+      setTimeout(function(){ if (t.parentNode) t.parentNode.removeChild(t); }, 300);
+    }, ok ? 1800 : 2600);
+  }
+  function dlNotifyClear(){
+    if (!DL_TOAST_EL) return;
+    var t = DL_TOAST_EL; DL_TOAST_EL = null;
+    if (t.parentNode) t.parentNode.removeChild(t);
+  }
+
   function doInject(){
     if (!CURRENT_GAME) return;
     if (LAUNCHING[CURRENT_GAME]) return;
@@ -24055,17 +24199,9 @@ __UI_SCRIPT__
     }
     LAUNCHING[CURRENT_GAME] = true;    /* 启动过程中也不能再暂停 */
     refreshPauseUi(CURRENT_GAME);
-    var start = document.getElementById('injectStart');
-    var cancel = document.getElementById('injectCancel');
-    var fill = document.getElementById('injectProg');
-    var stat = document.getElementById('injectStatus');
-    var panel = document.getElementById('injectPanel');
+    renderDetailHeroButtons(CURRENT_GAME);   /* 启动按钮立刻变禁用态 */
 
-    start.hidden = true;
-    cancel.hidden = false;
-    panel.classList.add('active');
-    stat.textContent = uiT('injecting');
-    fill.style.width = '0%';
+    dlNotifyStart(CURRENT_GAME);
 
     injectGame = CURRENT_GAME;
     injectPct = 0;
@@ -24087,7 +24223,7 @@ __UI_SCRIPT__
         if (injectPct > 96) { injectPct = 96; }
       }
       var p = Math.max(0, Math.min(100, injectPct));
-      fill.style.width = p + '%';
+      dlNotifyProgress(p);
       sbTaskProgress(p);
     }, 110);
 
@@ -24096,21 +24232,18 @@ __UI_SCRIPT__
     wv('LAUNCH:' + CURRENT_GAME + ':' + INJECT_METHOD);
   }
 
-  /* 宿主上报真实进度：详情页面板与侧栏任务卡一起更新 */
+  /* 宿主上报真实进度：顶部通知与侧栏任务卡一起更新 */
   function injectOnProgress(code, pct){
     injectRealPct = pct;
-    if (code && code === injectGame) {
-      var panel = document.getElementById('injectPanel');
-      if (panel && panel.classList.contains('active') && pct > injectPct) {
-        injectPct = pct;
-        document.getElementById('injectProg').style.width = Math.min(99, pct) + '%';
-      }
+    if (code && code === injectGame && pct > injectPct) {
+      injectPct = pct;
+      dlNotifyProgress(Math.min(99, pct));
     }
     if (code && code !== injectGame) { return; }
     sbTaskProgress(pct);
   }
 
-  /* 启动成功：面板收尾成「已启动」，侧栏任务卡短暂停留后自动消失 */
+  /* 启动成功：顶部通知收尾成「已启动」，侧栏任务卡短暂停留后自动消失 */
   function injectOnOk(code){
     if (injectTimer) { clearInterval(injectTimer); injectTimer = null; }
     if (code) {
@@ -24118,21 +24251,9 @@ __UI_SCRIPT__
       LAUNCHED[code] = true;        /* 本次运行已启动：暂停按钮从此刻起失效 */
     }
     refreshPauseUi(code || CURRENT_GAME);
-    var fill = document.getElementById('injectProg');
-    var stat = document.getElementById('injectStatus');
-    var cancel = document.getElementById('injectCancel');
-    var start = document.getElementById('injectStart');
-    var panel = document.getElementById('injectPanel');
-    if (fill) fill.style.width = '100%';
-    if (stat) stat.textContent = uiT('injected');
+    if (!code || code === CURRENT_GAME) renderDetailHeroButtons(CURRENT_GAME);
+    dlNotifyDone(true);
     sbTaskFinish('done', uiT('injected'), 4500);
-    setTimeout(function(){
-      if (cancel) cancel.hidden = true;
-      if (start) start.hidden = false;
-      if (fill) fill.style.width = '0%';
-      if (stat) stat.textContent = uiT('readyInject');
-      if (panel) panel.classList.remove('active');
-    }, 1600);
   }
 
   function cancelInject(){
@@ -24141,11 +24262,8 @@ __UI_SCRIPT__
     var cg = injectGame || CURRENT_GAME;
     if (cg) LAUNCHING[cg] = false;
     refreshPauseUi(cg);
-    document.getElementById('injectStart').hidden = false;
-    document.getElementById('injectCancel').hidden = true;
-    document.getElementById('injectProg').style.width = '0%';
-    document.getElementById('injectStatus').textContent = uiT('readyInject');
-    document.getElementById('injectPanel').classList.remove('active');
+    if (!cg || cg === CURRENT_GAME) renderDetailHeroButtons(CURRENT_GAME);
+    dlNotifyClear();
     sbTaskHide();
   }
 
@@ -25089,9 +25207,12 @@ __UI_SCRIPT__
         updateProfileBadges();          /* 订阅变了，PRO 徽标跟着变 */
         if (CURRENT_GAME) {
           var owned = hasLic(CURRENT_GAME);
-          document.getElementById('subSection').hidden = !owned;
-          document.getElementById('injectSection').hidden = !owned;
-          if (owned) updateSubDisplay(licOf(CURRENT_GAME));
+          if (owned) {
+            updateSubDisplay(licOf(CURRENT_GAME));
+          } else {
+            var subTimeEl2 = document.getElementById('subTime');
+            if (subTimeEl2) { subTimeEl2.className = 'sub-time'; subTimeEl2.textContent = fmtPrice(CURRENT_GAME); }
+          }
           renderDetailHeroButtons(CURRENT_GAME);
         }
       } catch (err) {}
@@ -25692,6 +25813,93 @@ __UI_SCRIPT__
   window.addEventListener('resize', function(){
     var pop = document.getElementById('annPop');
     if (pop && pop.classList.contains('show')) { annPlace(); }
+  });
+
+  /* 首次进页面初始化图标状态（有未读 → 跳动 + 小红点） */
+  annPaintBadge();
+
+
+  /* ══════════ 详情页自己的两个弹窗：游戏公告 / About（照搬上面全局公告弹窗那一套开合/定位逻辑） ══════════ */
+  function detailAnnPlace(){
+    var btn = document.getElementById('detailAnnBtn');
+    var pop = document.getElementById('detailAnnPop');
+    var arr = document.getElementById('detailAnnArrow');
+    if (!btn || !pop) return;
+    var r = btn.getBoundingClientRect();
+    var pw = pop.offsetWidth || 340;
+    var ph = pop.offsetHeight || 260;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var x = r.left;
+    if (x + pw > vw - 10) x = vw - pw - 10;
+    if (x < 10) x = 10;
+    var y = r.bottom + 10;
+    if (y + ph > vh - 10) { y = Math.max(10, r.top - ph - 10); }
+    pop.style.left = Math.round(x) + 'px';
+    pop.style.top  = Math.round(y) + 'px';
+    if (arr) arr.style.left = Math.round(r.left + r.width / 2 - x) + 'px';
+  }
+  function openDetailAnnPop(ev){
+    if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+    var pop = document.getElementById('detailAnnPop');
+    if (!pop) return;
+    pop.hidden = false;
+    detailAnnPlace();
+    requestAnimationFrame(function(){ pop.classList.add('show'); });
+    detailAnnReplay();
+  }
+  function closeDetailAnnPop(ev){
+    if (ev) { ev.stopPropagation(); ev.preventDefault(); }
+    var pop = document.getElementById('detailAnnPop');
+    if (!pop) return;
+    pop.classList.remove('show');
+    setTimeout(function(){ if (!pop.classList.contains('show')) { pop.hidden = true; } }, 220);
+  }
+  function toggleDetailAnnPop(ev){
+    var pop = document.getElementById('detailAnnPop');
+    if (!pop) return;
+    if (pop.hidden || !pop.classList.contains('show')) { openDetailAnnPop(ev); }
+    else { closeDetailAnnPop(ev); }
+  }
+  document.addEventListener('pointerdown', function(e){
+    var pop = document.getElementById('detailAnnPop');
+    if (!pop || pop.hidden) return;
+    var t = e.target;
+    if (t && t.closest && (t.closest('#detailAnnPop') || t.closest('#detailAnnBtn'))) return;
+    closeDetailAnnPop();
+  }, true);
+  window.addEventListener('resize', function(){
+    var pop = document.getElementById('detailAnnPop');
+    if (pop && pop.classList.contains('show')) { detailAnnPlace(); }
+  });
+
+  /* About：居中弹窗，开发商/发行商/发售日/平台/类型/特性（.meta-grid 里的内容和之前完全一样，只是挪进了弹窗） */
+  function toggleAboutPop(){
+    var ov = document.getElementById('aboutOverlay');
+    if (!ov) return;
+    ov.classList.toggle('open');
+  }
+  function closeAboutPop(){
+    var ov = document.getElementById('aboutOverlay');
+    if (ov) ov.classList.remove('open');
+  }
+
+  /* What players say：原「СПИСОК МОДОВ」位置的按钮，点一下展开/收起，展开时才去加载评价 */
+  function toggleReviewsPanel(){
+    var sec = document.getElementById('reviewsSection');
+    var btn = document.getElementById('detailReviewsBtn');
+    if (!sec || !btn) return;
+    REVIEWS_OPEN = sec.hidden;
+    sec.hidden = !REVIEWS_OPEN;
+    btn.classList.toggle('open', REVIEWS_OPEN);
+    if (REVIEWS_OPEN) {
+      loadReviews();
+      setTimeout(function(){ sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
+    }
+  }
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Escape') return;
+    closeDetailAnnPop();
+    closeAboutPop();
   });
 
   /* 首次进页面初始化图标状态（有未读 → 跳动 + 小红点） */
