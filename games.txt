@@ -196,6 +196,8 @@ price90  = 59.99
 priceLife= 109.99 
 hide = false
 Announcement1 = Please be careful using the risk feature, it could get you banned from the game.
+Announcement2 = According to the Discord information provided by the game, we are working on an HWID spoofer.\nAnd we’re adding more security features.
+
 
 
 
