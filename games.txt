@@ -195,6 +195,8 @@ price30  = 19.99
 price90  = 59.99     
 priceLife= 109.99 
 hide = false
+Announcement1 = Please be careful using the risk feature, it could get you banned from the game.
+
 
 
 # ───────────────────────────────────────────────────────────────────────────
