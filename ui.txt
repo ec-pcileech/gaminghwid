@@ -4387,7 +4387,7 @@ function uiRenewInitThumb(){
    · 只有一个素材：图片一直显示；视频循环播放
    · 换游戏（输入密钥前缀 / 点标签）时，新游戏的素材交叉淡入；页面关闭：停掉计时器并释放视频
    · 模糊强度 75%：满值 RENEW_BG_BLUR_MAX（40px）的 75% = 30px */
-var RENEW_BG_BLUR_PCT = 35;
+var RENEW_BG_BLUR_PCT = 75;
 var RENEW_BG_BLUR_MAX = 40;
 var RENEW_BG_SLIDE_MS = 5000;
 var RENEW_BG_FADE_MS = 1300;
