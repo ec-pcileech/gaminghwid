@@ -15779,14 +15779,17 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
   to{opacity:1;transform:none}
 }
 .detail-top{
+  /* 不再是一整条有背景的横条——每个胶囊自己带 blur，这条只负责排布 */
   height:64px;flex-shrink:0;display:flex;align-items:center;gap:14px;
   padding:0 26px;-webkit-app-region:drag;
-  background:var(--surface);
-  backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
-  border-bottom:1px solid var(--border);
-  z-index:2;
+  background:transparent;z-index:2;
 }
+/* 关闭按钮单独也是一个 blur 胶囊（原来是蹭 .detail-top 整条横条的底色，横条底色去掉后必须自己带） */
+.detail-top .tb-btn.close{
+  background:rgba(var(--bg-rgb),.5);border:1px solid var(--border-2);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+}
+.detail-top .tb-btn.close:hover{background:rgba(var(--bg-rgb),.68);border-color:var(--border-3,var(--accent-2))}
 .detail-back{
   width:36px;height:36px;border-radius:var(--radius);
   display:grid;place-items:center;
@@ -16062,11 +16065,26 @@ button.detail-pill:hover{border-color:var(--border-3,var(--accent-2));background
 .detail-pill-txt small{font-size:11px;color:var(--text-3);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
 .detail-pill-icon-img{width:28px;height:28px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--surface-2)}
 
-/* 公告胶囊：有未读才描边变大变小（颜色很淡，看得到就行，不抢视线） */
+/* 公告胶囊：平时只露一个圆形图标，鼠标移上去才展开成完整胶囊（文字+数量） */
+.detail-ann-pill{
+  width:46px;padding:0;justify-content:center;gap:0;overflow:hidden;
+  transition:width .32s cubic-bezier(.4,0,.2,1),padding .32s cubic-bezier(.4,0,.2,1),background var(--tr),border-color var(--tr);
+}
+.detail-ann-pill .detail-pill-txt{
+  max-width:0;opacity:0;margin-left:0;white-space:nowrap;
+  transition:max-width .3s ease .05s,opacity .22s ease,margin-left .3s ease .05s;
+}
+.detail-ann-pill:hover,.detail-ann-pill:focus-within{width:190px;padding:0 14px;gap:10px}
+.detail-ann-pill:hover .detail-pill-txt,.detail-ann-pill:focus-within .detail-pill-txt{
+  max-width:160px;opacity:1;margin-left:0;
+}
+/* 有未读公告：图标本体不动，只有后面那团强调色的光晕自己变大变小（很淡，看得到就行，不抢视线）。
+   用 filter:drop-shadow 而不是 box-shadow，因为 box-shadow 会被下面 .detail-ann-pill 自带的
+   overflow:hidden（收起状态裁文字用的）一起裁掉，drop-shadow 不受元素自身 overflow 影响。 */
 .detail-ann-pill.unread{animation:detailAnnPulse 2.2s ease-in-out infinite}
 @keyframes detailAnnPulse{
-  0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 0%,transparent);transform:scale(1)}
-  50%{box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 28%,transparent);transform:scale(1.035)}
+  0%,100%{filter:drop-shadow(0 0 0 color-mix(in srgb,var(--accent) 0%,transparent))}
+  50%{filter:drop-shadow(0 0 7px color-mix(in srgb,var(--accent) 55%,transparent))}
 }
 
 /* 下载/启动通知：居中出现在顶部，复用 toast / toast-ring 的视觉（圆形进度条） */
@@ -16114,7 +16132,8 @@ button.detail-pill:hover{border-color:var(--border-3,var(--accent-2));background
 .detail-icon-btn.wished{color:#ff8ba0;border-color:rgba(244,63,94,.55);background:rgba(244,63,94,.22)}
 .detail-icon-btn.wished svg{fill:currentColor}
 .detail-method-row{display:flex;gap:4px;padding:3px;border-radius:999px;
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16)}
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 .detail-method-row .inject-method-btn{
   width:34px;height:34px;border-radius:999px;display:grid;place-items:center;
   color:rgba(255,255,255,.6);cursor:pointer;transition:all var(--tr);background:transparent;border:none;
@@ -16131,8 +16150,13 @@ button.detail-pill:hover{border-color:var(--border-3,var(--accent-2));background
 .detail-reviews-pill svg,.detail-write-pill svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .detail-reviews-pill.open{border-color:var(--accent-2);color:var(--accent-2)}
 
-/* What players say：从底部条展开，不再默认常驻显示 */
-#reviewsSection{animation:heroIn .35s cubic-bezier(.4,0,.2,1)}
+/* What players say：从底部条展开，不再默认常驻显示；玻璃卡片背景，和其它胶囊一个风格 */
+#reviewsSection{
+  animation:heroIn .35s cubic-bezier(.4,0,.2,1);
+  background:rgba(var(--bg-rgb),.5);border:1px solid var(--border-2);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+  border-radius:var(--radius-lg);padding:24px 26px;
+}
 
 /* About 弹窗：复用现成的 .overlay/.modal，只加一点内边距 */
 .about-modal{max-width:460px}
