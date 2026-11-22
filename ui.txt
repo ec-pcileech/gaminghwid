@@ -15784,12 +15784,6 @@ body[data-fest="christmas"] .card:hover .card-cta:not(.owned)::before{animation:
   padding:0 26px;-webkit-app-region:drag;
   background:transparent;z-index:2;
 }
-/* 关闭按钮单独也是一个 blur 胶囊（原来是蹭 .detail-top 整条横条的底色，横条底色去掉后必须自己带） */
-.detail-top .tb-btn.close{
-  background:rgba(var(--bg-rgb),.5);border:1px solid var(--border-2);
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-}
-.detail-top .tb-btn.close:hover{background:rgba(var(--bg-rgb),.68);border-color:var(--border-3,var(--accent-2))}
 .detail-back{
   width:36px;height:36px;border-radius:var(--radius);
   display:grid;place-items:center;
@@ -16065,18 +16059,22 @@ button.detail-pill:hover{border-color:var(--border-3,var(--accent-2));background
 .detail-pill-txt small{font-size:11px;color:var(--text-3);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
 .detail-pill-icon-img{width:28px;height:28px;border-radius:9px;object-fit:cover;flex-shrink:0;background:var(--surface-2)}
 
-/* 公告胶囊：平时只露一个圆形图标，鼠标移上去才展开成完整胶囊（文字+数量） */
+/* 公告胶囊：平时只露一个圆形图标，鼠标移上去才整个"长大"展开成完整胶囊（文字+数量）。
+   图标的左内边距固定不变，收起/展开时图标本身不挪位置——只有胶囊从图标那头向外变宽，
+   不是现在这种内容整体往右平移的感觉。 */
 .detail-ann-pill{
-  width:46px;padding:0;justify-content:center;gap:0;overflow:hidden;
-  transition:width .32s cubic-bezier(.4,0,.2,1),padding .32s cubic-bezier(.4,0,.2,1),background var(--tr),border-color var(--tr);
+  width:46px;padding-left:12px;padding-right:0;justify-content:flex-start;gap:10px;overflow:hidden;
+  transition:width .42s cubic-bezier(.22,1.12,.36,1),padding-right .42s cubic-bezier(.22,1.12,.36,1),
+             background var(--tr),border-color var(--tr);
 }
+.detail-ann-pill .detail-pill-ico{flex-shrink:0}
 .detail-ann-pill .detail-pill-txt{
-  max-width:0;opacity:0;margin-left:0;white-space:nowrap;
-  transition:max-width .3s ease .05s,opacity .22s ease,margin-left .3s ease .05s;
+  max-width:0;opacity:0;white-space:nowrap;flex-shrink:0;
+  transition:max-width .36s cubic-bezier(.22,1.12,.36,1) .06s,opacity .28s ease .1s;
 }
-.detail-ann-pill:hover,.detail-ann-pill:focus-within{width:190px;padding:0 14px;gap:10px}
+.detail-ann-pill:hover,.detail-ann-pill:focus-within{width:192px;padding-right:14px}
 .detail-ann-pill:hover .detail-pill-txt,.detail-ann-pill:focus-within .detail-pill-txt{
-  max-width:160px;opacity:1;margin-left:0;
+  max-width:150px;opacity:1;
 }
 /* 有未读公告：图标本体不动，只有后面那团强调色的光晕自己变大变小（很淡，看得到就行，不抢视线）。
    用 filter:drop-shadow 而不是 box-shadow，因为 box-shadow 会被下面 .detail-ann-pill 自带的
@@ -17347,11 +17345,6 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
             <b id="detailPillTitle">-</b>
             <small id="subTime">-</small>
           </span>
-        </div>
-        <div style="margin-left:auto;-webkit-app-region:no-drag">
-          <button class="tb-btn close" onclick="uiRequestClose()">
-            <svg viewBox="0 0 24 24"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-          </button>
         </div>
       </div>
       <!-- Announcements 弹窗：挂在 .detail 下面（不挂在 .detail-top 里），避免 .detail-top 自己的
