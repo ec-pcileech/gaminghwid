@@ -11,7 +11,7 @@
 #               · 改回 available 后，客户端约 1 分钟内自动恢复登录界面，无需重启
 #               · 也认：maintenance / maintain / maintaining / 维护中 / 维护 / 维修中
 #  ────────────────────────────────────────────────────────────────────────
-#APP_VERSION 3.2.1
+#APP_VERSION 3.2.2
 #APP_STATUS available
 #APP_DOWNLOAD https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/STARLINE.exe
 #
@@ -35,6 +35,7 @@
 #       dev         开发商
 #       pub         发行商
 #       rel         发行日期（任意文本）
+#       description 游戏简介（详情页大标题下方那段文字）；别名：description = desc；不填就显示「当前游戏没有描述」（多语言，8 种内置语言都有，也能在客户端「自定义翻译」里改）
 #       genres      类型，逗号分隔
 #       features    特性，逗号分隔
 #       featured    是否进首页 banner 精选轮播：true / false（不填 = false）
@@ -83,7 +84,7 @@ price15  = 8.99
 price30  = 19.99       
 price90  = 59.99     
 priceLife= 109.99 
-
+description= For over two decades, Counter-Strike has offered an elite competitive experience, one shaped by millions of players from across the globe. And now the next chapter in the CS story is about to begin. This is Counter-Strike 2.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Deadlock
