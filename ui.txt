@@ -16102,9 +16102,6 @@ button.detail-pill:hover{border-color:var(--border-3,var(--accent-2));background
   display:flex;flex-direction:column;justify-content:center;gap:16px;
   max-width:640px;padding:24px 0 40px;
 }
-.detail-status-pill{height:34px;padding:0 14px 0 10px;gap:6px;align-self:flex-start}
-.detail-status-pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;color:var(--text-2)}
-.detail-status-pill .card-status{background:transparent;border:none;padding:0;font-size:11px}
 .detail-head .detail-hero-title{
   font-size:52px;font-weight:900;letter-spacing:-2px;line-height:1.02;
   color:#fff;text-shadow:0 4px 40px rgba(0,0,0,.7);
@@ -17368,11 +17365,6 @@ html[data-layout="rail-r"] .sb-sub-item.active::before{left:auto;right:-11px;bor
       </div>
       <div class="detail-scroll">
         <div class="detail-head">
-          <!-- 原「返回」按钮：现在显示当前游戏的状态（可用/更新中/过时），点击照旧返回商店 -->
-          <button class="detail-pill detail-status-pill" onclick="closeDetail()" title="Back">
-            <svg viewBox="0 0 24 24"><polyline points="11 17 6 12 11 7"/></svg>
-            <span class="card-status available" id="detailStatus">-</span>
-          </button>
           <div class="detail-hero-title" id="detailTitle">-</div>
           <p class="detail-desc" id="detailDesc" hidden></p>
           <div class="detail-actions" id="detailHeroBtns"></div>
