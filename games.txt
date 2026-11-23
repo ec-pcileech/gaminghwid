@@ -175,7 +175,7 @@ description=Counter-Strike: Source blends Counter-Strike's award-winning teampla
 title    = Rob Run
 short    = Rob Run
 icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/db8e0cf43c9475b96fb9446b4908de79fcb9f619/header.jpg?t=1793811654
-cover1   = https://video.akamai.steamstatic.com/store_trailers/4262460/472360392/29ed2dc0b601be51727ef42f945a3359297b80f4/1786445423/dash_h264.mpd?t=1786450153
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/258546065bdba3f2dc14b476a6c0ba8caaf5b367/ss_258546065bdba3f2dc14b476a6c0ba8caaf5b367.1920x1080.jpg?t=1793811654
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/021a08079176959be882c88607b13727f49c470f/ss_021a08079176959be882c88607b13727f49c470f.1920x1080.jpg?t=1793811654
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/838584dd1348b5a85f8e9bc840fbfe2b689f556c/ss_838584dd1348b5a85f8e9bc840fbfe2b689f556c.1920x1080.jpg?t=1793811654
 cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/58c183d67d59bf7cfd5ab0554b452d4e4e371102/ss_58c183d67d59bf7cfd5ab0554b452d4e4e371102.1920x1080.jpg?t=1793811654
