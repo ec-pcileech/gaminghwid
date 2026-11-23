@@ -113,7 +113,7 @@ price30  = 19.99
 price90  = 44.99
 priceLife= 74.99
 discount = 10
-
+description=Deadlock is a multiplayer game in early development.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Deadlock Octarine Crack
@@ -138,8 +138,7 @@ price30  = 1200.99
 price90  = 1200.99 
 priceLife= 120.99
 discount = 90
-
-
+description=Deadlock is a multiplayer game in early development.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Counter-Strike: Source
@@ -167,7 +166,7 @@ price15  = 8.99
 price30  = 19.99       
 price90  = 59.99     
 priceLife= 109.99 
-
+description=Counter-Strike: Source blends Counter-Strike's award-winning teamplay action with the advanced technology of Source™ technology.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Rob Run
@@ -198,9 +197,7 @@ priceLife= 109.99
 hide = false
 Announcement1 = Please be careful using the risk feature, it could get you banned from the game.
 Announcement2 = According to the Discord information provided by the game, we are working on an HWID spoofer.\nAnd we’re adding more security features.
-
-
-
+description=ROB RUN is a brutal crime sandbox featuring thousands of players. Rise above everyone through the grit, the grime, and the struggle. Break free and take yourself from squalor by any means.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Battlefield 4™
@@ -228,9 +225,10 @@ price15  = 13.99
 price30  = 30.99       
 price90  = 69.99     
 priceLife= 119.99 
+description=Embrace unrivaled destruction in Battlefield 4™. Revel in the glorious chaos of all-out war packed with rewarding, tactical challenges in an interactive environment.
 
 # ───────────────────────────────────────────────────────────────────────────
-#  PUBG
+#  PUBG: BATTLEGROUNDS
 # ───────────────────────────────────────────────────────────────────────────
 [PUBG]
 title    = PUBG: BATTLEGROUNDS
@@ -255,7 +253,7 @@ price30  = 24.99
 price90  = 59.99
 priceLife= 99.99
 Announcement1 = The product is being updated, please wait a moment.
-
+description=PUBG: BATTLEGROUNDS, the high-stakes winner-take-all shooter that started the Battle Royale craze, is free-to-play! Drop into diverse maps, loot unique weapons and supplies, and survive in an ever-shrinking zone where every turn could be your last.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Escape from Tarkov 
@@ -284,7 +282,7 @@ price15  = 15.99
 price30  = 34.99
 price90  = 79.99
 priceLife= 129.99
-
+description=Escape from Tarkov is the original extraction FPS where every raid is a gamble with death. Prep your raid, bleed, endure and fight through ruthless PMC players and Scavs, gain tactical advantage and cling to your loot — only extraction decides if you live or lose it all.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Counter-Strike 1.6
@@ -313,6 +311,7 @@ price15  = 7.99
 price30  = 12.99
 price90  = 30.99
 priceLife= 49.99
+description=Play the world's number 1 online action game. Engage in an incredibly realistic brand of terrorist warfare in this wildly popular team-based game. Ally with teammates to complete strategic missions. Take out enemy sites. Rescue hostages. Your role affects your team's success. Your team's success affects your role.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Left 4 Dead 2
@@ -342,6 +341,7 @@ price30  = 19.99
 price90  = 30.99
 priceLife= 69.99
 Announcement1 = The latest version has been released
+description=Set in the zombie apocalypse, Left 4 Dead 2 is a co-operative action horror FPS takes you and your friends through the cities, swamps and cemeteries of the Deep South, from Savannah to New Orleans across five expansive campaigns.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Apex Legends
@@ -364,6 +364,7 @@ rel      = Feb 4, 2019
 genres   = Battle Royale, FPS
 features = Multiplayer, Anti-Cheat
 featured = false
+description=Apex Legends is the award-winning, free-to-play Hero Shooter from Respawn Entertainment. Master an ever-growing roster of legendary characters with powerful abilities, and experience strategic squad play and innovative gameplay in the next evolution of Hero Shooter and Battle Royale.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Rust
@@ -387,7 +388,7 @@ rel      = Dec 11, 2013
 genres   = Survival, Shooter
 features = Multiplayer, Early Access
 featured = false
-
+description=The only aim in Rust is to survive. Everything wants you to die - the island’s wildlife, other inhabitants, the environment, and other survivors. Do whatever it takes to last another night.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Grand Theft Auto V
@@ -410,13 +411,13 @@ genres   = Action, Open World
 features = Multiplayer
 featured = true
 status   = available
-
+description=Experience entertainment blockbusters Grand Theft Auto V and Grand Theft Auto Online — now upgraded for a new generation with stunning visuals, faster loading, 3D audio, and more, plus exclusive content for GTA Online players.
 
 # ───────────────────────────────────────────────────────────────────────────
-#  Rainbow Six Siege
+#  Tom Clancy's Rainbow Six Siege
 # ───────────────────────────────────────────────────────────────────────────
 [RAINBOW6]
-title    = Rainbow Six Siege
+title    = Tom Clancy's Rainbow Six Siege
 short    = R6 Siege
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/359550/header.jpg
 cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/2efed3587d876f560cbf3f25d9a72fbd387b74e6/ss_2efed3587d876f560cbf3f25d9a72fbd387b74e6.1920x1080.jpg?t=1790952963
@@ -433,7 +434,7 @@ rel      = Dec 1, 2015
 genres   = FPS, Tactical
 features = Multiplayer, Anti-Cheat
 featured = false
-
+description=Tom Clancy's Rainbow Six Siege is an elite, tactical team-based shooter where superior planning and execution triumph.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Call of Duty: Warzone
@@ -456,7 +457,7 @@ pub      = Activision
 rel      = Mar 10, 2020
 genres   = Battle Royale, FPS
 features = Multiplayer, Cross-Platform
-
+description=Welcome to Call of Duty®: Warzone™, the massive free-to-play combat arena.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Battlefield 2042
@@ -481,7 +482,7 @@ rel      = Nov 19, 2021
 genres   = FPS, Shooter
 features = Multiplayer
 featured = false
-
+description=Battlefield™ 2042 is a first-person shooter that marks the return to the iconic all-out warfare of the franchise.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  THE FINALS
@@ -504,7 +505,7 @@ rel      = Dec 7, 2023
 genres   = FPS, Shooter
 features = Multiplayer, Destruction
 featured = false
-
+description=THE FINALS is the ultimate free-to-play FPS Game Show. Compete across fast-paced Modes and stunning Arenas, with unparalleled, unscripted destruction that turns the environment into your greatest Weapon. Steal the Show!
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Marvel Rivals External
@@ -531,7 +532,7 @@ price15  = 7.99
 price30  = 12.99
 price90  = 30.99
 priceLife= 49.99
-
+description=Marvel Rivals is a Super Hero Team-Based PVP Shooter! Assemble an all-star Marvel squad, devise countless strategies by combining powers to form unique Team-Up skills and fight in destructible, ever-changing battlefields across the continually evolving Marvel universe!
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Marvel Rivals Internal
@@ -558,6 +559,7 @@ price15  = 12.99
 price30  = 28.99
 price90  = 65.99
 priceLife= 109.99
+description=Marvel Rivals is a Super Hero Team-Based PVP Shooter! Assemble an all-star Marvel squad, devise countless strategies by combining powers to form unique Team-Up skills and fight in destructible, ever-changing battlefields across the continually evolving Marvel universe!
 
 # ───────────────────────────────────────────────────────────────────────────
 #  FORTNITE
@@ -582,7 +584,7 @@ featured = false
 price30  = 29.99
 price90  = 59.99
 priceLife= 89.99
-
+description=Be the last player standing in Battle Royale and Zero Build, explore and survive in LEGO Fortnite, blast to the finish with Rocket Racing or headline a concert with Fortnite Festival.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Gray Zone Warfare
@@ -607,7 +609,7 @@ featured = false
 price30  = 39.99
 price90  = 69.99
 priceLife= 119.99
-
+description=Enter a high-stakes PvE-first open-world tactical shooter set on a quarantined Southeast Asian island torn apart by faction warfare. Deploy as an elite operator, fight solo or with your squad to carry out missions, earn reputation, and explore the truth behind the Event igniting the conflict.
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -633,7 +635,7 @@ featured = true
 price30  = 21.99
 price90  = 59.99
 priceLife= 89.99
-
+description=WARDOGS is a TACTICAL ALL OUT WARFARE FPS where one hundred players split across three teams fight over the control zone. Set in the derelict industrial mountains of Eastern Europe on a destructible battlefield where teamwork pays and cash is king.
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -659,7 +661,7 @@ featured = false
 price30  = 39.99
 price90  = 89.99
 priceLife= 149.99
-
+description=Every raid in Arena Breakout: Infinite is a gamble between glory and ruin. From intense PvP firefights to challenging PvE encounters, every decision carries risk, reward, and consequences. Outthink, outgun, and extract - before the zone swallows you whole. In Kamona, true victory belongs to those who can adapt, survive, and make it out with their loot.
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Ready or Not
@@ -683,7 +685,7 @@ featured = false
 price30  = 39.99
 price90  = 89.99
 priceLife= 149.99
-
+description=Ready or Not is an intense, tactical, first-person shooter that depicts a modern-day world in which SWAT police units are called to defuse hostile and confronting situations.
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -709,7 +711,7 @@ featured = false
 price30  = 26.53
 price90  = 63.61
 priceLife= 95.32
-
+description=Overwatch®, A FUTURE WORTH FIGHTING FOR! Overwatch® is an always-on and ever-evolving free-to-play, team-based action game set in an optimistic future, where every match is the ultimate 5v5 or 6v6 battlefield brawl.
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -737,7 +739,7 @@ featured = false
 price30  = 9.99
 price90  = 21.99
 priceLife= 58.99
-
+description=Hurtworld is a hardcore multiplayer survival FPS with a focus on competitive gunplay and strategic map control. Built for hardcore gamers, Hurtworld aims to punish.
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -765,7 +767,7 @@ featured = false
 price30  = 25.99
 price90  = 48.99
 priceLife= 78.99
-
+description=ARC Raiders is a multiplayer extraction adventure, set in a lethal future earth, ravaged by a mysterious mechanized threat known as ARC.
 
 
 # ───────────────────────────────────────────────────────────────────────────
@@ -793,7 +795,7 @@ featured = false
 price30  = 12.99
 price90  = 35.99
 priceLife= 68.99
-
+description=10 years of horror. 10 years of jump scares and close calls. 10 years of brutal sacrifices and thrilling escapes. Trapped forever in a realm of eldritch evil where even death is not an escape, four determined Survivors face a bloodthirsty Killer in a vicious game of nerve and wits.
 
 
 
@@ -823,3 +825,5 @@ featured = false
 price30  = 12.99
 price90  = 35.99
 priceLife= 68.99
+description=Nine distinct classes provide a broad range of tactical abilities and personalities. Constantly updated with new game modes, maps, equipment and, most importantly, hats!
+
