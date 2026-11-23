@@ -53,6 +53,7 @@
 #       Announcement1 = 公告,Announcement的数量取决与Announcement【1】后面数字
 #       status   = 游戏状态，共三种状态：available / updating / outdated 
 #       hide = false 正常显示游戏文件夹
+#       autorun     steam://rungameid/xxxxxx 这类协议链接；写了的话点「启动」会先拉起这个链接
 #
 #   · 新增游戏：复制一节，改代号和字段即可，无需重新编译
 # ═══════════════════════════════════════════════════════════════════════════
@@ -175,7 +176,7 @@ description=Counter-Strike: Source blends Counter-Strike's award-winning teampla
 title    = Rob Run
 short    = Rob Run
 icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/db8e0cf43c9475b96fb9446b4908de79fcb9f619/header.jpg?t=1793811654
-cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/258546065bdba3f2dc14b476a6c0ba8caaf5b367/ss_258546065bdba3f2dc14b476a6c0ba8caaf5b367.1920x1080.jpg?t=1793811654
+cover1   = https://video.akamai.steamstatic.com/store_trailers/4262460/472360392/29ed2dc0b601be51727ef42f945a3359297b80f4/1786445423/dash_h264.mpd?t=1786450153
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/021a08079176959be882c88607b13727f49c470f/ss_021a08079176959be882c88607b13727f49c470f.1920x1080.jpg?t=1793811654
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/838584dd1348b5a85f8e9bc840fbfe2b689f556c/ss_838584dd1348b5a85f8e9bc840fbfe2b689f556c.1920x1080.jpg?t=1793811654
 cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/58c183d67d59bf7cfd5ab0554b452d4e4e371102/ss_58c183d67d59bf7cfd5ab0554b452d4e4e371102.1920x1080.jpg?t=1793811654
@@ -195,10 +196,11 @@ price15  = 12.99
 price30  = 19.99       
 price90  = 59.99     
 priceLife= 109.99 
-hide = false
+hide     = false
 Announcement1 = Please be careful using the risk feature, it could get you banned from the game.
 Announcement2 = According to the Discord information provided by the game, we are working on an HWID spoofer.\nAnd we’re adding more security features.
 description=ROB RUN is a brutal crime sandbox featuring thousands of players. Rise above everyone through the grit, the grime, and the struggle. Break free and take yourself from squalor by any means.
+autorun  = steam://rungameid/4262460
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Battlefield 4™
