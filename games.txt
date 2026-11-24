@@ -91,6 +91,7 @@ price30  = 19.99
 price90  = 59.99     
 priceLife= 109.99 
 description= For over two decades, Counter-Strike has offered an elite competitive experience, one shaped by millions of players from across the globe. And now the next chapter in the CS story is about to begin. This is Counter-Strike 2.
+autorun  = steam://rungameid/730
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Deadlock
