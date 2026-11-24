@@ -20959,7 +20959,43 @@ __UI_SCRIPT__
   var DETAIL_IDX = 0;
   var HERO_TIMER = null;
 
-  function isVideoUrl(u){ return /\.(mp4|webm|ogv|m4v|mov)(\?.*)?$/i.test(u || ''); }
+  function isVideoUrl(u){ return /\.(mp4|webm|ogv|m4v|mov|m3u8|mpd)(\?.*)?$/i.test(u || ''); }
+  /* HLS(.m3u8) / DASH(.mpd) 播放：Chromium 内核的 <video> 不能直接认这两种清单文件，
+     要靠 hls.js / dash.js 把流解出来再喂给 <video>。普通 mp4/webm 等走原生 <video src>，不受影响。
+     两个库都是第一次真的碰到这种链接时才去 CDN 懒加载，不用的游戏完全不受影响、不占体积。 */
+  function streamKind(u){
+    if (/\.m3u8(\?.*)?$/i.test(u || '')) return 'hls';
+    if (/\.mpd(\?.*)?$/i.test(u || ''))  return 'dash';
+    return null;
+  }
+  var LIB_LOAD_P = {};
+  function loadLib(src, globalName){
+    if (window[globalName]) return Promise.resolve(window[globalName]);
+    if (LIB_LOAD_P[src]) return LIB_LOAD_P[src];
+    LIB_LOAD_P[src] = new Promise(function(resolve, reject){
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function(){ resolve(window[globalName]); };
+      s.onerror = function(){ delete LIB_LOAD_P[src]; reject(new Error('load failed: ' + src)); };
+      document.head.appendChild(s);
+    });
+    return LIB_LOAD_P[src];
+  }
+  function loadHlsJs(){ return loadLib('https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js', 'Hls'); }
+  function loadDashJs(){ return loadLib('https://cdn.jsdelivr.net/npm/dashjs@4.7.4/dist/dash.all.min.js', 'dashjs'); }
+  /* 把上一张幻灯片挂在这个 <video> 上的 hls.js / dash.js 播放器彻底销毁，换下一张媒体前必须先做这步，
+     不然每切一张图/视频就会多攒一个播放器实例，内存越用越多 */
+  function carDestroyStream(ctx){
+    if (!ctx) return;
+    if (ctx.streamPlayer) {
+      try {
+        if (ctx.streamKind === 'hls') ctx.streamPlayer.destroy();
+        else if (ctx.streamKind === 'dash') ctx.streamPlayer.reset();
+      } catch (e) {}
+    }
+    ctx.streamPlayer = null;
+    ctx.streamKind = null;
+  }
 
   /* 给每个游戏补一个 poster（不能是视频）：扫全部 cover，再退回 icon */
   function normalizeGames(){
@@ -21060,6 +21096,7 @@ __UI_SCRIPT__
     clearTimeout(ctx.timer);
     ctx.timer = 0;
     ctx.on = false;
+    carDestroyStream(ctx);
     var vid = document.getElementById(ctx.video);
     if (vid) {
       try { vid.pause(); } catch (e) {}
@@ -21099,16 +21136,49 @@ __UI_SCRIPT__
       if (vid) {
         var vbox = vid.parentNode;
         if (vbox) vbox.classList.add('loading');
-        if (vid.getAttribute('src') !== url) vid.setAttribute('src', url);
-        try { vid.currentTime = 0; } catch (e) {}
         var mark = function(){ if (token === ctx.idx) { vid.classList.add('on'); loadDone(vbox); } };
+        var kind = streamKind(url);
+        carDestroyStream(ctx);     /* 换媒体了：先把上一张可能挂着的 hls.js/dash.js 播放器清掉 */
+        if (!kind) {
+          /* 普通 mp4/webm/…：原生 <video src> 就能播，跟以前一样 */
+          vid.removeAttribute('src'); vid.load();
+          vid.setAttribute('src', url);
+          try { vid.currentTime = 0; } catch (e) {}
+          var pr = vid.play();
+          if (pr && pr.catch) pr.catch(function(){});
+        } else if (kind === 'hls' && vid.canPlayType('application/vnd.apple.mpegurl')) {
+          /* 极少数内核原生支持 HLS（比如 Safari）：直接当普通链接播，不用 hls.js */
+          vid.setAttribute('src', url);
+          var pr2 = vid.play();
+          if (pr2 && pr2.catch) pr2.catch(function(){});
+        } else if (kind === 'hls') {
+          loadHlsJs().then(function(Hls){
+            if (token !== ctx.idx || !Hls || !Hls.isSupported()) { mark(); return; }
+            var hls = new Hls({ enableWorker: true });
+            ctx.streamPlayer = hls; ctx.streamKind = 'hls';
+            hls.on(Hls.Events.MANIFEST_PARSED, mark);
+            hls.on(Hls.Events.ERROR, function(ev, data){ if (data && data.fatal) mark(); });
+            hls.loadSource(url);
+            hls.attachMedia(vid);
+            var pr3 = vid.play();
+            if (pr3 && pr3.catch) pr3.catch(function(){});
+          }).catch(mark);
+        } else if (kind === 'dash') {
+          loadDashJs().then(function(dashjs){
+            if (token !== ctx.idx || !dashjs) { mark(); return; }
+            var player = dashjs.MediaPlayer().create();
+            ctx.streamPlayer = player; ctx.streamKind = 'dash';
+            player.on(dashjs.MediaPlayer.events.CAN_PLAY, mark);
+            player.on(dashjs.MediaPlayer.events.ERROR, mark);
+            player.initialize(vid, url, true);
+          }).catch(mark);
+        }
         vid.addEventListener('loadeddata', mark);
         vid.addEventListener('canplay', mark);
         vid.addEventListener('error', mark);
-        var pr = vid.play();
-        if (pr && pr.catch) pr.catch(function(){});
       }
     } else {
+      carDestroyStream(ctx);
       if (vid) { try { vid.pause(); } catch (e) {} vid.classList.remove('on'); }
       if (img) {
         var ibox = img.parentNode;
