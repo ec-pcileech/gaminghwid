@@ -11,7 +11,7 @@
 #               · 改回 available 后，客户端约 1 分钟内自动恢复登录界面，无需重启
 #               · 也认：maintenance / maintain / maintaining / 维护中 / 维护 / 维修中
 #  ────────────────────────────────────────────────────────────────────────
-#APP_VERSION 3.2.1
+#APP_VERSION 3.2.2
 #APP_STATUS available
 #APP_DOWNLOAD https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/STARLINE.exe
 #
@@ -32,6 +32,9 @@
 #       download    下载直链
 #                   .exe / .dll  → 直接下载到 C:\ProgramData\STARLINE
 #                   压缩包       → 下载到同目录后静默解压，再按 runmode 挑文件
+#       runmodefile 压缩包解压（或者直接下载）出来的东西里，明确指定要运行/注入哪一个文件，
+#                   按文件名精确匹配（不区分大小写），比如 runmodefile = start.bat。不写就还是
+#                   默认逻辑：按 runmode 对应的扩展名（.exe/.dll/.bat）去找，挑最近修改的那个
 #       dev         开发商
 #       pub         发行商
 #       rel         发行日期（任意文本）
@@ -97,6 +100,7 @@ price30  = 19.99
 price90  = 59.99     
 priceLife= 109.99 
 steamid  = 730
+runmodefile = catalyst.exe
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Deadlock
