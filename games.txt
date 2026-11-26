@@ -11,7 +11,7 @@
 #               · 改回 available 后，客户端约 1 分钟内自动恢复登录界面，无需重启
 #               · 也认：maintenance / maintain / maintaining / 维护中 / 维护 / 维修中
 #  ────────────────────────────────────────────────────────────────────────
-#APP_VERSION 3.2.2
+#APP_VERSION 3.2.1
 #APP_STATUS available
 #APP_DOWNLOAD https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/STARLINE.exe
 #
@@ -36,6 +36,18 @@
 #       pub         发行商
 #       rel         发行日期（任意文本）
 #       description 游戏简介（详情页大标题下方那段文字）；别名：description = desc；不填就显示「当前游戏没有描述」（多语言，8 种内置语言都有，也能在客户端「自定义翻译」里改）
+#       autorun     steam://rungameid/xxxxxx 这类协议链接；写了的话点「启动」会先拉起这个链接
+#                   （Steam 弹登录/更新都跟 STARLINE 无关），等 process 那个进程真的跑完 + 10 秒宽限，
+#                   才会接着走下面的下载/exe/dll/zip/bat 流程；不写就是没有这一步，跟以前一样直接下载
+#       autorunProc  autorun 阶段单独指定要等哪个进程（默认跟 process 字段一样）；
+#                    游戏启动器和真正的游戏主程序不是同一个 exe 时用这个，比如很多虚幻引擎游戏，
+#                    Steam 配置里写的是启动器文件名，真正跑起来的其实是带 -Shipping 后缀的那个
+#       steamid     Steam 商店的 AppID（比如 https://store.steampowered.com/app/730 里的 730）。
+#                   写了的话 icon 和 cover 不用再手动贴链接——启动时自动从 Steam 商店 API 抓：
+#                   头图当 icon，预告片(同一条只取能播的最低画质版本，不会把同一个预告片的
+#                   几种画质都塞进去)+ 全部截图当 cover。语言跟着客户端当前界面语言走，没有
+#                   对应语言（含自定义翻译语言）就用英文。抓一次缓存 24 小时，抓失败就保留
+#                   下面手填的 icon/cover1..N，不会清空，所以这两种写法可以同时写、互为保险
 #       genres      类型，逗号分隔
 #       features    特性，逗号分隔
 #       featured    是否进首页 banner 精选轮播：true / false（不填 = false）
@@ -53,12 +65,6 @@
 #       Announcement1 = 公告,Announcement的数量取决与Announcement【1】后面数字
 #       status   = 游戏状态，共三种状态：available / updating / outdated 
 #       hide = false 正常显示游戏文件夹
-#       autorun     steam://rungameid/xxxxxx 这类协议链接；写了的话点「启动」会先拉起这个链接
-#                   （Steam 弹登录/更新都跟 STARLINE 无关），等 process 那个进程真的跑完 + 10 秒宽限，
-#                   才会接着走下面的下载/exe/dll/zip/bat 流程；不写就是没有这一步，跟以前一样直接下载
-#       autorunProc  autorun 阶段单独指定要等哪个进程（默认跟 process 字段一样）；
-#                    游戏启动器和真正的游戏主程序不是同一个 exe 时用这个，比如很多虚幻引擎游戏，
-#                    Steam 配置里写的是启动器文件名，真正跑起来的其实是带 -Shipping 后缀的那个
 #
 #   · 新增游戏：复制一节，改代号和字段即可，无需重新编译
 # ═══════════════════════════════════════════════════════════════════════════
@@ -77,7 +83,7 @@ cover3   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/73
 cover4   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/730/ss_ef82850f036dac5772cb07dbc2d1116ea13eb163.1920x1080.jpg?t=1789251637
 cover5   = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/730/ss_54b9c26b028c84d5f8a5316f31ae6203953ed84d.1920x1080.jpg?t=1789251637
 process  = cs2.exe
-runmode  = exe
+runmode  = dll
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_cs2.zip
 dev      = Valve
 pub      = Valve
@@ -90,8 +96,7 @@ price15  = 8.99
 price30  = 19.99       
 price90  = 59.99     
 priceLife= 109.99 
-description= For over two decades, Counter-Strike has offered an elite competitive experience, one shaped by millions of players from across the globe. And now the next chapter in the CS story is about to begin. This is Counter-Strike 2.
-autorun  = steam://rungameid/730
+steamid  = 730
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Deadlock
@@ -120,7 +125,7 @@ price30  = 19.99
 price90  = 44.99
 priceLife= 74.99
 discount = 10
-description=Deadlock is a multiplayer game in early development.
+steamid  = 1422450
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Deadlock Octarine Crack
@@ -145,7 +150,7 @@ price30  = 1200.99
 price90  = 1200.99 
 priceLife= 120.99
 discount = 90
-description=Deadlock is a multiplayer game in early development.
+steamid  = 1422450
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Counter-Strike: Source
@@ -173,7 +178,7 @@ price15  = 8.99
 price30  = 19.99       
 price90  = 59.99     
 priceLife= 109.99 
-description=Counter-Strike: Source blends Counter-Strike's award-winning teamplay action with the advanced technology of Source™ technology.
+steamid  = 240
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Rob Run
@@ -182,12 +187,11 @@ description=Counter-Strike: Source blends Counter-Strike's award-winning teampla
 title    = Rob Run
 short    = Rob Run
 icon     = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/db8e0cf43c9475b96fb9446b4908de79fcb9f619/header.jpg?t=1793811654
-cover1   = https://video.akamai.steamstatic.com/store_trailers/4262460/472360392/29ed2dc0b601be51727ef42f945a3359297b80f4/1786445423/dash_h264.mpd?t=1786450153
+cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/258546065bdba3f2dc14b476a6c0ba8caaf5b367/ss_258546065bdba3f2dc14b476a6c0ba8caaf5b367.1920x1080.jpg?t=1793811654
 cover2   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/021a08079176959be882c88607b13727f49c470f/ss_021a08079176959be882c88607b13727f49c470f.1920x1080.jpg?t=1793811654
 cover3   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/838584dd1348b5a85f8e9bc840fbfe2b689f556c/ss_838584dd1348b5a85f8e9bc840fbfe2b689f556c.1920x1080.jpg?t=1793811654
 cover4   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/58c183d67d59bf7cfd5ab0554b452d4e4e371102/ss_58c183d67d59bf7cfd5ab0554b452d4e4e371102.1920x1080.jpg?t=1793811654
 cover5   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/e16f10d92eeb37401f77be4fdee0d7cab70d4b6a/ss_e16f10d92eeb37401f77be4fdee0d7cab70d4b6a.1920x1080.jpg?t=1793811654
-cover6   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/4262460/258546065bdba3f2dc14b476a6c0ba8caaf5b367/ss_258546065bdba3f2dc14b476a6c0ba8caaf5b367.1920x1080.jpg?t=1793811654
 process  = ROB RUN.exe
 runmode  = bat
 download = https://raw.githubusercontent.com/ec-pcileech/gaminghwid/refs/heads/main/starline_robrun.zip
@@ -202,11 +206,10 @@ price15  = 12.99
 price30  = 19.99       
 price90  = 59.99     
 priceLife= 109.99 
-hide     = false
+hide = false
 Announcement1 = Please be careful using the risk feature, it could get you banned from the game.
 Announcement2 = According to the Discord information provided by the game, we are working on an HWID spoofer.\nAnd we’re adding more security features.
-description=ROB RUN is a brutal crime sandbox featuring thousands of players. Rise above everyone through the grit, the grime, and the struggle. Break free and take yourself from squalor by any means.
-autorun  = steam://rungameid/4262460
+steamid  = 4262460
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Battlefield 4™
@@ -234,10 +237,10 @@ price15  = 13.99
 price30  = 30.99       
 price90  = 69.99     
 priceLife= 119.99 
-description=Embrace unrivaled destruction in Battlefield 4™. Revel in the glorious chaos of all-out war packed with rewarding, tactical challenges in an interactive environment.
+steamid  = 1238860
 
 # ───────────────────────────────────────────────────────────────────────────
-#  PUBG: BATTLEGROUNDS
+#  PUBG
 # ───────────────────────────────────────────────────────────────────────────
 [PUBG]
 title    = PUBG: BATTLEGROUNDS
@@ -262,7 +265,7 @@ price30  = 24.99
 price90  = 59.99
 priceLife= 99.99
 Announcement1 = The product is being updated, please wait a moment.
-description=PUBG: BATTLEGROUNDS, the high-stakes winner-take-all shooter that started the Battle Royale craze, is free-to-play! Drop into diverse maps, loot unique weapons and supplies, and survive in an ever-shrinking zone where every turn could be your last.
+steamid  = 578080
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Escape from Tarkov 
@@ -291,7 +294,7 @@ price15  = 15.99
 price30  = 34.99
 price90  = 79.99
 priceLife= 129.99
-description=Escape from Tarkov is the original extraction FPS where every raid is a gamble with death. Prep your raid, bleed, endure and fight through ruthless PMC players and Scavs, gain tactical advantage and cling to your loot — only extraction decides if you live or lose it all.
+steamid  = 3932890
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Counter-Strike 1.6
@@ -320,7 +323,7 @@ price15  = 7.99
 price30  = 12.99
 price90  = 30.99
 priceLife= 49.99
-description=Play the world's number 1 online action game. Engage in an incredibly realistic brand of terrorist warfare in this wildly popular team-based game. Ally with teammates to complete strategic missions. Take out enemy sites. Rescue hostages. Your role affects your team's success. Your team's success affects your role.
+steamid  = 10
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Left 4 Dead 2
@@ -350,7 +353,7 @@ price30  = 19.99
 price90  = 30.99
 priceLife= 69.99
 Announcement1 = The latest version has been released
-description=Set in the zombie apocalypse, Left 4 Dead 2 is a co-operative action horror FPS takes you and your friends through the cities, swamps and cemeteries of the Deep South, from Savannah to New Orleans across five expansive campaigns.
+steamid  = 550
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Apex Legends
@@ -373,7 +376,7 @@ rel      = Feb 4, 2019
 genres   = Battle Royale, FPS
 features = Multiplayer, Anti-Cheat
 featured = false
-description=Apex Legends is the award-winning, free-to-play Hero Shooter from Respawn Entertainment. Master an ever-growing roster of legendary characters with powerful abilities, and experience strategic squad play and innovative gameplay in the next evolution of Hero Shooter and Battle Royale.
+steamid  = 1172470
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Rust
@@ -397,7 +400,7 @@ rel      = Dec 11, 2013
 genres   = Survival, Shooter
 features = Multiplayer, Early Access
 featured = false
-description=The only aim in Rust is to survive. Everything wants you to die - the island’s wildlife, other inhabitants, the environment, and other survivors. Do whatever it takes to last another night.
+steamid  = 252490
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Grand Theft Auto V
@@ -420,13 +423,13 @@ genres   = Action, Open World
 features = Multiplayer
 featured = true
 status   = available
-description=Experience entertainment blockbusters Grand Theft Auto V and Grand Theft Auto Online — now upgraded for a new generation with stunning visuals, faster loading, 3D audio, and more, plus exclusive content for GTA Online players.
+steamid  = 3240220
 
 # ───────────────────────────────────────────────────────────────────────────
-#  Tom Clancy's Rainbow Six Siege
+#  Rainbow Six Siege
 # ───────────────────────────────────────────────────────────────────────────
 [RAINBOW6]
-title    = Tom Clancy's Rainbow Six Siege
+title    = Rainbow Six Siege
 short    = R6 Siege
 icon     = https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/359550/header.jpg
 cover1   = https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/359550/2efed3587d876f560cbf3f25d9a72fbd387b74e6/ss_2efed3587d876f560cbf3f25d9a72fbd387b74e6.1920x1080.jpg?t=1790952963
@@ -443,7 +446,7 @@ rel      = Dec 1, 2015
 genres   = FPS, Tactical
 features = Multiplayer, Anti-Cheat
 featured = false
-description=Tom Clancy's Rainbow Six Siege is an elite, tactical team-based shooter where superior planning and execution triumph.
+steamid  = 359550
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Call of Duty: Warzone
@@ -466,7 +469,7 @@ pub      = Activision
 rel      = Mar 10, 2020
 genres   = Battle Royale, FPS
 features = Multiplayer, Cross-Platform
-description=Welcome to Call of Duty®: Warzone™, the massive free-to-play combat arena.
+steamid  = 1962663
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Battlefield 2042
@@ -491,7 +494,7 @@ rel      = Nov 19, 2021
 genres   = FPS, Shooter
 features = Multiplayer
 featured = false
-description=Battlefield™ 2042 is a first-person shooter that marks the return to the iconic all-out warfare of the franchise.
+steamid  = 1517290
 
 # ───────────────────────────────────────────────────────────────────────────
 #  THE FINALS
@@ -514,7 +517,7 @@ rel      = Dec 7, 2023
 genres   = FPS, Shooter
 features = Multiplayer, Destruction
 featured = false
-description=THE FINALS is the ultimate free-to-play FPS Game Show. Compete across fast-paced Modes and stunning Arenas, with unparalleled, unscripted destruction that turns the environment into your greatest Weapon. Steal the Show!
+steamid  = 2073850
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Marvel Rivals External
@@ -541,7 +544,7 @@ price15  = 7.99
 price30  = 12.99
 price90  = 30.99
 priceLife= 49.99
-description=Marvel Rivals is a Super Hero Team-Based PVP Shooter! Assemble an all-star Marvel squad, devise countless strategies by combining powers to form unique Team-Up skills and fight in destructible, ever-changing battlefields across the continually evolving Marvel universe!
+steamid  = 2767030
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Marvel Rivals Internal
@@ -568,7 +571,7 @@ price15  = 12.99
 price30  = 28.99
 price90  = 65.99
 priceLife= 109.99
-description=Marvel Rivals is a Super Hero Team-Based PVP Shooter! Assemble an all-star Marvel squad, devise countless strategies by combining powers to form unique Team-Up skills and fight in destructible, ever-changing battlefields across the continually evolving Marvel universe!
+steamid  = 2767030
 
 # ───────────────────────────────────────────────────────────────────────────
 #  FORTNITE
@@ -593,7 +596,7 @@ featured = false
 price30  = 29.99
 price90  = 59.99
 priceLife= 89.99
-description=Be the last player standing in Battle Royale and Zero Build, explore and survive in LEGO Fortnite, blast to the finish with Rocket Racing or headline a concert with Fortnite Festival.
+steamid  = 
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Gray Zone Warfare
@@ -618,8 +621,7 @@ featured = false
 price30  = 39.99
 price90  = 69.99
 priceLife= 119.99
-description=Enter a high-stakes PvE-first open-world tactical shooter set on a quarantined Southeast Asian island torn apart by faction warfare. Deploy as an elite operator, fight solo or with your squad to carry out missions, earn reputation, and explore the truth behind the Event igniting the conflict.
-
+steamid  = 2479810
 
 # ───────────────────────────────────────────────────────────────────────────
 #  WARDOGS
@@ -644,8 +646,7 @@ featured = true
 price30  = 21.99
 price90  = 59.99
 priceLife= 89.99
-description=WARDOGS is a TACTICAL ALL OUT WARFARE FPS where one hundred players split across three teams fight over the control zone. Set in the derelict industrial mountains of Eastern Europe on a destructible battlefield where teamwork pays and cash is king.
-
+steamid  = 1867240
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Arena Breakout: Infinite
@@ -670,7 +671,7 @@ featured = false
 price30  = 39.99
 price90  = 89.99
 priceLife= 149.99
-description=Every raid in Arena Breakout: Infinite is a gamble between glory and ruin. From intense PvP firefights to challenging PvE encounters, every decision carries risk, reward, and consequences. Outthink, outgun, and extract - before the zone swallows you whole. In Kamona, true victory belongs to those who can adapt, survive, and make it out with their loot.
+steamid  = 2073620
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Ready or Not
@@ -694,8 +695,7 @@ featured = false
 price30  = 39.99
 price90  = 89.99
 priceLife= 149.99
-description=Ready or Not is an intense, tactical, first-person shooter that depicts a modern-day world in which SWAT police units are called to defuse hostile and confronting situations.
-
+steamid  = 1144200
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Overwatch®
@@ -720,8 +720,7 @@ featured = false
 price30  = 26.53
 price90  = 63.61
 priceLife= 95.32
-description=Overwatch®, A FUTURE WORTH FIGHTING FOR! Overwatch® is an always-on and ever-evolving free-to-play, team-based action game set in an optimistic future, where every match is the ultimate 5v5 or 6v6 battlefield brawl.
-
+steamid  = 2357570
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Hurtworld
@@ -748,8 +747,7 @@ featured = false
 price30  = 9.99
 price90  = 21.99
 priceLife= 58.99
-description=Hurtworld is a hardcore multiplayer survival FPS with a focus on competitive gunplay and strategic map control. Built for hardcore gamers, Hurtworld aims to punish.
-
+steamid  = 393420
 
 # ───────────────────────────────────────────────────────────────────────────
 #  ARC Raiders
@@ -776,8 +774,7 @@ featured = false
 price30  = 25.99
 price90  = 48.99
 priceLife= 78.99
-description=ARC Raiders is a multiplayer extraction adventure, set in a lethal future earth, ravaged by a mysterious mechanized threat known as ARC.
-
+steamid  = 1808500
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Dead by Daylight
@@ -804,9 +801,7 @@ featured = false
 price30  = 12.99
 price90  = 35.99
 priceLife= 68.99
-description=10 years of horror. 10 years of jump scares and close calls. 10 years of brutal sacrifices and thrilling escapes. Trapped forever in a realm of eldritch evil where even death is not an escape, four determined Survivors face a bloodthirsty Killer in a vicious game of nerve and wits.
-
-
+steamid  = 381210
 
 # ───────────────────────────────────────────────────────────────────────────
 #  Team Fortress 2
@@ -834,5 +829,4 @@ featured = false
 price30  = 12.99
 price90  = 35.99
 priceLife= 68.99
-description=Nine distinct classes provide a broad range of tactical abilities and personalities. Constantly updated with new game modes, maps, equipment and, most importantly, hats!
-
+steamid  = 440
