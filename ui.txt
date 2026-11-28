@@ -16165,6 +16165,17 @@ button.detail-pill:hover{border-color:var(--border-3,var(--accent-2));background
 .about-modal{max-width:460px}
 .about-meta-grid{padding:20px 26px 26px}
 
+/* Steam 抓取中：卡片缩略图 / 详情页右上角那个游戏图标胶囊上扫一道光，呼吸灯一样提示"正在刷新" */
+@keyframes steamShimmer{0%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.card.steam-loading .card-img{position:relative;overflow:hidden}
+.card.steam-loading .card-img::after,
+.detail-game-pill.steam-loading::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);
+  animation:steamShimmer 1.3s ease-in-out infinite;
+}
+.detail-game-pill.steam-loading{position:relative;overflow:hidden}
+
 @media(max-width:860px){
   .detail-pill-txt b,.detail-pill-txt small{max-width:120px}
   .detail-head{max-width:100%;padding-right:26px}
@@ -21015,7 +21026,7 @@ __UI_SCRIPT__
   normalizeGames();
 
   /* 宿主在后台拉到新的 games.txt 时会推一份过来：就地换掉并重刷界面，不用重启 */
-  function applyGamesUpdate(json, orderCsv){
+  function applyGamesUpdate(json, orderCsv, silent){
     var next = null;
     try { next = (typeof json === 'string') ? JSON.parse(json) : json; } catch (e) { next = null; }
     if (!next || typeof next !== 'object') return false;
@@ -21049,8 +21060,35 @@ __UI_SCRIPT__
     if (CURRENT_GAME && !GAMES[CURRENT_GAME]) closeDetail();
     else if (CURRENT_GAME) renderDetailAnn(CURRENT_GAME);   /* 后台更新 games.txt 后，公告也实时刷新 */
     if (typeof PANE !== 'undefined' && PANE.code && !GAMES[PANE.code]) paneHide();
-    toast(uiT('gamesUpdated'), 'ok', 2600);
+    if (!silent) toast(uiT('gamesUpdated'), 'ok', 2600);
     return true;
+  }
+
+  /* Steam 抓取中/抓取完成：给卡片的缩略图加一个呼吸灯一样的加载态，抓完/抓失败都会收起来 */
+  function steamLoadingSet(code, on){
+    var cards = document.querySelectorAll('#grid .card');
+    for (var i = 0; i < cards.length; i++) {
+      if (cards[i].getAttribute('data-game') === code) cards[i].classList.toggle('steam-loading', on);
+    }
+    var pill = document.querySelector('.detail-game-pill');
+    if (CURRENT_GAME === code && pill) pill.classList.toggle('steam-loading', on);
+  }
+  /* Steam 数据抓完：如果正好开着这个游戏的详情页，把标题/图标/简介/背景跟着刷新一遍
+     （STEAMUPD 已经把 GAMES[code] 换成新数据了，这里只是把已经打开的详情页重新套一遍） */
+  function refreshDetailFromGames(code){
+    var meta = GAMES[code];
+    if (!meta) return;
+    var tEl = document.getElementById('detailTitle'); if (tEl) tEl.textContent = meta.title || code;
+    var pEl = document.getElementById('detailPillTitle'); if (pEl) pEl.textContent = meta.title || code;
+    var iEl = document.getElementById('detailIcon'); if (iEl) iEl.src = meta.img || meta.poster || '';
+    var dEl = document.getElementById('detailDesc');
+    if (dEl) {
+      var dTxt = String(meta.desc || meta.description || '').trim();
+      dEl.textContent = dTxt || uiT('noDescription');
+      dEl.classList.toggle('empty', !dTxt);
+      dEl.hidden = false;
+    }
+    if (DETAIL_BG) { carStop(DETAIL_BG); carStart(DETAIL_BG, code, mediaItems(code)); }
   }
 
 
@@ -25392,6 +25430,23 @@ __UI_SCRIPT__
       var gJson = (nl >= 0) ? gBody.slice(0, nl) : gBody;
       var gOrder = (nl >= 0) ? gBody.slice(nl + 1) : '';
       if (typeof applyGamesUpdate === 'function') applyGamesUpdate(gJson, gOrder);
+    }
+    else if (msg.indexOf('STEAMUPD:') === 0) {
+      /* 某个 steamid 游戏的 Steam 抓取完成：数据格式跟 GAMESUPD 一样，但不弹"游戏列表已更新"
+         （一个个游戏抓完都弹会很吵），而且会顺手把当前正打开的详情页也跟着刷新 */
+      var sBody = msg.slice(9);
+      var snl = sBody.indexOf('\n');
+      var sJson = (snl >= 0) ? sBody.slice(0, snl) : sBody;
+      var sOrder = (snl >= 0) ? sBody.slice(snl + 1) : '';
+      if (typeof applyGamesUpdate === 'function') applyGamesUpdate(sJson, sOrder, true);
+    }
+    else if (msg.indexOf('STEAM_LOADING:') === 0) {
+      steamLoadingSet(msg.slice(14), true);
+    }
+    else if (msg.indexOf('STEAM_LOADED:') === 0) {
+      var slParts = msg.slice(13).split(':');
+      steamLoadingSet(slParts[0], false);
+      if (CURRENT_GAME === slParts[0] && slParts[1] === '1') refreshDetailFromGames(CURRENT_GAME);
     }
     else if (msg.indexOf('GAMEANN:') === 0) {
       /* 宿主后台拉到新的 games.txt，且只有公告变了：GAMEANN:{"CS2":["…"],…}
